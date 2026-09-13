@@ -1,0 +1,29 @@
+node_modules/
+dist/
+playwright-report/
+test-results/
+.env
+.env.*
+!.env.example
+.DS_Store
+.local-tools/
+
+# Python application and local verification
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+.venv/
+server/.coverage
+
+# Local design reviews and generated archives
+design-previews/
+*.log
+*.zip
+*.sqlite
+*.sqlite3
+*.db
+*.pem
+*.key
+backups/

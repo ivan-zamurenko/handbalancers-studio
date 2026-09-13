@@ -1,0 +1,23 @@
+# Only explicitly needed build inputs enter the Docker context.
+**
+!server/
+!server/Dockerfile
+!server/pyproject.toml
+!server/requirements.lock
+!server/alembic.ini
+!server/alembic/
+!server/alembic/**
+!server/studio/
+!server/studio/**
+!server/templates/
+!server/templates/**
+!server/static/
+!server/static/**
+!deploy/
+!deploy/healthcheck.py
+**/__pycache__/
+**/*.pyc
+**/.env
+**/.env.*
+**/*.pem
+**/*.key

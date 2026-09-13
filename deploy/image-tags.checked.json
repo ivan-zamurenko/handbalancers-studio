@@ -1,0 +1,25 @@
+{
+  "checked_on": "2026-09-13",
+  "method": "Read-only Docker Hub v2 public tag metadata over verified TLS; no image layers downloaded",
+  "runtime_verified": false,
+  "tags": [
+    {
+      "image": "postgres:17.11-bookworm",
+      "source": "https://hub.docker.com/v2/repositories/library/postgres/tags/17.11-bookworm",
+      "tag_status": "active",
+      "architectures": ["386", "amd64", "arm", "arm64", "ppc64le"]
+    },
+    {
+      "image": "nginx:1.30.4-alpine",
+      "source": "https://hub.docker.com/v2/repositories/library/nginx/tags/1.30.4-alpine",
+      "tag_status": "active",
+      "architectures": ["386", "amd64", "arm", "arm64", "ppc64le", "riscv64", "s390x"]
+    },
+    {
+      "image": "certbot/certbot:v5.8.0",
+      "source": "https://hub.docker.com/v2/repositories/certbot/certbot/tags/v5.8.0",
+      "tag_status": "active",
+      "architectures": ["amd64", "arm", "arm64"]
+    }
+  ]
+}

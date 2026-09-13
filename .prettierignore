@@ -1,0 +1,9 @@
+node_modules/
+dist/
+playwright-report/
+test-results/
+public/images/
+.local-tools/
+design-previews/
+AGENTS.md
+PROJECT_MEMORY.md
