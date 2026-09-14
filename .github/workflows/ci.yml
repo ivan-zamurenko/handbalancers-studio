@@ -97,6 +97,15 @@ jobs:
     timeout-minutes: 25
     needs: quality
 
+    # The account flow script also builds Settings() to seed a simulated
+    # entitlement, so every step needs the same configuration, not just the one
+    # that starts the server.
+    env:
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@127.0.0.1:5432/studio
+      APP_ENV: development
+      LOCAL_PREVIEW: 'true'
+      BASE_URL: http://127.0.0.1:8000
+
     services:
       postgres:
         image: postgres:14-alpine
@@ -142,11 +151,6 @@ jobs:
       # The preview endpoints the browser scripts rely on stay disabled unless
       # LOCAL_PREVIEW is set, and it is only accepted on a loopback BASE_URL.
       - name: Start the application
-        env:
-          DATABASE_URL: postgresql+psycopg://postgres:postgres@127.0.0.1:5432/studio
-          APP_ENV: development
-          LOCAL_PREVIEW: 'true'
-          BASE_URL: http://127.0.0.1:8000
         working-directory: server
         run: |
           alembic upgrade head

@@ -2,8 +2,14 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
+import { existsSync } from 'node:fs';
 import { chromium, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+
+// The isolated interpreter exists only on the development machine, so CI runners
+// fall back to the platform python instead of failing on a missing path.
+const isolatedPython = '.local-tools/python/bin/python';
+const python = process.env.PYTHON_BIN || (existsSync(isolatedPython) ? isolatedPython : 'python3');
 
 const email = `browser-flow-${randomBytes(8).toString('hex')}@example.invalid`;
 const password = randomBytes(24).toString('base64url');
@@ -39,7 +45,7 @@ try {
   await expect(page.locator('#email-code')).toBeVisible();
   assert.equal((await session()).user, null, 'No account until email is verified');
   const code = execFileSync(
-    '.local-tools/python/bin/python',
+    python,
     [
       '-c',
       `
@@ -83,7 +89,7 @@ else: raise SystemExit(1)
   assert.equal(blocked, 402);
   // Create a clearly simulated entitlement only for this randomly named local test account.
   execFileSync(
-    '.local-tools/python/bin/python',
+    python,
     [
       '-c',
       `
