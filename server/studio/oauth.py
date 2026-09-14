@@ -1,6 +1,7 @@
 """Provider identities use verified issuer + subject, never automatic email linking."""
 
 import hmac
+import json
 import secrets
 from datetime import timedelta
 from typing import Literal
@@ -181,9 +182,24 @@ def finish_login(factory, settings, provider, attempt, claims, response):
             email = claims.get("email") if claims.get("email_verified") in {True, "true"} else None
             if not isinstance(email, str) or len(email) > 320:
                 email = None
+            if not email:
+                raise ValueError("A verified email is required")
+            if email and db.scalar(
+                select(User.id).where(User.email == email.lower(), User.is_demo.is_(False))
+            ):
+                raise ValueError("Use the existing sign-in method for this email")
             # Display name is never used as an authorization or account-linking identifier.
             name = str(claims.get("name") or "Handbalancer")[:100]
-            user = User(name=name, email=email, is_demo=False)
+            first_name = str(claims.get("given_name") or name)[:48]
+            last_name = str(claims.get("family_name") or "")[:48]
+            user = User(
+                name=name,
+                first_name=first_name,
+                last_name=last_name,
+                email=email.lower() if email else None,
+                email_verified_at=utcnow() if email else None,
+                is_demo=False,
+            )
             db.add(user)
             db.flush()
             db.add(Identity(user_id=user.id, provider=provider, subject=claims["sub"]))
@@ -194,7 +210,7 @@ def finish_login(factory, settings, provider, attempt, claims, response):
 @router.api_route("/{provider}/callback", methods=["GET", "POST"])
 async def callback(provider: Provider, request: Request):
     settings = request.app.state.settings
-    response = RedirectResponse("/plans", status_code=303)
+    response = RedirectResponse("/checkout", status_code=303)
     response.delete_cookie(OAUTH_COOKIE, path="/auth", secure=settings.secure_cookies)
     if not settings.providers[provider]:
         return RedirectResponse("/register?auth_error=unavailable", status_code=303)
@@ -211,6 +227,16 @@ async def callback(provider: Provider, request: Request):
             request.cookies.get(OAUTH_COOKIE, ""),
         )
         claims = await verified_claims(settings, provider, code, attempt)
+        if provider == "apple" and params.get("user"):
+            try:
+                # Apple supplies names only on the first authorization; never trust its email here.
+                details = json.loads(str(params["user"]))
+                names = details.get("name", {})
+                claims["given_name"] = str(names.get("firstName", ""))[:48]
+                claims["family_name"] = str(names.get("lastName", ""))[:48]
+                claims["name"] = f"{claims['given_name']} {claims['family_name']}".strip()
+            except (ValueError, TypeError, AttributeError):
+                pass
         await run_in_threadpool(
             finish_login,
             request.app.state.session_factory,

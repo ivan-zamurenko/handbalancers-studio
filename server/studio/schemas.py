@@ -25,7 +25,7 @@ class OnboardingInput(StrictBody):
     goals: list[Goal] = Field(min_length=1, max_length=4)
     experience: Literal["beginner", "intermediate", "advanced"]
     days: list[Annotated[StrictInt, Field(ge=0, le=6)]] = Field(min_length=1, max_length=3)
-    minutes: Literal[30, 45, 60]
+    minutes: Literal[30, 45, 60, 90]
     minutes_plus: StrictBool = False
     timezone: str = Field(min_length=1, max_length=64)
     locale: Literal["uk", "en"] = "uk"
@@ -76,3 +76,45 @@ class PreviewRegistration(StrictBody):
 
 class CheckoutInput(StrictBody):
     plan_id: PlanId
+
+
+class ProfileInput(StrictBody):
+    first_name: str = Field(min_length=1, max_length=48)
+    last_name: str = Field(min_length=1, max_length=48)
+
+    @field_validator("first_name", "last_name")
+    @classmethod
+    def plain_person_name(cls, value):
+        value = value.strip()
+        if not value:
+            raise ValueError("Use a plain name")
+        if any(ord(char) < 32 or char in "<>" for char in value):
+            raise ValueError("Use a plain name")
+        return value
+
+
+class EmailLogin(StrictBody):
+    # Passwords must never be trimmed or included in repr/validation responses.
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=False, hide_input_in_errors=True)
+    email: str = Field(min_length=3, max_length=254)
+    password: str = Field(min_length=12, max_length=128, repr=False)
+
+    @field_validator("email")
+    @classmethod
+    def normalized_email(cls, value):
+        import re
+
+        value = value.strip().lower()
+        if not re.fullmatch(
+            r"[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?\.[a-z]{2,63}", value
+        ):
+            raise ValueError("Use a valid email address")
+        return value
+
+
+class EmailRegistration(EmailLogin, ProfileInput):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=False, hide_input_in_errors=True)
+
+
+class VerificationInput(StrictBody):
+    code: str = Field(pattern=r"^[0-9]{6}$", repr=False)

@@ -21,7 +21,8 @@ from studio.settings import Settings
         {"days": [True]},
         {"days": [7]},
         {"days": ["1"]},
-        {"minutes": 90},
+        {"minutes": 75},
+        {"minutes": 90, "minutes_plus": True},
         {"minutes": 15},
         {"minutes": 20},
         {"minutes_plus": True},
@@ -44,7 +45,7 @@ def test_onboarding_normalizes_week_order(answers):
 
 
 @pytest.mark.parametrize(
-    "minutes, minutes_plus", [(30, False), (45, False), (60, False), (60, True)]
+    "minutes, minutes_plus", [(30, False), (45, False), (60, False), (60, True), (90, False)]
 )
 @pytest.mark.parametrize("days", [[0], [1, 3], [0, 2, 6]])
 def test_current_time_and_day_choices(answers, minutes, minutes_plus, days):

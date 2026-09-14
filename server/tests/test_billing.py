@@ -32,6 +32,7 @@ def paid_checkout():
     )
     checkout = {
         "id": "cs_fixture",
+        "status": "complete",
         "mode": "subscription",
         "payment_status": "paid",
         "client_reference_id": str(attempt.user_id),
@@ -261,3 +262,228 @@ def test_checkout_reuses_same_plan_and_expires_previous_plan(db_factory, setting
         with pytest.raises(HTTPException) as exc:
             begin_checkout(db, settings, user, "pro", gateway)
         assert exc.value.status_code == 409
+
+
+@pytest.fixture
+def trial_checkout(paid_checkout):
+    attempt, checkout = paid_checkout
+    attempt.trial_days = 7
+    checkout["amount_total"] = 0
+    checkout["payment_status"] = "no_payment_required"
+    checkout["subscription"].update(
+        status="trialing", trial_start=int(time.time()), trial_end=int(time.time()) + 7 * 86400
+    )
+    checkout["subscription"].pop("current_period_end")
+    return attempt, checkout
+
+
+def test_trial_zero_charge_requires_approved_trial_and_valid_dates(trial_checkout):
+    attempt, checkout = trial_checkout
+    validate_paid_checkout(attempt, checkout)
+    assert period_end(checkout["subscription"]).timestamp() == checkout["subscription"]["trial_end"]
+    attempt.trial_days = 0
+    with pytest.raises(BillingUnavailable):
+        validate_paid_checkout(attempt, checkout)
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        {"amount_total": 4999},
+        {"payment_status": "unpaid"},
+        {"status": "open"},
+        {"client_reference_id": "another-user"},
+        {"currency": "usd"},
+    ],
+)
+def test_trial_rejects_mismatched_checkout(trial_checkout, change):
+    attempt, checkout = trial_checkout
+    with pytest.raises(BillingUnavailable):
+        validate_paid_checkout(attempt, checkout | change)
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        {"trial_end": 1},
+        {"trial_start": None},
+        {"trial_end": int(time.time()) + 8 * 86400},
+        {"status": "active"},
+    ],
+)
+def test_trial_rejects_invalid_subscription(trial_checkout, change):
+    attempt, checkout = trial_checkout
+    checkout["subscription"].update(change)
+    with pytest.raises(BillingUnavailable):
+        validate_paid_checkout(attempt, checkout)
+
+
+def test_gateway_requires_card_and_only_adds_trial_when_authorized(
+    monkeypatch, settings, paid_checkout
+):
+    from types import SimpleNamespace
+
+    import stripe
+
+    attempt, _ = paid_checkout
+    captured = []
+    monkeypatch.setattr(
+        stripe.Price,
+        "retrieve",
+        lambda *a, **k: {
+            "active": True,
+            "unit_amount": 4999,
+            "currency": "eur",
+            "recurring": {"interval": "month", "interval_count": 1},
+        },
+    )
+
+    def create(**kwargs):
+        captured.append(kwargs)
+        return SimpleNamespace(id="cs_fixture", url="https://checkout.stripe.com/fixture")
+
+    monkeypatch.setattr(stripe.checkout.Session, "create", create)
+    for days in (0, 7):
+        attempt.trial_days = days
+        StripeGateway(settings).create_checkout(attempt)
+    assert captured[0]["payment_method_collection"] == "always"
+    assert "trial_period_days" not in captured[0]["subscription_data"]
+    assert captured[1]["subscription_data"]["trial_period_days"] == 7
+
+
+@pytest.mark.postgres
+def test_successful_trial_is_consumed_once_and_cancellation_is_synced(db_factory, trial_checkout):
+    with db_factory() as db:
+        attempt, checkout = seed_checkout(db, trial_checkout)
+        checkout["subscription"]["cancel_at_period_end"] = True
+        gateway = FakeGateway(checkout)
+        apply_webhook(db, completion_event(checkout), gateway)
+        first_use = db.get(User, attempt.user_id).trial_used_at
+        assert first_use is not None
+        assert db.get(Subscription, attempt.user_id).status == "trialing"
+        assert db.get(Subscription, attempt.user_id).cancel_at_period_end is True
+        apply_webhook(db, completion_event(checkout), gateway)
+        assert db.get(User, attempt.user_id).trial_used_at == first_use
+
+
+@pytest.mark.postgres
+@pytest.mark.parametrize(
+    "plan,used,days",
+    [
+        ("essential", False, 7),
+        ("plus", False, 7),
+        ("pro", False, 0),
+        ("pro_plus", False, 0),
+        ("plus", True, 0),
+    ],
+)
+def test_trial_eligibility_is_server_owned(db_factory, settings, plan, used, days):
+    from pydantic import SecretStr
+
+    settings.stripe_secret_key = SecretStr("test-fixture-only")
+    settings.stripe_webhook_secret = SecretStr("test-fixture-only")
+    for name in ("essential", "plus", "pro", "pro_plus"):
+        setattr(settings, "stripe_price_" + name, "price_" + name)
+    with db_factory() as db:
+        user = User(name="Fixture", trial_used_at=utcnow() if used else None)
+        db.add(user)
+        db.commit()
+        begin_checkout(db, settings, user, plan, FakeGateway({}))
+        attempt = db.scalar(select(CheckoutAttempt).where(CheckoutAttempt.user_id == user.id))
+        assert attempt.trial_days == days
+        assert user.trial_used_at is None if not used else user.trial_used_at is not None
+
+
+def test_cancel_renewal_preserves_period(monkeypatch, settings):
+    import stripe
+
+    def modify(sub_id, **kwargs):
+        assert sub_id == "sub_fixture"
+        assert kwargs["cancel_at_period_end"] is True
+        return {"id": sub_id, "status": "trialing", "cancel_at_period_end": True}
+
+    monkeypatch.setattr(stripe.Subscription, "modify", modify)
+    assert StripeGateway(settings).cancel_at_period_end("sub_fixture")["status"] == "trialing"
+
+
+@pytest.mark.parametrize("plan", ["pro", "pro_plus"])
+def test_free_checkout_is_rejected_for_mentor_plans(trial_checkout, plan):
+    attempt, checkout = trial_checkout
+    attempt.plan_id = plan
+    with pytest.raises(BillingUnavailable):
+        validate_paid_checkout(attempt, checkout)
+
+
+@pytest.mark.postgres
+def test_switch_after_lost_response_recovers_same_attempt_before_expiring(db_factory, settings):
+    from pydantic import SecretStr
+
+    settings.stripe_secret_key = SecretStr("test-fixture-only")
+    settings.stripe_webhook_secret = SecretStr("test-fixture-only")
+    for plan in ("essential", "plus", "pro", "pro_plus"):
+        setattr(settings, "stripe_price_" + plan, "price_" + plan)
+
+    class LostResponseGateway(FakeGateway):
+        def create_checkout(self, attempt):
+            result = super().create_checkout(attempt)
+            if len(self.created) == 1:
+                raise BillingUnavailable("Simulated lost response")
+            return result
+
+    with db_factory() as db:
+        user = User(name="Retry")
+        db.add(user)
+        db.commit()
+        gateway = LostResponseGateway({})
+        with pytest.raises(HTTPException) as error:
+            begin_checkout(db, settings, user, "essential", gateway)
+        assert error.value.status_code == 503
+        db.rollback()
+        result = begin_checkout(db, settings, user, "plus", gateway)
+        assert result.startswith("https://checkout.stripe.com/")
+        assert gateway.created[0] == gateway.created[1]
+        assert gateway.created[2] != gateway.created[0]
+        assert gateway.expired == [f"cs_{gateway.created[0]}"]
+        assert db.scalar(select(func.count()).select_from(Subscription)) == 1
+
+
+@pytest.mark.postgres
+def test_unknown_checkout_older_than_idempotency_window_is_not_recreated(db_factory, settings):
+    from pydantic import SecretStr
+
+    settings.stripe_secret_key = SecretStr("test-fixture-only")
+    settings.stripe_webhook_secret = SecretStr("test-fixture-only")
+    for plan in ("essential", "plus", "pro", "pro_plus"):
+        setattr(settings, "stripe_price_" + plan, "price_" + plan)
+    with db_factory() as db:
+        user = User(name="Old checkout")
+        db.add(user)
+        db.flush()
+        db.add(
+            CheckoutAttempt(
+                user_id=user.id,
+                plan_id="essential",
+                amount_cents=1999,
+                currency="EUR",
+                stripe_price_id="price_essential",
+                status="pending",
+                created_at=utcnow() - timedelta(hours=25),
+            )
+        )
+        db.commit()
+        gateway = FakeGateway({})
+        with pytest.raises(HTTPException) as error:
+            begin_checkout(db, settings, user, "plus", gateway)
+        assert error.value.status_code == 409
+        assert gateway.created == []
+        assert gateway.expired == []
+
+
+def test_demo_membership_does_not_grant_production_access():
+    from studio.billing import active_subscription
+
+    subscription = Subscription(
+        status="active", is_demo=True, current_period_end=utcnow() + timedelta(days=10)
+    )
+    assert active_subscription(subscription)
+    assert not active_subscription(subscription, allow_demo=False)

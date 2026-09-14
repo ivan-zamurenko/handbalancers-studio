@@ -1,4 +1,5 @@
 """Run the isolated local database/application without exposing credentials."""
+
 from __future__ import annotations
 
 import argparse
@@ -6,6 +7,7 @@ import os
 import shutil
 import subprocess
 from pathlib import Path
+from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 SERVER = ROOT / "server"
@@ -17,7 +19,9 @@ def environment() -> dict[str, str]:
     result = dict(os.environ)
     config = SERVER / ".env"
     if not config.exists():
-        raise SystemExit("Missing server/.env. See docs/deployment.md; never paste credentials into chat.")
+        raise SystemExit(
+            "Missing server/.env. See docs/deployment.md; never paste credentials into chat."
+        )
     for line in config.read_text().splitlines():
         if line.strip() and not line.lstrip().startswith("#") and "=" in line:
             key, value = line.split("=", 1)
@@ -33,33 +37,59 @@ def postgres_binary(name: str) -> str:
         candidate = Path(f"/opt/homebrew/opt/postgresql@{version}/bin/{name}")
         if candidate.exists():
             return str(candidate)
-    raise SystemExit("PostgreSQL binaries not found. Use Docker Compose or install PostgreSQL.")
+    raise SystemExit(
+        "PostgreSQL binaries not found. Use Docker Compose or install PostgreSQL."
+    )
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["serve", "migrate", "test", "db-start", "db-stop", "db-status"])
+    parser.add_argument(
+        "command",
+        choices=["serve", "migrate", "test", "db-start", "db-stop", "db-status"],
+    )
     args = parser.parse_args()
     if args.command.startswith("db-"):
         if not (PGDATA / "PG_VERSION").exists():
-            raise SystemExit("Isolated database not initialized. See docs/local-development.md.")
+            raise SystemExit(
+                "Isolated database not initialized. See docs/local-development.md."
+            )
         binary = postgres_binary("pg_ctl")
         command = [binary, "-D", str(PGDATA)]
         if args.command == "db-start":
             sock = Path(f"/private/tmp/hbs-postgres-{os.getuid()}")
             sock.mkdir(mode=0o700, exist_ok=True)
             os.chmod(sock, 0o700)
-            command += ["-l", str(PGDATA.parent / "server.log"), "-o", f"-h 127.0.0.1 -p 55432 -k {sock}", "-w", "start"]
+            command += [
+                "-l",
+                str(PGDATA.parent / "server.log"),
+                "-o",
+                f"-h 127.0.0.1 -p 55432 -k {sock}",
+                "-w",
+                "start",
+            ]
         elif args.command == "db-stop":
             command += ["-m", "fast", "-w", "stop"]
         else:
             command += ["status"]
         raise SystemExit(subprocess.call(command))
     if not PYTHON.exists():
-        raise SystemExit("Missing .local-tools/python environment. See docs/local-development.md.")
+        raise SystemExit(
+            "Missing .local-tools/python environment. See docs/local-development.md."
+        )
     env = environment()
     if args.command == "serve":
-        command = [str(PYTHON), "-m", "uvicorn", "studio.main:app", "--host", "127.0.0.1", "--port", "8000", "--no-access-log"]
+        command = [
+            str(PYTHON),
+            "-m",
+            "uvicorn",
+            "studio.main:app",
+            "--host",
+            "127.0.0.1",
+            "--port",
+            "8000",
+            "--no-access-log",
+        ]
     elif args.command == "migrate":
         command = [str(PYTHON), "-m", "alembic", "upgrade", "head"]
     else:
@@ -68,7 +98,29 @@ def main() -> None:
         if "@127.0.0.1:55432/studio" not in url:
             raise SystemExit("Tests require the isolated local PostgreSQL instance.")
         env["TEST_DATABASE_URL"] = url.rsplit("/", 1)[0] + "/studio_test"
-        command = [str(PYTHON), "-m", "pytest", "-q"]
+        command = [str(PYTHON), "-m", "pytest", "-q", "--tb=short"]
+        result = subprocess.run(
+            command, cwd=SERVER, env=env, capture_output=True, text=True, check=False
+        )
+        output = result.stdout + result.stderr
+        sensitive = [
+            value
+            for key, value in env.items()
+            if any(word in key for word in ("SECRET", "PASSWORD", "DATABASE_URL"))
+            and len(value) >= 8
+        ]
+        database_password = unquote(
+            urlsplit(
+                env["DATABASE_URL"].replace("postgresql+psycopg", "postgresql", 1)
+            ).password
+            or ""
+        )
+        if database_password:
+            sensitive.append(database_password)
+        for value in sorted(sensitive, key=len, reverse=True):
+            output = output.replace(value, "[REDACTED]")
+        print(output, end="")
+        raise SystemExit(result.returncode)
     raise SystemExit(subprocess.call(command, cwd=SERVER, env=env))
 
 

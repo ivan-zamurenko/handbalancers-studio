@@ -8,13 +8,14 @@ class Plan:
     id: str
     price_cents: int
     currency: str = "EUR"
+    trial_days: int = 0
 
 
 PLANS = {
     plan.id: plan
     for plan in (
-        Plan("essential", 1999),
-        Plan("plus", 4999),
+        Plan("essential", 1999, trial_days=7),
+        Plan("plus", 4999, trial_days=7),
         Plan("pro", 17999),
         Plan("pro_plus", 29999),
     )

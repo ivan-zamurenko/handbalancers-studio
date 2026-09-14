@@ -3,10 +3,12 @@
 Schedule this daily in deployment. Profiles, users, memberships and payment records are retained.
 """
 
+from datetime import timedelta
+
 from sqlalchemy import delete
 
 from studio.db import make_engine, make_session_factory
-from studio.models import BrowserSession, OAuthAttempt, utcnow
+from studio.models import AuthRateLimit, BrowserSession, EmailVerification, OAuthAttempt, utcnow
 from studio.settings import Settings
 
 
@@ -14,6 +16,8 @@ def cleanup_expired(db):
     now = utcnow()
     oauth = db.execute(delete(OAuthAttempt).where(OAuthAttempt.expires_at <= now)).rowcount
     sessions = db.execute(delete(BrowserSession).where(BrowserSession.expires_at <= now)).rowcount
+    db.execute(delete(EmailVerification).where(EmailVerification.expires_at <= now))
+    db.execute(delete(AuthRateLimit).where(AuthRateLimit.window_start < now - timedelta(days=1)))
     db.commit()
     return {"oauth_attempts_removed": oauth, "sessions_removed": sessions}
 

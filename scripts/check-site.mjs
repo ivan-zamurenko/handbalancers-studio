@@ -193,7 +193,10 @@ try {
   assert.equal(selectedCards[3].scale, 1);
   check('Only selected tariff zooms; selection is separate from continuing');
   await page.goto(`${base}/dashboard`);
-  await page.waitForURL('**/onboarding');
+  await page.waitForURL('**/login');
+  await expect(page.locator('#login-form')).toBeVisible();
+  await expect(page.locator('.dashboard')).toHaveCount(0);
+  await page.goto(`${base}/onboarding`);
   await next();
   await page.getByRole('alert').waitFor();
   check('Protected route and empty questionnaire validation');
@@ -214,9 +217,9 @@ try {
     await page
       .locator('input[name=minutes]')
       .evaluateAll((inputs) => inputs.map((input) => input.value)),
-    ['30', '45', '60', '60-plus'],
+    ['30', '45', '60', '90'],
   );
-  await choose('#minutes-60-plus');
+  await choose('#minutes-90');
   await screenshot('onboarding-time');
   await audit('onboarding-time-uk');
   await next();
@@ -229,20 +232,29 @@ try {
   await page.locator('#day-5').press('Space');
   await expect(page.locator('#day-1')).toBeEnabled();
   await choose('#day-5');
-  check('Four duration choices; 60+; at most three days with deselection available');
+  check('Four duration choices; 90 minutes; at most three days with deselection available');
   await screenshot('onboarding-days');
   await audit('onboarding-days-uk');
   await next();
-  await page.waitForURL('**/register');
-  await page.locator('#preview-name').fill('Studio Browser Test');
-  await audit('register-uk');
-  await page.locator('#register-form button[type="submit"]').click();
   await page.waitForURL('**/plans');
   await audit('plans-uk');
   await screenshot('plans-desktop');
   await page.locator('[data-plan="plus"]').click();
-  assert.equal(new URL(page.url()).pathname, '/plans', 'Selecting a plan does not navigate');
   await page.locator('[data-plan-continue]').click();
+  await page.waitForURL('**/register');
+  await expect(page.locator('#email-register-form')).toBeVisible();
+  await audit('register-uk');
+  // Local-only billing fixture; the public registration UI requires email verification.
+  await page.evaluate(async () => {
+    const state = await fetch('/api/session').then((r) => r.json());
+    const response = await fetch('/api/preview/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': state.csrf_token },
+      body: JSON.stringify({ name: 'Studio Browser Test' }),
+    });
+    if (!response.ok) throw Error('Local billing fixture failed');
+  });
+  await page.reload();
   await page.waitForURL((url) => url.pathname === '/checkout');
   await audit('checkout-uk');
   await page.locator('[data-demo-pay]').click();
@@ -253,21 +265,21 @@ try {
   const saved = await page.evaluate(async () => (await fetch('/api/session')).json());
   assert.deepEqual(saved.onboarding.goals, ['handstand', 'mobility']);
   assert.deepEqual(saved.onboarding.days, [0, 3, 5]);
-  assert.equal(saved.onboarding.minutes, 60);
-  assert.equal(saved.onboarding.minutes_plus, true);
+  assert.equal(saved.onboarding.minutes, 90);
+  assert.equal(saved.onboarding.minutes_plus, false);
   assert.equal(saved.onboarding.primary_goal, undefined);
   assert.equal(saved.onboarding.equipment, undefined);
   assert.equal(saved.subscription.plan_id, 'plus');
   assert.equal(saved.subscription.is_demo, true);
   assert.equal(saved.subscription.status, 'active');
-  check('Onboarding → demo registration → Plus → demo payment → persisted dashboard');
+  check('Onboarding → plan selection → local billing fixture → persisted dashboard');
   await audit('dashboard-uk');
   await screenshot('dashboard-desktop');
   await page.locator('[data-language="en"]').click();
   assert.equal(await page.locator('html').getAttribute('lang'), 'en');
   await audit('dashboard-en');
   check('English switch');
-  await page.locator('[data-logout]').click();
+  await page.locator('.header-account[data-logout]').click();
   await page.waitForURL((url) => url.pathname === '/');
   const loggedOut = await page.evaluate(async () => (await fetch('/api/session')).json());
   assert.equal(loggedOut.user, null);
@@ -359,6 +371,53 @@ try {
   );
   assert.equal(calendarOverflow, false);
   check('Mobile carousel keeps new question visible; calendar fits at 390 px');
+  // Restored radio state must win over an old 60+ draft at submission time.
+  for (const restoreWithoutChange of [false, true]) {
+    const recovery = await browser.newPage();
+    try {
+      await recovery.addInitScript(() => {
+        localStorage.setItem(
+          'hbs:onboarding:v1',
+          JSON.stringify({
+            document: {
+              goals: ['handstand'],
+              experience: 'beginner',
+              minutes: 60,
+              minutes_plus: true,
+              days: [],
+              locale: 'uk',
+              timezone: 'Europe/Dublin',
+            },
+            dirty: true,
+            owner: null,
+          }),
+        );
+      });
+      await recovery.goto(`${base}/onboarding`);
+      await recovery.locator('button[type=submit]').click();
+      await expect(recovery.locator('#experience-beginner')).toBeEnabled();
+      await recovery.locator('button[type=submit]').click();
+      await expect(recovery.locator('#minutes-90')).toBeEnabled();
+      if (restoreWithoutChange) {
+        await recovery.locator('#minutes-90').evaluate((input) => {
+          input.checked = true;
+        });
+      } else {
+        await recovery.locator('label:has(#minutes-90)').click();
+      }
+      await recovery.locator('button[type=submit]').click();
+      await expect(recovery.locator('#day-0')).toBeEnabled();
+      await recovery.locator('label:has(#day-0)').click();
+      await recovery.locator('button[type=submit]').click();
+      await recovery.waitForURL('**/plans');
+      const recovered = await recovery.evaluate(() => fetch('/api/session').then((r) => r.json()));
+      assert.equal(recovered.onboarding.minutes, 90);
+      assert.equal(recovered.onboarding.minutes_plus, false);
+    } finally {
+      await recovery.close();
+    }
+  }
+  check('90-minute selection survives legacy drafts and radio restoration without change events');
   assert.deepEqual(errors, [], 'No unhandled browser errors');
   check('No unhandled browser JavaScript errors');
   assert.equal(

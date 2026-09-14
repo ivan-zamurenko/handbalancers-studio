@@ -85,9 +85,9 @@ export const copy = {
       strength:
         'Підніматися, утримувати себе, пробувати складніші рухи. Зміцнюйте тіло для практики й повсякденних справ.',
       mobility:
-        'Хочеться рухатися вільніше? Працюйте над рухливістю плечей і стегон та поступово розширюйте свій діапазон.',
+        'Більше свободи в кожному русі. Розвивайте гнучкість і дбайте про здоров’я суглобів та м’язів.',
       fitness:
-        'Зробіть паузу для себе після насиченого дня. Поєднуйте силу й рухливість у заняттях, для яких є місце у вашому житті.',
+        'Зробіть паузу для себе після насиченого дня. Поєднуйте силу й рухливість для кращого самопочуття та більшої енергії щодня.',
     },
     chooseDirection: 'Почати з цього напряму',
     methodEyebrow: 'Продуманий шлях',
@@ -162,7 +162,8 @@ export const copy = {
     coachNote: 'Персональний супровід веду я, засновник студії.',
     equipmentEyebrow: 'Спорядження для ваших занять',
     equipmentTitle: 'Більше опори.\nБільше можливостей.',
-    equipmentBody: 'Для роботи над балансом, зручної розтяжки та впевненої опори. Обирайте те, що доповнить ваші заняття.',
+    equipmentBody:
+      'Для роботи над балансом, зручної розтяжки та впевненої опори. Обирайте те, що доповнить ваші заняття.',
     equipmentNames: {
       none: 'Без спорядження',
       mat: 'Килимок',
@@ -199,21 +200,22 @@ export const copy = {
     ],
     finalTitle: 'Ваш наступний крок\nпочинається з вас.',
     finalBody: 'Оберіть напрям. Знайдіть свій ритм.',
-    steps: ['Ваші цілі', 'Реєстрація', 'Тариф', 'Оплата'],
+    steps: ['Ваші цілі', 'Тариф', 'Реєстрація', 'Оплата'],
     stages: 'Етапи початку практики',
     formSections: ['Напрями', 'Рівень', 'Час', 'Дні'],
     formProgress: 'Частина',
     of: 'із',
     goalsTitle: 'До чого прагнете?',
-    goalsIntro: 'Оберіть один або кілька напрямів.',
+    goalsIntro:
+      'Оберіть один або декілька напрямів. Ваші цілі визначають, над чим працюватимемо у програмі.',
     selectedGoals: 'Обрано напрямів',
     continuePlan: 'Продовжити з',
     chosenPlan: 'Обрано тариф',
     selectPlanFirst: 'Оберіть тариф, щоб продовжити',
     timeTitle: 'Скільки часу маєте для себе?',
-    timeIntro: 'Скільки часу готові приділити одному заняттю?',
+    timeIntro: 'Оберіть зручну тривалість заняття для вашої програми.',
     daysHint: 'Від 1 до 3 днів. Щоб змінити день, зніміть один із вибраних',
-    formErrorMinutes: 'Оберіть тривалість: 30, 45, 60 або 60+ хвилин.',
+    formErrorMinutes: 'Оберіть тривалість: 30, 45, 60 або 90 хвилин.',
     formErrorDays: 'Оберіть від одного до трьох днів для тренувань.',
     formValues: [
       'Цілі визначають напрям вашої практики.',
@@ -222,7 +224,7 @@ export const copy = {
       'Далі - реєстрація та вибір тарифу.',
     ],
     experienceTitle: 'Який у вас досвід?',
-    experienceIntro: 'Оберіть опис, найближчий до вашого досвіду.',
+    experienceIntro: 'Рівень допомагає обрати стартову точку.',
     experience: {
       beginner: ['Починаю', 'Знайомлюся з практикою або повертаюся після перерви.'],
       intermediate: ['Щось знаю', 'Маю досвід базових вправ і займаюся час від часу.'],
@@ -296,8 +298,7 @@ export const copy = {
     spaceSummary: 'Ваш простір',
     nextStep: 'Наступний крок',
     assessmentTitle: 'Початкове оцінювання',
-    assessmentBody:
-      'Підготовка методики триває. Ми ще не призначаємо вправ, не збираємо відео та не показуємо вигадані результати.',
+    assessmentBody: 'Початкове оцінювання допоможе визначити, з чого почати вашу програму.',
     pending: 'Готується',
     dashboardEmpty: 'Історія почнеться з першого справжнього заняття.',
     profile: 'Профіль',
@@ -309,7 +310,7 @@ export const copy = {
     privacySections: [
       [
         'Що зберігається зараз',
-        'Анкета містить цілі, самооцінку досвіду, тривалість, розклад, часовий пояс і мову. Локальний демонстраційний акаунт містить ім’я та обраний демонстраційний тариф.',
+        'Зберігаємо ім’я, прізвище, підтверджену пошту, захищений хеш пароля, анкету, обраний тариф і записи тренувань. Анкета містить цілі, досвід, тривалість, розклад, часовий пояс і мову.',
       ],
       [
         'Браузер і сесія',
@@ -462,9 +463,9 @@ export const copy = {
       strength:
         'Lift, hold and explore more challenging movements. Build strength for your practice and the things you do every day.',
       mobility:
-        'Want more freedom to move? Work on shoulder and hip mobility, gradually exploring a wider range of movement.',
+        'More freedom in every movement. Develop flexibility and care for the health of your joints and muscles.',
       fitness:
-        'Make room for yourself after a full day. Combine strength and mobility in sessions that fit the life you actually live.',
+        'Take a moment for yourself after a full day. Combine strength and mobility to work towards feeling better and having more energy every day.',
     },
     chooseDirection: 'Start with this direction',
     methodEyebrow: 'A considered path',
@@ -547,7 +548,8 @@ export const copy = {
     coachNote: 'I provide the coaching personally, as the studio’s founder.',
     equipmentEyebrow: 'Equipment for your practice',
     equipmentTitle: 'More support.\nMore possibilities.',
-    equipmentBody: 'For balance work, comfortable stretching and steady support. Choose what complements your practice.',
+    equipmentBody:
+      'For balance work, comfortable stretching and steady support. Choose what complements your practice.',
     equipmentNames: {
       none: 'No equipment',
       mat: 'Mat',
@@ -584,21 +586,22 @@ export const copy = {
     ],
     finalTitle: 'Your next step\nstarts with you.',
     finalBody: 'Choose your direction. Find your rhythm.',
-    steps: ['Your goals', 'Sign up', 'Plan', 'Payment'],
+    steps: ['Your goals', 'Plan', 'Sign up', 'Payment'],
     stages: 'Getting started steps',
     formSections: ['Directions', 'Level', 'Time', 'Days'],
     formProgress: 'Part',
     of: 'of',
     goalsTitle: 'What moves you?',
-    goalsIntro: 'Choose one or more directions.',
+    goalsIntro:
+      'Choose one or more directions. Your goals shape what we focus on in your programme.',
     selectedGoals: 'Selected directions',
     continuePlan: 'Continue with',
     chosenPlan: 'Selected plan',
     selectPlanFirst: 'Select a plan to continue',
     timeTitle: 'How much time is yours?',
-    timeIntro: 'How much time can you give each session?',
+    timeIntro: 'Choose a session length that works for you.',
     daysHint: 'Choose 1-3 days. Unselect a day to choose another',
-    formErrorMinutes: 'Choose a session length: 30, 45, 60 or 60+ minutes.',
+    formErrorMinutes: 'Choose a session length: 30, 45, 60 or 90 minutes.',
     formErrorDays: 'Choose between one and three training days.',
     formValues: [
       'Your goals shape your practice.',
@@ -607,7 +610,7 @@ export const copy = {
       'Next: sign up and choose a plan.',
     ],
     experienceTitle: 'What is your experience?',
-    experienceIntro: 'Choose the description closest to your experience.',
+    experienceIntro: 'Your level helps set a starting point.',
     experience: {
       beginner: ['Getting started', 'Discovering the practice or returning after a break.'],
       intermediate: ['Some experience', 'Experience with basic exercises and occasional practice.'],
@@ -681,8 +684,7 @@ export const copy = {
     spaceSummary: 'Your space',
     nextStep: 'Next step',
     assessmentTitle: 'Starting assessment',
-    assessmentBody:
-      'The methodology is being prepared. We are not prescribing exercises, collecting videos or displaying made-up results yet.',
+    assessmentBody: 'Your starting assessment will help identify where to begin your programme.',
     pending: 'In preparation',
     dashboardEmpty: 'Your history will begin with your first real session.',
     profile: 'Profile',
@@ -694,7 +696,7 @@ export const copy = {
     privacySections: [
       [
         'What is stored now',
-        'Your preferences include goals, self-reported experience, session length, schedule, time zone and language. A local demo account contains your name and selected demo plan.',
+        'We store your first and last name, verified email, protected password hash, preferences, selected plan and training records. Preferences include goals, experience, session length, schedule, time zone and language.',
       ],
       [
         'Browser and session',

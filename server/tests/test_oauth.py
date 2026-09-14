@@ -111,25 +111,33 @@ def test_oauth_does_not_link_accounts_by_email(db_factory, settings, answers):
                 )
             )
             db.commit()
-        finish_login(
-            db_factory,
-            settings,
-            provider,
-            {"session_hash": session_hash},
-            {
-                "sub": f"{provider}-subject",
-                "email": "same@example.invalid",
-                "email_verified": True,
-                "name": "Fixture",
-            },
-            Response(),
-        )
+
+        def attempt_login(provider=provider, session_hash=session_hash):
+            finish_login(
+                db_factory,
+                settings,
+                provider,
+                {"session_hash": session_hash},
+                {
+                    "sub": f"{provider}-subject",
+                    "email": "same@example.invalid",
+                    "email_verified": True,
+                    "name": "Fixture",
+                },
+                Response(),
+            )
+
+        if provider == "apple":
+            with pytest.raises(ValueError, match="existing sign-in"):
+                attempt_login()
+        else:
+            attempt_login()
         with db_factory() as db:
-            assert db.get(BrowserSession, session_hash) is None
+            assert (db.get(BrowserSession, session_hash) is None) == (provider == "google")
     with db_factory() as db:
         identities = db.scalars(select(Identity)).all()
-        assert len({identity.user_id for identity in identities}) == 2
-        assert len(db.scalars(select(OnboardingProfile)).all()) == 2
+        assert len({identity.user_id for identity in identities}) == 1
+        assert len(db.scalars(select(OnboardingProfile)).all()) == 1
 
 
 @pytest.mark.postgres

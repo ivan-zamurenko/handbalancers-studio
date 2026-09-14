@@ -13,6 +13,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from studio.api import router as api_router
+from studio.authentication import profile_router
+from studio.authentication import router as auth_router
 from studio.db import make_engine, make_session_factory
 from studio.oauth import router as oauth_router
 from studio.settings import SERVER_DIR, Settings
@@ -91,7 +93,10 @@ def create_app(settings: Settings | None = None, session_factory=None) -> FastAP
             "font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; "
             "frame-ancestors 'none'; form-action 'self' https://accounts.google.com https://appleid.apple.com"
         )
-        if not request.url.path.startswith(("/static/", "/assets/")):
+        # Mutable script/style URLs must revalidate, including imported JS modules.
+        if request.url.path.startswith("/static/") and request.url.path.endswith((".js", ".css")):
+            response.headers["Cache-Control"] = "no-cache"
+        elif not request.url.path.startswith(("/static/", "/assets/")):
             response.headers["Cache-Control"] = "no-store"
         return response
 
@@ -127,6 +132,8 @@ def create_app(settings: Settings | None = None, session_factory=None) -> FastAP
         return {"status": "ok"}
 
     app.include_router(api_router)
+    app.include_router(auth_router)
+    app.include_router(profile_router)
     app.include_router(oauth_router)
     app.mount(
         "/static", StaticFiles(directory=SERVER_DIR / "static", check_dir=False), name="static"
@@ -143,6 +150,7 @@ def create_app(settings: Settings | None = None, session_factory=None) -> FastAP
         "/",
         "/onboarding",
         "/register",
+        "/login",
         "/plans",
         "/checkout",
         "/dashboard",

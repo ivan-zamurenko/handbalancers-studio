@@ -34,16 +34,20 @@ class StripeGateway:
                 or recurring.get("interval_count") != 1
             ):
                 raise BillingUnavailable("Configured Stripe price does not match the plan")
+            subscription_data = {"metadata": {"user_id": str(attempt.user_id)}}
+            if attempt.trial_days == 7:
+                subscription_data["trial_period_days"] = 7
             session = stripe.checkout.Session.create(
                 api_key=self.key,
                 idempotency_key=f"studio-checkout-{attempt.id}",
                 mode="subscription",
                 # Keep the initial flow synchronous; asynchronous bank debits need another lifecycle.
                 payment_method_types=["card"],
+                payment_method_collection="always",
                 line_items=[{"price": attempt.stripe_price_id, "quantity": 1}],
                 client_reference_id=str(attempt.user_id),
                 metadata={"checkout_id": str(attempt.id), "user_id": str(attempt.user_id)},
-                subscription_data={"metadata": {"user_id": str(attempt.user_id)}},
+                subscription_data=subscription_data,
                 success_url=f"{self.settings.base_url}/dashboard?checkout=success",
                 cancel_url=f"{self.settings.base_url}/checkout?plan={attempt.plan_id}&canceled=1",
             )
@@ -63,6 +67,15 @@ class StripeGateway:
     def subscription(self, subscription_id: str):
         return stripe.Subscription.retrieve(subscription_id, api_key=self.key)
 
+    def cancel_at_period_end(self, subscription_id: str):
+        """Stop renewal while preserving already-paid access and trial time."""
+        try:
+            return stripe.Subscription.modify(
+                subscription_id, api_key=self.key, cancel_at_period_end=True
+            )
+        except stripe.StripeError:
+            raise BillingUnavailable("Unable to cancel renewal. Please try again") from None
+
     def expire_checkout(self, session_id: str):
         try:
             current = stripe.checkout.Session.retrieve(session_id, api_key=self.key)
@@ -75,9 +88,10 @@ class StripeGateway:
             raise BillingUnavailable("Previous checkout could not be closed") from None
 
 
-def active_subscription(subscription: Subscription | None) -> bool:
+def active_subscription(subscription: Subscription | None, *, allow_demo: bool = True) -> bool:
     return bool(
         subscription
+        and (allow_demo or not subscription.is_demo)
         and subscription.status in {"active", "trialing"}
         and subscription.current_period_end
         and subscription.current_period_end > utcnow()
@@ -92,9 +106,14 @@ def begin_checkout(
     if not user.is_demo and not settings.payments_enabled:
         raise HTTPException(503, "Payments have not been configured yet")
     # Lock the owner to serialize double-clicks and competing plan selections.
-    db.execute(select(User).where(User.id == user.id).with_for_update())
+    user = db.scalar(
+        select(User)
+        .where(User.id == user.id)
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    )
     subscription = db.get(Subscription, user.id)
-    if active_subscription(subscription):
+    if active_subscription(subscription, allow_demo=settings.preview_enabled):
         raise HTTPException(409, "A membership is already active")
     attempt = db.scalar(
         select(CheckoutAttempt)
@@ -107,11 +126,25 @@ def begin_checkout(
         .limit(1)
     )
     if attempt and (
-        attempt.plan_id != plan_id or attempt.created_at <= utcnow() - timedelta(hours=23)
+        attempt.plan_id != plan_id
+        or attempt.created_at <= utcnow() - timedelta(hours=23)
+        or (attempt.trial_days and user.trial_used_at)
     ):
         if not user.is_demo:
             if not attempt.stripe_session_id:
-                raise HTTPException(409, "A checkout is being prepared. Please try again shortly")
+                # A remote success can precede a lost response. Reuse the original
+                # idempotency key to recover that session before opening another.
+                # Stripe may prune keys after 24 hours; never recreate an older one.
+                if attempt.created_at <= utcnow() - timedelta(hours=23):
+                    raise HTTPException(409, "Previous checkout needs payment reconciliation")
+                try:
+                    attempt.stripe_session_id, attempt.checkout_url = gateway.create_checkout(
+                        attempt
+                    )
+                except BillingUnavailable:
+                    raise HTTPException(
+                        409, "Unable to reconcile the previous checkout. Please retry"
+                    ) from None
             try:
                 gateway.expire_checkout(attempt.stripe_session_id)
             except BillingUnavailable:
@@ -129,6 +162,7 @@ def begin_checkout(
             currency=plan.currency,
             is_demo=user.is_demo,
             stripe_price_id=None if user.is_demo else settings.stripe_prices[plan_id],
+            trial_days=plan.trial_days if not user.is_demo and not user.trial_used_at else 0,
         )
         db.add(attempt)
         if subscription is None:
@@ -194,6 +228,8 @@ def period_end(provider_subscription) -> datetime | None:
             (item["current_period_end"] for item in items if item.get("current_period_end")),
             default=None,
         )
+    if not timestamp and provider_subscription.get("status") == "trialing":
+        timestamp = provider_subscription.get("trial_end")
     return datetime.fromtimestamp(timestamp, UTC) if timestamp else None
 
 
@@ -232,7 +268,12 @@ def apply_webhook(db: Session, event: dict, gateway: StripeGateway):
             subscription.stripe_subscription_id = provider_sub["id"]
             subscription.status = provider_sub["status"]
             subscription.current_period_end = period_end(provider_sub)
+            subscription.cancel_at_period_end = bool(provider_sub.get("cancel_at_period_end"))
             subscription.last_event_created = created
+        if attempt.trial_days == 7:
+            owner = db.get(User, attempt.user_id, with_for_update=True)
+            if owner and owner.trial_used_at is None:
+                owner.trial_used_at = utcnow()
         attempt.status = "paid"
     elif kind in {
         "customer.subscription.updated",
@@ -259,6 +300,7 @@ def apply_webhook(db: Session, event: dict, gateway: StripeGateway):
                 current = gateway.subscription(sub_id)
                 subscription.status = current["status"]
                 subscription.current_period_end = period_end(current)
+                subscription.cancel_at_period_end = bool(current.get("cancel_at_period_end"))
                 subscription.last_event_created = created
     db.commit()
 
@@ -267,14 +309,36 @@ def validate_paid_checkout(attempt: CheckoutAttempt, checkout):
     lines = checkout.get("line_items", {}).get("data", [])
     metadata = checkout.get("metadata") or {}
     sub = checkout.get("subscription")
+    trial = bool(attempt.trial_days == 7)
+    trial_start = sub.get("trial_start") if isinstance(sub, dict) else None
+    trial_end = sub.get("trial_end") if isinstance(sub, dict) else None
+    valid_trial = bool(
+        trial
+        and attempt.plan_id in {"essential", "plus"}
+        and isinstance(trial_start, (int, float))
+        and isinstance(trial_end, (int, float))
+        and 7 * 86400 - 60 <= trial_end - trial_start <= 7 * 86400 + 60
+        and trial_start <= utcnow().timestamp()
+        and trial_end > utcnow().timestamp()
+        and sub.get("status") == "trialing"
+        and checkout.get("amount_total") == 0
+        and checkout.get("payment_status") in {"paid", "no_payment_required"}
+    )
+    valid_payment = bool(
+        not trial
+        and checkout.get("payment_status") == "paid"
+        and checkout.get("amount_total") == attempt.amount_cents
+        and isinstance(sub, dict)
+        and sub.get("status") == "active"
+    )
     if (
         attempt.is_demo
+        or checkout.get("status") != "complete"
+        or not (valid_trial or valid_payment)
         or checkout.get("mode") != "subscription"
-        or checkout.get("payment_status") != "paid"
         or checkout.get("client_reference_id") != str(attempt.user_id)
         or metadata.get("checkout_id") != str(attempt.id)
         or metadata.get("user_id") != str(attempt.user_id)
-        or checkout.get("amount_total") != attempt.amount_cents
         or checkout.get("currency", "").upper() != attempt.currency
         or len(lines) != 1
         or lines[0].get("quantity") != 1

@@ -35,6 +35,11 @@ class Settings(BaseSettings):
     stripe_price_plus: str = ""
     stripe_price_pro: str = ""
     stripe_price_pro_plus: str = ""
+    smtp_host: str = ""
+    smtp_port: int = Field(default=587, ge=1, le=65535)
+    smtp_username: str = ""
+    smtp_password: SecretStr = Field(default=SecretStr(""), repr=False)
+    smtp_from: str = ""
 
     @model_validator(mode="after")
     def safe_configuration(self):

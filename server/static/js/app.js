@@ -1,5 +1,6 @@
-import { copy, goalIds, planIds } from './copy.js';
-import { shell, footer, view, isActive } from './views.js';
+import { memberCopy } from './member-copy.js?v=20260914-membership';
+import { copy, goalIds, planIds } from './copy.js?v=20260914-membership';
+import { shell, footer, view, isActive } from './views.js?v=20260914-membership';
 
 const STORAGE = { draft: 'hbs:onboarding:v1', locale: 'hbs:locale:v1', plan: 'hbs:plan:v1' };
 const read = (key) => {
@@ -51,7 +52,7 @@ function normaliseDraft(value) {
     ? value.experience
     : '';
   d.days = uniqueAllowed(value.days, [0, 1, 2, 3, 4, 5, 6]).sort((a, b) => a - b);
-  d.minutes = [30, 45, 60].includes(value.minutes) ? value.minutes : null;
+  d.minutes = [30, 45, 60, 90].includes(value.minutes) ? value.minutes : null;
   d.minutes_plus = d.minutes === 60 && value.minutes_plus === true;
   // Timezone is device-derived; a corrupt local draft must not make the form unsaveable.
   try {
@@ -79,6 +80,8 @@ const state = {
   error: '',
   fatal: false,
   previewName: '',
+  authStage: 'register',
+  registration: {},
 };
 const main = document.querySelector('#main');
 const shellElement = document.querySelector('#shell');
@@ -97,14 +100,14 @@ class RequestError extends Error {
   }
 }
 
-async function api(path, body) {
+async function api(path, body, method) {
   const headers = { Accept: 'application/json' };
   if (body !== undefined) {
     headers['Content-Type'] = 'application/json';
     headers['X-CSRF-Token'] = state.session.csrf_token;
   }
   const response = await fetch(path, {
-    method: body === undefined ? 'GET' : 'POST',
+    method: method || (body === undefined ? 'GET' : 'POST'),
     credentials: 'same-origin',
     redirect: 'error',
     headers,
@@ -150,6 +153,8 @@ function observeChangeIllustration() {
 }
 
 function render({ focus = false, preserve = false } = {}) {
+  // Recheck access after session refreshes as well as navigation.
+  guard();
   const activeId = preserve ? document.activeElement?.id : null;
   const openDetails = [...main.querySelectorAll('details[open][id]')].map((node) => node.id);
   const t = copy[state.locale];
@@ -180,17 +185,23 @@ function render({ focus = false, preserve = false } = {}) {
 // Server routes enforce the same order. These guards make transitions clear in the UI.
 function guard() {
   if (state.fatal || !state.session) return;
-  const path = location.pathname;
+  const path = location.pathname,
+    session = state.session;
   let target = '';
-  if (['/register', '/checkout', '/dashboard'].includes(path) && !state.session.onboarding)
+  const incomplete =
+    session.user && !session.user.is_demo && (!session.user.first_name || !session.user.last_name);
+  if (path === '/dashboard' && !session.user) target = '/login';
+  else if (path === '/login' && session.user)
+    target = session.onboarding ? '/dashboard' : '/onboarding';
+  else if (['/register', '/checkout', '/dashboard'].includes(path) && !session.onboarding)
     target = '/onboarding';
-  else if (['/checkout', '/dashboard'].includes(path) && !state.session.user) target = '/register';
-  else if (path === '/register' && state.session.user)
-    target = isActive(state) ? '/dashboard' : '/plans';
-  else if (path === '/dashboard' && !isActive(state))
-    target = state.selectedPlan ? '/checkout' : '/plans';
+  else if (path === '/register' && session.user && !incomplete)
+    target = isActive(state) ? '/dashboard' : session.selected_plan ? '/checkout' : '/plans';
+  else if (path === '/register' && !session.user && !session.selected_plan) target = '/plans';
+  else if (path === '/checkout' && !session.selected_plan) target = '/plans';
+  else if (['/checkout', '/dashboard'].includes(path) && incomplete) target = '/register';
+  else if (path === '/checkout' && !session.user) target = '/register';
   else if (path === '/checkout' && isActive(state)) target = '/dashboard';
-  else if (path === '/checkout' && !state.selectedPlan) target = '/plans';
   if (target) history.replaceState({}, '', target);
 }
 
@@ -224,7 +235,8 @@ async function mutation(action) {
   try {
     await action();
   } catch (error) {
-    state.error = errorText(error);
+    if (error.status === 402) navigate('/plans');
+    else state.error = errorText(error);
   } finally {
     state.busy = false;
     render({ preserve: true });
@@ -241,7 +253,8 @@ function invalidStep(index) {
   if (index === 0 && !d.goals.length) return t.formErrorGoals;
   if (index === 1 && !['beginner', 'intermediate', 'advanced'].includes(d.experience))
     return t.formErrorExperience;
-  if (index === 2 && ![30, 45, 60].includes(d.minutes)) return t.formErrorMinutes;
+  if (index === 2 && (![30, 45, 60, 90].includes(d.minutes) || d.minutes_plus))
+    return t.formErrorMinutes;
   if (index === 3 && (!d.days.length || d.days.length > 3)) return t.formErrorDays;
   return '';
 }
@@ -329,8 +342,8 @@ function updateDraft(input) {
         : d.days.filter((day) => day !== Number(value))
     ).sort((a, b) => a - b);
   } else if (name === 'minutes') {
-    d.minutes = value === '60-plus' ? 60 : Number(value);
-    d.minutes_plus = value === '60-plus';
+    d.minutes = Number(value);
+    d.minutes_plus = false;
   }
   d.locale = state.locale;
   saveDraft();
@@ -352,6 +365,11 @@ document.addEventListener('submit', (event) => {
   if (event.target.id === 'onboarding-form') {
     event.preventDefault();
     if (transitioning) return;
+    // Read the visible radio selection too: browser restoration may omit a change event.
+    if (state.formStep === 2) {
+      const selected = event.target.querySelector('input[name="minutes"]:checked');
+      if (selected) updateDraft(selected);
+    }
     state.error = invalidStep(state.formStep);
     if (state.error) {
       render({ preserve: true });
@@ -377,22 +395,65 @@ document.addEventListener('submit', (event) => {
       state.session.onboarding = result.onboarding;
       saveDraft(false);
       announce(copy[state.locale].saved);
-      navigate(state.session.user ? (isActive(state) ? '/dashboard' : '/plans') : '/register');
+      navigate(state.session.user ? '/dashboard' : '/plans');
     });
   }
-  if (event.target.id === 'register-form') {
+  if (
+    ['email-register-form', 'verify-form', 'login-form', 'profile-form', 'training-form'].includes(
+      event.target.id,
+    )
+  ) {
     event.preventDefault();
-    const name = state.previewName.trim();
-    if (!name || name.length > 80) {
-      state.error = copy[state.locale].nameError;
-      render({ preserve: true });
-      return;
-    }
+    const form = event.target;
+    const payload = Object.fromEntries(new FormData(form));
+    const type = form.id;
+    if (type === 'email-register-form')
+      state.registration = {
+        first_name: payload.first_name,
+        last_name: payload.last_name,
+        email: payload.email,
+      };
     mutation(async () => {
-      await api('/api/preview/register', { name });
-      await refreshSession();
-      saveDraft(false);
-      navigate('/plans');
+      try {
+        if (type === 'email-register-form') {
+          await api('/api/auth/register', payload);
+          state.authStage = 'verify';
+        } else if (type === 'verify-form' || type === 'login-form') {
+          const result = await api(
+            type === 'verify-form' ? '/api/auth/verify' : '/api/auth/login',
+            payload,
+          );
+          await refreshSession();
+          state.draft = normaliseDraft(state.session.onboarding);
+          state.authStage = 'register';
+          state.registration = {};
+          state.selectedPlan = state.session.selected_plan || state.selectedPlan;
+          saveDraft(false);
+          navigate(type === 'login-form' && isActive(state) ? '/dashboard' : result.url);
+        } else if (type === 'profile-form') {
+          await api('/api/profile', payload, 'PATCH');
+          await refreshSession();
+          if (location.pathname === '/register')
+            navigate(state.session.selected_plan ? '/checkout' : '/plans');
+        } else {
+          await api('/api/training-sessions', {
+            minutes: Number(payload.minutes),
+            goal: payload.goal,
+          });
+          await refreshSession();
+        }
+      } catch (error) {
+        if (type.includes('login') || type.includes('verify') || type.includes('register')) {
+          state.error =
+            memberCopy[state.locale][
+              error.status === 429
+                ? 'rateError'
+                : error.status === 503
+                  ? 'emailUnavailable'
+                  : 'authError'
+            ];
+        } else throw error;
+      }
     });
   }
 });
@@ -435,7 +496,7 @@ document.addEventListener('click', (event) => {
     const completed = state.session?.onboarding;
     if (
       completed &&
-      [30, 45, 60].includes(completed.minutes) &&
+      [30, 45, 60, 90].includes(completed.minutes) &&
       completed.days.length <= 3 &&
       !state.busy
     )
@@ -468,14 +529,29 @@ document.addEventListener('click', (event) => {
     announce(
       `${copy[state.locale].chosenPlan}: ${button.dataset.plan === 'pro_plus' ? 'Pro+' : button.dataset.plan}`,
     );
+  } else if (button.hasAttribute('data-auth-restart')) {
+    state.authStage = 'register';
+    render();
+  } else if (button.hasAttribute('data-billing-portal')) {
+    mutation(async () => {
+      const result = await api('/api/billing-portal', {});
+      const url = new URL(result.url);
+      if (url.protocol !== 'https:' || url.hostname !== 'billing.stripe.com')
+        throw new RequestError(502);
+      location.assign(url.href);
+    });
   } else if (button.hasAttribute('data-plan-continue') && state.selectedPlan) {
-    navigate(
-      !state.session.onboarding
-        ? '/onboarding'
-        : !state.session.user
-          ? '/register'
-          : `/checkout?plan=${state.selectedPlan}`,
-    );
+    mutation(async () => {
+      await api('/api/plan', { plan_id: state.selectedPlan });
+      state.session.selected_plan = state.selectedPlan;
+      navigate(
+        !state.session.onboarding
+          ? '/onboarding'
+          : !state.session.user
+            ? '/register'
+            : `/checkout?plan=${state.selectedPlan}`,
+      );
+    });
   } else if (button.hasAttribute('data-demo-pay'))
     mutation(async () => {
       await api('/api/checkout', { plan_id: state.selectedPlan });
@@ -506,6 +582,8 @@ document.addEventListener('click', (event) => {
       state.draft.locale = state.locale;
       state.selectedPlan = 'plus';
       state.previewName = '';
+      state.authStage = 'register';
+      state.registration = {};
       await refreshSession();
       navigate('/');
     });
@@ -526,12 +604,28 @@ window.addEventListener('popstate', () => {
   render({ focus: true });
 });
 
+async function refreshCheckoutStatus() {
+  // Stripe may redirect before its signed webhook has reached our database.
+  for (let attempt = 0; attempt < 10 && !isActive(state); attempt++) {
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    if (location.pathname !== '/dashboard') return;
+    try {
+      await refreshSession();
+      render({ preserve: true });
+    } catch {
+      return;
+    }
+  }
+}
+
 async function boot() {
   state.fatal = false;
   state.error = '';
   try {
     const [session, plans] = await Promise.all([api('/api/session'), api('/api/plans')]);
     state.session = session;
+    if (session.selected_plan) state.selectedPlan = session.selected_plan;
+    state.authStage = session.verification_pending ? 'verify' : 'register';
     state.plans = plans.plans.filter(
       (plan) =>
         planIds.includes(plan.id) &&
@@ -555,6 +649,11 @@ async function boot() {
     }
     guard();
     render();
+    if (
+      location.pathname === '/dashboard' &&
+      new URLSearchParams(location.search).get('checkout') === 'success'
+    )
+      refreshCheckoutStatus();
     if (location.hash)
       requestAnimationFrame(() =>
         document.getElementById(location.hash.slice(1))?.scrollIntoView(),
@@ -566,3 +665,20 @@ async function boot() {
 }
 
 boot();
+
+// Reconcile expiring access and weekly totals while the dashboard stays open.
+setInterval(async () => {
+  if (
+    location.pathname !== '/dashboard' ||
+    document.hidden ||
+    state.busy ||
+    main.querySelector('details[open]')
+  )
+    return;
+  try {
+    await refreshSession();
+    render({ preserve: true });
+  } catch {
+    /* Keep the last known view on a transient network error. */
+  }
+}, 60000);

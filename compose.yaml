@@ -10,7 +10,7 @@ x-app: &app
     SESSION_SECRET: ${SESSION_SECRET:?A random session secret is required}
     APP_ENV: development
     # Demo auth requires a true loopback peer; use native local.py for that flow.
-    LOCAL_PREVIEW: "false"
+    LOCAL_PREVIEW: 'false'
     BASE_URL: http://127.0.0.1:8000
     GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
     GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
@@ -22,6 +22,11 @@ x-app: &app
     STRIPE_PRICE_PLUS: ${STRIPE_PRICE_PLUS:-}
     STRIPE_PRICE_PRO: ${STRIPE_PRICE_PRO:-}
     STRIPE_PRICE_PRO_PLUS: ${STRIPE_PRICE_PRO_PLUS:-}
+    SMTP_HOST: ${SMTP_HOST:-}
+    SMTP_PORT: ${SMTP_PORT:-587}
+    SMTP_USERNAME: ${SMTP_USERNAME:-}
+    SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+    SMTP_FROM: ${SMTP_FROM:-}
   read_only: true
   tmpfs:
     - /tmp:rw,noexec,nosuid,size=32m
@@ -31,7 +36,7 @@ x-app: &app
     driver: json-file
     options:
       max-size: 10m
-      max-file: "3"
+      max-file: '3'
 
 services:
   db:
@@ -47,7 +52,7 @@ services:
       - ./deploy/postgres/10-create-app.sql:/docker-entrypoint-initdb.d/10-create-app.sql:ro
     networks: [data]
     healthcheck:
-      test: [CMD-SHELL, "pg_isready -h 127.0.0.1 -U postgres -d postgres"]
+      test: [CMD-SHELL, 'pg_isready -h 127.0.0.1 -U postgres -d postgres']
       interval: 5s
       timeout: 3s
       retries: 10
@@ -63,7 +68,7 @@ services:
         condition: service_healthy
     healthcheck:
       disable: true
-    restart: "no"
+    restart: 'no'
 
   api:
     <<: *app

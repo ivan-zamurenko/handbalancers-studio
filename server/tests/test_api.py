@@ -140,7 +140,8 @@ def test_demo_full_flow_rotates_session_and_keeps_profile(client, answers, db_fa
     assert (
         client.post("/api/preview/pay", json={"plan_id": "pro"}, headers=headers).status_code == 409
     )
-    assert client.get("/api/session").json()["subscription"] == {
+    membership = client.get("/api/session").json()["subscription"]
+    assert {key: membership[key] for key in ("plan_id", "status", "is_demo")} == {
         "plan_id": "plus",
         "status": "active",
         "is_demo": True,
@@ -287,3 +288,15 @@ def test_stripe_signature_is_checked_against_raw_body(client, settings, monkeypa
     )
     assert client.post("/api/webhooks/stripe", content=body, headers=headers).status_code == 200
     assert received == ["evt_fixture"]
+
+
+@pytest.mark.parametrize(
+    "path", ["/static/js/app.js", "/static/js/views.js", "/static/css/studio.css"]
+)
+def test_mutable_frontend_assets_revalidate(client, path):
+    response = client.get(path)
+    assert response.status_code == 200
+    assert response.headers["cache-control"] == "no-cache"
+    cached = client.get(path, headers={"If-None-Match": response.headers["etag"]})
+    assert cached.status_code == 304
+    assert cached.headers["cache-control"] == "no-cache"

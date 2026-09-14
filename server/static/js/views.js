@@ -1,5 +1,6 @@
-import { icon } from './icons.js';
-import { copy, goalIds, planIds, planNames } from './copy.js';
+import { memberCopy } from './member-copy.js?v=20260914-membership';
+import { icon } from './icons.js?v=20260914-membership';
+import { copy, goalIds, planIds, planNames } from './copy.js?v=20260914-membership';
 
 // Every dynamic value, including account names and saved form data, is escaped.
 export const escapeHtml = (value = '') =>
@@ -33,14 +34,18 @@ const price = (state, id) => {
 
 export function shell(state) {
   const t = copy[state.locale];
+  const accountControl = (className) =>
+    state.session?.user
+      ? `<button type="button" class="${className}" data-logout ${state.busy ? 'disabled' : ''}>${e(t.logout)}</button>`
+      : routeLink('/login', e(t.login), className);
   return `${state.session?.local_preview && !['/', '/plans'].includes(location.pathname) ? `<aside class="local-bar"><span class="status-dot" aria-hidden="true"></span><span>${e(t.local)} <span class="local-detail">· ${e(t.localNote)}</span></span></aside>` : ''}
     <header class="site-header"><div class="header-inner">
       <a class="brand" href="/" data-route aria-label="Handbalancer’s Studio - ${e(t.home)}"><span class="brand-mark" aria-hidden="true">h<span>.</span></span><span>Handbalancer’s<br>Studio</span></a>
       <button class="menu-button" type="button" id="menu-toggle" aria-expanded="${state.menuOpen}" aria-controls="main-navigation" aria-label="${e(state.menuOpen ? t.closeMenu : t.openMenu)}"><span></span><span></span></button>
       <nav id="main-navigation" class="navigation ${state.menuOpen ? 'is-open' : ''}" aria-label="${e(t.navigation)}">
-        <a href="/#directions" data-route>${e(t.directions)}</a><a href="/#method" data-route>${e(t.method)}</a><a href="/#plans" data-route>${e(t.plans)}</a>${routeLink(state.session?.user ? '/dashboard' : '/register', e(t.login), 'mobile-account')}
+        <a href="/#directions" data-route>${e(t.directions)}</a><a href="/#method" data-route>${e(t.method)}</a><a href="/#plans" data-route>${e(t.plans)}</a>${accountControl('mobile-account')}
       </nav>
-      <div class="header-actions"><div class="language-switch" role="group" aria-label="Language / Мова"><button type="button" data-language="uk" lang="uk" aria-label="Українська" aria-pressed="${state.locale === 'uk'}">UA</button><button type="button" data-language="en" lang="en" aria-label="English" aria-pressed="${state.locale === 'en'}">EN</button></div>${routeLink(state.session?.user ? '/dashboard' : '/register', e(t.login), 'header-account')}</div>
+      <div class="header-actions"><div class="language-switch" role="group" aria-label="Language / Мова"><button type="button" data-language="uk" lang="uk" aria-label="Українська" aria-pressed="${state.locale === 'uk'}">UA</button><button type="button" data-language="en" lang="en" aria-label="English" aria-pressed="${state.locale === 'en'}">EN</button></div>${accountControl('header-account')}</div>
     </div></header>`;
 }
 
@@ -55,8 +60,9 @@ function stepper(state, index) {
 }
 
 function planCards(state) {
-  const t = copy[state.locale];
-  return `<div class="plan-grid">${planIds.map((id, i) => `<article class="plan-card ${state.selectedPlan === id ? 'selected' : ''}"><p class="plan-tag">${i === 1 ? `<span class="recommendation-badge">${e(t.recommended)}</span>` : '&nbsp;'}</p><h3>${e(planNames[id])}</h3><p class="plan-description">${e(t.planDescriptions[i])}</p><div class="price">${e(price(state, id))}</div><p class="period">${e(t.month)}</p><button class="button plan-select" type="button" data-plan="${id}" aria-pressed="${state.selectedPlan === id}" ${state.busy || !state.plans.some((p) => p.id === id) ? 'disabled' : ''}>${e(t.choose)} ${e(planNames[id])}</button><div class="plan-features"><p>${e(t.includes[i])}</p><ul>${t.features[i].map((f) => `<li>${e(f)}</li>`).join('')}</ul></div></article>`).join('')}</div><div class="plan-action"><button type="button" class="button primary" data-plan-continue ${!state.selectedPlan || state.busy ? 'disabled' : ''}>${state.selectedPlan ? `${e(t.continuePlan)} ${e(planNames[state.selectedPlan])} →` : e(t.selectPlanFirst)}</button></div>`;
+  const t = copy[state.locale],
+    m = memberCopy[state.locale];
+  return `<div class="plan-grid">${planIds.map((id, i) => `<article class="plan-card ${state.selectedPlan === id ? 'selected' : ''}"><p class="plan-tag">${i === 1 ? `<span class="recommendation-badge">${e(t.recommended)}</span>` : '&nbsp;'}</p><h3>${e(planNames[id])}</h3><p class="plan-description">${e(t.planDescriptions[i])}</p><div class="price">${e(price(state, id))}</div><p class="period">${e(t.month)}</p><p class="trial-caption">${e(state.plans.find((p) => p.id === id)?.trial_days && state.session?.trial_eligible ? m.trial : m.noTrial)}</p><button class="button plan-select" type="button" data-plan="${id}" aria-pressed="${state.selectedPlan === id}" ${state.busy || !state.plans.some((p) => p.id === id) ? 'disabled' : ''}>${e(t.choose)} ${e(planNames[id])}</button><div class="plan-features"><p>${e(t.includes[i])}</p><ul>${t.features[i].map((f) => `<li>${e(f)}</li>`).join('')}</ul></div></article>`).join('')}</div><div class="plan-action"><button type="button" class="button primary" data-plan-continue ${!state.selectedPlan || state.busy ? 'disabled' : ''}>${state.selectedPlan ? `${e(t.continuePlan)} ${e(planNames[state.selectedPlan])} →` : e(t.selectPlanFirst)}</button></div>`;
 }
 
 // The upward line is a visual direction, not measured health data or a forecast.
@@ -108,46 +114,93 @@ function onboarding(state) {
       .join('')}</div></fieldset>`;
   if (s === 2)
     body = `<fieldset class="form-group"><legend class="sr-only">${e(t.minutesLabel)}</legend><div class="duration-options">${[
-      30,
-      45,
-      60,
-      '60-plus',
+      30, 45, 60, 90,
     ]
       .map((n) => {
-        const selected =
-          n === '60-plus' ? d.minutes === 60 && d.minutes_plus : d.minutes === n && !d.minutes_plus;
-        return `<label class="duration-choice ${selected ? 'selected' : ''}"><input type="radio" name="minutes" value="${n}" id="minutes-${n}" ${selected ? 'checked' : ''}><span class="duration-icon">${icon('clock')}</span><strong>${n === '60-plus' ? '60+' : n}</strong><small>${e(t.minutes)}</small></label>`;
+        const selected = d.minutes === n && !d.minutes_plus;
+        return `<label class="duration-choice ${selected ? 'selected' : ''}"><input type="radio" name="minutes" value="${n}" id="minutes-${n}" ${selected ? 'checked' : ''}><span class="duration-icon">${icon('clock')}</span><strong>${n}</strong><small>${e(t.minutes)}</small></label>`;
       })
       .join('')}</div></fieldset>`;
   if (s === 3)
-    body = `<fieldset class="form-group"><legend class="sr-only">${e(t.daysLabel)}</legend><div class="day-options">${t.weekdays.map((day, i) => `<label class="day-choice ${d.days.includes(i) ? 'selected' : ''} ${!d.days.includes(i) && d.days.length >= 3 ? 'unavailable' : ''}"><input type="checkbox" name="days" value="${i}" id="day-${i}" aria-describedby="days-limit" ${d.days.includes(i) ? 'checked' : ''} ${!d.days.includes(i) && d.days.length >= 3 ? 'disabled' : ''}><span class="calendar-day" aria-hidden="true">${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i]}</span><span class="calendar-name">${e(day)}</span></label>`).join('')}</div><p id="days-limit" class="field-hint">${e(t.daysHint)} · ${d.days.length}/3</p></fieldset><aside class="form-review"><p class="eyebrow">${e(t.reviewTitle)}</p>${selectionSummary(state)}<p>${e(t.experience[d.experience]?.[0] || '')} · ${d.minutes}${d.minutes_plus ? '+' : ''} ${e(t.minutes)}${d.days.length ? ` · ${d.days.map((i) => e(t.weekdaysShort[i])).join(', ')}` : ''}</p></aside>`;
-  return `<section class="section flow-section">${stepper(state, 0)}<div class="form-progress"><span>${e(t.formProgress)} 0${s + 1} ${e(t.of)} 04</span><span>${e(t.formSections[s])}</span><div class="progress-track"><span class="progress-${s + 1}"></span></div></div><div class="onboarding-slide"><h1 class="flow-title">${e(titles[s])}</h1><p class="intro">${e(intros[s])}</p><form id="onboarding-form" novalidate>${errorMessage(state)}${body}<p class="form-value">${e(t.formValues[s])}</p><div class="form-actions">${s > 0 ? `<button type="button" class="text-link" data-form-back>← ${e(t.back)}</button>` : `<span class="field-hint">${e(t.selectedGoals)}: ${d.goals.length}</span>`}<button type="submit" class="button primary" ${state.busy ? 'disabled' : ''}>${e(state.busy ? t.working : s === 3 ? (state.session?.user ? t.save : t.saveAndContinue) : t.next)} ${arrow}</button></div><p class="draft-note">${e(t.draftNote)}</p></form></div></section>`;
+    body = `<fieldset class="form-group"><legend class="sr-only">${e(t.daysLabel)}</legend><div class="day-options">${t.weekdays.map((day, i) => `<label class="day-choice ${d.days.includes(i) ? 'selected' : ''} ${!d.days.includes(i) && d.days.length >= 3 ? 'unavailable' : ''}"><input type="checkbox" name="days" value="${i}" id="day-${i}" ${d.days.includes(i) ? 'checked' : ''} ${!d.days.includes(i) && d.days.length >= 3 ? 'disabled' : ''}><span class="calendar-day" aria-hidden="true">${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i]}</span><span class="calendar-name">${e(day)}</span></label>`).join('')}</div></fieldset>`;
+  return `<section class="section flow-section">${stepper(state, 0)}<div class="form-progress"><span>${e(t.formProgress)} 0${s + 1} ${e(t.of)} 04</span><span>${e(t.formSections[s])}</span><div class="progress-track"><span class="progress-${s + 1}"></span></div></div><div class="onboarding-slide"><h1 class="flow-title">${e(titles[s])}</h1><p class="intro">${e(intros[s])}</p><form id="onboarding-form" novalidate>${errorMessage(state)}${body}<div class="form-actions"><button type="submit" class="button primary" ${state.busy ? 'disabled' : ''}>${e(state.busy ? t.working : s === 3 ? t.save : t.next)} ${arrow}</button>${s > 0 && s < 3 ? `<button type="button" class="text-link" data-form-back>← ${e(t.back)}</button>` : ''}</div></form></div></section>`;
+}
+
+function profileFields(state) {
+  const m = memberCopy[state.locale],
+    u = state.session.user || state.registration;
+  return `<div class="profile-fields"><div class="field"><label for="first-name">${e(m.first)}</label><input id="first-name" name="first_name" autocomplete="given-name" maxlength="48" required value="${e(u?.first_name || '')}"></div><div class="field"><label for="last-name">${e(m.last)}</label><input id="last-name" name="last_name" autocomplete="family-name" maxlength="48" required value="${e(u?.last_name || '')}"></div></div>`;
 }
 
 function register(state) {
-  const t = copy[state.locale];
-  const authError = new URLSearchParams(location.search).get('auth_error');
-  return `<section class="section flow-section register-section">${stepper(state, 1)}<div class="center"><p class="eyebrow">Handbalancer’s Studio</p><h1 class="flow-title">${heading(t.registerTitle)}</h1><p class="intro">${e(t.registerIntro)}</p>${selectionSummary(state, state.session.onboarding)}</div>${errorMessage(state)}${authError ? `<p class="message error" role="alert">${e(authError === 'unavailable' ? t.authUnavailable : t.authError)}</p>` : ''}<div class="auth-options">${['google', 'apple'].map((provider) => (state.session.providers[provider] ? `<a class="button auth-button" href="/auth/${provider}/login"><span class="provider-mark" aria-hidden="true">${provider === 'google' ? 'G' : '●'}</span>${e(t[provider])}</a>` : `<button class="button auth-button" type="button" disabled><span class="provider-mark" aria-hidden="true">${provider === 'google' ? 'G' : '●'}</span><span>${e(t[provider])}<small>${e(t.providerUnavailable)}</small></span></button>`)).join('')}<p class="fine-note center">${e(t.providerNote)}</p></div>${state.session.local_preview ? `<div class="demo-panel"><span class="demo-label">${e(t.previewTitle)}</span><form id="register-form"><div class="field"><label for="preview-name">${e(t.previewName)}</label><input id="preview-name" name="name" autocomplete="given-name" minlength="1" maxlength="80" placeholder="${e(t.previewPlaceholder)}" required value="${e(state.previewName || '')}"></div><button class="button primary full-width" type="submit" ${state.busy ? 'disabled' : ''}>${e(state.busy ? t.working : t.previewRegister)} ${arrow}</button></form><p class="fine-note">${e(t.previewRegisterNote)}</p></div>` : ''}<p class="legal-links">${e(t.legalBefore)} ${routeLink('/terms', e(t.terms), 'text-link')} ${e(t.legalAnd)} ${routeLink('/privacy', e(t.privacy), 'text-link')}.</p><div class="center">${routeLink('/onboarding', `← ${e(t.edit)}`, 'text-link')}</div></section>`;
+  const t = copy[state.locale],
+    m = memberCopy[state.locale];
+  const login = location.pathname === '/login';
+  const verify = !login && state.authStage === 'verify';
+  if (state.session.user)
+    return `<section class="section flow-section">${stepper(state, 2)}<h1 class="flow-title">${e(m.profileMissing)}</h1><p class="intro">${e(m.profileMissingBody)}</p><form id="profile-form">${errorMessage(state)}${profileFields(state)}<button class="button primary full-width" type="submit">${e(t.save)}</button></form></section>`;
+  return `<section class="section flow-section register-section">${!login ? stepper(state, 2) : ''}<div class="center"><h1 class="flow-title">${e(verify ? m.verifyTitle : login ? m.loginTitle : m.signupTitle)}</h1><p class="intro">${e(verify ? m.verifyIntro : login ? m.loginIntro : m.signupIntro)}</p></div>${errorMessage(state)}${new URLSearchParams(location.search).has('auth_error') ? `<p class="message error" role="alert">${e(m.authError)}</p>` : ''}
+  ${
+    verify
+      ? `<form id="verify-form" class="account-form"><div class="field"><label for="email-code">${e(m.code)}</label><input id="email-code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required></div><button type="submit" class="button primary full-width" ${state.busy ? 'disabled' : ''}>${e(m.verify)}</button></form><button type="button" class="text-link auth-restart" data-auth-restart>${e(m.restart)}</button>${state.session.local_preview ? `<p class="fine-note">${e(m.localMail)}</p>` : ''}`
+      : `
+  <div class="auth-options">${['google', 'apple'].map((provider) => (state.session.providers[provider] ? `<a class="button auth-button" href="/auth/${provider}/login">${e(t[provider])}</a>` : '')).join('')}</div>
+  <form id="${login ? 'login-form' : 'email-register-form'}" class="account-form">
+  ${login ? '' : profileFields(state)}<div class="field"><label for="account-email">${e(m.email)}</label><input id="account-email" type="email" name="email" autocomplete="email" maxlength="254" required value="${e(state.registration?.email || '')}"></div><div class="field"><label for="account-password">${e(m.password)}</label><input id="account-password" type="password" name="password" autocomplete="${login ? 'current-password' : 'new-password'}" minlength="12" maxlength="128" aria-describedby="password-hint" required><p id="password-hint" class="field-hint">${e(m.passwordHint)}</p></div><button type="submit" class="button primary full-width" ${state.busy ? 'disabled' : ''}>${e(login ? t.login : m.signup)}</button></form>
+  <p class="legal-links">${e(login ? m.noAccount : m.haveAccount)} ${routeLink(login ? '/onboarding' : '/login', e(login ? m.signup : t.login), 'text-link')}</p>`
+  }
+  ${!login ? `<p class="legal-links">${e(t.legalBefore)} ${routeLink('/terms', e(t.terms), 'text-link')} ${e(t.legalAnd)} ${routeLink('/privacy', e(t.privacy), 'text-link')}.</p>` : ''}</section>`;
 }
 
 function plans(state) {
   const t = copy[state.locale];
-  return `<section class="section plans-page">${state.session.user && state.session.onboarding ? stepper(state, 2) : ''}<div class="section-heading center"><p class="eyebrow">${e(t.supportEyebrow)}</p><h1 class="display">${heading(t.plansTitle)}</h1><p class="intro">${e(t.plansIntro)}</p>${state.session.onboarding ? selectionSummary(state, state.session.onboarding) : ''}</div>${errorMessage(state)}${planCards(state)}</section>`;
+  return `<section class="section plans-page">${state.session.onboarding ? stepper(state, 1) : ''}<div class="section-heading center"><p class="eyebrow">${e(t.supportEyebrow)}</p><h1 class="display">${heading(t.plansTitle)}</h1><p class="intro">${e(t.plansIntro)}</p>${state.session.onboarding ? selectionSummary(state, state.session.onboarding) : ''}</div>${errorMessage(state)}${planCards(state)}</section>`;
 }
 
 function checkout(state) {
   const t = copy[state.locale],
     id = state.selectedPlan,
-    i = planIds.indexOf(id);
+    i = planIds.indexOf(id),
+    m = memberCopy[state.locale];
+  const trial = state.plans.find((p) => p.id === id)?.trial_days && state.session.trial_eligible;
   const params = new URLSearchParams(location.search);
-  return `<section class="section flow-section checkout-section">${stepper(state, 3)}<div class="center"><p class="eyebrow">Handbalancer’s Studio</p><h1 class="flow-title">${heading(t.checkoutTitle)}</h1><p class="intro">${e(t.checkoutIntro)}</p></div>${errorMessage(state)}${params.has('canceled') ? `<p class="message">${e(t.canceledPayment)}</p>` : ''}${params.has('success') ? `<p class="message">${e(t.pendingPayment)} <button type="button" class="text-link" data-refresh>${e(t.refreshStatus)}</button></p>` : ''}<article class="checkout-card"><div class="checkout-plan"><div><p class="eyebrow">${e(t.subscription)}</p><h2>${e(planNames[id])}</h2></div>${badge(state.session.local_preview ? t.local : t.monthly)}</div><p class="muted">${e(t.planDescriptions[i])}</p><div class="plan-features"><p>${e(t.includes[i])}</p><ul>${t.features[i].map((item) => `<li>${e(item)}</li>`).join('')}</ul></div><dl class="checkout-total"><div><dt>${e(t.period)}</dt><dd>${e(t.monthly)}</dd></div><div><dt>${e(t.monthlyTotal)}</dt><dd class="checkout-price">${e(price(state, id))}</dd></div></dl>${state.session.payments_enabled && !state.session.user.is_demo ? `<button type="button" class="button primary full-width" data-checkout ${state.busy ? 'disabled' : ''}>${e(state.busy ? t.working : t.pay)} ${arrow}</button>` : `<div class="message"><strong>${e(t.paymentUnavailable)}</strong><p>${e(t.paymentUnavailableBody)}</p></div>`}${state.session.local_preview && state.session.user.is_demo ? `<div class="demo-payment"><span class="demo-label">${e(t.local)}</span><p>${e(t.demoPayNote)}</p><button type="button" class="button primary full-width" data-demo-pay ${state.busy ? 'disabled' : ''}>${e(state.busy ? t.working : t.demoPay)} ${arrow}</button></div>` : ''}</article><div class="center">${routeLink('/plans', `← ${e(t.changePlan)}`, 'text-link')}</div></section>`;
+  return `<section class="section flow-section checkout-section">${stepper(state, 3)}<div class="center"><p class="eyebrow">Handbalancer’s Studio</p><h1 class="flow-title">${heading(t.checkoutTitle)}</h1><p class="intro">${e(t.checkoutIntro)}</p></div>${errorMessage(state)}${params.has('canceled') ? `<p class="message">${e(t.canceledPayment)}</p>` : ''}${params.has('success') ? `<p class="message">${e(t.pendingPayment)} <button type="button" class="text-link" data-refresh>${e(t.refreshStatus)}</button></p>` : ''}<article class="checkout-card"><div class="checkout-plan"><div><p class="eyebrow">${e(t.subscription)}</p><h2>${e(planNames[id])}</h2></div>${badge(state.session.local_preview ? t.local : t.monthly)}</div><p class="muted">${e(t.planDescriptions[i])}</p><div class="plan-features"><p>${e(t.includes[i])}</p><ul>${t.features[i].map((item) => `<li>${e(item)}</li>`).join('')}</ul></div>${trial ? `<p class="trial-terms">${e(m.trialTerms.replace('{price}', price(state, id)))}</p>` : ''}<dl class="checkout-total"><div><dt>${e(t.period)}</dt><dd>${e(t.monthly)}</dd></div><div><dt>${e(t.monthlyTotal)}</dt><dd class="checkout-price">${e(price(state, id))}</dd></div></dl>${state.session.payments_enabled && !state.session.user.is_demo ? `<button type="button" class="button primary full-width" data-checkout ${state.busy ? 'disabled' : ''}>${e(state.busy ? t.working : trial ? m.beginTrial : t.pay)} ${arrow}</button>` : `<div class="message"><strong>${e(t.paymentUnavailable)}</strong><p>${e(t.paymentUnavailableBody)}</p></div>`}${state.session.local_preview && state.session.user.is_demo ? `<div class="demo-payment"><span class="demo-label">${e(t.local)}</span><p>${e(t.demoPayNote)}</p><button type="button" class="button primary full-width" data-demo-pay ${state.busy ? 'disabled' : ''}>${e(state.busy ? t.working : t.demoPay)} ${arrow}</button></div>` : ''}</article><div class="center checkout-links">${routeLink('/dashboard', e(m.openAccount), 'text-link')}${routeLink('/plans', `← ${e(t.changePlan)}`, 'text-link')}</div></section>`;
 }
 
 function dashboard(state) {
   const t = copy[state.locale],
+    m = memberCopy[state.locale],
     d = state.session.onboarding,
-    sub = state.session.subscription;
-  return `<section class="section dashboard-section"><div class="dashboard-heading"><div><p class="eyebrow">${e(t.dashboardEyebrow)}</p><p class="greeting">${e(t.greeting)}, ${e(state.session.user.name)}.</p><h1 class="display">${e(t.dashboardTitle)}</h1><p class="intro">${e(t.dashboardIntro)}</p></div><div class="member-plan"><span class="status-dot" aria-hidden="true"></span><span>${e(sub.is_demo ? t.demoBadge : t.activeBadge)}</span><strong>${e(planNames[sub.plan_id] || sub.plan_id)}</strong></div></div>${errorMessage(state)}<div class="dashboard-grid"><article class="dashboard-card goals-card"><p class="eyebrow">01 / ${e(t.goalsSummary)}</p><h2>${e(t.experience[d.experience][0])}</h2>${selectionSummary(state, d)}${routeLink('/onboarding', `${e(t.edit)} ${arrow}`, 'text-link')}</article><article class="dashboard-card"><p class="eyebrow">02 / ${e(t.scheduleSummary)}</p><h2>${d.minutes}${d.minutes_plus ? '+' : ''} <span>${e(t.minutes)}</span></h2><div class="dashboard-days">${t.weekdays.map((day, i) => `<span class="${d.days.includes(i) ? 'scheduled' : ''}" aria-label="${e(day)}${d.days.includes(i) ? ` - ${e(t.daysLabel)}` : ''}">${e(t.weekdaysShort[i])}</span>`).join('')}</div><p class="muted">${e(d.timezone)}</p></article><article class="dashboard-card"><p class="eyebrow">03 / ${e(t.profile)}</p><h2>${e(state.session.user.name)}</h2><p class="muted">${e(t.saved)}</p></article></div><article class="assessment-card"><div class="assessment-mark" aria-hidden="true">↗</div><div><p class="eyebrow">${e(t.nextStep)}</p><h2>${e(t.assessmentTitle)}</h2><p>${e(t.assessmentBody)}</p></div>${badge(t.pending)}</article><p class="empty-history">${e(t.dashboardEmpty)}</p><div class="dashboard-bottom"><span>${e(t.profile)}: ${e(state.session.user.name)}</span><button class="text-link" type="button" data-logout ${state.busy ? 'disabled' : ''}>${e(t.logout)} <span aria-hidden="true">↗</span></button></div></section>`;
+    u = state.session.user,
+    sub = state.session.subscription,
+    p = state.session.progress;
+  const active = isActive(state),
+    indicator = sub?.indicator || 'inactive';
+  const subLabel =
+    indicator === 'inactive'
+      ? m.inactive
+      : indicator === 'ending'
+        ? m.ending
+        : sub?.status === 'trialing'
+          ? m.trialActive
+          : m.active;
+  const date = (value) =>
+    new Intl.DateTimeFormat('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      timeZone: d.timezone,
+    }).format(new Date(value));
+  const planIndex = planIds.indexOf(sub?.plan_id);
+  const features = planIndex >= 0 ? t.features.slice(0, planIndex + 1).flat() : [];
+  return `<section class="section dashboard-section"><div class="dashboard-heading"><div><p class="eyebrow">${e(t.dashboardEyebrow)}</p><p class="greeting">${e(t.greeting)}, ${e(u.first_name || u.name)}.</p><h1 class="display">${e(t.dashboardTitle)}</h1></div><div class="member-plan"><span class="subscription-dot status-${indicator}" aria-hidden="true"></span><span>${e(subLabel)}</span>${sub ? `<strong>${e(planNames[sub.plan_id])}</strong>` : ''}${sub?.current_period_end ? `<small>${e(sub.cancel_at_period_end ? m.endDate : m.renewDate)}: ${e(date(sub.current_period_end))}</small>` : ''}</div></div>${errorMessage(state)}
+  ${new URLSearchParams(location.search).get('checkout') === 'success' && !active ? `<p class="message">${e(t.pendingPayment)} <button type="button" class="text-link" data-refresh>${e(t.refreshStatus)}</button></p>` : ''}
+  ${!active ? `<div class="membership-notice"><p>${e(m.noSubscriptionBody)}</p>${routeLink('/plans', e(m.noPlan), 'button primary')}</div>` : ''}
+  <div class="dashboard-grid"><article class="dashboard-card goals-card"><p class="eyebrow">01 / ${e(t.goalsSummary)}</p><h2>${e(t.experience[d.experience][0])}</h2>${selectionSummary(state, d)}${routeLink('/onboarding', `${e(t.edit)} ${arrow}`, 'text-link')}</article>
+  <article class="dashboard-card rhythm-card"><p class="eyebrow">02 / ${e(t.scheduleSummary)}</p><div class="rhythm-overview"><div><h2>${d.minutes} <span>${e(t.minutes)} / ${p.target_minutes} ${e(t.minutes)}</span></h2><p class="fine-note">${e(m.weeklyNote)}</p></div><div class="progress-ring"><svg viewBox="0 0 100 100" role="img" aria-label="${e(m.weekly)}: ${p.progress_percent}%"><circle class="ring-track" cx="50" cy="50" r="40"/><circle class="ring-fill" cx="50" cy="50" r="40" pathLength="100" stroke-dasharray="${p.progress_percent} 100" transform="rotate(-90 50 50)"/></svg><strong>${p.progress_percent}%</strong></div></div><p class="weekly-completed">${e(m.done)}: ${p.completed_minutes} / ${p.target_minutes} ${e(t.minutes)}</p><div class="dashboard-days">${t.weekdays.map((day, i) => `<span class="${d.days.includes(i) ? 'scheduled' : ''}" aria-label="${e(day)}">${e(t.weekdaysShort[i])}</span>`).join('')}</div><p class="next-session">${p.next_session ? `${e(m.next)} ${e(date(p.next_session.scheduled_at))} - ${e(p.next_session.title)}` : e(m.awaitPlan)}</p></article>
+  <article class="dashboard-card profile-card"><p class="eyebrow">03 / ${e(t.profile)}</p><h2>${e(u.first_name || u.name)} ${e(u.last_name)}</h2><p class="profile-email">${e(u.email || '-')}</p><details class="profile-editor"><summary class="text-link">${e(m.editProfile)} ${arrow}</summary><form id="profile-form">${profileFields(state)}<button type="submit" class="button primary full-width">${e(t.save)}</button></form></details></article></div>
+  <div class="dashboard-detail-grid"><article class="dashboard-card"><p class="eyebrow">${e(m.weekly)}</p><h2>${p.completed_sessions} <span>${e(m.sessions)}</span></h2><p class="muted">${e(m.historyNote)}</p>${active ? `<details class="training-editor"><summary class="text-link">${e(m.log)} ${arrow}</summary><form id="training-form"><div class="field"><label for="training-goal">${e(m.direction)}</label><select id="training-goal" name="goal">${d.goals.map((id) => `<option value="${id}">${e(t.goalTitles[id])}</option>`).join('')}</select></div><div class="field"><label for="training-minutes">${e(m.duration)}</label><input id="training-minutes" name="minutes" type="number" min="1" max="480" step="1" required></div><button type="submit" class="button primary full-width">${e(m.record)}</button></form></details>` : routeLink('/plans', e(m.log), 'text-link')}</article>
+  <article class="dashboard-card plan-entitlements"><p class="eyebrow">${e(m.included)}</p><h2>${e(sub ? planNames[sub.plan_id] : m.noPlan)}</h2>${features.length ? `<ul>${features.map((item) => `<li>${e(item)}</li>`).join('')}</ul>` : ''}${active && !sub.is_demo ? `<button class="text-link" type="button" data-billing-portal>${e(m.manage)} ${arrow}</button>` : routeLink('/plans', e(t.changePlan), 'text-link')}</article></div>
+  <article class="assessment-card"><div class="assessment-mark" aria-hidden="true">↗</div><div><p class="eyebrow">${e(t.nextStep)}</p><h2>${e(t.assessmentTitle)}</h2><p>${e(t.assessmentBody)}</p></div>${badge(t.pending)}</article></section>`;
 }
 
 function legal(state, path) {
@@ -164,6 +217,7 @@ export function view(state) {
     '/': landing,
     '/onboarding': onboarding,
     '/register': register,
+    '/login': register,
     '/plans': plans,
     '/checkout': checkout,
     '/dashboard': dashboard,

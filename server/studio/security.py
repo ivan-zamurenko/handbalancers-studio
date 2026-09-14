@@ -125,6 +125,7 @@ def rotate_session(
         BrowserSession(
             token_hash=token_hash(raw),
             user_id=user.id,
+            selected_plan=old.selected_plan,
             expires_at=utcnow() + timedelta(seconds=SESSION_SECONDS),
         )
     )
