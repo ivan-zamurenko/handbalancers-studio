@@ -58,3 +58,11 @@
 Міграція0002 успішно застосована до локальної БД.136 серверних тестів passed,4 попередження залежностей.20 груп scripts/check-site.mjs,12 axe станів без порушень. scripts/check-account-flow.mjs перевірив реєстрацію через приватний локальний email-код, login, inline profile, inactive402,60хв із180=33.3%, next planned session, desktop/mobile та axe. Stripe trial entitlement у браузері - тестова локальна fixture; живі зовнішні інтеграції не запускалися. Офіційний Stripe протокол trial перевірений за документацією, API виклики у pytest замінені контрольованими відповідями.
 
 15 deployment unittest (1skip через відсутність Docker), Ruff/Prettier/diff checks пройшли. Скриншоти member-dashboard-1440.png і member-dashboard-390.png у .local-tools/verification/site/. Інструкція локальної пошти та умов тріалу: account-and-membership.md.
+
+## Безперервна інтеграція, 2026-09-14
+
+Додано `.github/workflows/ci.yml`. Перевірки більше не залежать від однієї машини: вони запускаються на кожен push у `main`, на кожен pull request і вручну.
+
+Завдання `quality`: `ruff check`, `ruff format --check`, `prettier --check .`, серверні тести проти сервісного PostgreSQL 14, deployment unittest, `alembic upgrade head` та `alembic check`. Завдання `browser`: піднімає застосунок, чекає на `/health/ready`, потім запускає `check-site.mjs` і `check-account-flow.mjs` у Chrome; лог застосунку зберігається артефактом лише при збої.
+
+CI не використовує `scripts/local.py test`, бо той скрипт вимагає приватний `server/.env` і локальний порт 55432. Замість цього pytest отримує лише `TEST_DATABASE_URL`; fixture і далі відмовляється працювати з будь-якою БД, чия назва не закінчується на `_test`. Цей виклик відтворено локально перед комітом: 136 passed. `SESSION_SECRET` для CI генерується на кожен запуск через `openssl rand`, тому жодного схожого на секрет літерала у Git немає. Жодних реальних облікових даних провайдерів у CI немає, тому живі Google/Apple, Stripe і SMTP залишаються неперевіреними.
