@@ -120,3 +120,7 @@ def test_plan_catalogue_has_server_prices():
         ("pro_plus", 29999),
     ]
     assert all(plan["currency"] == "EUR" for plan in public_plans())
+
+
+def test_ci_selftest_must_fail():
+    assert 1 == 2  # intentional failure to prove CI blocks bad code
