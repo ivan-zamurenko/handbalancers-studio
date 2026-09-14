@@ -426,11 +426,6 @@ main {
   flex-wrap: wrap;
   margin-top: 33px;
 }
-.hero-small {
-  color: var(--quiet);
-  font-size: 10px;
-  margin-top: 22px;
-}
 .hero-figure {
   position: absolute;
   right: 0;
@@ -464,27 +459,6 @@ main {
   color: #b5b5b5;
   line-height: 1.6;
 }
-.image-index {
-  position: absolute;
-  top: 36px;
-  right: 45px;
-  color: #a6a6a6;
-  font-size: 8px;
-  letter-spacing: 0.15em;
-}
-.hero-scroll {
-  position: absolute;
-  bottom: 32px;
-  left: 52px;
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  color: #aeaeae;
-  font-size: 10px;
-}
-.hero-scroll span {
-  font-size: 17px;
-}
 .philosophy {
   border-top: 1px solid #1d1d1d;
   text-align: center;
@@ -495,25 +469,6 @@ main {
 .philosophy .intro {
   margin: 26px auto 0;
   max-width: 580px;
-}
-.philosophy-tags {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 45px;
-  margin-top: 46px;
-}
-.philosophy-tags span {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  color: #bcbcbc;
-  font-size: 11px;
-}
-.philosophy-tags b {
-  font-weight: 400;
-  color: #bbbbbb;
-  font-size: 10px;
 }
 .section-heading {
   display: grid;
@@ -739,14 +694,6 @@ main {
   left: 0;
   color: #b6b6b6;
 }
-.plan-note {
-  font-size: 11px;
-  color: var(--quiet);
-  line-height: 1.75;
-  max-width: 760px;
-  text-align: center;
-  margin: 26px auto 0;
-}
 .comparison {
   max-width: 1050px;
   margin: 38px auto 0;
@@ -768,11 +715,6 @@ main {
 }
 .comparison[open] > summary > span {
   transform: rotate(45deg);
-}
-.table-scroll {
-  overflow: auto;
-  border: 1px solid #262626;
-  border-radius: 14px;
 }
 table {
   border-collapse: collapse;
@@ -805,48 +747,12 @@ tr:last-child td {
   color: #bfbfbf;
   font-size: 16px;
 }
-.not-included {
-  color: #9d9d9d;
-}
-.coaching-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 100px;
-  align-items: start;
-}
 .coaching-section .intro {
   max-width: 380px;
   font-size: 14px;
 }
 .coaching-section .button {
   margin-top: 30px;
-}
-.coach-details {
-  border-top: 1px solid #2f2f2f;
-}
-.coach-details article {
-  padding: 27px 0;
-  border-bottom: 1px solid #2f2f2f;
-  position: relative;
-  padding-left: 62px;
-}
-.coach-number {
-  position: absolute;
-  left: 0;
-  top: 32px;
-  font-size: 10px;
-  color: #b4b4b4;
-}
-.coach-details h3 {
-  font-size: 22px;
-  letter-spacing: -0.03em;
-  font-weight: 450;
-}
-.coach-details article p {
-  margin-top: 12px;
-  color: var(--muted);
-  font-size: 13px;
-  max-width: 370px;
 }
 .equipment-section {
   display: grid;
@@ -1170,9 +1076,6 @@ tr:last-child td {
   font-size: 10px;
   line-height: 1.65;
 }
-.primary-field {
-  margin-top: 28px;
-}
 .experience-options {
   display: grid;
   gap: 12px;
@@ -1234,48 +1137,12 @@ tr:last-child td {
   min-height: 47px;
   font-size: 11px;
 }
-.equipment-options {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-.equipment-choice {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  min-height: 70px;
-  padding: 17px;
-  border-radius: 14px;
-  border: 1px solid #363636;
-  background: #131313;
-  font-size: 12px;
-  cursor: pointer;
-}
-.form-review {
-  background: #131313;
-  border: 1px solid #303030;
-  border-radius: 16px;
-  padding: 23px;
-  margin-top: 26px;
-}
 .form-review .eyebrow {
   font-size: 9px;
   margin: 0;
 }
 .form-review .chips {
   margin-top: 14px;
-}
-.form-review > p:last-child {
-  font-size: 11px;
-  line-height: 1.8;
-  color: #bebebe;
-  margin-top: 18px;
-  overflow-wrap: anywhere;
-}
-.form-review > p:last-child span {
-  color: #909090;
-  padding: 0 5px;
 }
 .form-actions {
   display: flex;
@@ -1286,13 +1153,6 @@ tr:last-child td {
 }
 .form-actions .button {
   font-size: 12px;
-}
-.draft-note {
-  font-size: 10px;
-  color: #a2a2a2;
-  line-height: 1.7;
-  max-width: 520px;
-  margin-top: 24px;
 }
 .message {
   padding: 18px 20px;
@@ -1344,18 +1204,6 @@ tr:last-child td {
 }
 .auth-button:disabled {
   opacity: 0.65;
-}
-.provider-mark {
-  position: absolute;
-  left: 20px;
-  font-size: 18px;
-  font-weight: 550;
-}
-.demo-panel {
-  border: 1px solid #404040;
-  border-radius: 19px;
-  padding: 25px;
-  background: linear-gradient(140deg, #191919, #111111);
 }
 .demo-label {
   display: inline-block;
@@ -1557,23 +1405,6 @@ tr:last-child td {
   background: #aeaeae;
   color: #0f0f0f;
 }
-.equipment-list {
-  display: flex;
-  flex-direction: column;
-  gap: 13px;
-  margin-top: 27px;
-  font-size: 13px;
-  color: #c5c5c5;
-}
-.equipment-list span {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.equipment-list span:before {
-  content: '+';
-  color: #bbbbbb;
-}
 .assessment-card {
   display: flex;
   align-items: center;
@@ -1616,22 +1447,6 @@ tr:last-child td {
   margin-left: auto;
   white-space: nowrap;
   align-self: flex-start;
-}
-.empty-history {
-  text-align: center;
-  color: #a9a9a9;
-  font-size: 12px;
-  padding: 40px 0;
-}
-.dashboard-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  padding-top: 20px;
-  border-top: 1px solid #2f2f2f;
-  font-size: 11px;
-  color: #b8b8b8;
 }
 .legal-page {
   max-width: 900px;
@@ -1706,9 +1521,6 @@ tr:last-child td {
   .hero .intro {
     max-width: 350px;
   }
-  .hero-scroll {
-    left: 34px;
-  }
   .direction-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -1737,9 +1549,6 @@ tr:last-child td {
   .practice-figure img {
     height: 540px;
   }
-  .coaching-section {
-    gap: 60px;
-  }
   .equipment-section {
     gap: 42px;
   }
@@ -1751,10 +1560,6 @@ tr:last-child td {
   }
   .dashboard-card:last-child {
     grid-column: 1/-1;
-  }
-  .equipment-list {
-    flex-direction: row;
-    flex-wrap: wrap;
   }
   .dashboard-heading {
     gap: 30px;
@@ -1887,10 +1692,6 @@ tr:last-child td {
     font-size: 11px;
     gap: 10px;
   }
-  .hero-small {
-    font-size: 9px;
-    margin-top: 17px;
-  }
   .hero-figure {
     position: relative;
     inset: auto;
@@ -1913,19 +1714,6 @@ tr:last-child td {
     bottom: 16px;
     max-width: 145px;
   }
-  .image-index {
-    top: 30px;
-    right: 24px;
-    font-size: 7px;
-  }
-  .hero-scroll {
-    bottom: 25px;
-    left: 23px;
-    font-size: 9px;
-  }
-  .hero-scroll span {
-    font-size: 16px;
-  }
   .display {
     font-size: clamp(35px, 7vw, 46px);
   }
@@ -1940,18 +1728,6 @@ tr:last-child td {
     margin-bottom: 17px;
   }
   .philosophy {
-  }
-  .philosophy-tags {
-    gap: 18px;
-    flex-wrap: wrap;
-    margin-top: 30px;
-  }
-  .philosophy-tags span {
-    font-size: 10px;
-    gap: 8px;
-  }
-  .philosophy-tags b {
-    font-size: 9px;
   }
   .section-heading {
     display: block;
@@ -2062,10 +1838,6 @@ tr:last-child td {
   .plan-features li {
     font-size: 11px;
   }
-  .plan-note {
-    font-size: 10px;
-    margin-top: 23px;
-  }
   .comparison {
     margin-top: 27px;
   }
@@ -2073,25 +1845,9 @@ tr:last-child td {
     font-size: 11px;
     padding: 20px 0;
   }
-  .coaching-section {
-    grid-template-columns: 1fr;
-    gap: 35px;
-  }
   .coaching-section .intro {
     max-width: 420px;
     font-size: 13px;
-  }
-  .coach-details article {
-    padding: 24px 0 24px 53px;
-  }
-  .coach-number {
-    top: 29px;
-  }
-  .coach-details h3 {
-    font-size: 24px;
-  }
-  .coach-details article p {
-    font-size: 12px;
   }
   .equipment-section {
     display: flex;
@@ -2255,14 +2011,6 @@ tr:last-child td {
     padding: 10px 2px;
     border-radius: 10px;
   }
-  .equipment-options {
-    gap: 10px;
-  }
-  .equipment-choice {
-    padding: 15px 13px;
-    font-size: 11px;
-    min-height: 68px;
-  }
   .field > label,
   .form-group > legend {
     font-size: 12px;
@@ -2271,23 +2019,11 @@ tr:last-child td {
   .field select {
     font-size: 16px;
   }
-  .draft-note {
-    font-size: 10px;
-  }
-  .form-review {
-    padding: 20px;
-  }
-  .form-review > p:last-child {
-    font-size: 10px;
-  }
   .form-review .chip {
     font-size: 10px;
   }
   .auth-options {
     margin-top: 28px;
-  }
-  .demo-panel {
-    padding: 22px;
   }
   .auth-button {
     font-size: 12px;
@@ -2363,11 +2099,6 @@ tr:last-child td {
     font-size: 10px;
     min-height: 34px;
   }
-  .equipment-list {
-    gap: 13px 22px;
-    flex-direction: row;
-    font-size: 12px;
-  }
   .assessment-card {
     padding: 25px;
     gap: 17px;
@@ -2389,13 +2120,6 @@ tr:last-child td {
   }
   .assessment-card > .chip {
     margin: 0 0 0 60px;
-    font-size: 10px;
-  }
-  .empty-history {
-    font-size: 11px;
-    padding: 31px 0;
-  }
-  .dashboard-bottom {
     font-size: 10px;
   }
   .legal-page {
@@ -2533,10 +2257,6 @@ tr:last-child td {
     font-size: 10px;
     padding-left: 16px;
     padding-right: 16px;
-  }
-  .equipment-choice {
-    font-size: 10px;
-    gap: 9px;
   }
   .equipment-choice .choice-check {
     width: 16px;
@@ -2780,14 +2500,6 @@ main
   margin: 20px auto 0;
   max-width: 600px;
 }
-.form-value {
-  font-size: 14px;
-  color: #bbb;
-  line-height: 1.6;
-  text-align: center;
-  margin: 18px auto 0;
-  max-width: 570px;
-}
 .choice-card {
   background: #121212;
   border-color: #3e3e3e;
@@ -2923,12 +2635,6 @@ main
 }
 .day-choice:has(input:disabled) {
   cursor: not-allowed;
-}
-.form-review {
-  margin-top: 26px;
-  background: #141414;
-  border-color: #333;
-  text-align: center;
 }
 .form-review .chips,
 .form-review .eyebrow {
@@ -3212,153 +2918,6 @@ main
   padding: 16px 28px;
   line-height: 1.4;
 }
-.transformation-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px;
-  margin-top: 36px;
-}
-.trajectory {
-  padding: 30px;
-  border: 1px solid #333;
-  border-radius: 24px;
-  background: #111;
-}
-.trajectory-before {
-  --chart-color: #d88b88;
-  background: linear-gradient(145deg, #1b1414, #101010);
-}
-.trajectory-after {
-  --chart-color: #79d69a;
-  border-color: #3a5944;
-  background: linear-gradient(145deg, #142019, #101410);
-}
-.trajectory-label {
-  font-size: 22px;
-  font-weight: 500;
-  letter-spacing: -0.025em;
-  line-height: 1.3;
-}
-.trajectory-description {
-  min-height: 50px;
-  margin-top: 14px;
-  color: #b4b4bc;
-  font-size: 15px;
-  line-height: 1.65;
-  max-width: 420px;
-}
-.journey-chart {
-  display: block;
-  width: 100%;
-  height: auto;
-  margin-top: 24px;
-  overflow: visible;
-}
-.journey-chart path {
-  fill: none;
-  vector-effect: non-scaling-stroke;
-}
-.chart-grid {
-  stroke: #ffffff0c;
-  stroke-width: 1;
-}
-.chart-baseline {
-  stroke: #ffffff22;
-  stroke-width: 1;
-}
-.chart-curve,
-.chart-arrow {
-  stroke: var(--chart-color);
-  stroke-width: 2.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.chart-axis {
-  display: flex;
-  justify-content: space-between;
-  color: #a5a5ab;
-  font-size: 12px;
-  padding: 0 16px;
-}
-.chart-note {
-  font-size: 12px;
-  color: #a5a5ab;
-  line-height: 1.6;
-  text-align: center;
-  margin: 18px auto 0;
-  max-width: 740px;
-}
-.journey-timeline {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 28px;
-  padding: 0;
-  list-style: none;
-  margin-top: 46px;
-}
-.journey-timeline li {
-  position: relative;
-  padding: 25px 18px 0 0;
-  border-top: 1px solid #47745a;
-}
-.journey-dot {
-  position: absolute;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #79d69a;
-  top: -4px;
-  left: 0;
-}
-.journey-timeline li:not(:last-child)::after {
-  content: '→';
-  position: absolute;
-  right: -23px;
-  top: -17px;
-  font-size: 24px;
-  line-height: 1.3;
-  color: #79d69a;
-}
-.journey-timeline h3 {
-  font-size: 19px;
-  font-weight: 500;
-  letter-spacing: -0.02em;
-}
-.journey-timeline p {
-  font-size: 14px;
-  line-height: 1.65;
-  margin-top: 8px;
-  color: #b4b4bc;
-}
-.journey-outcomes {
-  margin-top: 36px;
-  padding-top: 26px;
-  border-top: 1px solid #2c2c2c;
-  text-align: center;
-}
-.journey-outcomes > p {
-  font-size: 14px;
-  color: #b4b4bc;
-}
-.journey-outcomes ul {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 12px 24px;
-  padding: 0;
-  list-style: none;
-  margin-top: 18px;
-}
-.journey-outcomes li {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  font-size: 14px;
-}
-.journey-outcomes li > span {
-  color: #79d69a;
-  font-size: 18px;
-}
 @media (max-width: 760px) {
   .hero {
     min-height: 0;
@@ -3370,50 +2929,6 @@ main
   }
   .hero-figure {
     bottom: auto;
-  }
-  .transformation-grid {
-    grid-template-columns: 1fr;
-    gap: 18px;
-  }
-  .trajectory {
-    padding: 24px;
-  }
-  .trajectory-description {
-    min-height: 0;
-  }
-  .journey-timeline {
-    grid-template-columns: 1fr;
-    gap: 0;
-    margin-top: 32px;
-  }
-  .journey-timeline li {
-    border-top: 0;
-    border-left: 1px solid #47745a;
-    padding: 0 0 28px 25px;
-    margin-left: 4px;
-  }
-  .journey-dot {
-    left: -4px;
-    top: 6px;
-  }
-  .journey-timeline li:not(:last-child)::after {
-    content: '↓';
-    top: auto;
-    right: auto;
-    left: -7px;
-    bottom: 0;
-    font-size: 18px;
-    background: var(--canvas);
-  }
-  .journey-timeline li:last-child {
-    padding-bottom: 0;
-    border-left-color: transparent;
-  }
-  .journey-timeline h3 {
-    font-size: 18px;
-  }
-  .journey-outcomes ul {
-    gap: 12px 18px;
   }
   .method-steps li {
     grid-template-columns: 42px minmax(0, 1fr);
