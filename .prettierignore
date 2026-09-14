@@ -7,3 +7,7 @@ public/images/
 design-previews/
 AGENTS.md
 PROJECT_MEMORY.md
+
+# Prettier parses .inc as Markdown and would join every nginx directive into one
+# line, letting the leading comment swallow the `set` directive. Never format it.
+deploy/nginx/

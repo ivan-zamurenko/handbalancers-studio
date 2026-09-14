@@ -6,13 +6,13 @@
 
 ## Чому дві конфігурації
 
-| Властивість | `compose.yaml` | `compose.production.yaml` |
-| --- | --- | --- |
-| Адреса | `http://127.0.0.1:8000` | `https://STUDIO_HOST` |
-| Опубліковані порти | API лише на `127.0.0.1:8000` | nginx на 80 і 443 |
-| PostgreSQL | Приватна мережа, без порту на хості | Приватна мережа, без порту на хості |
-| Локальний preview | Вимкнений; demo запускають нативно | Примусово вимкнений |
-| HTTPS | Немає | TLS 1.2/1.3, HTTP перенаправляє на HTTPS |
+| Властивість        | `compose.yaml`                      | `compose.production.yaml`                |
+| ------------------ | ----------------------------------- | ---------------------------------------- |
+| Адреса             | `http://127.0.0.1:8000`             | `https://STUDIO_HOST`                    |
+| Опубліковані порти | API лише на `127.0.0.1:8000`        | nginx на 80 і 443                        |
+| PostgreSQL         | Приватна мережа, без порту на хості | Приватна мережа, без порту на хості      |
+| Локальний preview  | Вимкнений; demo запускають нативно  | Примусово вимкнений                      |
+| HTTPS              | Немає                               | TLS 1.2/1.3, HTTP перенаправляє на HTTPS |
 
 Production-файл запускають **самостійно** через `-f compose.production.yaml`. Не об’єднуйте обидва файли: злиття могло б успадкувати локальний порт API. Різні назви Compose-проєктів також відокремлюють томи з даними.
 
@@ -81,11 +81,11 @@ curl --fail --silent --show-error https://studio.example.com/health/ready
 
 Власний Stripe-акаунт не створює налаштувань Google або Apple. Це окремі інтеграції. Наявність env-полів означає підготовлений код інтеграції; успішний вхід і оплату треба підтвердити з вашими обліковими записами.
 
-| Сервіс | Що внести приватно | Точна адреса для production |
-| --- | --- | --- |
-| Google | OAuth client типу Web application: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Authorized redirect URI: `https://studio.example.com/auth/google/callback` |
-| Apple | Services ID для web: `APPLE_CLIENT_ID`; згенерований чинний client-secret JWT: `APPLE_CLIENT_SECRET` | Return URL: `https://studio.example.com/auth/apple/callback` |
-| Stripe | `STRIPE_SECRET_KEY`, endpoint signing secret `STRIPE_WEBHOOK_SECRET`; чотири `STRIPE_PRICE_*` | Webhook endpoint: `https://studio.example.com/api/webhooks/stripe` |
+| Сервіс | Що внести приватно                                                                                   | Точна адреса для production                                                |
+| ------ | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Google | OAuth client типу Web application: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`                        | Authorized redirect URI: `https://studio.example.com/auth/google/callback` |
+| Apple  | Services ID для web: `APPLE_CLIENT_ID`; згенерований чинний client-secret JWT: `APPLE_CLIENT_SECRET` | Return URL: `https://studio.example.com/auth/apple/callback`               |
+| Stripe | `STRIPE_SECRET_KEY`, endpoint signing secret `STRIPE_WEBHOOK_SECRET`; чотири `STRIPE_PRICE_*`        | Webhook endpoint: `https://studio.example.com/api/webhooks/stripe`         |
 
 Замініть домен у **кожній** адресі власним `STUDIO_HOST`. Google повертає користувача через GET, Apple використовує HTTPS POST із `response_mode=form_post`; проксі має зберігати цей POST. Для Google також налаштуйте consent screen, аудиторію та дозволених тестових користувачів відповідно до режиму OAuth-проєкту. [Google: web server OAuth](https://developers.google.com/identity/protocols/oauth2/web-server).
 
