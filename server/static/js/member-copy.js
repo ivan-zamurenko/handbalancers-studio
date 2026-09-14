@@ -7,6 +7,10 @@ export const memberCopy = {
     passwordHint: 'Щонайменше 12 символів',
     signup: 'Створити акаунт',
     loginTitle: 'З поверненням.',
+    loginOr: 'або',
+    loginWith: 'Продовжити через',
+    providerLater: 'Згодом',
+    providerPending: 'Третій сервіс входу ще не обрано',
     signupTitle: 'Ваш наступний крок.',
     signupIntro: 'Створіть акаунт, щоб зберегти свій план і продовжити.',
     loginIntro: 'Увійдіть, щоб повернутися до своїх занять.',
@@ -53,8 +57,6 @@ export const memberCopy = {
       'Перевірте дані. Для входу потрібні правильні пошта й пароль, для підтвердження - чинний код.',
     rateError: 'Забагато спроб. Спробуйте трохи пізніше.',
     emailUnavailable: 'Не вдалося надіслати лист. Спробуйте пізніше.',
-    localMail:
-      'Локальна перевірка: лист збережено в приватній тестовій скриньці на цьому комп’ютері.',
   },
   en: {
     first: 'First name',
@@ -64,6 +66,10 @@ export const memberCopy = {
     passwordHint: 'At least 12 characters',
     signup: 'Create account',
     loginTitle: 'Welcome back.',
+    loginOr: 'or',
+    loginWith: 'Continue with',
+    providerLater: 'Later',
+    providerPending: 'The third sign-in service has not been chosen yet',
     signupTitle: 'Your next step.',
     signupIntro: 'Create an account to save your plan and continue.',
     loginIntro: 'Sign in to return to your practice.',
@@ -110,6 +116,5 @@ export const memberCopy = {
       'Check your details. Sign in with the correct email and password, or verify with a valid code.',
     rateError: 'Too many attempts. Please try again later.',
     emailUnavailable: 'Email could not be sent. Please try again later.',
-    localMail: 'Local testing: your email was saved to the private test inbox on this computer.',
   },
 };

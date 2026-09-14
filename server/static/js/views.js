@@ -1,5 +1,5 @@
 import { memberCopy } from './member-copy.js?v=20260914-membership';
-import { icon } from './icons.js?v=20260914-membership';
+import { icon, providerIcon, socialIcon } from './icons.js?v=20260914-membership';
 import { copy, goalIds, planIds, planNames } from './copy.js?v=20260914-membership';
 
 // Every dynamic value, including account names and saved form data, is escaped.
@@ -13,6 +13,11 @@ const heading = (value) => value.split('\n').map(e).join('<br>');
 const arrow = '<span aria-hidden="true">↗</span>';
 const routeLink = (href, label, cls = 'button') =>
   `<a class="${cls}" href="${href}" data-route>${label}</a>`;
+const isAuthPage = () => ['/login', '/register'].includes(location.pathname);
+const languageSwitch = (state) =>
+  `<div class="language-switch" role="group" aria-label="Language / Мова"><button type="button" data-language="uk" lang="uk" aria-label="Українська" aria-pressed="${state.locale === 'uk'}">UA</button><button type="button" data-language="en" lang="en" aria-label="English" aria-pressed="${state.locale === 'en'}">EN</button></div>`;
+const authBrand = (t) =>
+  `<div class="login-brand"><a class="brand" href="/" data-route aria-label="Handbalancer’s Studio - ${e(t.home)}"><span class="brand-mark" aria-hidden="true">h<span>.</span></span><span>Handbalancer’s<br>Studio</span></a></div>`;
 const badge = (label) => `<span class="chip">${e(label)}</span>`;
 const errorMessage = (state) =>
   state.error ? `<div class="message error" role="alert">${e(state.error)}</div>` : '';
@@ -33,6 +38,7 @@ const price = (state, id) => {
 };
 
 export function shell(state) {
+  if (isAuthPage()) return '';
   const t = copy[state.locale];
   const accountControl = (className) =>
     state.session?.user
@@ -45,18 +51,36 @@ export function shell(state) {
       <nav id="main-navigation" class="navigation ${state.menuOpen ? 'is-open' : ''}" aria-label="${e(t.navigation)}">
         <a href="/#directions" data-route>${e(t.directions)}</a><a href="/#method" data-route>${e(t.method)}</a><a href="/#plans" data-route>${e(t.plans)}</a>${accountControl('mobile-account')}
       </nav>
-      <div class="header-actions"><div class="language-switch" role="group" aria-label="Language / Мова"><button type="button" data-language="uk" lang="uk" aria-label="Українська" aria-pressed="${state.locale === 'uk'}">UA</button><button type="button" data-language="en" lang="en" aria-label="English" aria-pressed="${state.locale === 'en'}">EN</button></div>${accountControl('header-account')}</div>
+      <div class="header-actions">${languageSwitch(state)}${accountControl('header-account')}</div>
     </div></header>`;
 }
 
 export function footer(state) {
   const t = copy[state.locale];
-  return `<div class="footer-inner"><div><a class="footer-brand" href="/" data-route>Handbalancer’s Studio<span aria-hidden="true">↗</span></a><p>${e(t.footer)}</p></div><nav aria-label="${e(t.terms)}">${routeLink('/privacy', e(t.privacy), 'text-link')}${routeLink('/terms', e(t.terms), 'text-link')}</nav><span class="footer-year">© ${new Date().getFullYear()}</span></div>`;
+  return `<div class="footer-inner">
+    <a class="footer-brand" href="/" data-route aria-label="Handbalancer’s Studio - ${e(t.home)}"><span class="brand-mark" aria-hidden="true">h<span>.</span></span><span>Handbalancer’s<br>Studio</span></a>
+    <div class="footer-info"><p class="footer-copyright">© ${new Date().getFullYear()} Handbalancer’s Studio</p><p>${e(t.footer)}</p><nav class="footer-legal" aria-label="${e(t.terms)}">${routeLink('/privacy', e(t.privacy), 'text-link')}${routeLink('/terms', e(t.terms), 'text-link')}</nav></div>
+    <div class="footer-actions">${isAuthPage() ? languageSwitch(state) : ''}<div class="footer-socials"><a class="footer-social footer-social-instagram" href="https://www.instagram.com/ivan.zamurenko/" target="_blank" rel="noopener noreferrer" aria-label="Instagram - @ivan.zamurenko">${socialIcon('instagram')}</a><a class="footer-social footer-social-youtube" href="https://www.youtube.com/@HandbalancersNotes" target="_blank" rel="noopener noreferrer" aria-label="YouTube - Handbalancer’s Notes">${socialIcon('youtube')}</a><button class="footer-social" type="button" disabled aria-label="X">${socialIcon('x')}</button></div></div>
+  </div>`;
 }
 
 function stepper(state, index) {
   const t = copy[state.locale];
-  return `<ol class="stepper" aria-label="${e(t.stages)}">${t.steps.map((label, i) => `<li ${i === index ? 'aria-current="step"' : ''} class="${i < index ? 'complete' : ''}"><span aria-hidden="true">${i < index ? '✓' : `0${i + 1}`}</span><span>${e(label)}</span></li>`).join('')}</ol>`;
+  const user = state.session.user;
+  const completed = [
+    Boolean(state.session.onboarding),
+    Boolean(state.session.onboarding && state.session.selected_plan),
+    Boolean(user && (user.is_demo || (user.first_name && user.last_name))),
+    isActive(state),
+  ];
+  const routes = ['/onboarding', '/plans', '/register?edit=profile', '/dashboard'];
+  return `<ol class="stepper" aria-label="${e(t.stages)}">${t.steps
+    .map((label, i) => {
+      const done = i !== index && completed[i];
+      const content = `<span class="step-indicator" aria-hidden="true">${done ? '✓' : `0${i + 1}`}</span><span>${e(label)}</span>`;
+      return `<li ${i === index ? 'aria-current="step"' : ''} class="${done ? 'complete' : ''}">${done ? routeLink(routes[i], content, 'step-content step-link') : `<span class="step-content">${content}</span>`}</li>`;
+    })
+    .join('')}</ol>`;
 }
 
 function planCards(state) {
@@ -86,7 +110,7 @@ function landing(state) {
     <section id="plans" class="section pricing-section"><div class="section-heading center"><p class="eyebrow">${e(t.supportEyebrow)}</p><h2 class="display">${heading(t.plansTitle)}</h2><p class="intro">${e(t.plansIntro)}</p></div>${planCards(state)}</section>
     <section id="equipment" class="section equipment-section"><div class="equipment-copy"><p class="eyebrow">${e(t.equipmentEyebrow)}</p><h2 class="display">${heading(t.equipmentTitle)}</h2><p class="intro">${e(t.equipmentBody)}</p><div class="chips">${['mat', 'parallettes', 'blocks'].map((id) => badge(t.equipmentNames[id])).join('')}</div></div><figure><img src="/static/images/equipment.webp" width="1536" height="1024" loading="lazy" alt="${e(t.equipmentAlt)}"></figure></section>
     <section id="faq" class="section faq-section"><div><p class="eyebrow">${e(t.faqEyebrow)}</p><h2 class="display">${e(t.faqTitle)}</h2></div><div class="faq-list">${t.faq.map((item, i) => `<details id="faq-${i}"><summary>${e(item[0])}<span aria-hidden="true">＋</span></summary><p>${e(item[1])}</p></details>`).join('')}</div></section>
-    <section class="section final-cta center"><span class="cta-mark" aria-hidden="true">h<span>.</span></span><h2 class="display">${heading(t.finalTitle)}</h2><p class="intro">${e(t.finalBody)}</p>${routeLink('/onboarding', `${e(t.start)} ${arrow}`, 'button primary')}</section>`;
+    <section class="section final-cta center"><h2 class="display">${heading(t.finalTitle)}</h2><p class="intro">${e(t.finalBody)}</p>${routeLink('/onboarding', `${e(t.start)} ${arrow}`, 'button primary')}</section>`;
 }
 
 function selectionSummary(state, document = state.draft) {
@@ -137,24 +161,42 @@ function register(state) {
     m = memberCopy[state.locale];
   const login = location.pathname === '/login';
   const verify = !login && state.authStage === 'verify';
+  const editing = new URLSearchParams(location.search).get('edit') === 'profile';
   if (state.session.user)
-    return `<section class="section flow-section">${stepper(state, 2)}<h1 class="flow-title">${e(m.profileMissing)}</h1><p class="intro">${e(m.profileMissingBody)}</p><form id="profile-form">${errorMessage(state)}${profileFields(state)}<button class="button primary full-width" type="submit">${e(t.save)}</button></form></section>`;
-  return `<section class="section flow-section register-section">${!login ? stepper(state, 2) : ''}<div class="center"><h1 class="flow-title">${e(verify ? m.verifyTitle : login ? m.loginTitle : m.signupTitle)}</h1><p class="intro">${e(verify ? m.verifyIntro : login ? m.loginIntro : m.signupIntro)}</p></div>${errorMessage(state)}${new URLSearchParams(location.search).has('auth_error') ? `<p class="message error" role="alert">${e(m.authError)}</p>` : ''}
+    return `<section class="section flow-section register-section login-section">${stepper(state, 2)}<div class="login-card">${authBrand(t)}<div class="center"><h1 class="flow-title">${e(editing ? m.editProfile : m.profileMissing)}</h1>${editing ? '' : `<p class="intro">${e(m.profileMissingBody)}</p>`}</div><form id="profile-form">${errorMessage(state)}${profileFields(state)}<button class="button primary full-width" type="submit">${e(t.save)}</button></form></div></section>`;
+  return `<section class="section flow-section register-section login-section">${!login ? stepper(state, 2) : ''}<div class="login-card">${authBrand(t)}<div class="center"><h1 class="flow-title">${e(verify ? m.verifyTitle : login ? m.loginTitle : m.signupTitle)}</h1><p class="intro">${e(verify ? m.verifyIntro : login ? m.loginIntro : m.signupIntro)}</p></div>${errorMessage(state)}${new URLSearchParams(location.search).has('auth_error') ? `<p class="message error" role="alert">${e(m.authError)}</p>` : ''}
   ${
     verify
-      ? `<form id="verify-form" class="account-form"><div class="field"><label for="email-code">${e(m.code)}</label><input id="email-code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required></div><button type="submit" class="button primary full-width" ${state.busy ? 'disabled' : ''}>${e(m.verify)}</button></form><button type="button" class="text-link auth-restart" data-auth-restart>${e(m.restart)}</button>${state.session.local_preview ? `<p class="fine-note">${e(m.localMail)}</p>` : ''}`
+      ? `<form id="verify-form" class="account-form"><div class="field"><label for="email-code">${e(m.code)}</label><input id="email-code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required></div><button type="submit" class="button primary full-width" ${state.busy ? 'disabled' : ''}>${e(m.verify)}</button></form><button type="button" class="text-link auth-restart" data-auth-restart>${e(m.restart)}</button>`
       : `
-  <div class="auth-options">${['google', 'apple'].map((provider) => (state.session.providers[provider] ? `<a class="button auth-button" href="/auth/${provider}/login">${e(t[provider])}</a>` : '')).join('')}</div>
   <form id="${login ? 'login-form' : 'email-register-form'}" class="account-form">
   ${login ? '' : profileFields(state)}<div class="field"><label for="account-email">${e(m.email)}</label><input id="account-email" type="email" name="email" autocomplete="email" maxlength="254" required value="${e(state.registration?.email || '')}"></div><div class="field"><label for="account-password">${e(m.password)}</label><input id="account-password" type="password" name="password" autocomplete="${login ? 'current-password' : 'new-password'}" minlength="12" maxlength="128" aria-describedby="password-hint" required><p id="password-hint" class="field-hint">${e(m.passwordHint)}</p></div><button type="submit" class="button primary full-width" ${state.busy ? 'disabled' : ''}>${e(login ? t.login : m.signup)}</button></form>
   <p class="legal-links">${e(login ? m.noAccount : m.haveAccount)} ${routeLink(login ? '/onboarding' : '/login', e(login ? m.signup : t.login), 'text-link')}</p>`
   }
-  ${!login ? `<p class="legal-links">${e(t.legalBefore)} ${routeLink('/terms', e(t.terms), 'text-link')} ${e(t.legalAnd)} ${routeLink('/privacy', e(t.privacy), 'text-link')}.</p>` : ''}</section>`;
+  ${!login ? `<p class="legal-links auth-legal"><span>${e(t.legalBefore)}</span><span class="auth-legal-links">${routeLink('/terms', e(t.terms), 'text-link')} ${e(t.legalAnd)} ${routeLink('/privacy', e(t.privacy), 'text-link')}.</span></p>` : ''}
+  ${
+    !verify
+      ? `<div class="login-divider">${e(m.loginOr)}</div><div class="login-providers" role="group" aria-label="${e(m.loginWith)}">${[
+          'google',
+          'apple',
+        ]
+          .map((provider) => {
+            const logo = providerIcon(provider);
+            return state.session.providers[provider]
+              ? `<a class="button login-provider" href="/auth/${provider}/login" aria-label="${e(t[provider])}" title="${e(t[provider])}">${logo}</a>`
+              : `<button class="button login-provider" type="button" disabled aria-label="${e(t[provider])} - ${e(t.providerUnavailable)}" title="${e(t.providerUnavailable)}">${logo}</button>`;
+          })
+          .join(
+            '',
+          )}<button class="button login-provider login-provider-pending" type="button" disabled aria-label="${e(m.providerPending)}" title="${e(m.providerPending)}"><span aria-hidden="true">•••</span><span>${e(m.providerLater)}</span></button></div>`
+      : ''
+  }
+  </div></section>`;
 }
 
 function plans(state) {
   const t = copy[state.locale];
-  return `<section class="section plans-page">${state.session.onboarding ? stepper(state, 1) : ''}<div class="section-heading center"><p class="eyebrow">${e(t.supportEyebrow)}</p><h1 class="display">${heading(t.plansTitle)}</h1><p class="intro">${e(t.plansIntro)}</p>${state.session.onboarding ? selectionSummary(state, state.session.onboarding) : ''}</div>${errorMessage(state)}${planCards(state)}</section>`;
+  return `<section class="section plans-page">${state.session.onboarding ? stepper(state, 1) : ''}<div class="section-heading center"><p class="eyebrow">${e(t.supportEyebrow)}</p><h1 class="display">${heading(t.plansTitle)}</h1><p class="intro">${e(t.plansIntro)}</p></div>${errorMessage(state)}${planCards(state)}</section>`;
 }
 
 function checkout(state) {

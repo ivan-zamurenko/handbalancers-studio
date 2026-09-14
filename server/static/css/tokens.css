@@ -98,6 +98,11 @@
   --danger: var(--danger-63);
   --warning: var(--warning-77);
 
+  --social-instagram-yellow: #feda75;
+  --social-instagram-pink: #d62976;
+  --social-instagram-purple: #962fbf;
+  --social-youtube: #ff0000;
+
   /* Геометрія і типографіка */
   --radius: 24px;
   --font: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', sans-serif;

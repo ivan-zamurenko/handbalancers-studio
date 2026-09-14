@@ -155,7 +155,10 @@ function observeChangeIllustration() {
 function render({ focus = false, preserve = false } = {}) {
   // Recheck access after session refreshes as well as navigation.
   guard();
-  const activeId = preserve ? document.activeElement?.id : null;
+  const activeElement = preserve ? document.activeElement : null;
+  const activeId = activeElement?.id;
+  const activeLanguage = activeElement?.dataset.language;
+  const languageRegion = activeElement?.closest('#footer') ? '#footer' : '#shell';
   const openDetails = [...main.querySelectorAll('details[open][id]')].map((node) => node.id);
   const t = copy[state.locale];
   document.documentElement.lang = state.locale;
@@ -179,6 +182,10 @@ function render({ focus = false, preserve = false } = {}) {
     if (node?.tagName === 'DETAILS') node.open = true;
   }
   if (activeId) document.getElementById(activeId)?.focus({ preventScroll: true });
+  else if (activeLanguage)
+    document
+      .querySelector(`${languageRegion} [data-language="${activeLanguage}"]`)
+      ?.focus({ preventScroll: true });
   if (focus) focusHeading();
 }
 
@@ -195,7 +202,12 @@ function guard() {
     target = session.onboarding ? '/dashboard' : '/onboarding';
   else if (['/register', '/checkout', '/dashboard'].includes(path) && !session.onboarding)
     target = '/onboarding';
-  else if (path === '/register' && session.user && !incomplete)
+  else if (
+    path === '/register' &&
+    session.user &&
+    !incomplete &&
+    new URLSearchParams(location.search).get('edit') !== 'profile'
+  )
     target = isActive(state) ? '/dashboard' : session.selected_plan ? '/checkout' : '/plans';
   else if (path === '/register' && !session.user && !session.selected_plan) target = '/plans';
   else if (path === '/checkout' && !session.selected_plan) target = '/plans';
@@ -483,6 +495,7 @@ document.addEventListener('click', (event) => {
     if (state.menuOpen) document.querySelector('#main-navigation a')?.focus();
     else document.querySelector('#menu-toggle')?.focus();
   } else if (button.dataset.language) {
+    const languageRegion = button.closest('#footer') ? '#footer' : '#shell';
     const locale = button.dataset.language;
     if (locale === state.locale) return;
     state.locale = locale;
@@ -491,7 +504,9 @@ document.addEventListener('click', (event) => {
     saveDraft();
     state.error = '';
     render();
-    document.querySelector(`[data-language="${locale}"]`)?.focus({ preventScroll: true });
+    document
+      .querySelector(`${languageRegion} [data-language="${locale}"]`)
+      ?.focus({ preventScroll: true });
     // A completed document can be updated without sending an unfinished local draft.
     const completed = state.session?.onboarding;
     if (

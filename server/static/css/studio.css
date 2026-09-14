@@ -807,13 +807,6 @@ tr:last-child td {
 .final-cta {
   background: radial-gradient(ellipse at 50% 55%, var(--glass-strong), transparent 60%);
 }
-.cta-mark {
-  display: block;
-  font-size: 52px;
-  letter-spacing: -5px;
-  color: var(--text-77);
-  margin-bottom: 30px;
-}
 .final-cta .button {
   margin-top: 29px;
 }
@@ -822,42 +815,99 @@ tr:last-child td {
 }
 #footer {
   border-top: 1px solid var(--line-15);
+  background: var(--surface-07);
 }
 .footer-inner {
   max-width: 1440px;
   margin: auto;
-  padding: 46px 52px;
-  display: flex;
+  padding: 44px 52px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 40px;
 }
 .footer-brand {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 20px;
+  font-weight: 550;
+  line-height: 1.25;
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 18px;
 }
-.footer-brand span {
+.footer-brand .brand-mark {
+  font-size: 64px;
+}
+.footer-brand .brand-mark span {
+  color: var(--accent);
+}
+.footer-inner .footer-info p {
+  font-size: 14px;
+  color: var(--text-64);
+  margin: 0;
+  line-height: 1.65;
+}
+.footer-legal {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 340px;
+  gap: 8px 24px;
+  margin-top: 20px;
+}
+.footer-inner .footer-legal a {
+  font-size: 14px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+.footer-socials {
+  display: flex;
+  gap: 12px;
+}
+.footer-actions {
+  display: grid;
+  gap: 24px;
+  justify-items: center;
+  justify-self: end;
+  align-self: start;
+}
+.footer-actions .language-switch button {
+  min-width: 44px;
+  min-height: 44px;
+}
+.footer-social {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 12px;
+  border: 1px solid var(--line-15);
+  border-radius: 50%;
+  background: var(--surface-11);
   color: var(--text-96);
 }
-.footer-inner p {
-  font-size: 10px;
-  color: var(--text-57);
-  margin-top: 8px;
+.footer-social:disabled {
+  opacity: 0.65;
 }
-.footer-inner nav {
-  display: flex;
-  gap: 28px;
-  margin-left: auto;
+.footer-social[href]:hover {
+  filter: brightness(1.15);
+  border-color: var(--line-35);
 }
-.footer-inner nav a {
-  font-size: 10px;
+.footer-social-instagram {
+  color: var(--text-100);
+  background: radial-gradient(
+    circle at 25% 100%,
+    var(--social-instagram-yellow),
+    var(--social-instagram-pink) 55%,
+    var(--social-instagram-purple)
+  );
 }
-.footer-year {
-  font-size: 10px;
-  color: var(--text-57);
-  white-space: nowrap;
+.footer-social-youtube {
+  color: var(--text-100);
+  background: var(--social-youtube);
+}
+.footer-social svg {
+  width: 24px;
+  height: 24px;
 }
 /* Forms use native controls; visual selection follows checked state. */
 .flow-section {
@@ -877,33 +927,43 @@ tr:last-child td {
   margin-right: auto;
 }
 .stepper li {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   font-size: 10px;
   color: var(--text-64);
   white-space: nowrap;
 }
-.stepper li > span:first-child {
+.step-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  border-radius: 8px;
+}
+.step-link:hover {
+  color: var(--text-96);
+}
+.stepper .step-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
   border: 1px solid var(--line-20);
   border-radius: 50%;
-  width: 25px;
-  height: 25px;
-  font-size: 9px;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  font-size: 12px;
 }
 .stepper li[aria-current] {
   color: var(--text-87);
 }
-.stepper li[aria-current] > span:first-child {
+.stepper li[aria-current] .step-indicator {
   background: var(--surface-11);
   border-color: var(--line-45);
   color: var(--text-87);
 }
-.stepper .complete > span:first-child {
-  color: var(--text-77);
+.stepper .complete .step-indicator {
+  color: var(--surface-04);
+  background: var(--accent);
+  border-color: var(--accent);
 }
 .flow-title {
   font-size: clamp(34px, 4.4vw, 52px);
@@ -1557,6 +1617,10 @@ tr:last-child td {
   .footer-inner {
     padding-left: 34px;
     padding-right: 34px;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .footer-actions {
+    grid-column: 2;
   }
 }
 @media (max-width: 760px) {
@@ -1883,34 +1947,24 @@ tr:last-child td {
   }
   .final-cta {
   }
-  .cta-mark {
-    font-size: 43px;
-    margin-bottom: 26px;
-  }
   .final-cta .intro {
     font-size: 12px;
   }
   .footer-inner {
-    padding: 32px 23px;
-    flex-wrap: wrap;
-    gap: 23px;
-  }
-  .footer-inner > div {
-    width: 100%;
+    padding: 36px 24px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
   }
   .footer-brand {
-    font-size: 13px;
-    justify-content: space-between;
+    font-size: 18px;
+    justify-self: start;
   }
-  .footer-inner nav {
-    margin: 0;
-    gap: 23px;
+  .footer-legal {
+    grid-template-columns: minmax(0, 1fr);
   }
-  .footer-inner p {
-    font-size: 10px;
-  }
-  .footer-year {
-    margin-left: auto;
+  .footer-actions {
+    grid-column: 1;
+    justify-self: start;
   }
   .flow-section {
     padding-top: 20px;
@@ -1922,16 +1976,12 @@ tr:last-child td {
     margin-bottom: 35px;
   }
   .stepper li {
-    gap: 5px;
     font-size: 9px;
     white-space: normal;
     line-height: 1.4;
   }
-  .stepper li > span:first-child {
-    width: 23px;
-    height: 23px;
-    flex-shrink: 0;
-    font-size: 8px;
+  .step-content {
+    gap: 5px;
   }
   .flow-title {
     font-size: 38px;
@@ -2237,11 +2287,9 @@ tr:last-child td {
   }
   .stepper li {
     font-size: 8px;
-    gap: 4px;
   }
-  .stepper li > span:first-child {
-    width: 22px;
-    height: 22px;
+  .step-content {
+    gap: 4px;
   }
   .stepper {
     gap: 6px;
@@ -2300,8 +2348,7 @@ body {
   background: var(--accent-71);
   box-shadow: none;
 }
-.brand-mark span,
-.cta-mark span {
+.brand-mark span {
   color: var(--accent-70);
 }
 .eyebrow {
@@ -2797,9 +2844,6 @@ main
 .plan-tag,
 .recommendation-badge,
 .language-switch button,
-.footer-inner p,
-.footer-inner nav a,
-.footer-year,
 .form-progress,
 .stepper li,
 .field-hint,
@@ -2829,10 +2873,12 @@ main
     gap: 8px;
   }
   .stepper li {
-    flex-direction: column;
-    align-items: center;
     text-align: center;
     font-size: 11px;
+  }
+  .step-content {
+    flex-direction: column;
+    align-items: center;
     gap: 6px;
   }
   .language-switch button,
@@ -3129,16 +3175,6 @@ main
 }
 .flow-section .stepper {
   margin-bottom: 52px;
-  padding: 24px 16px;
-  border: 1px solid var(--line-20);
-  border-radius: 18px;
-  background: var(--surface-07);
-}
-.flow-section .stepper li > span:first-child {
-  width: 30px;
-  height: 30px;
-  flex-shrink: 0;
-  font-size: 12px;
 }
 #onboarding-form {
   margin-top: 36px;
@@ -3163,7 +3199,6 @@ main
     padding-top: 36px;
   }
   .flow-section .stepper {
-    padding: 20px 8px;
     margin-bottom: 36px;
   }
   #onboarding-form .form-actions {
