@@ -1,0 +1,71 @@
+{
+  "task_id": "S00-02",
+  "status": "done",
+  "branch": "task/execution-v4",
+  "base_sha": "2ee4403cc80963168a919e8e52e72748a4257f7c",
+  "changed_paths": [
+    "pyproject.toml",
+    "uv.lock",
+    "package.json",
+    "package-lock.json",
+    ".python-version",
+    ".node-version",
+    ".npmrc",
+    "server/studio/__init__.py",
+    "tools/tests/test_s00_02_toolchain.py",
+    "docs/toolchain-lock.md",
+    "README.md",
+    ".workflow/CURRENT.md",
+    ".workflow/state.json",
+    ".workflow/evidence/S00-02.json"
+  ],
+  "red": {
+    "command": "python3 -m unittest discover -s tools/tests -p test_s00_02_toolchain.py -v",
+    "observed_failure": "3 assertion failures: missing pyproject.toml; no toolchain artifacts existed.",
+    "not_an_environment_failure": true
+  },
+  "green": {
+    "command": "python3 -m unittest discover -s tools/tests -p test_s00_02_toolchain.py -v",
+    "exit_code": 0,
+    "summary": "3 passed after real uv sync --locked and npm ci; environment uses pinned local uv/Node on PATH."
+  },
+  "regression_commands": [
+    {
+      "command": "python3 -m unittest discover -s tools/tests -v",
+      "exit_code": 0,
+      "summary": "24 tests passed"
+    },
+    {
+      "command": "uv run --locked pytest -q",
+      "exit_code": 0,
+      "summary": "24 tests passed via configured pytest runner"
+    },
+    {
+      "command": "uv run --locked ruff check tools/tests/test_s00_02_toolchain.py server/studio",
+      "exit_code": 0,
+      "summary": "Passed; new files formatted with pinned Ruff"
+    },
+    {
+      "command": "python3 tools/roadmap.py validate",
+      "exit_code": 0,
+      "summary": "134 tasks valid"
+    }
+  ],
+  "manual_checks": [
+    "uv sync --locked and npm ci succeeded in project root; tests also install twice in a disposable copy and compare lock bytes.",
+    "uv build --out-dir .local-tools/dist succeeded; wheel contains only studio and distribution metadata; source distribution excludes caches and reference files.",
+    "Official Node archive SHA256 verified; details in docs/toolchain-lock.md."
+  ],
+  "scope_deviations": [
+    "server/studio/__init__.py required for actual editable installation; docs/toolchain-lock.md required by card special conditions; README updated with usable commands.",
+    "Continue on owner-designated primary project branch task/execution-v4; no separate project or worktree.",
+    ".npmrc enforces exact Node/npm engines and exact dependency saves; temporary-copy tests include this config."
+  ],
+  "review": {
+    "reviewer": "read-only agent review_s00_02",
+    "result": "no_blocking_findings",
+    "findings": []
+  },
+  "push_status": "pending_at_commit",
+  "notes": "Initial Python urllib downloads failed on missing local CA configuration; retried with curl using system TLS verification. Initial sandbox uv lock failed DNS; authorized network run succeeded. These environment failures are not the RED evidence. An optional packaging probe initially used unsupported uv build --locked; corrected to uv build with the exact pinned build backend, then both artifacts verified. Push result is reported after this commit; no self-referential SHA recorded."
+}
