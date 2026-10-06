@@ -3,6 +3,8 @@
   "remote": "origin",
   "repository": "ivan-zamurenko/handbalancers-studio",
   "branch": "task/execution-v4",
-  "push_status": "pending",
-  "default_branch_change": "authorized: main -> task/execution-v4"
+  "push_status": "pushed",
+  "default_branch": "task/execution-v4",
+  "old_main": "deleted locally and remotely; archived as archive/pre-execution-v4",
+  "verified_implementation_commit": "1ab3879"
 }

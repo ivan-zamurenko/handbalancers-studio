@@ -7,7 +7,7 @@
     "S00-01": {
       "status": "done",
       "evidence": ".workflow/evidence/S00-01.json",
-      "push_status": "pending"
+      "push_status": "pushed"
     },
     "S00-02": {
       "status": "todo",

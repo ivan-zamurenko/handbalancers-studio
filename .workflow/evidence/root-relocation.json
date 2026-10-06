@@ -21,12 +21,19 @@
     ],
     "diff_check": "passed"
   },
-  "push_status": "pending",
+  "push_status": "pushed",
   "review": {
     "result": "no_blockers",
     "reviewer": "review_s00_01",
     "checks": "Independently confirmed all 264 baseline files, 21 tests and valid 134-task graph. Only intended metadata/docs changed."
   },
   "prior_approval_blocker": "Automatic approval review rejected combined commit/push because the staged replacement records 181 pre-existing old-file deletions. Remote main remains unchanged; explicit user confirmation requested for publishing this replacement tree in task/execution-v4.",
-  "authorization": "Owner explicitly requested deleting old project branch and making new project branch primary; this authorizes replacing the old tree, publishing V4, changing default branch and removing main. Archive tag will preserve old tip."
+  "authorization": "Owner explicitly requested deleting old project branch and making new project branch primary; this authorizes replacing the old tree, publishing V4, changing default branch and removing main. Archive tag will preserve old tip.",
+  "commit": "1ab3879",
+  "branch_transition": {
+    "default_branch": "task/execution-v4",
+    "old_main": "deleted locally and remotely",
+    "archive_tag": "archive/pre-execution-v4",
+    "archived_sha": "9e124a5cab5654b7e4d0ed54acc8a6748a3c665f"
+  }
 }

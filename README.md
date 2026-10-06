@@ -40,7 +40,7 @@ python3 tools/workspace.py /path/to/new-directory
 коммітом потрібен перегляд staged diff. Не використовуйте `git add -f` для цих даних.
 
 Використовується origin цього проєкту: `ivan-zamurenko/handbalancers-studio`.
-За дорученням власника основною стає `task/execution-v4`, стара `main`
-видаляється після переключення GitHub. Її вершина зберігається під тегом
+За дорученням власника основна гілка — `task/execution-v4`; стару `main`
+видалено локально й на GitHub. Її вершину збережено під тегом
 `archive/pre-execution-v4`.
 Стан і наступний крок: `.workflow/CURRENT.md`.
