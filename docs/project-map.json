@@ -1,0 +1,2692 @@
+{
+  "kind": "target_paths_not_implemented",
+  "files": [
+    {
+      "path": ".dockerignore",
+      "introduced_or_changed_by": [
+        "S16-06"
+      ]
+    },
+    {
+      "path": ".editorconfig",
+      "introduced_or_changed_by": [
+        "S00-01"
+      ]
+    },
+    {
+      "path": ".env.example",
+      "introduced_or_changed_by": [
+        "S00-04"
+      ]
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "introduced_or_changed_by": [
+        "S00-07",
+        "S01-07"
+      ]
+    },
+    {
+      "path": ".gitignore",
+      "introduced_or_changed_by": [
+        "S00-01"
+      ]
+    },
+    {
+      "path": ".node-version",
+      "introduced_or_changed_by": [
+        "S00-02"
+      ]
+    },
+    {
+      "path": ".python-version",
+      "introduced_or_changed_by": [
+        "S00-02"
+      ]
+    },
+    {
+      "path": ".workflow/CURRENT.md",
+      "introduced_or_changed_by": [
+        "S00-01"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "introduced_or_changed_by": [
+        "S00-01"
+      ]
+    },
+    {
+      "path": "Dockerfile",
+      "introduced_or_changed_by": [
+        "S16-06"
+      ]
+    },
+    {
+      "path": "README.md",
+      "introduced_or_changed_by": [
+        "S00-01"
+      ]
+    },
+    {
+      "path": "alembic.ini",
+      "introduced_or_changed_by": [
+        "S01-02"
+      ]
+    },
+    {
+      "path": "compose.production.example.yaml",
+      "introduced_or_changed_by": [
+        "S16-06"
+      ]
+    },
+    {
+      "path": "compose.yaml",
+      "introduced_or_changed_by": [
+        "S16-06"
+      ]
+    },
+    {
+      "path": "docs/decisions/proplus-channel.md",
+      "introduced_or_changed_by": [
+        "S15-01"
+      ]
+    },
+    {
+      "path": "docs/release/commerce-signoff.md",
+      "introduced_or_changed_by": [
+        "S17-04"
+      ]
+    },
+    {
+      "path": "docs/release/readiness.json",
+      "introduced_or_changed_by": [
+        "S16-08"
+      ]
+    },
+    {
+      "path": "docs/release/release-checklist.md",
+      "introduced_or_changed_by": [
+        "S17-05"
+      ]
+    },
+    {
+      "path": "docs/runbooks/apple-provider.md",
+      "introduced_or_changed_by": [
+        "S04-03"
+      ]
+    },
+    {
+      "path": "docs/runbooks/auth-setup.md",
+      "introduced_or_changed_by": [
+        "S17-01"
+      ]
+    },
+    {
+      "path": "docs/runbooks/backup-restore.md",
+      "introduced_or_changed_by": [
+        "S16-07"
+      ]
+    },
+    {
+      "path": "docs/runbooks/data-lifecycle.md",
+      "introduced_or_changed_by": [
+        "S16-04"
+      ]
+    },
+    {
+      "path": "docs/runbooks/deployment.md",
+      "introduced_or_changed_by": [
+        "S17-05"
+      ]
+    },
+    {
+      "path": "docs/runbooks/proplus-service.md",
+      "introduced_or_changed_by": [
+        "S15-01"
+      ]
+    },
+    {
+      "path": "docs/runbooks/stripe-setup.md",
+      "introduced_or_changed_by": [
+        "S13-01"
+      ]
+    },
+    {
+      "path": "docs/threat-model.md",
+      "introduced_or_changed_by": [
+        "S16-02"
+      ]
+    },
+    {
+      "path": "docs/verification/S13-09-external-check.md",
+      "introduced_or_changed_by": [
+        "S13-09"
+      ]
+    },
+    {
+      "path": "docs/verification/S15-01-external-check.md",
+      "introduced_or_changed_by": [
+        "S15-01"
+      ]
+    },
+    {
+      "path": "docs/verification/S16-07-external-check.md",
+      "introduced_or_changed_by": [
+        "S16-07"
+      ]
+    },
+    {
+      "path": "docs/verification/S17-01-external-check.md",
+      "introduced_or_changed_by": [
+        "S17-01"
+      ]
+    },
+    {
+      "path": "docs/verification/S17-02-external-check.md",
+      "introduced_or_changed_by": [
+        "S17-02"
+      ]
+    },
+    {
+      "path": "docs/verification/S17-03-external-check.md",
+      "introduced_or_changed_by": [
+        "S17-03"
+      ]
+    },
+    {
+      "path": "docs/verification/S17-04-external-check.md",
+      "introduced_or_changed_by": [
+        "S17-04"
+      ]
+    },
+    {
+      "path": "docs/verification/S17-05-external-check.md",
+      "introduced_or_changed_by": [
+        "S17-05"
+      ]
+    },
+    {
+      "path": "docs/verification/ai-real-evaluation.md",
+      "introduced_or_changed_by": [
+        "S17-03"
+      ]
+    },
+    {
+      "path": "docs/verification/ai-shadow.md",
+      "introduced_or_changed_by": [
+        "S14-07"
+      ]
+    },
+    {
+      "path": "docs/verification/auth-external.md",
+      "introduced_or_changed_by": [
+        "S17-01"
+      ]
+    },
+    {
+      "path": "docs/verification/performance.md",
+      "introduced_or_changed_by": [
+        "S16-05"
+      ]
+    },
+    {
+      "path": "docs/verification/stripe-testmode.md",
+      "introduced_or_changed_by": [
+        "S13-09"
+      ]
+    },
+    {
+      "path": "docs/verification/training-slice.md",
+      "introduced_or_changed_by": [
+        "S09-10"
+      ]
+    },
+    {
+      "path": "docs/verification/video-access.md",
+      "introduced_or_changed_by": [
+        "S17-02"
+      ]
+    },
+    {
+      "path": "evals/",
+      "introduced_or_changed_by": [
+        "S17-03"
+      ]
+    },
+    {
+      "path": "evals/README.md",
+      "introduced_or_changed_by": [
+        "S14-07"
+      ]
+    },
+    {
+      "path": "evals/run_eval.py",
+      "introduced_or_changed_by": [
+        "S14-07"
+      ]
+    },
+    {
+      "path": "evals/schemas/example.schema.json",
+      "introduced_or_changed_by": [
+        "S14-07"
+      ]
+    },
+    {
+      "path": "package-lock.json",
+      "introduced_or_changed_by": [
+        "S00-02"
+      ]
+    },
+    {
+      "path": "package.json",
+      "introduced_or_changed_by": [
+        "S00-02"
+      ]
+    },
+    {
+      "path": "playwright.config.js",
+      "introduced_or_changed_by": [
+        "S00-05"
+      ]
+    },
+    {
+      "path": "pyproject.toml",
+      "introduced_or_changed_by": [
+        "S00-02"
+      ]
+    },
+    {
+      "path": "server/alembic/env.py",
+      "introduced_or_changed_by": [
+        "S01-02"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0001_schemas.py",
+      "introduced_or_changed_by": [
+        "S01-02"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0002_profiles.py",
+      "introduced_or_changed_by": [
+        "S01-04"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0003_profile_security.py",
+      "introduced_or_changed_by": [
+        "S01-05"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0004_auth_storage.py",
+      "introduced_or_changed_by": [
+        "S01-06"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0005_auth_limits.py",
+      "introduced_or_changed_by": [
+        "S03-09"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0006_audit.py",
+      "introduced_or_changed_by": [
+        "S04-05"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0007_preferences.py",
+      "introduced_or_changed_by": [
+        "S04-06"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0008_onboarding.py",
+      "introduced_or_changed_by": [
+        "S05-01"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0009_subscriptions.py",
+      "introduced_or_changed_by": [
+        "S05-04"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0010_coach_access.py",
+      "introduced_or_changed_by": [
+        "S05-06"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0011_command_receipts.py",
+      "introduced_or_changed_by": [
+        "S05-07"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0012_exercise_drafts.py",
+      "introduced_or_changed_by": [
+        "S06-01"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0013_exercise_versions.py",
+      "introduced_or_changed_by": [
+        "S06-03"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0014_program_roots.py",
+      "introduced_or_changed_by": [
+        "S07-01"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0015_program_workouts.py",
+      "introduced_or_changed_by": [
+        "S07-02"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0016_workout_blocks.py",
+      "introduced_or_changed_by": [
+        "S07-03"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0017_program_exercises.py",
+      "introduced_or_changed_by": [
+        "S07-04"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0018_program_targets.py",
+      "introduced_or_changed_by": [
+        "S07-05"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0019_program_immutability.py",
+      "introduced_or_changed_by": [
+        "S07-06"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0020_training_plans.py",
+      "introduced_or_changed_by": [
+        "S08-01"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0021_assignments.py",
+      "introduced_or_changed_by": [
+        "S08-02"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0022_training_weeks.py",
+      "introduced_or_changed_by": [
+        "S08-03"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0023_scheduled_workouts.py",
+      "introduced_or_changed_by": [
+        "S08-04"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0024_sessions.py",
+      "introduced_or_changed_by": [
+        "S09-01"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0025_set_logs.py",
+      "introduced_or_changed_by": [
+        "S09-02"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0026_session_time.py",
+      "introduced_or_changed_by": [
+        "S09-03"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0027_training_reports.py",
+      "introduced_or_changed_by": [
+        "S09-04"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0028_media_versions.py",
+      "introduced_or_changed_by": [
+        "S10-02"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0029_review_tasks.py",
+      "introduced_or_changed_by": [
+        "S10-03"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0030_private_notes.py",
+      "introduced_or_changed_by": [
+        "S10-04"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0031_review_versions.py",
+      "introduced_or_changed_by": [
+        "S10-05"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0032_planning_rules.py",
+      "introduced_or_changed_by": [
+        "S11-01"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0033_planning_previews.py",
+      "introduced_or_changed_by": [
+        "S11-04"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0034_plan_permissions.py",
+      "introduced_or_changed_by": [
+        "S11-09"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0035_change_requests.py",
+      "introduced_or_changed_by": [
+        "S11-10"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0036_assessment_protocols.py",
+      "introduced_or_changed_by": [
+        "S12-01"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0037_assessment_runs.py",
+      "introduced_or_changed_by": [
+        "S12-02"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0038_assessment_results.py",
+      "introduced_or_changed_by": [
+        "S12-03"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0039_checkout_attempts.py",
+      "introduced_or_changed_by": [
+        "S13-02"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0040_webhook_inbox.py",
+      "introduced_or_changed_by": [
+        "S13-03"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0041_trial_claims.py",
+      "introduced_or_changed_by": [
+        "S13-05"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0042_processing_permissions.py",
+      "introduced_or_changed_by": [
+        "S14-01"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0043_analysis_jobs.py",
+      "introduced_or_changed_by": [
+        "S14-03"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0044_analysis_observations.py",
+      "introduced_or_changed_by": [
+        "S14-05"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0045_adaptation_proposals.py",
+      "introduced_or_changed_by": [
+        "S14-06"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0046_call_allowance.py",
+      "introduced_or_changed_by": [
+        "S15-02"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0047_optional_chat.py",
+      "introduced_or_changed_by": [
+        "S15-03"
+      ]
+    },
+    {
+      "path": "server/alembic/versions/0048_measured_indexes.py",
+      "introduced_or_changed_by": [
+        "S16-05"
+      ]
+    },
+    {
+      "path": "server/static/css/",
+      "introduced_or_changed_by": [
+        "S16-01"
+      ]
+    },
+    {
+      "path": "server/static/css/base.css",
+      "introduced_or_changed_by": [
+        "S02-01"
+      ]
+    },
+    {
+      "path": "server/static/css/coach.css",
+      "introduced_or_changed_by": [
+        "S10-08"
+      ]
+    },
+    {
+      "path": "server/static/css/components.css",
+      "introduced_or_changed_by": [
+        "S02-02"
+      ]
+    },
+    {
+      "path": "server/static/css/program-builder.css",
+      "introduced_or_changed_by": [
+        "S07-09"
+      ]
+    },
+    {
+      "path": "server/static/css/tokens.css",
+      "introduced_or_changed_by": [
+        "S02-01"
+      ]
+    },
+    {
+      "path": "server/static/css/workout.css",
+      "introduced_or_changed_by": [
+        "S09-07"
+      ]
+    },
+    {
+      "path": "server/static/js/api/client.js",
+      "introduced_or_changed_by": [
+        "S02-05"
+      ]
+    },
+    {
+      "path": "server/static/js/components/dialog.js",
+      "introduced_or_changed_by": [
+        "S02-02"
+      ]
+    },
+    {
+      "path": "server/static/js/features/analysis/status.js",
+      "introduced_or_changed_by": [
+        "S14-09"
+      ]
+    },
+    {
+      "path": "server/static/js/features/auth/registration.js",
+      "introduced_or_changed_by": [
+        "S03-10"
+      ]
+    },
+    {
+      "path": "server/static/js/features/billing/checkout.js",
+      "introduced_or_changed_by": [
+        "S13-08"
+      ]
+    },
+    {
+      "path": "server/static/js/features/coach/assignment.js",
+      "introduced_or_changed_by": [
+        "S08-05"
+      ]
+    },
+    {
+      "path": "server/static/js/features/coach/exercise-editor.js",
+      "introduced_or_changed_by": [
+        "S06-05"
+      ]
+    },
+    {
+      "path": "server/static/js/features/coach/workspace.js",
+      "introduced_or_changed_by": [
+        "S10-08"
+      ]
+    },
+    {
+      "path": "server/static/js/features/member/today.js",
+      "introduced_or_changed_by": [
+        "S08-06"
+      ]
+    },
+    {
+      "path": "server/static/js/features/onboarding/form.js",
+      "introduced_or_changed_by": [
+        "S05-02"
+      ]
+    },
+    {
+      "path": "server/static/js/features/planning/change-main.js",
+      "introduced_or_changed_by": [
+        "S11-06"
+      ]
+    },
+    {
+      "path": "server/static/js/features/planning/move.js",
+      "introduced_or_changed_by": [
+        "S11-08"
+      ]
+    },
+    {
+      "path": "server/static/js/features/planning/select-workout.js",
+      "introduced_or_changed_by": [
+        "S11-07"
+      ]
+    },
+    {
+      "path": "server/static/js/features/programs/builder.js",
+      "introduced_or_changed_by": [
+        "S07-09"
+      ]
+    },
+    {
+      "path": "server/static/js/features/public/plans.js",
+      "introduced_or_changed_by": [
+        "S05-03"
+      ]
+    },
+    {
+      "path": "server/static/js/features/training/outbox.js",
+      "introduced_or_changed_by": [
+        "S09-08"
+      ]
+    },
+    {
+      "path": "server/static/js/features/training/session-controller.js",
+      "introduced_or_changed_by": [
+        "S09-07"
+      ]
+    },
+    {
+      "path": "server/static/js/features/training/sync.js",
+      "introduced_or_changed_by": [
+        "S09-08"
+      ]
+    },
+    {
+      "path": "server/static/js/i18n/",
+      "introduced_or_changed_by": [
+        "S16-01"
+      ]
+    },
+    {
+      "path": "server/static/js/i18n/en.json",
+      "introduced_or_changed_by": [
+        "S02-04"
+      ]
+    },
+    {
+      "path": "server/static/js/i18n/uk.json",
+      "introduced_or_changed_by": [
+        "S02-04"
+      ]
+    },
+    {
+      "path": "server/static/js/state/save-status.js",
+      "introduced_or_changed_by": [
+        "S02-05"
+      ]
+    },
+    {
+      "path": "server/static/js/state/session.js",
+      "introduced_or_changed_by": [
+        "S03-07"
+      ]
+    },
+    {
+      "path": "server/static/js/state/theme.js",
+      "introduced_or_changed_by": [
+        "S02-03"
+      ]
+    },
+    {
+      "path": "server/static/js/theme-boot.js",
+      "introduced_or_changed_by": [
+        "S02-03"
+      ]
+    },
+    {
+      "path": "server/studio/__init__.py",
+      "introduced_or_changed_by": [
+        "S00-03"
+      ]
+    },
+    {
+      "path": "server/studio/accounts/cli.py",
+      "introduced_or_changed_by": [
+        "S04-05"
+      ]
+    },
+    {
+      "path": "server/studio/accounts/coach_access.py",
+      "introduced_or_changed_by": [
+        "S05-06"
+      ]
+    },
+    {
+      "path": "server/studio/accounts/coach_routes.py",
+      "introduced_or_changed_by": [
+        "S05-06"
+      ]
+    },
+    {
+      "path": "server/studio/accounts/data_export.py",
+      "introduced_or_changed_by": [
+        "S16-04"
+      ]
+    },
+    {
+      "path": "server/studio/accounts/deletion.py",
+      "introduced_or_changed_by": [
+        "S16-04"
+      ]
+    },
+    {
+      "path": "server/studio/accounts/models.py",
+      "introduced_or_changed_by": [
+        "S01-04"
+      ]
+    },
+    {
+      "path": "server/studio/accounts/onboarding.py",
+      "introduced_or_changed_by": [
+        "S05-01"
+      ]
+    },
+    {
+      "path": "server/studio/accounts/onboarding_routes.py",
+      "introduced_or_changed_by": [
+        "S05-02"
+      ]
+    },
+    {
+      "path": "server/studio/accounts/profile_completion.py",
+      "introduced_or_changed_by": [
+        "S04-03"
+      ]
+    },
+    {
+      "path": "server/studio/accounts/provisioning.py",
+      "introduced_or_changed_by": [
+        "S03-04",
+        "S04-04"
+      ]
+    },
+    {
+      "path": "server/studio/accounts/roles.py",
+      "introduced_or_changed_by": [
+        "S04-05"
+      ]
+    },
+    {
+      "path": "server/studio/accounts/routes.py",
+      "introduced_or_changed_by": [
+        "S04-06"
+      ]
+    },
+    {
+      "path": "server/studio/accounts/service.py",
+      "introduced_or_changed_by": [
+        "S04-06"
+      ]
+    },
+    {
+      "path": "server/studio/analysis/apply.py",
+      "introduced_or_changed_by": [
+        "S14-08"
+      ]
+    },
+    {
+      "path": "server/studio/analysis/evidence.py",
+      "introduced_or_changed_by": [
+        "S14-04"
+      ]
+    },
+    {
+      "path": "server/studio/analysis/jobs.py",
+      "introduced_or_changed_by": [
+        "S14-03"
+      ]
+    },
+    {
+      "path": "server/studio/analysis/models.py",
+      "introduced_or_changed_by": [
+        "S14-03"
+      ]
+    },
+    {
+      "path": "server/studio/analysis/proposals.py",
+      "introduced_or_changed_by": [
+        "S14-06"
+      ]
+    },
+    {
+      "path": "server/studio/analysis/schemas.py",
+      "introduced_or_changed_by": [
+        "S14-05"
+      ]
+    },
+    {
+      "path": "server/studio/analysis/validation.py",
+      "introduced_or_changed_by": [
+        "S14-05"
+      ]
+    },
+    {
+      "path": "server/studio/assessments/assignments.py",
+      "introduced_or_changed_by": [
+        "S12-02"
+      ]
+    },
+    {
+      "path": "server/studio/assessments/models.py",
+      "introduced_or_changed_by": [
+        "S12-01"
+      ]
+    },
+    {
+      "path": "server/studio/assessments/protocols.py",
+      "introduced_or_changed_by": [
+        "S12-01"
+      ]
+    },
+    {
+      "path": "server/studio/assessments/publishing.py",
+      "introduced_or_changed_by": [
+        "S12-04"
+      ]
+    },
+    {
+      "path": "server/studio/assessments/results.py",
+      "introduced_or_changed_by": [
+        "S12-03"
+      ]
+    },
+    {
+      "path": "server/studio/auth/csrf.py",
+      "introduced_or_changed_by": [
+        "S03-09"
+      ]
+    },
+    {
+      "path": "server/studio/auth/dependencies.py",
+      "introduced_or_changed_by": [
+        "S03-06",
+        "S05-05"
+      ]
+    },
+    {
+      "path": "server/studio/auth/gateway.py",
+      "introduced_or_changed_by": [
+        "S03-01"
+      ]
+    },
+    {
+      "path": "server/studio/auth/identity_policy.py",
+      "introduced_or_changed_by": [
+        "S04-04"
+      ]
+    },
+    {
+      "path": "server/studio/auth/jwt.py",
+      "introduced_or_changed_by": [
+        "S03-02"
+      ]
+    },
+    {
+      "path": "server/studio/auth/logout.py",
+      "introduced_or_changed_by": [
+        "S03-07"
+      ]
+    },
+    {
+      "path": "server/studio/auth/models.py",
+      "introduced_or_changed_by": [
+        "S01-06"
+      ]
+    },
+    {
+      "path": "server/studio/auth/oauth.py",
+      "introduced_or_changed_by": [
+        "S04-01",
+        "S04-02",
+        "S04-03"
+      ]
+    },
+    {
+      "path": "server/studio/auth/oauth_storage.py",
+      "introduced_or_changed_by": [
+        "S04-01"
+      ]
+    },
+    {
+      "path": "server/studio/auth/rate_limits.py",
+      "introduced_or_changed_by": [
+        "S03-09"
+      ]
+    },
+    {
+      "path": "server/studio/auth/recovery.py",
+      "introduced_or_changed_by": [
+        "S03-08"
+      ]
+    },
+    {
+      "path": "server/studio/auth/refresh.py",
+      "introduced_or_changed_by": [
+        "S03-06"
+      ]
+    },
+    {
+      "path": "server/studio/auth/routes.py",
+      "introduced_or_changed_by": [
+        "S03-03",
+        "S03-05",
+        "S04-02"
+      ]
+    },
+    {
+      "path": "server/studio/auth/schemas.py",
+      "introduced_or_changed_by": [
+        "S03-03"
+      ]
+    },
+    {
+      "path": "server/studio/auth/service.py",
+      "introduced_or_changed_by": [
+        "S03-03"
+      ]
+    },
+    {
+      "path": "server/studio/auth/sessions.py",
+      "introduced_or_changed_by": [
+        "S03-05"
+      ]
+    },
+    {
+      "path": "server/studio/auth/supabase_adapter.py",
+      "introduced_or_changed_by": [
+        "S03-01"
+      ]
+    },
+    {
+      "path": "server/studio/auth/token_store.py",
+      "introduced_or_changed_by": [
+        "S01-06"
+      ]
+    },
+    {
+      "path": "server/studio/auth/verification.py",
+      "introduced_or_changed_by": [
+        "S03-04"
+      ]
+    },
+    {
+      "path": "server/studio/billing/catalog.py",
+      "introduced_or_changed_by": [
+        "S05-04",
+        "S13-01"
+      ]
+    },
+    {
+      "path": "server/studio/billing/checkout.py",
+      "introduced_or_changed_by": [
+        "S13-02"
+      ]
+    },
+    {
+      "path": "server/studio/billing/entitlements.py",
+      "introduced_or_changed_by": [
+        "S05-04"
+      ]
+    },
+    {
+      "path": "server/studio/billing/feature_readiness.py",
+      "introduced_or_changed_by": [
+        "S16-08"
+      ]
+    },
+    {
+      "path": "server/studio/billing/lifecycle.py",
+      "introduced_or_changed_by": [
+        "S13-07"
+      ]
+    },
+    {
+      "path": "server/studio/billing/models.py",
+      "introduced_or_changed_by": [
+        "S05-04"
+      ]
+    },
+    {
+      "path": "server/studio/billing/portal.py",
+      "introduced_or_changed_by": [
+        "S13-06"
+      ]
+    },
+    {
+      "path": "server/studio/billing/reconciliation.py",
+      "introduced_or_changed_by": [
+        "S13-04"
+      ]
+    },
+    {
+      "path": "server/studio/billing/stripe_gateway.py",
+      "introduced_or_changed_by": [
+        "S13-01"
+      ]
+    },
+    {
+      "path": "server/studio/billing/trials.py",
+      "introduced_or_changed_by": [
+        "S13-05"
+      ]
+    },
+    {
+      "path": "server/studio/billing/webhooks.py",
+      "introduced_or_changed_by": [
+        "S13-03"
+      ]
+    },
+    {
+      "path": "server/studio/catalog/measurements.py",
+      "introduced_or_changed_by": [
+        "S06-02"
+      ]
+    },
+    {
+      "path": "server/studio/catalog/models.py",
+      "introduced_or_changed_by": [
+        "S06-01"
+      ]
+    },
+    {
+      "path": "server/studio/catalog/planning_metadata.py",
+      "introduced_or_changed_by": [
+        "S06-06"
+      ]
+    },
+    {
+      "path": "server/studio/catalog/publishing.py",
+      "introduced_or_changed_by": [
+        "S06-03"
+      ]
+    },
+    {
+      "path": "server/studio/catalog/queries.py",
+      "introduced_or_changed_by": [
+        "S06-04"
+      ]
+    },
+    {
+      "path": "server/studio/catalog/routes.py",
+      "introduced_or_changed_by": [
+        "S06-01"
+      ]
+    },
+    {
+      "path": "server/studio/catalog/schemas.py",
+      "introduced_or_changed_by": [
+        "S06-02"
+      ]
+    },
+    {
+      "path": "server/studio/catalog/service.py",
+      "introduced_or_changed_by": [
+        "S06-01"
+      ]
+    },
+    {
+      "path": "server/studio/coaching/calls.py",
+      "introduced_or_changed_by": [
+        "S15-02"
+      ]
+    },
+    {
+      "path": "server/studio/coaching/conversations.py",
+      "introduced_or_changed_by": [
+        "S15-03"
+      ]
+    },
+    {
+      "path": "server/studio/db.py",
+      "introduced_or_changed_by": [
+        "S01-02",
+        "S01-03"
+      ]
+    },
+    {
+      "path": "server/studio/health.py",
+      "introduced_or_changed_by": [
+        "S00-03",
+        "S16-03"
+      ]
+    },
+    {
+      "path": "server/studio/jobs/analysis_worker.py",
+      "introduced_or_changed_by": [
+        "S14-03"
+      ]
+    },
+    {
+      "path": "server/studio/jobs/billing_worker.py",
+      "introduced_or_changed_by": [
+        "S13-04"
+      ]
+    },
+    {
+      "path": "server/studio/jobs/metrics.py",
+      "introduced_or_changed_by": [
+        "S16-03"
+      ]
+    },
+    {
+      "path": "server/studio/main.py",
+      "introduced_or_changed_by": [
+        "S00-03"
+      ]
+    },
+    {
+      "path": "server/studio/media/access.py",
+      "introduced_or_changed_by": [
+        "S14-02"
+      ]
+    },
+    {
+      "path": "server/studio/media/adapters/",
+      "introduced_or_changed_by": [
+        "S17-02"
+      ]
+    },
+    {
+      "path": "server/studio/media/adapters/base.py",
+      "introduced_or_changed_by": [
+        "S14-02"
+      ]
+    },
+    {
+      "path": "server/studio/media/capabilities.py",
+      "introduced_or_changed_by": [
+        "S10-01"
+      ]
+    },
+    {
+      "path": "server/studio/media/links.py",
+      "introduced_or_changed_by": [
+        "S10-01"
+      ]
+    },
+    {
+      "path": "server/studio/media/models.py",
+      "introduced_or_changed_by": [
+        "S10-02"
+      ]
+    },
+    {
+      "path": "server/studio/media/permissions.py",
+      "introduced_or_changed_by": [
+        "S14-01"
+      ]
+    },
+    {
+      "path": "server/studio/media/service.py",
+      "introduced_or_changed_by": [
+        "S10-02"
+      ]
+    },
+    {
+      "path": "server/studio/planning/apply.py",
+      "introduced_or_changed_by": [
+        "S11-05",
+        "S14-08"
+      ]
+    },
+    {
+      "path": "server/studio/planning/assignments.py",
+      "introduced_or_changed_by": [
+        "S08-02"
+      ]
+    },
+    {
+      "path": "server/studio/planning/candidates.py",
+      "introduced_or_changed_by": [
+        "S11-03"
+      ]
+    },
+    {
+      "path": "server/studio/planning/change_requests.py",
+      "introduced_or_changed_by": [
+        "S11-10",
+        "S11-11"
+      ]
+    },
+    {
+      "path": "server/studio/planning/compatibility.py",
+      "introduced_or_changed_by": [
+        "S11-02"
+      ]
+    },
+    {
+      "path": "server/studio/planning/management.py",
+      "introduced_or_changed_by": [
+        "S13-07"
+      ]
+    },
+    {
+      "path": "server/studio/planning/models.py",
+      "introduced_or_changed_by": [
+        "S08-01"
+      ]
+    },
+    {
+      "path": "server/studio/planning/permissions.py",
+      "introduced_or_changed_by": [
+        "S11-09"
+      ]
+    },
+    {
+      "path": "server/studio/planning/plans.py",
+      "introduced_or_changed_by": [
+        "S08-01"
+      ]
+    },
+    {
+      "path": "server/studio/planning/previews.py",
+      "introduced_or_changed_by": [
+        "S11-04"
+      ]
+    },
+    {
+      "path": "server/studio/planning/queries.py",
+      "introduced_or_changed_by": [
+        "S08-06"
+      ]
+    },
+    {
+      "path": "server/studio/planning/rules.py",
+      "introduced_or_changed_by": [
+        "S11-01"
+      ]
+    },
+    {
+      "path": "server/studio/planning/schedule.py",
+      "introduced_or_changed_by": [
+        "S08-04"
+      ]
+    },
+    {
+      "path": "server/studio/planning/skips.py",
+      "introduced_or_changed_by": [
+        "S11-08"
+      ]
+    },
+    {
+      "path": "server/studio/planning/weeks.py",
+      "introduced_or_changed_by": [
+        "S08-03"
+      ]
+    },
+    {
+      "path": "server/studio/programs/blocks.py",
+      "introduced_or_changed_by": [
+        "S07-03"
+      ]
+    },
+    {
+      "path": "server/studio/programs/cloning.py",
+      "introduced_or_changed_by": [
+        "S07-07"
+      ]
+    },
+    {
+      "path": "server/studio/programs/models.py",
+      "introduced_or_changed_by": [
+        "S07-01"
+      ]
+    },
+    {
+      "path": "server/studio/programs/prescriptions.py",
+      "introduced_or_changed_by": [
+        "S07-04"
+      ]
+    },
+    {
+      "path": "server/studio/programs/publishing.py",
+      "introduced_or_changed_by": [
+        "S07-06"
+      ]
+    },
+    {
+      "path": "server/studio/programs/queries.py",
+      "introduced_or_changed_by": [
+        "S07-08"
+      ]
+    },
+    {
+      "path": "server/studio/programs/routes.py",
+      "introduced_or_changed_by": [
+        "S07-01"
+      ]
+    },
+    {
+      "path": "server/studio/programs/service.py",
+      "introduced_or_changed_by": [
+        "S07-01"
+      ]
+    },
+    {
+      "path": "server/studio/programs/targets.py",
+      "introduced_or_changed_by": [
+        "S07-05"
+      ]
+    },
+    {
+      "path": "server/studio/programs/workouts.py",
+      "introduced_or_changed_by": [
+        "S07-02"
+      ]
+    },
+    {
+      "path": "server/studio/progress/calculator.py",
+      "introduced_or_changed_by": [
+        "S09-09"
+      ]
+    },
+    {
+      "path": "server/studio/progress/queries.py",
+      "introduced_or_changed_by": [
+        "S09-09"
+      ]
+    },
+    {
+      "path": "server/studio/reviews/evidence_changes.py",
+      "introduced_or_changed_by": [
+        "S10-07"
+      ]
+    },
+    {
+      "path": "server/studio/reviews/models.py",
+      "introduced_or_changed_by": [
+        "S10-03"
+      ]
+    },
+    {
+      "path": "server/studio/reviews/private_notes.py",
+      "introduced_or_changed_by": [
+        "S10-04"
+      ]
+    },
+    {
+      "path": "server/studio/reviews/publishing.py",
+      "introduced_or_changed_by": [
+        "S10-06"
+      ]
+    },
+    {
+      "path": "server/studio/reviews/queries.py",
+      "introduced_or_changed_by": [
+        "S10-09"
+      ]
+    },
+    {
+      "path": "server/studio/reviews/service.py",
+      "introduced_or_changed_by": [
+        "S10-05"
+      ]
+    },
+    {
+      "path": "server/studio/reviews/tasks.py",
+      "introduced_or_changed_by": [
+        "S10-03"
+      ]
+    },
+    {
+      "path": "server/studio/settings.py",
+      "introduced_or_changed_by": [
+        "S00-04"
+      ]
+    },
+    {
+      "path": "server/studio/shared/authorization.py",
+      "introduced_or_changed_by": [
+        "S05-05"
+      ]
+    },
+    {
+      "path": "server/studio/shared/context.py",
+      "introduced_or_changed_by": [
+        "S01-03"
+      ]
+    },
+    {
+      "path": "server/studio/shared/errors.py",
+      "introduced_or_changed_by": [
+        "S00-06"
+      ]
+    },
+    {
+      "path": "server/studio/shared/http.py",
+      "introduced_or_changed_by": [
+        "S00-06"
+      ]
+    },
+    {
+      "path": "server/studio/shared/i18n.py",
+      "introduced_or_changed_by": [
+        "S02-04"
+      ]
+    },
+    {
+      "path": "server/studio/shared/idempotency.py",
+      "introduced_or_changed_by": [
+        "S05-07"
+      ]
+    },
+    {
+      "path": "server/studio/shared/logging.py",
+      "introduced_or_changed_by": [
+        "S00-06",
+        "S16-03"
+      ]
+    },
+    {
+      "path": "server/studio/training/abandon.py",
+      "introduced_or_changed_by": [
+        "S09-05"
+      ]
+    },
+    {
+      "path": "server/studio/training/complete.py",
+      "introduced_or_changed_by": [
+        "S09-04"
+      ]
+    },
+    {
+      "path": "server/studio/training/manual.py",
+      "introduced_or_changed_by": [
+        "S09-06"
+      ]
+    },
+    {
+      "path": "server/studio/training/models.py",
+      "introduced_or_changed_by": [
+        "S09-01"
+      ]
+    },
+    {
+      "path": "server/studio/training/reports.py",
+      "introduced_or_changed_by": [
+        "S09-04"
+      ]
+    },
+    {
+      "path": "server/studio/training/set_logs.py",
+      "introduced_or_changed_by": [
+        "S09-02"
+      ]
+    },
+    {
+      "path": "server/studio/training/start.py",
+      "introduced_or_changed_by": [
+        "S09-01"
+      ]
+    },
+    {
+      "path": "server/studio/training/timing.py",
+      "introduced_or_changed_by": [
+        "S09-03"
+      ]
+    },
+    {
+      "path": "server/templates/auth/login.html",
+      "introduced_or_changed_by": [
+        "S03-10"
+      ]
+    },
+    {
+      "path": "server/templates/auth/recovery.html",
+      "introduced_or_changed_by": [
+        "S03-08"
+      ]
+    },
+    {
+      "path": "server/templates/auth/register.html",
+      "introduced_or_changed_by": [
+        "S03-10"
+      ]
+    },
+    {
+      "path": "server/templates/auth/verify.html",
+      "introduced_or_changed_by": [
+        "S03-10"
+      ]
+    },
+    {
+      "path": "server/templates/coach/analysis_detail.html",
+      "introduced_or_changed_by": [
+        "S14-09"
+      ]
+    },
+    {
+      "path": "server/templates/coach/assessment_editor.html",
+      "introduced_or_changed_by": [
+        "S12-05"
+      ]
+    },
+    {
+      "path": "server/templates/coach/assessment_review.html",
+      "introduced_or_changed_by": [
+        "S12-05"
+      ]
+    },
+    {
+      "path": "server/templates/coach/assignment.html",
+      "introduced_or_changed_by": [
+        "S08-05"
+      ]
+    },
+    {
+      "path": "server/templates/coach/change_requests.html",
+      "introduced_or_changed_by": [
+        "S11-11"
+      ]
+    },
+    {
+      "path": "server/templates/coach/coaching.html",
+      "introduced_or_changed_by": [
+        "S15-03"
+      ]
+    },
+    {
+      "path": "server/templates/coach/exercise_editor.html",
+      "introduced_or_changed_by": [
+        "S06-05",
+        "S06-06"
+      ]
+    },
+    {
+      "path": "server/templates/coach/exercises.html",
+      "introduced_or_changed_by": [
+        "S06-04"
+      ]
+    },
+    {
+      "path": "server/templates/coach/plan_permissions.html",
+      "introduced_or_changed_by": [
+        "S11-09"
+      ]
+    },
+    {
+      "path": "server/templates/coach/workspace.html",
+      "introduced_or_changed_by": [
+        "S10-08"
+      ]
+    },
+    {
+      "path": "server/templates/member/analysis.html",
+      "introduced_or_changed_by": [
+        "S14-09"
+      ]
+    },
+    {
+      "path": "server/templates/member/assessment.html",
+      "introduced_or_changed_by": [
+        "S12-05"
+      ]
+    },
+    {
+      "path": "server/templates/member/calendar.html",
+      "introduced_or_changed_by": [
+        "S11-07"
+      ]
+    },
+    {
+      "path": "server/templates/member/coaching.html",
+      "introduced_or_changed_by": [
+        "S15-03"
+      ]
+    },
+    {
+      "path": "server/templates/member/dashboard.html",
+      "introduced_or_changed_by": [
+        "S08-06"
+      ]
+    },
+    {
+      "path": "server/templates/member/exercise.html",
+      "introduced_or_changed_by": [
+        "S06-04"
+      ]
+    },
+    {
+      "path": "server/templates/member/feedback.html",
+      "introduced_or_changed_by": [
+        "S10-09"
+      ]
+    },
+    {
+      "path": "server/templates/member/history.html",
+      "introduced_or_changed_by": [
+        "S09-09"
+      ]
+    },
+    {
+      "path": "server/templates/member/manual_session.html",
+      "introduced_or_changed_by": [
+        "S09-06"
+      ]
+    },
+    {
+      "path": "server/templates/member/profile.html",
+      "introduced_or_changed_by": [
+        "S04-06"
+      ]
+    },
+    {
+      "path": "server/templates/member/program_detail.html",
+      "introduced_or_changed_by": [
+        "S11-06"
+      ]
+    },
+    {
+      "path": "server/templates/member/programs.html",
+      "introduced_or_changed_by": [
+        "S07-08"
+      ]
+    },
+    {
+      "path": "server/templates/member/session_detail.html",
+      "introduced_or_changed_by": [
+        "S10-09"
+      ]
+    },
+    {
+      "path": "server/templates/member/subscription.html",
+      "introduced_or_changed_by": [
+        "S13-06",
+        "S13-08"
+      ]
+    },
+    {
+      "path": "server/templates/member/workout.html",
+      "introduced_or_changed_by": [
+        "S09-07"
+      ]
+    },
+    {
+      "path": "server/templates/public/checkout_status.html",
+      "introduced_or_changed_by": [
+        "S13-08"
+      ]
+    },
+    {
+      "path": "server/templates/public/index.html",
+      "introduced_or_changed_by": [
+        "S05-03"
+      ]
+    },
+    {
+      "path": "server/templates/public/onboarding.html",
+      "introduced_or_changed_by": [
+        "S05-02"
+      ]
+    },
+    {
+      "path": "server/templates/public/plans.html",
+      "introduced_or_changed_by": [
+        "S05-03"
+      ]
+    },
+    {
+      "path": "server/templates/shared/base.html",
+      "introduced_or_changed_by": [
+        "S02-01"
+      ]
+    },
+    {
+      "path": "server/templates/shared/forms.html",
+      "introduced_or_changed_by": [
+        "S02-02"
+      ]
+    },
+    {
+      "path": "server/templates/shared/language.html",
+      "introduced_or_changed_by": [
+        "S02-04"
+      ]
+    },
+    {
+      "path": "server/templates/shared/navigation.html",
+      "introduced_or_changed_by": [
+        "S05-05"
+      ]
+    },
+    {
+      "path": "server/templates/shared/program_builder.html",
+      "introduced_or_changed_by": [
+        "S07-09"
+      ]
+    },
+    {
+      "path": "server/tests/conftest.py",
+      "introduced_or_changed_by": [
+        "S00-03"
+      ]
+    },
+    {
+      "path": "server/tests/contracts/accounts/test_apple_adapter.py",
+      "introduced_or_changed_by": [
+        "S04-03"
+      ]
+    },
+    {
+      "path": "server/tests/contracts/accounts/test_oauth_callback.py",
+      "introduced_or_changed_by": [
+        "S04-02"
+      ]
+    },
+    {
+      "path": "server/tests/contracts/accounts/test_profile_preferences.py",
+      "introduced_or_changed_by": [
+        "S04-06"
+      ]
+    },
+    {
+      "path": "server/tests/contracts/auth/test_password_login.py",
+      "introduced_or_changed_by": [
+        "S03-05"
+      ]
+    },
+    {
+      "path": "server/tests/contracts/auth/test_password_recovery.py",
+      "introduced_or_changed_by": [
+        "S03-08"
+      ]
+    },
+    {
+      "path": "server/tests/contracts/auth/test_signup_request.py",
+      "introduced_or_changed_by": [
+        "S03-03"
+      ]
+    },
+    {
+      "path": "server/tests/contracts/billing/test_billing_portal.py",
+      "introduced_or_changed_by": [
+        "S13-06"
+      ]
+    },
+    {
+      "path": "server/tests/contracts/catalog/test_exercise_browse.py",
+      "introduced_or_changed_by": [
+        "S06-04"
+      ]
+    },
+    {
+      "path": "server/tests/contracts/foundation/test_app_factory.py",
+      "introduced_or_changed_by": [
+        "S00-03"
+      ]
+    },
+    {
+      "path": "server/tests/contracts/foundation/test_error_contract.py",
+      "introduced_or_changed_by": [
+        "S00-06"
+      ]
+    },
+    {
+      "path": "server/tests/contracts/operations/test_observability.py",
+      "introduced_or_changed_by": [
+        "S16-03"
+      ]
+    },
+    {
+      "path": "server/tests/contracts/programs/test_program_catalog.py",
+      "introduced_or_changed_by": [
+        "S07-08"
+      ]
+    },
+    {
+      "path": "server/tests/integration/analysis/test_adaptation_draft.py",
+      "introduced_or_changed_by": [
+        "S14-06"
+      ]
+    },
+    {
+      "path": "server/tests/integration/analysis/test_analysis_jobs.py",
+      "introduced_or_changed_by": [
+        "S14-03"
+      ]
+    },
+    {
+      "path": "server/tests/integration/analysis/test_guarded_auto_apply.py",
+      "introduced_or_changed_by": [
+        "S14-08"
+      ]
+    },
+    {
+      "path": "server/tests/integration/analysis/test_observations_schema.py",
+      "introduced_or_changed_by": [
+        "S14-05"
+      ]
+    },
+    {
+      "path": "server/tests/integration/analysis/test_processing_permissions.py",
+      "introduced_or_changed_by": [
+        "S14-01"
+      ]
+    },
+    {
+      "path": "server/tests/integration/assessments/test_assessment_assignment.py",
+      "introduced_or_changed_by": [
+        "S12-02"
+      ]
+    },
+    {
+      "path": "server/tests/integration/assessments/test_assessment_protocol.py",
+      "introduced_or_changed_by": [
+        "S12-01"
+      ]
+    },
+    {
+      "path": "server/tests/integration/assessments/test_criterion_results.py",
+      "introduced_or_changed_by": [
+        "S12-03"
+      ]
+    },
+    {
+      "path": "server/tests/integration/assessments/test_readiness_publish.py",
+      "introduced_or_changed_by": [
+        "S12-04"
+      ]
+    },
+    {
+      "path": "server/tests/integration/auth/test_auth_local_e2e.py",
+      "introduced_or_changed_by": [
+        "S03-11"
+      ]
+    },
+    {
+      "path": "server/tests/integration/auth/test_local_auth_roundtrip.py",
+      "introduced_or_changed_by": [
+        "S03-11"
+      ]
+    },
+    {
+      "path": "server/tests/integration/auth/test_refresh_session.py",
+      "introduced_or_changed_by": [
+        "S03-06"
+      ]
+    },
+    {
+      "path": "server/tests/integration/auth/test_verify_email.py",
+      "introduced_or_changed_by": [
+        "S03-04"
+      ]
+    },
+    {
+      "path": "server/tests/integration/billing/test_checkout_attempts.py",
+      "introduced_or_changed_by": [
+        "S13-02"
+      ]
+    },
+    {
+      "path": "server/tests/integration/billing/test_subscription_projection.py",
+      "introduced_or_changed_by": [
+        "S13-04"
+      ]
+    },
+    {
+      "path": "server/tests/integration/billing/test_tier_transitions.py",
+      "introduced_or_changed_by": [
+        "S13-07"
+      ]
+    },
+    {
+      "path": "server/tests/integration/billing/test_trial_claims.py",
+      "introduced_or_changed_by": [
+        "S13-05"
+      ]
+    },
+    {
+      "path": "server/tests/integration/billing/test_webhook_inbox.py",
+      "introduced_or_changed_by": [
+        "S13-03"
+      ]
+    },
+    {
+      "path": "server/tests/integration/catalog/test_exercise_drafts.py",
+      "introduced_or_changed_by": [
+        "S06-01"
+      ]
+    },
+    {
+      "path": "server/tests/integration/catalog/test_exercise_publish.py",
+      "introduced_or_changed_by": [
+        "S06-03"
+      ]
+    },
+    {
+      "path": "server/tests/integration/coaching/test_call_allowance.py",
+      "introduced_or_changed_by": [
+        "S15-02"
+      ]
+    },
+    {
+      "path": "server/tests/integration/coaching/test_chat_delivery.py",
+      "introduced_or_changed_by": [
+        "S15-03"
+      ]
+    },
+    {
+      "path": "server/tests/integration/database/test_auth_storage.py",
+      "introduced_or_changed_by": [
+        "S01-06"
+      ]
+    },
+    {
+      "path": "server/tests/integration/database/test_migration_baseline.py",
+      "introduced_or_changed_by": [
+        "S01-02"
+      ]
+    },
+    {
+      "path": "server/tests/integration/database/test_profile_schema.py",
+      "introduced_or_changed_by": [
+        "S01-04"
+      ]
+    },
+    {
+      "path": "server/tests/integration/database/test_transaction_context.py",
+      "introduced_or_changed_by": [
+        "S01-03"
+      ]
+    },
+    {
+      "path": "server/tests/integration/onboarding/test_coach_access.py",
+      "introduced_or_changed_by": [
+        "S05-06"
+      ]
+    },
+    {
+      "path": "server/tests/integration/onboarding/test_entitlement_projection.py",
+      "introduced_or_changed_by": [
+        "S05-04"
+      ]
+    },
+    {
+      "path": "server/tests/integration/onboarding/test_onboarding_model.py",
+      "introduced_or_changed_by": [
+        "S05-01"
+      ]
+    },
+    {
+      "path": "server/tests/integration/planning/",
+      "introduced_or_changed_by": [
+        "S11-12"
+      ]
+    },
+    {
+      "path": "server/tests/integration/planning/test_approve_request.py",
+      "introduced_or_changed_by": [
+        "S11-11"
+      ]
+    },
+    {
+      "path": "server/tests/integration/planning/test_change_requests.py",
+      "introduced_or_changed_by": [
+        "S11-10"
+      ]
+    },
+    {
+      "path": "server/tests/integration/planning/test_coach_permissions.py",
+      "introduced_or_changed_by": [
+        "S11-09"
+      ]
+    },
+    {
+      "path": "server/tests/integration/planning/test_command_receipts.py",
+      "introduced_or_changed_by": [
+        "S05-07"
+      ]
+    },
+    {
+      "path": "server/tests/integration/planning/test_move_and_skip.py",
+      "introduced_or_changed_by": [
+        "S11-08"
+      ]
+    },
+    {
+      "path": "server/tests/integration/planning/test_planner_properties.py",
+      "introduced_or_changed_by": [
+        "S11-12"
+      ]
+    },
+    {
+      "path": "server/tests/integration/planning/test_planning_apply.py",
+      "introduced_or_changed_by": [
+        "S11-05"
+      ]
+    },
+    {
+      "path": "server/tests/integration/planning/test_planning_preview.py",
+      "introduced_or_changed_by": [
+        "S11-04"
+      ]
+    },
+    {
+      "path": "server/tests/integration/planning/test_primary_assignment.py",
+      "introduced_or_changed_by": [
+        "S08-02"
+      ]
+    },
+    {
+      "path": "server/tests/integration/planning/test_rules_versioning.py",
+      "introduced_or_changed_by": [
+        "S11-01"
+      ]
+    },
+    {
+      "path": "server/tests/integration/planning/test_scheduled_occurrences.py",
+      "introduced_or_changed_by": [
+        "S08-04"
+      ]
+    },
+    {
+      "path": "server/tests/integration/planning/test_single_plan.py",
+      "introduced_or_changed_by": [
+        "S08-01"
+      ]
+    },
+    {
+      "path": "server/tests/integration/planning/test_training_weeks.py",
+      "introduced_or_changed_by": [
+        "S08-03"
+      ]
+    },
+    {
+      "path": "server/tests/integration/programs/test_block_structure.py",
+      "introduced_or_changed_by": [
+        "S07-03"
+      ]
+    },
+    {
+      "path": "server/tests/integration/programs/test_clone_derivative.py",
+      "introduced_or_changed_by": [
+        "S07-07"
+      ]
+    },
+    {
+      "path": "server/tests/integration/programs/test_prescriptions.py",
+      "introduced_or_changed_by": [
+        "S07-04"
+      ]
+    },
+    {
+      "path": "server/tests/integration/programs/test_program_identity.py",
+      "introduced_or_changed_by": [
+        "S07-01"
+      ]
+    },
+    {
+      "path": "server/tests/integration/programs/test_publish_tree.py",
+      "introduced_or_changed_by": [
+        "S07-06"
+      ]
+    },
+    {
+      "path": "server/tests/integration/programs/test_set_targets.py",
+      "introduced_or_changed_by": [
+        "S07-05"
+      ]
+    },
+    {
+      "path": "server/tests/integration/programs/test_workout_structure.py",
+      "introduced_or_changed_by": [
+        "S07-02"
+      ]
+    },
+    {
+      "path": "server/tests/integration/reviews/test_late_evidence.py",
+      "introduced_or_changed_by": [
+        "S10-07"
+      ]
+    },
+    {
+      "path": "server/tests/integration/reviews/test_media_versions.py",
+      "introduced_or_changed_by": [
+        "S10-02"
+      ]
+    },
+    {
+      "path": "server/tests/integration/reviews/test_review_draft.py",
+      "introduced_or_changed_by": [
+        "S10-05"
+      ]
+    },
+    {
+      "path": "server/tests/integration/reviews/test_review_publish.py",
+      "introduced_or_changed_by": [
+        "S10-06"
+      ]
+    },
+    {
+      "path": "server/tests/integration/reviews/test_weekly_review_tasks.py",
+      "introduced_or_changed_by": [
+        "S10-03"
+      ]
+    },
+    {
+      "path": "server/tests/integration/training/test_abandon_session.py",
+      "introduced_or_changed_by": [
+        "S09-05"
+      ]
+    },
+    {
+      "path": "server/tests/integration/training/test_complete_session.py",
+      "introduced_or_changed_by": [
+        "S09-04"
+      ]
+    },
+    {
+      "path": "server/tests/integration/training/test_manual_session.py",
+      "introduced_or_changed_by": [
+        "S09-06"
+      ]
+    },
+    {
+      "path": "server/tests/integration/training/test_progress_history.py",
+      "introduced_or_changed_by": [
+        "S09-09"
+      ]
+    },
+    {
+      "path": "server/tests/integration/training/test_record_sets.py",
+      "introduced_or_changed_by": [
+        "S09-02"
+      ]
+    },
+    {
+      "path": "server/tests/integration/training/test_session_start.py",
+      "introduced_or_changed_by": [
+        "S09-01"
+      ]
+    },
+    {
+      "path": "server/tests/integration/training/test_session_timing.py",
+      "introduced_or_changed_by": [
+        "S09-03"
+      ]
+    },
+    {
+      "path": "server/tests/security/",
+      "introduced_or_changed_by": [
+        "S16-02"
+      ]
+    },
+    {
+      "path": "server/tests/security/accounts/test_coach_bootstrap.py",
+      "introduced_or_changed_by": [
+        "S04-05"
+      ]
+    },
+    {
+      "path": "server/tests/security/accounts/test_identity_linking.py",
+      "introduced_or_changed_by": [
+        "S04-04"
+      ]
+    },
+    {
+      "path": "server/tests/security/accounts/test_oauth_attempt.py",
+      "introduced_or_changed_by": [
+        "S04-01"
+      ]
+    },
+    {
+      "path": "server/tests/security/auth/test_csrf_rate_limits.py",
+      "introduced_or_changed_by": [
+        "S03-09"
+      ]
+    },
+    {
+      "path": "server/tests/security/auth/test_jwt_validation.py",
+      "introduced_or_changed_by": [
+        "S03-02"
+      ]
+    },
+    {
+      "path": "server/tests/security/auth/test_logout.py",
+      "introduced_or_changed_by": [
+        "S03-07"
+      ]
+    },
+    {
+      "path": "server/tests/security/database/test_profile_rls.py",
+      "introduced_or_changed_by": [
+        "S01-05"
+      ]
+    },
+    {
+      "path": "server/tests/security/onboarding/test_server_guards.py",
+      "introduced_or_changed_by": [
+        "S05-05"
+      ]
+    },
+    {
+      "path": "server/tests/security/operations/test_privacy_lifecycle.py",
+      "introduced_or_changed_by": [
+        "S16-04"
+      ]
+    },
+    {
+      "path": "server/tests/security/operations/test_security_regressions.py",
+      "introduced_or_changed_by": [
+        "S16-02"
+      ]
+    },
+    {
+      "path": "server/tests/security/reviews/test_private_notes.py",
+      "introduced_or_changed_by": [
+        "S10-04"
+      ]
+    },
+    {
+      "path": "server/tests/support/actors.py",
+      "introduced_or_changed_by": [
+        "S01-05"
+      ]
+    },
+    {
+      "path": "server/tests/support/database_guard.py",
+      "introduced_or_changed_by": [
+        "S01-01"
+      ]
+    },
+    {
+      "path": "server/tests/unit/analysis/test_evidence_manifest.py",
+      "introduced_or_changed_by": [
+        "S14-04"
+      ]
+    },
+    {
+      "path": "server/tests/unit/analysis/test_media_access_boundary.py",
+      "introduced_or_changed_by": [
+        "S14-02"
+      ]
+    },
+    {
+      "path": "server/tests/unit/auth/test_auth_gateway.py",
+      "introduced_or_changed_by": [
+        "S03-01"
+      ]
+    },
+    {
+      "path": "server/tests/unit/billing/test_stripe_gateway.py",
+      "introduced_or_changed_by": [
+        "S13-01"
+      ]
+    },
+    {
+      "path": "server/tests/unit/catalog/test_measurement_types.py",
+      "introduced_or_changed_by": [
+        "S06-02"
+      ]
+    },
+    {
+      "path": "server/tests/unit/catalog/test_planning_metadata.py",
+      "introduced_or_changed_by": [
+        "S06-06"
+      ]
+    },
+    {
+      "path": "server/tests/unit/foundation/test_settings.py",
+      "introduced_or_changed_by": [
+        "S00-04"
+      ]
+    },
+    {
+      "path": "server/tests/unit/planning/",
+      "introduced_or_changed_by": [
+        "S11-12"
+      ]
+    },
+    {
+      "path": "server/tests/unit/planning/test_availability_candidates.py",
+      "introduced_or_changed_by": [
+        "S11-03"
+      ]
+    },
+    {
+      "path": "server/tests/unit/planning/test_compatibility_engine.py",
+      "introduced_or_changed_by": [
+        "S11-02"
+      ]
+    },
+    {
+      "path": "server/tests/unit/reviews/test_media_links.py",
+      "introduced_or_changed_by": [
+        "S10-01"
+      ]
+    },
+    {
+      "path": "server/tests/unit/ui/test_localization.py",
+      "introduced_or_changed_by": [
+        "S02-04"
+      ]
+    },
+    {
+      "path": "supabase/config.toml",
+      "introduced_or_changed_by": [
+        "S01-01"
+      ]
+    },
+    {
+      "path": "supabase/templates/confirmation.html",
+      "introduced_or_changed_by": [
+        "S03-04"
+      ]
+    },
+    {
+      "path": "tests/e2e/",
+      "introduced_or_changed_by": [
+        "S00-05",
+        "S09-10",
+        "S11-12"
+      ]
+    },
+    {
+      "path": "tests/e2e/accessibility/",
+      "introduced_or_changed_by": [
+        "S16-01"
+      ]
+    },
+    {
+      "path": "tests/e2e/s02-02-form-primitives.spec.js",
+      "introduced_or_changed_by": [
+        "S02-02"
+      ]
+    },
+    {
+      "path": "tests/e2e/s03-10-registration-ui.spec.js",
+      "introduced_or_changed_by": [
+        "S03-10"
+      ]
+    },
+    {
+      "path": "tests/e2e/s05-02-guest-onboarding.spec.js",
+      "introduced_or_changed_by": [
+        "S05-02"
+      ]
+    },
+    {
+      "path": "tests/e2e/s05-03-public-pages.spec.js",
+      "introduced_or_changed_by": [
+        "S05-03"
+      ]
+    },
+    {
+      "path": "tests/e2e/s06-05-exercise-editor-ui.spec.js",
+      "introduced_or_changed_by": [
+        "S06-05"
+      ]
+    },
+    {
+      "path": "tests/e2e/s07-09-builder-ui.spec.js",
+      "introduced_or_changed_by": [
+        "S07-09"
+      ]
+    },
+    {
+      "path": "tests/e2e/s08-05-coach-assignment-ui.spec.js",
+      "introduced_or_changed_by": [
+        "S08-05"
+      ]
+    },
+    {
+      "path": "tests/e2e/s08-06-client-today.spec.js",
+      "introduced_or_changed_by": [
+        "S08-06"
+      ]
+    },
+    {
+      "path": "tests/e2e/s09-07-workout-c3.spec.js",
+      "introduced_or_changed_by": [
+        "S09-07"
+      ]
+    },
+    {
+      "path": "tests/e2e/s09-10-training-roundtrip.spec.js",
+      "introduced_or_changed_by": [
+        "S09-10"
+      ]
+    },
+    {
+      "path": "tests/e2e/s10-08-coach-a1.spec.js",
+      "introduced_or_changed_by": [
+        "S10-08"
+      ]
+    },
+    {
+      "path": "tests/e2e/s10-09-member-feedback.spec.js",
+      "introduced_or_changed_by": [
+        "S10-09"
+      ]
+    },
+    {
+      "path": "tests/e2e/s11-06-essential-main-change.spec.js",
+      "introduced_or_changed_by": [
+        "S11-06"
+      ]
+    },
+    {
+      "path": "tests/e2e/s11-07-essential-add-replace.spec.js",
+      "introduced_or_changed_by": [
+        "S11-07"
+      ]
+    },
+    {
+      "path": "tests/e2e/s12-05-assessment-ui.spec.js",
+      "introduced_or_changed_by": [
+        "S12-05"
+      ]
+    },
+    {
+      "path": "tests/e2e/s13-08-billing-ui-flow.spec.js",
+      "introduced_or_changed_by": [
+        "S13-08"
+      ]
+    },
+    {
+      "path": "tests/e2e/s14-09-analysis-status-ui.spec.js",
+      "introduced_or_changed_by": [
+        "S14-09"
+      ]
+    },
+    {
+      "path": "tests/e2e/s16-01-accessibility-i18n.spec.js",
+      "introduced_or_changed_by": [
+        "S16-01"
+      ]
+    },
+    {
+      "path": "tests/js/",
+      "introduced_or_changed_by": [
+        "S00-05"
+      ]
+    },
+    {
+      "path": "tests/js/s02-01-design-tokens.test.js",
+      "introduced_or_changed_by": [
+        "S02-01"
+      ]
+    },
+    {
+      "path": "tests/js/s02-03-theme-clock.test.js",
+      "introduced_or_changed_by": [
+        "S02-03"
+      ]
+    },
+    {
+      "path": "tests/js/s02-05-http-client.test.js",
+      "introduced_or_changed_by": [
+        "S02-05"
+      ]
+    },
+    {
+      "path": "tests/js/s09-08-offline-outbox.test.js",
+      "introduced_or_changed_by": [
+        "S09-08"
+      ]
+    },
+    {
+      "path": "tools/benchmarks/",
+      "introduced_or_changed_by": [
+        "S16-05"
+      ]
+    },
+    {
+      "path": "tools/check_migrations.py",
+      "introduced_or_changed_by": [
+        "S01-07"
+      ]
+    },
+    {
+      "path": "tools/checks.py",
+      "introduced_or_changed_by": [
+        "S00-07"
+      ]
+    },
+    {
+      "path": "tools/local_auth_fixture.py",
+      "introduced_or_changed_by": [
+        "S03-11"
+      ]
+    },
+    {
+      "path": "tools/local_stack.py",
+      "introduced_or_changed_by": [
+        "S01-01"
+      ]
+    },
+    {
+      "path": "tools/restore_check.py",
+      "introduced_or_changed_by": [
+        "S16-07"
+      ]
+    },
+    {
+      "path": "tools/stripe_testmode.py",
+      "introduced_or_changed_by": [
+        "S13-09"
+      ]
+    },
+    {
+      "path": "tools/test-origin.mjs",
+      "introduced_or_changed_by": [
+        "S00-05"
+      ]
+    },
+    {
+      "path": "tools/tests/test_s00_01_workspace.py",
+      "introduced_or_changed_by": [
+        "S00-01"
+      ]
+    },
+    {
+      "path": "tools/tests/test_s00_02_toolchain.py",
+      "introduced_or_changed_by": [
+        "S00-02"
+      ]
+    },
+    {
+      "path": "tools/tests/test_s00_05_js_harness.py",
+      "introduced_or_changed_by": [
+        "S00-05"
+      ]
+    },
+    {
+      "path": "tools/tests/test_s00_07_ci_baseline.py",
+      "introduced_or_changed_by": [
+        "S00-07"
+      ]
+    },
+    {
+      "path": "tools/tests/test_s01_01_local_supabase.py",
+      "introduced_or_changed_by": [
+        "S01-01"
+      ]
+    },
+    {
+      "path": "tools/tests/test_s01_07_migration_ci.py",
+      "introduced_or_changed_by": [
+        "S01-07"
+      ]
+    },
+    {
+      "path": "tools/tests/test_s14_07_ai_evaluation.py",
+      "introduced_or_changed_by": [
+        "S14-07"
+      ]
+    },
+    {
+      "path": "tools/tests/test_s16_05_load_and_indexes.py",
+      "introduced_or_changed_by": [
+        "S16-05"
+      ]
+    },
+    {
+      "path": "tools/tests/test_s16_06_container_build.py",
+      "introduced_or_changed_by": [
+        "S16-06"
+      ]
+    },
+    {
+      "path": "tools/tests/test_s16_08_release_matrix.py",
+      "introduced_or_changed_by": [
+        "S16-08"
+      ]
+    },
+    {
+      "path": "uv.lock",
+      "introduced_or_changed_by": [
+        "S00-02"
+      ]
+    }
+  ]
+}

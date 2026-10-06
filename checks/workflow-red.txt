@@ -1,0 +1,197 @@
+test_all_done_returns_complete (test_roadmap.RoadmapAcceptance.test_all_done_returns_complete) ... FAIL
+test_approved_gate_unblocks_but_does_not_complete_task (test_roadmap.RoadmapAcceptance.test_approved_gate_unblocks_but_does_not_complete_task) ... FAIL
+test_context_contains_only_relevant_documents (test_roadmap.RoadmapAcceptance.test_context_contains_only_relevant_documents) ... FAIL
+test_cycle_is_rejected (test_roadmap.RoadmapAcceptance.test_cycle_is_rejected) ... FAIL
+test_done_requires_done_dependencies (test_roadmap.RoadmapAcceptance.test_done_requires_done_dependencies) ... FAIL
+test_done_requires_evidence (test_roadmap.RoadmapAcceptance.test_done_requires_evidence) ... FAIL
+test_done_unblocks_dependency (test_roadmap.RoadmapAcceptance.test_done_unblocks_dependency) ... FAIL
+test_duplicate_id_is_rejected (test_roadmap.RoadmapAcceptance.test_duplicate_id_is_rejected) ... FAIL
+test_gate_approval_requires_evidence (test_roadmap.RoadmapAcceptance.test_gate_approval_requires_evidence) ... FAIL
+test_in_progress_is_resumed (test_roadmap.RoadmapAcceptance.test_in_progress_is_resumed) ... FAIL
+test_initial_next_is_first (test_roadmap.RoadmapAcceptance.test_initial_next_is_first) ... FAIL
+test_missing_dependency_is_rejected (test_roadmap.RoadmapAcceptance.test_missing_dependency_is_rejected) ... FAIL
+test_multiple_in_progress_is_error (test_roadmap.RoadmapAcceptance.test_multiple_in_progress_is_error) ... FAIL
+test_pending_external_gate_does_not_block_independent_work (test_roadmap.RoadmapAcceptance.test_pending_external_gate_does_not_block_independent_work) ... FAIL
+test_safe_path_rejects_traversal (test_roadmap.RoadmapAcceptance.test_safe_path_rejects_traversal) ... FAIL
+test_selector_is_read_only (test_roadmap.RoadmapAcceptance.test_selector_is_read_only) ... FAIL
+
+======================================================================
+FAIL: test_all_done_returns_complete (test_roadmap.RoadmapAcceptance.test_all_done_returns_complete)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 36, in setUp
+    self.mod = load_module()
+               ~~~~~~~~~~~^^
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 13, in load_module
+    raise AssertionError('The required roadmap utility has not been implemented yet')
+AssertionError: The required roadmap utility has not been implemented yet
+
+======================================================================
+FAIL: test_approved_gate_unblocks_but_does_not_complete_task (test_roadmap.RoadmapAcceptance.test_approved_gate_unblocks_but_does_not_complete_task)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 36, in setUp
+    self.mod = load_module()
+               ~~~~~~~~~~~^^
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 13, in load_module
+    raise AssertionError('The required roadmap utility has not been implemented yet')
+AssertionError: The required roadmap utility has not been implemented yet
+
+======================================================================
+FAIL: test_context_contains_only_relevant_documents (test_roadmap.RoadmapAcceptance.test_context_contains_only_relevant_documents)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 36, in setUp
+    self.mod = load_module()
+               ~~~~~~~~~~~^^
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 13, in load_module
+    raise AssertionError('The required roadmap utility has not been implemented yet')
+AssertionError: The required roadmap utility has not been implemented yet
+
+======================================================================
+FAIL: test_cycle_is_rejected (test_roadmap.RoadmapAcceptance.test_cycle_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 36, in setUp
+    self.mod = load_module()
+               ~~~~~~~~~~~^^
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 13, in load_module
+    raise AssertionError('The required roadmap utility has not been implemented yet')
+AssertionError: The required roadmap utility has not been implemented yet
+
+======================================================================
+FAIL: test_done_requires_done_dependencies (test_roadmap.RoadmapAcceptance.test_done_requires_done_dependencies)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 36, in setUp
+    self.mod = load_module()
+               ~~~~~~~~~~~^^
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 13, in load_module
+    raise AssertionError('The required roadmap utility has not been implemented yet')
+AssertionError: The required roadmap utility has not been implemented yet
+
+======================================================================
+FAIL: test_done_requires_evidence (test_roadmap.RoadmapAcceptance.test_done_requires_evidence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 36, in setUp
+    self.mod = load_module()
+               ~~~~~~~~~~~^^
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 13, in load_module
+    raise AssertionError('The required roadmap utility has not been implemented yet')
+AssertionError: The required roadmap utility has not been implemented yet
+
+======================================================================
+FAIL: test_done_unblocks_dependency (test_roadmap.RoadmapAcceptance.test_done_unblocks_dependency)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 36, in setUp
+    self.mod = load_module()
+               ~~~~~~~~~~~^^
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 13, in load_module
+    raise AssertionError('The required roadmap utility has not been implemented yet')
+AssertionError: The required roadmap utility has not been implemented yet
+
+======================================================================
+FAIL: test_duplicate_id_is_rejected (test_roadmap.RoadmapAcceptance.test_duplicate_id_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 36, in setUp
+    self.mod = load_module()
+               ~~~~~~~~~~~^^
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 13, in load_module
+    raise AssertionError('The required roadmap utility has not been implemented yet')
+AssertionError: The required roadmap utility has not been implemented yet
+
+======================================================================
+FAIL: test_gate_approval_requires_evidence (test_roadmap.RoadmapAcceptance.test_gate_approval_requires_evidence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 36, in setUp
+    self.mod = load_module()
+               ~~~~~~~~~~~^^
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 13, in load_module
+    raise AssertionError('The required roadmap utility has not been implemented yet')
+AssertionError: The required roadmap utility has not been implemented yet
+
+======================================================================
+FAIL: test_in_progress_is_resumed (test_roadmap.RoadmapAcceptance.test_in_progress_is_resumed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 36, in setUp
+    self.mod = load_module()
+               ~~~~~~~~~~~^^
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 13, in load_module
+    raise AssertionError('The required roadmap utility has not been implemented yet')
+AssertionError: The required roadmap utility has not been implemented yet
+
+======================================================================
+FAIL: test_initial_next_is_first (test_roadmap.RoadmapAcceptance.test_initial_next_is_first)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 36, in setUp
+    self.mod = load_module()
+               ~~~~~~~~~~~^^
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 13, in load_module
+    raise AssertionError('The required roadmap utility has not been implemented yet')
+AssertionError: The required roadmap utility has not been implemented yet
+
+======================================================================
+FAIL: test_missing_dependency_is_rejected (test_roadmap.RoadmapAcceptance.test_missing_dependency_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 36, in setUp
+    self.mod = load_module()
+               ~~~~~~~~~~~^^
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 13, in load_module
+    raise AssertionError('The required roadmap utility has not been implemented yet')
+AssertionError: The required roadmap utility has not been implemented yet
+
+======================================================================
+FAIL: test_multiple_in_progress_is_error (test_roadmap.RoadmapAcceptance.test_multiple_in_progress_is_error)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 36, in setUp
+    self.mod = load_module()
+               ~~~~~~~~~~~^^
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 13, in load_module
+    raise AssertionError('The required roadmap utility has not been implemented yet')
+AssertionError: The required roadmap utility has not been implemented yet
+
+======================================================================
+FAIL: test_pending_external_gate_does_not_block_independent_work (test_roadmap.RoadmapAcceptance.test_pending_external_gate_does_not_block_independent_work)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 36, in setUp
+    self.mod = load_module()
+               ~~~~~~~~~~~^^
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 13, in load_module
+    raise AssertionError('The required roadmap utility has not been implemented yet')
+AssertionError: The required roadmap utility has not been implemented yet
+
+======================================================================
+FAIL: test_safe_path_rejects_traversal (test_roadmap.RoadmapAcceptance.test_safe_path_rejects_traversal)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 36, in setUp
+    self.mod = load_module()
+               ~~~~~~~~~~~^^
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 13, in load_module
+    raise AssertionError('The required roadmap utility has not been implemented yet')
+AssertionError: The required roadmap utility has not been implemented yet
+
+======================================================================
+FAIL: test_selector_is_read_only (test_roadmap.RoadmapAcceptance.test_selector_is_read_only)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 36, in setUp
+    self.mod = load_module()
+               ~~~~~~~~~~~^^
+  File "/mnt/data/Handbalancers_Studio_Execution_v4_2026-10-06/tools/tests/test_roadmap.py", line 13, in load_module
+    raise AssertionError('The required roadmap utility has not been implemented yet')
+AssertionError: The required roadmap utility has not been implemented yet
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.004s
+
+FAILED (failures=16)

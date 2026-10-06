@@ -1,29 +1,48 @@
-node_modules/
-dist/
-playwright-report/
-test-results/
+# Product/local secrets and generated execution artifacts
 .env
 .env.*
 !.env.example
-.DS_Store
-.local-tools/
-
-# Python application and local verification
+*.pem
+*.key
+*.p12
+*.p8
+*.sqlite*
+*.db
+.venv/
+node_modules/
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.mypy_cache/
 .ruff_cache/
-*.egg-info/
-.venv/
-server/.coverage
+playwright-report/
+test-results/
+coverage/
+.local-tools/
+.private/
+private-evidence/
+*.har
+# Do not blanket-ignore migrations, unit tests, docs, or selected references.
 
-# Local design reviews and generated archives
-design-previews/
-*.log
-*.zip
-*.sqlite
-*.sqlite3
-*.db
-*.pem
-*.key
+# Credentials, session exports and database backups (not migration SQL).
+token.json
+tokens.json
+secrets.json
+credentials.json
+cookies.txt
+cookies.json
+*.dump
+*.backup
+backup*.sql
+dump*.sql
+*.sql.gz
 backups/
+dumps/
+# Private source recordings are never repository assets.
+*.[mM][pP]4
+*.[mM][oO][vV]
+*.[wW][eE][bB][mM]
+*.[mM]4[vV]
+*.[aA][vV][iI]
+*.[mM][kK][vV]
+.DS_Store

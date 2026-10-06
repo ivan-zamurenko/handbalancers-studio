@@ -1,0 +1,56 @@
+// Logical core overview only. Not executable SQL.
+// Full fields: schema_current.json. Composite guards: MODEL_CURRENT.md.
+Table users {
+  id uuid [pk]
+}
+Table training_plans {
+  id uuid [pk]
+  user_id uuid [ref: > users.id]
+  management_mode text
+  status text
+  row_version integer
+}
+Table program_versions {
+  id uuid [pk]
+  program_id uuid
+  publication_state text
+  source_program_version_id uuid [ref: > program_versions.id]
+}
+Table program_workouts {
+  id uuid [pk]
+  program_version_id uuid [ref: > program_versions.id]
+}
+Table user_programs {
+  id uuid [pk]
+  training_plan_id uuid [ref: > training_plans.id]
+  user_id uuid [ref: > users.id]
+  program_version_id uuid [ref: > program_versions.id]
+  assignment_role text
+  status text
+}
+Table scheduled_workouts {
+  id uuid [pk]
+  training_plan_id uuid [ref: > training_plans.id]
+  user_id uuid [ref: > users.id]
+  user_program_id uuid [ref: > user_programs.id, note: 'Nullable for additional']
+  program_version_id uuid [ref: > program_versions.id]
+  program_workout_id uuid [ref: > program_workouts.id]
+  origin_kind text
+  status text
+}
+Table training_sessions {
+  id uuid [pk]
+  training_plan_id uuid [ref: > training_plans.id]
+  user_id uuid [ref: > users.id]
+  scheduled_workout_id uuid [ref: > scheduled_workouts.id, unique]
+  program_version_id uuid [ref: > program_versions.id]
+  status text
+}
+Table planning_previews {
+  id uuid [pk]
+  training_plan_id uuid [ref: > training_plans.id]
+  base_plan_revision integer
+  context_fingerprint text
+  state text
+  outcome text
+}

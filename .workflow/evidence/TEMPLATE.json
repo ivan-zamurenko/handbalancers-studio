@@ -1,0 +1,27 @@
+{
+  "task_id": "S00-01",
+  "status": "in_progress",
+  "branch": "task/s00-01-workspace",
+  "base_sha": null,
+  "changed_paths": [],
+  "red": {
+    "command": "",
+    "observed_failure": "",
+    "not_an_environment_failure": null
+  },
+  "green": {
+    "command": "",
+    "exit_code": null,
+    "summary": ""
+  },
+  "regression_commands": [],
+  "manual_checks": [],
+  "scope_deviations": [],
+  "review": {
+    "reviewer": null,
+    "result": "pending",
+    "findings": []
+  },
+  "push_status": "not_started",
+  "notes": "Replace placeholders with actual results; do not insert current commit SHA into its own content."
+}

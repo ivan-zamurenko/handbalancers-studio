@@ -1,0 +1,2 @@
+Прочитай AGENTS.md и .workflow/CURRENT.md. Сверь текущий git status/branch/SHA с checkpoint. Запусти python tools/roadmap.py next. Если предыдущая задача in_progress, сначала восстанови её по evidence; не начинай поверх второй задачи.
+Продолжай один допустимый шаг. Сохраняй данные пользователя, не отключай test failures и не повторяй уже отвеченные вопросы. В конце обнови checkpoint и назови следующий готовый ID.

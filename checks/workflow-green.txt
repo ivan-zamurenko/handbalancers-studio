@@ -1,0 +1,21 @@
+test_all_done_returns_complete (test_roadmap.RoadmapAcceptance.test_all_done_returns_complete) ... ok
+test_approved_gate_unblocks_but_does_not_complete_task (test_roadmap.RoadmapAcceptance.test_approved_gate_unblocks_but_does_not_complete_task) ... ok
+test_context_contains_only_relevant_documents (test_roadmap.RoadmapAcceptance.test_context_contains_only_relevant_documents) ... ok
+test_cycle_is_rejected (test_roadmap.RoadmapAcceptance.test_cycle_is_rejected) ... ok
+test_done_requires_done_dependencies (test_roadmap.RoadmapAcceptance.test_done_requires_done_dependencies) ... ok
+test_done_requires_evidence (test_roadmap.RoadmapAcceptance.test_done_requires_evidence) ... ok
+test_done_unblocks_dependency (test_roadmap.RoadmapAcceptance.test_done_unblocks_dependency) ... ok
+test_duplicate_id_is_rejected (test_roadmap.RoadmapAcceptance.test_duplicate_id_is_rejected) ... ok
+test_gate_approval_requires_evidence (test_roadmap.RoadmapAcceptance.test_gate_approval_requires_evidence) ... ok
+test_in_progress_is_resumed (test_roadmap.RoadmapAcceptance.test_in_progress_is_resumed) ... ok
+test_initial_next_is_first (test_roadmap.RoadmapAcceptance.test_initial_next_is_first) ... ok
+test_missing_dependency_is_rejected (test_roadmap.RoadmapAcceptance.test_missing_dependency_is_rejected) ... ok
+test_multiple_in_progress_is_error (test_roadmap.RoadmapAcceptance.test_multiple_in_progress_is_error) ... ok
+test_pending_external_gate_does_not_block_independent_work (test_roadmap.RoadmapAcceptance.test_pending_external_gate_does_not_block_independent_work) ... ok
+test_safe_path_rejects_traversal (test_roadmap.RoadmapAcceptance.test_safe_path_rejects_traversal) ... ok
+test_selector_is_read_only (test_roadmap.RoadmapAcceptance.test_selector_is_read_only) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.019s
+
+OK

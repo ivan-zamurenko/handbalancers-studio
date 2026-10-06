@@ -1,0 +1,2 @@
+Остановись в понятном состоянии. Запиши .workflow/CURRENT.md и evidence текущей задачи: branch/base SHA, реальные изменения, точную failing/passing команду, pending work, gates, dirty files. Не делай фиктивный green commit.
+Если задача завершена — tests+review+commit/push status и следующий ID. Если нет — следующий агент должен знать одну ближайшую операцию, а не читать весь чат. Секреты и клиентские данные в checkpoint запрещены.

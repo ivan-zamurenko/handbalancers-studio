@@ -1,0 +1,40 @@
+TAP version 13
+# Subtest: Auto uses local wall clock and explicit boundaries
+ok 1 - Auto uses local wall clock and explicit boundaries
+  ---
+  duration_ms: 8.485564
+  type: 'test'
+  ...
+# Subtest: Explicit choices override the clock
+ok 2 - Explicit choices override the clock
+  ---
+  duration_ms: 0.187283
+  type: 'test'
+  ...
+# Subtest: Unknown preference is Auto; invalid clock has safe fallback
+ok 3 - Unknown preference is Auto; invalid clock has safe fallback
+  ---
+  duration_ms: 0.113357
+  type: 'test'
+  ...
+# Subtest: Blocked storage is nonfatal
+ok 4 - Blocked storage is nonfatal
+  ---
+  duration_ms: 0.258447
+  type: 'test'
+  ...
+# Subtest: Persistence stores the preference, not the current appearance
+ok 5 - Persistence stores the preference, not the current appearance
+  ---
+  duration_ms: 0.251848
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 91.17931

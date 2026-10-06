@@ -1,0 +1,156 @@
+[
+  {
+    "id": "S-MODEL",
+    "title": "GPT-6 Astra model",
+    "url": "https://developers.openai.com/api/docs/models/gpt-6-astra",
+    "supports": "Model identifier/reasoning values; direct video input not supported. Not a claim of account access.",
+    "checked_on": "2026-10-06"
+  },
+  {
+    "id": "S-MODELGUIDE",
+    "title": "Using GPT-6",
+    "url": "https://developers.openai.com/api/docs/guides/latest-model",
+    "supports": "Responses/tooling and model parameter compatibility.",
+    "checked_on": "2026-10-06"
+  },
+  {
+    "id": "S-CONFIG",
+    "title": "Codex configuration reference",
+    "url": "https://learn.chatgpt.com/docs/config-file/config-reference",
+    "supports": "model, effort, sandbox, approvals and subagent config fields.",
+    "checked_on": "2026-10-06"
+  },
+  {
+    "id": "S-AGENTS",
+    "title": "AGENTS.md instructions",
+    "url": "https://learn.chatgpt.com/docs/agent-configuration/agents-md",
+    "supports": "Repository instructions loading. Our task/checkpoint rules are project-specific.",
+    "checked_on": "2026-10-06"
+  },
+  {
+    "id": "S-SKILLBLOG",
+    "title": "Rethinking skills and prompts for GPT-6 Astra",
+    "url": "https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra",
+    "supports": "Narrow triggers, progressive context and avoiding irrelevant instruction bloat.",
+    "checked_on": "2026-10-06"
+  },
+  {
+    "id": "S-SKILLS",
+    "title": "Agent skills",
+    "url": "https://learn.chatgpt.com/docs/build-skills",
+    "supports": "Repository skill location and skill mechanics.",
+    "checked_on": "2026-10-06"
+  },
+  {
+    "id": "S-SUBAGENTS",
+    "title": "Subagents",
+    "url": "https://learn.chatgpt.com/docs/agent-configuration/subagents",
+    "supports": "Scoped delegation and agent role configuration.",
+    "checked_on": "2026-10-06"
+  },
+  {
+    "id": "S-WORKTREE",
+    "title": "Git worktrees",
+    "url": "https://learn.chatgpt.com/docs/environments/git-worktrees",
+    "supports": "Separate working trees; our DB/port isolation rule supplements this.",
+    "checked_on": "2026-10-06"
+  },
+  {
+    "id": "S-PKCE",
+    "title": "Supabase PKCE",
+    "url": "https://supabase.com/docs/guides/auth/sessions/pkce-flow",
+    "supports": "Code/verifier exchange and browser flow constraints.",
+    "checked_on": "2026-10-06"
+  },
+  {
+    "id": "S-AUTHSSR",
+    "title": "Supabase server-side advanced guide",
+    "url": "https://supabase.com/docs/guides/auth/server-side/advanced-guide",
+    "supports": "Token refresh/trusted auth state considerations.",
+    "checked_on": "2026-10-06"
+  },
+  {
+    "id": "S-LINKING",
+    "title": "Supabase identity linking",
+    "url": "https://supabase.com/docs/guides/auth/auth-identity-linking",
+    "supports": "Provider-managed verified identity linking.",
+    "checked_on": "2026-10-06"
+  },
+  {
+    "id": "S-APPLE",
+    "title": "Supabase Apple login",
+    "url": "https://supabase.com/docs/guides/auth/social-login/auth-apple",
+    "supports": "Apple web configuration, secret rotation, profile attributes.",
+    "checked_on": "2026-10-06"
+  },
+  {
+    "id": "S-PASSWORD",
+    "title": "Supabase password auth",
+    "url": "https://supabase.com/docs/guides/auth/passwords",
+    "supports": "Managed email/password flow.",
+    "checked_on": "2026-10-06"
+  },
+  {
+    "id": "S-SUPABASELOCAL",
+    "title": "Local development database migrations",
+    "url": "https://supabase.com/docs/guides/local-development/database-migrations",
+    "supports": "Local services and schema workflow; choice of Alembic for product is our architecture.",
+    "checked_on": "2026-10-06"
+  },
+  {
+    "id": "S-RLS",
+    "title": "PostgreSQL row security",
+    "url": "https://www.postgresql.org/docs/current/ddl-rowsecurity.html",
+    "supports": "RLS scope and owner/BYPASSRLS exceptions.",
+    "checked_on": "2026-10-06"
+  },
+  {
+    "id": "S-ORMVERSION",
+    "title": "SQLAlchemy version counters",
+    "url": "https://docs.sqlalchemy.org/en/20/orm/versioning.html",
+    "supports": "Optimistic version checks and bulk-operation limitations.",
+    "checked_on": "2026-10-06"
+  },
+  {
+    "id": "S-ALEMBIC",
+    "title": "Alembic autogenerate",
+    "url": "https://alembic.sqlalchemy.org/en/latest/autogenerate.html",
+    "supports": "Generated revisions need review; detection limits.",
+    "checked_on": "2026-10-06"
+  },
+  {
+    "id": "S-FASTAPI",
+    "title": "FastAPI testing",
+    "url": "https://fastapi.tiangolo.com/tutorial/testing/",
+    "supports": "Application HTTP testing pattern.",
+    "checked_on": "2026-10-06"
+  },
+  {
+    "id": "S-PW",
+    "title": "Playwright best practices",
+    "url": "https://playwright.dev/docs/best-practices",
+    "supports": "Isolated user-visible tests/locators; project snapshot matrix is our choice.",
+    "checked_on": "2026-10-06"
+  },
+  {
+    "id": "S-PYTEST",
+    "title": "pytest fixtures",
+    "url": "https://docs.pytest.org/en/stable/how-to/fixtures.html",
+    "supports": "Fixture scope/teardown; our red-green policy follows user mandate.",
+    "checked_on": "2026-10-06"
+  },
+  {
+    "id": "S-STRIPE",
+    "title": "Stripe webhooks",
+    "url": "https://docs.stripe.com/webhooks",
+    "supports": "Signature handling, duplicates/retries/out-of-order delivery.",
+    "checked_on": "2026-10-06"
+  },
+  {
+    "id": "S-TRIAL",
+    "title": "Stripe subscription trials",
+    "url": "https://docs.stripe.com/billing/subscriptions/trials",
+    "supports": "Trial mechanics; 7-day/tier rules supplied by owner.",
+    "checked_on": "2026-10-06"
+  }
+]

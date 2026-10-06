@@ -1,0 +1,1291 @@
+{
+  "version": 4,
+  "created_on": "2026-10-06",
+  "purpose": "greenfield implementation roadmap and agent execution kit",
+  "application_implemented": false,
+  "task_count": 134,
+  "acceptance_scenarios": 552,
+  "stage_count": 18,
+  "files": [
+    {
+      "path": ".agents/skills/studio-task-delivery/SKILL.md",
+      "bytes": 3000,
+      "sha256": "e11673796cdc3d9c8e58d15b994a118fe430e931757664b37cdd0c7302396f00"
+    },
+    {
+      "path": ".agents/skills/studio-task-delivery/agents/openai.yaml",
+      "bytes": 223,
+      "sha256": "e57da91d99ec58514cd8c831e959316bfebecb47bc57a99cacd3d144512cbfbf"
+    },
+    {
+      "path": ".agents/skills/studio-task-delivery/references/evidence-and-handoff.md",
+      "bytes": 1111,
+      "sha256": "52e58b39b7ae4e7f5d19b9ddc77748136c46a54878e1a6bec0cb28cfeae125e0"
+    },
+    {
+      "path": ".codex/agents/reviewer.toml",
+      "bytes": 606,
+      "sha256": "344ea4ef05aa462ec84e96b05196239e2d49651d3b8ec78b94dc0cab9c729372"
+    },
+    {
+      "path": ".codex/config.toml",
+      "bytes": 566,
+      "sha256": "83eb8c4f1d7e440dd40cbf8ffc67dc391db24e9e2cd84a359262ec0d30abeecf"
+    },
+    {
+      "path": ".gitignore",
+      "bytes": 376,
+      "sha256": "cc703d8f7fcc3cf6388e2526a424a76f32c5d40c7963d6b42b9bcf9048285979"
+    },
+    {
+      "path": ".workflow/CURRENT.md",
+      "bytes": 1741,
+      "sha256": "953b11f033a48fb62bcdff9cbb1305692eedb38717f1e2b3a6fe28df66b4acd5"
+    },
+    {
+      "path": ".workflow/checkpoints/TEMPLATE.md",
+      "bytes": 446,
+      "sha256": "03694b10ea0950f8e7f0a794a48ce20ae898fc5136ef4a3e0a750a5df469e789"
+    },
+    {
+      "path": ".workflow/evidence/TEMPLATE.json",
+      "bytes": 619,
+      "sha256": "2004245e3d1467447fe5a8a7c271085bd683324a0530812dfd4df11289d85ea7"
+    },
+    {
+      "path": ".workflow/state.json",
+      "bytes": 15264,
+      "sha256": "572be2676945cbb4b79d72a874698158a63be3d646facaaa3baf7ac02cbe9b16"
+    },
+    {
+      "path": "00_READ_FIRST.md",
+      "bytes": 2888,
+      "sha256": "0aeaf73edcf027e5e9115f2bc7120eaae27a916fdf8818745af64c947c91dde3"
+    },
+    {
+      "path": "AGENTS.md",
+      "bytes": 6828,
+      "sha256": "46648c178424a21896ea8f09f58bc0b06735dc33ce55b0a16d35cd371e282157"
+    },
+    {
+      "path": "AGENT_START_RU.txt",
+      "bytes": 2144,
+      "sha256": "ab0e5e02ca67a1b3537ae4ef3c15f54eca0e3a85db76f0484ff8479c398da6ca"
+    },
+    {
+      "path": "START_HERE.html",
+      "bytes": 1364416,
+      "sha256": "f0a88d20c6149244b6ff26bdf7cbecad83215e7f8686cf586f50979eea1fff0c"
+    },
+    {
+      "path": "agent-config/README_RU.md",
+      "bytes": 6029,
+      "sha256": "fabbdc0a7e0868e79aad3e83bed8742ea338ed8d1bb547ef9d43f4b450a38a2f"
+    },
+    {
+      "path": "agent-config/quality.config.toml.example",
+      "bytes": 314,
+      "sha256": "21219a92fdfe5ec899be1288d36f6b31b7816c9794421c5519af745632eb1fd3"
+    },
+    {
+      "path": "agent-config/responses-quality.example.json",
+      "bytes": 199,
+      "sha256": "dcf733957c11bfec9cf859fa80d6238e673712bda1fe4ceb07f23a85c964b3f1"
+    },
+    {
+      "path": "agent-config/skill.zip",
+      "bytes": 2806,
+      "sha256": "6ed1ea65f616c298f525d34b0addc5a468a674604b451ae63f4c02f8912481c3"
+    },
+    {
+      "path": "checks/README.md",
+      "bytes": 2425,
+      "sha256": "1d2accef1955bb5d93615e04b9352268fb2b0cfb218aad54465283b944034663"
+    },
+    {
+      "path": "checks/package-results.json",
+      "bytes": 944,
+      "sha256": "1a4c8edd53b0ebf84cf2f3030bccf5a0840a2632618751aed48be6fd591abd2f"
+    },
+    {
+      "path": "checks/reference-theme-tests.txt",
+      "bytes": 936,
+      "sha256": "c2bef10135b27464ed229b3ebfe6670eb89794a0c305d8d01929cbbdcc37a825"
+    },
+    {
+      "path": "checks/viewer-results.json",
+      "bytes": 648,
+      "sha256": "a2a535b718be0db3756e24a17352efee64a53ec4ec80d61869b4e01667ffa2b6"
+    },
+    {
+      "path": "checks/workflow-green.txt",
+      "bytes": 1863,
+      "sha256": "0ff32f6a229a3af6be218b9fe3001de76b5f29568a3d1430165e2a80e0e3f3f8"
+    },
+    {
+      "path": "checks/workflow-red.txt",
+      "bytes": 13645,
+      "sha256": "175bc68b02407f3afd1da523ef5dcc54be40e7740f63d857db209b55c6b9ef9a"
+    },
+    {
+      "path": "docs/SOURCES.md",
+      "bytes": 4146,
+      "sha256": "6ff9dc80c4fa1a3cdd294fcd1ea38207e9643ea96dea2661ee692dab9a5fc07a"
+    },
+    {
+      "path": "docs/api-inventory.json",
+      "bytes": 8716,
+      "sha256": "dce13addc8e61e38b4cb2e21430b9da8d0e0505bccc8a715c6a0598ad0058947"
+    },
+    {
+      "path": "docs/architecture.md",
+      "bytes": 6723,
+      "sha256": "f1dac822f6191b25246326f7432f429ab6b0365d199d6e1f966a36e5193b9054"
+    },
+    {
+      "path": "docs/auth-contract.md",
+      "bytes": 5239,
+      "sha256": "36e5374ae30d76296273f8f56e800526c54c393e6ff66c6f5eb88bbba644c70d"
+    },
+    {
+      "path": "docs/contracts.md",
+      "bytes": 11760,
+      "sha256": "94ae0a86e8ffd89448cafbde2a5028173ccd1a6df372bd304f637b029769163a"
+    },
+    {
+      "path": "docs/database-introduction.md",
+      "bytes": 2927,
+      "sha256": "1157213053ee7c320c4afba620fb1006d6cfab4760423e3bef058ed8781842a9"
+    },
+    {
+      "path": "docs/database-invariants.md",
+      "bytes": 8070,
+      "sha256": "b8f40aca16d78dd11990d655d1b383ff986ac5e02107697bd0f5e9178dd1c328"
+    },
+    {
+      "path": "docs/decisions.md",
+      "bytes": 4656,
+      "sha256": "9886868bd6472bace35cb8e716640573fe6c065e01d601f93060af3b362ec00f"
+    },
+    {
+      "path": "docs/engineering-defaults.md",
+      "bytes": 5105,
+      "sha256": "db17d285ec084f37f2b04e438f380960ae46f83c4e79e29d47f48f8efaf4bbfa"
+    },
+    {
+      "path": "docs/frontend.md",
+      "bytes": 4350,
+      "sha256": "ea3ae5027fac192f1ac92dfe955fa60725d40141fa7888830206148cc3daa087"
+    },
+    {
+      "path": "docs/owner-gates.md",
+      "bytes": 4414,
+      "sha256": "50b5299966716a365356da6406b79de72ab5d66f21194e1916adbf33d12770b3"
+    },
+    {
+      "path": "docs/owner-workflow.md",
+      "bytes": 8324,
+      "sha256": "cf524f1d1ec19a090c810f59c6e600346ec9f60b993609f978246a4bcf5a2b50"
+    },
+    {
+      "path": "docs/project-map.json",
+      "bytes": 58750,
+      "sha256": "719768f3f1e61bf2c861fa78f970f006e18f2cdb6b0dc8b6b8f63407015d3a30"
+    },
+    {
+      "path": "docs/project-structure.md",
+      "bytes": 8452,
+      "sha256": "7b6ea73484dc11bedada85d3e1b5921e1211d2aaf4bb6348a6f6e29db919c638"
+    },
+    {
+      "path": "docs/schema_v4.json",
+      "bytes": 138821,
+      "sha256": "ef64d2cd3b6564ecc89af61db1b73b2a50074bfb94d954e1dead7c1188e767bc"
+    },
+    {
+      "path": "docs/skills-policy.md",
+      "bytes": 2145,
+      "sha256": "c0b1e3ded3852f36f04dfe53a6809cb3ec71ba8c05397b8ad6ac35e0abf78121"
+    },
+    {
+      "path": "docs/sources.json",
+      "bytes": 5518,
+      "sha256": "b50c8f2a4463d743246022184ccc2b020cad8ea1bc0a67223b239df93c283e96"
+    },
+    {
+      "path": "docs/testing-and-commits.md",
+      "bytes": 7657,
+      "sha256": "0f88b411edc000d649d24f3e4a3a8d8a872d2032cb77525cfe99c8548911cd6e"
+    },
+    {
+      "path": "docs/toolchain.md",
+      "bytes": 5396,
+      "sha256": "cacde04c38ec49edadd53f6e09b8e3a8eaec187aee57f02cee366df1c33cd2fa"
+    },
+    {
+      "path": "prompts/CHATGPT_PROJECT_RU.md",
+      "bytes": 1368,
+      "sha256": "8f0e870a84ca7b0eb60d21daf7bea053725c243551b45f3bf4e1d92e7456e24b"
+    },
+    {
+      "path": "prompts/CONTINUE_RU.md",
+      "bytes": 642,
+      "sha256": "e8c73e6a1aafe22ff9518a284d09e222ff410294430e18abbd7e0080f328c6ce"
+    },
+    {
+      "path": "prompts/HANDOFF_RU.md",
+      "bytes": 665,
+      "sha256": "60fd0a510931eb5087f7c196b903821101543a4f3c399a185e5ede40d015fa62"
+    },
+    {
+      "path": "prompts/REVIEW_RU.md",
+      "bytes": 975,
+      "sha256": "990490713692b7d136001feef4d06016e6e33a6267a5fb577c723b1350ea8abb"
+    },
+    {
+      "path": "references/MODEL_HANDOFF_HISTORICAL.md",
+      "bytes": 72507,
+      "sha256": "1246e77068538d567e76a32225e75ec5cbcbaec4d3a55cfbc7aea9e0fc92d6a5"
+    },
+    {
+      "path": "references/README.md",
+      "bytes": 1328,
+      "sha256": "58d665692f2a18c079efc477cd725421eff6892d69b5cbfc22475efa8093a3b9"
+    },
+    {
+      "path": "references/design/README.md",
+      "bytes": 3822,
+      "sha256": "fe7a8cbaccf26003a01deb8d7670ac1cbeaf1c5fa7091359062b768930413ca7"
+    },
+    {
+      "path": "references/design/preview/assets/appearance-copy.json",
+      "bytes": 223,
+      "sha256": "4522b99ec78084f094ca6017fce9bdc9d51e9ebee262234880d6162faf742c53"
+    },
+    {
+      "path": "references/design/preview/assets/design-tokens.json",
+      "bytes": 1773,
+      "sha256": "91ae65e9c975129f350f7f34ff88585e36cc19fc3c6128620c13542655cdeb4e"
+    },
+    {
+      "path": "references/design/preview/assets/selected-preview.js",
+      "bytes": 18781,
+      "sha256": "50e03033c189ed641da662d204d5aef315dc99c72ff3bc349414bf9aa7335f09"
+    },
+    {
+      "path": "references/design/preview/assets/selected.css",
+      "bytes": 26584,
+      "sha256": "225dea89f58d53fb064dafc550786bb76838e7ebd41196fa16f38b26b3348aa9"
+    },
+    {
+      "path": "references/design/preview/assets/theme-controller.js",
+      "bytes": 3695,
+      "sha256": "91d1ac4a0f3561c81093e8d5e721b7c73ffe681e8e9bb6d6e3cad27fca3d278d"
+    },
+    {
+      "path": "references/design/preview/checks/theme.test.cjs",
+      "bytes": 1410,
+      "sha256": "5c77e1c856c2f7fc5fb33552e0db89b40acb8f532fe69cf46f6c60f41bc81df7"
+    },
+    {
+      "path": "references/design/preview/index.html",
+      "bytes": 50316,
+      "sha256": "9a12c18a09dc48eab4a24d3742351c17dd75ebc19dd1737d0ec3902dfa81d602"
+    },
+    {
+      "path": "references/design/preview/previews/A1-dark-1440.png",
+      "bytes": 144125,
+      "sha256": "7f24e9120f19af07d50d7237181e9c159ea3015aba59450d54d521832cd92412"
+    },
+    {
+      "path": "references/design/preview/previews/A1-dark-390.png",
+      "bytes": 55322,
+      "sha256": "9c3addc6f9e8dc592f9cd067efc0d7d83f80f41162ce91548ef40cf4648e6396"
+    },
+    {
+      "path": "references/design/preview/previews/A1-light-1440.png",
+      "bytes": 144106,
+      "sha256": "17579889bfe63d606c2d769b97c41771c2f149060257b3887be1d6ccd39878e0"
+    },
+    {
+      "path": "references/design/preview/previews/A1-light-390.png",
+      "bytes": 55239,
+      "sha256": "d77ec611b2b55c0d5b1a211e4ef66bb83b9278b3ce5d4c831a0e0c8fa5f81c41"
+    },
+    {
+      "path": "references/design/preview/previews/C1-dark-1440.png",
+      "bytes": 122782,
+      "sha256": "9a6bbc792ff1f8abd1f09656955b01c80223bfcd6e7eeddae76576d42654d909"
+    },
+    {
+      "path": "references/design/preview/previews/C1-dark-390.png",
+      "bytes": 85566,
+      "sha256": "1e06d51538d048104156214e25666118ed7f9e3c0e5d84a5a2c5035afc0f039a"
+    },
+    {
+      "path": "references/design/preview/previews/C1-light-1440.png",
+      "bytes": 121765,
+      "sha256": "53f1bc5c62b50f50c62466bf04aaaa39876105b51c3159d4ed878a8747403680"
+    },
+    {
+      "path": "references/design/preview/previews/C1-light-390.png",
+      "bytes": 83821,
+      "sha256": "beb5faa91486c654f1fd4a510687cd3d913d356a81ab9b2d3a90ad08ac05efe0"
+    },
+    {
+      "path": "references/design/preview/previews/C3-dark-1440.png",
+      "bytes": 72780,
+      "sha256": "a18211cc8a12f10e034cade97f3f1055d0572f470f9701b2187fc3024872b958"
+    },
+    {
+      "path": "references/design/preview/previews/C3-dark-390.png",
+      "bytes": 57944,
+      "sha256": "783bee30d1be1caba4e5ee6d4686c4c6c6200254bca1a410ff64d9ed4f3940f8"
+    },
+    {
+      "path": "references/design/preview/previews/C3-light-1440.png",
+      "bytes": 72466,
+      "sha256": "5cfc47ddd3c46ed8ea84ff1a510bc381d840ad72d21d319f607c0b5507139daa"
+    },
+    {
+      "path": "references/design/preview/previews/C3-light-390.png",
+      "bytes": 57396,
+      "sha256": "8d67557add529eed75d52b556875b2c3e959cc4f699bc4510c1d0fef76b758e6"
+    },
+    {
+      "path": "references/design/preview/reference/selected-overview.jpg",
+      "bytes": 876972,
+      "sha256": "dfab9ac05c21104386131211472f26a574bd6b4895709b04e15da5bf447a7734"
+    },
+    {
+      "path": "references/v3/00_READ_FIRST.md",
+      "bytes": 6565,
+      "sha256": "b55eb5d2c1af1ac68accc40d61f3df9e27554dfe8fac933ff70d69aa2a202b1b"
+    },
+    {
+      "path": "references/v3/01_decisions/CHANGELOG_AND_PRECEDENCE.md",
+      "bytes": 2718,
+      "sha256": "bf992863331148ad7dcdb7f577aea2a07e29397a169864aa509c25b521191e52"
+    },
+    {
+      "path": "references/v3/01_decisions/CONFIRMED_DECISIONS.md",
+      "bytes": 11271,
+      "sha256": "596ed335b8fdd4162e0d0b5abf0bbf97e6103bca9d51039dd38fafcd4267fd05"
+    },
+    {
+      "path": "references/v3/01_decisions/OPEN_DECISIONS.md",
+      "bytes": 3978,
+      "sha256": "f8d11dcfbab4f17066637fcf1466f8d8cdf1919b3d65ee6a93aee5964aac6fff"
+    },
+    {
+      "path": "references/v3/02_client/CLIENT_SPEC.md",
+      "bytes": 8757,
+      "sha256": "00128f53b6d6da70253fa8c09e24ade585bb823833eb7d833a3297ec3a0bff98"
+    },
+    {
+      "path": "references/v3/03_admin/ADMIN_SPEC.md",
+      "bytes": 9440,
+      "sha256": "a87d5a3404e503281eedffbe38fec8e56f395e2e90209f492eef7ad3152a5f61"
+    },
+    {
+      "path": "references/v3/04_architecture/API_CONTRACTS.md",
+      "bytes": 5204,
+      "sha256": "86fd85c3b9fe6053f517206215f0859195d35db888485bb0cd08405120610516"
+    },
+    {
+      "path": "references/v3/04_architecture/ARCHITECTURE.md",
+      "bytes": 7595,
+      "sha256": "61c2201b25dcc70c6bd52e57b3304fad9f9b816a80d2b5d5c2354e6437ec3e12"
+    },
+    {
+      "path": "references/v3/04_architecture/PROJECT_STRUCTURE.md",
+      "bytes": 1648,
+      "sha256": "9e61d73ab9df05f3d70119a564e31bd7b50eb9cf22d01482e7bc7f92ef92e292"
+    },
+    {
+      "path": "references/v3/05_database/CORE_OVERVIEW.dbml",
+      "bytes": 1540,
+      "sha256": "1fd53fc9c3a06fa646fdb889bba0179ea3d4e5055ea7c2c134e1da4b8fba1902"
+    },
+    {
+      "path": "references/v3/05_database/FIELD_DICTIONARY.html",
+      "bytes": 106891,
+      "sha256": "b5f2015cd92d4b12cc44909ef0e98b0dabca2b2c8467dfd7233c007ec1ceee0d"
+    },
+    {
+      "path": "references/v3/05_database/FIELD_DICTIONARY.md",
+      "bytes": 62487,
+      "sha256": "09e38f1af3ef78d2124d62cfe55068f8cae1894c72c0d925bce60c46d85ee63f"
+    },
+    {
+      "path": "references/v3/05_database/MODEL_CURRENT.md",
+      "bytes": 10826,
+      "sha256": "3e5073b7afbd64563bc125120198c21d54054b530487673fca595ef507c9104f"
+    },
+    {
+      "path": "references/v3/05_database/schema_current.json",
+      "bytes": 134684,
+      "sha256": "ce23fc379a12aaaaf47ae6c01561ae5faa2a3dc19d3fdd6d8662e110caed6a6a"
+    },
+    {
+      "path": "references/v3/06_flows/STATES_AND_TRANSACTIONS.md",
+      "bytes": 8794,
+      "sha256": "56d45c9ecf8fd281306ecaf488b50ee1f457b590bd26f0ff45553edcc06ea43e"
+    },
+    {
+      "path": "references/v3/06_flows/mermaid/01-shared-architecture.mmd",
+      "bytes": 633,
+      "sha256": "ddbc7c34297095969d70a54207b767da6565e9cf4639ebca0e1e1957015e3719"
+    },
+    {
+      "path": "references/v3/06_flows/mermaid/02-unified-plan.mmd",
+      "bytes": 1164,
+      "sha256": "bf42b0db01217a3e57b8242691ee5f25137d2bb7dfc65123545ad2f7c15667ac"
+    },
+    {
+      "path": "references/v3/06_flows/mermaid/03-workout-states.mmd",
+      "bytes": 335,
+      "sha256": "868f7114dded915d70e6825a2fa273f23da2367f1cffd7240e7dafd6b1377215"
+    },
+    {
+      "path": "references/v3/06_flows/mermaid/04-review-and-adaptation.mmd",
+      "bytes": 892,
+      "sha256": "e844faec1c4278185ee3a9e4bf89f51f98f1251e4a9d969faf60ab3d6e6e8332"
+    },
+    {
+      "path": "references/v3/06_flows/mermaid/05-core-model.mmd",
+      "bytes": 705,
+      "sha256": "578c676f58a8b8832a9708bd5fdd0f8725224b2879009aeab86c2fd4e704d6fc"
+    },
+    {
+      "path": "references/v3/06_flows/mermaid/06-preview-apply-sequence.mmd",
+      "bytes": 915,
+      "sha256": "7628d40b617d5f6fcd46a4025cd5622df246a5012c45d3c8f362f707f24dc685"
+    },
+    {
+      "path": "references/v3/06_flows/mermaid/README.md",
+      "bytes": 731,
+      "sha256": "123ad1064e148b2bd4ec75a4115b83ea22cb95540a9f1533d6bf94f03bc8ca1f"
+    },
+    {
+      "path": "references/v3/08_delivery/ROADMAP_AND_ACCEPTANCE.md",
+      "bytes": 7443,
+      "sha256": "fc2be0df3086c5fddc66b3f40115fc92fe7fd4196e83185d30edc96ed2a1ce34"
+    },
+    {
+      "path": "references/v3/08_delivery/acceptance_cases.json",
+      "bytes": 7420,
+      "sha256": "772ba0d2c043f163d3a15506f1276b8386f6f1e726c475ddb83e292918abedf0"
+    },
+    {
+      "path": "references/v3/AGENT_START_RU.txt",
+      "bytes": 3797,
+      "sha256": "b26dfdc0d7901dcf9685f31ae57b89f499ac5aaa039a6831bd337fef28b0460b"
+    },
+    {
+      "path": "references/v3/FILE_INDEX.html",
+      "bytes": 12919,
+      "sha256": "6254a31a1e29430a90fe624ea7c7e6b5b57b537e21b98f58d2f35695d95477a5"
+    },
+    {
+      "path": "references/v3/SOURCES_AND_LIMITS.md",
+      "bytes": 3402,
+      "sha256": "19cb69d65e50da583318303a3ced15156d4afdbe5481ba844cb6bd4046b4c01e"
+    },
+    {
+      "path": "references/v3/START_HERE.html",
+      "bytes": 106166,
+      "sha256": "371c1661a3cf10a0ed565a24f72141b12aa3b88a2745b7ecd4924291a8cbd6f3"
+    },
+    {
+      "path": "roadmap/MIGRATIONS.md",
+      "bytes": 3765,
+      "sha256": "1ac260f9d24880d4b5f281ca0f365c7a30b9692d62ce79bc09552678faf672d4"
+    },
+    {
+      "path": "roadmap/MILESTONES.md",
+      "bytes": 2223,
+      "sha256": "39f4987d4d10df8c12c763e89d6ca743cec129e752b7bf8cb1fbc046fa7c7e61"
+    },
+    {
+      "path": "roadmap/ROADMAP.md",
+      "bytes": 24051,
+      "sha256": "38cee5fbdd25eccb4f9bd204d8c99764de00c1f56b0ed2e96d732fee88afda2b"
+    },
+    {
+      "path": "roadmap/stages/S00.md",
+      "bytes": 1275,
+      "sha256": "d402241683636d8b086a8e73a2238ea971221e5da8fce48b0f5f81ae31dccd0f"
+    },
+    {
+      "path": "roadmap/stages/S01.md",
+      "bytes": 1343,
+      "sha256": "71fe397b15cdd4af1be1cd943aa5ccf9f5a19e77536ca612269bad71538c9bba"
+    },
+    {
+      "path": "roadmap/stages/S02.md",
+      "bytes": 992,
+      "sha256": "77d7bd04052b57a09455908436f9836b479b2547560c6d3e5aa9bbdee9646f3c"
+    },
+    {
+      "path": "roadmap/stages/S03.md",
+      "bytes": 1717,
+      "sha256": "e9765b088be2833deb36a803148e5f790ea43e318561739c85a0700718525f25"
+    },
+    {
+      "path": "roadmap/stages/S04.md",
+      "bytes": 1188,
+      "sha256": "2c247c2d4181fbcff3ab49b6ea4d5435c38ce2954e06b89a644465600357cd6d"
+    },
+    {
+      "path": "roadmap/stages/S05.md",
+      "bytes": 1359,
+      "sha256": "f8bc7a6a391df1ca93029c9dfc4e04417fe4f32b1233771859705ece123719fe"
+    },
+    {
+      "path": "roadmap/stages/S06.md",
+      "bytes": 1198,
+      "sha256": "56f4e8617d32fe62f71cefa9f5f764671492a345b3839763fef8819c2b2f5a3b"
+    },
+    {
+      "path": "roadmap/stages/S07.md",
+      "bytes": 1512,
+      "sha256": "a1c0ebf3f652c8a7935967ccd07b000f2d087ecd25dde3881a03c9a177e397c1"
+    },
+    {
+      "path": "roadmap/stages/S08.md",
+      "bytes": 1177,
+      "sha256": "3ffa8a7e2fe26b26345d5aa044a62c4f82a66cbbf3b81567ff0e1de194961d8e"
+    },
+    {
+      "path": "roadmap/stages/S09.md",
+      "bytes": 1737,
+      "sha256": "64e60df41428ee0575dfc128c03a0a961802b1848a632155297ee06646761ca2"
+    },
+    {
+      "path": "roadmap/stages/S10.md",
+      "bytes": 1524,
+      "sha256": "917e112addd653c2745dbfc81e54986cfa39b42bd5eaa1618c5baebb65687365"
+    },
+    {
+      "path": "roadmap/stages/S11.md",
+      "bytes": 1987,
+      "sha256": "a9b4a518a5a60f6dd263c2897236e84a8385e2de5b51cddbf277d9ff90033a73"
+    },
+    {
+      "path": "roadmap/stages/S12.md",
+      "bytes": 1138,
+      "sha256": "719c015f5656db8140d3032b7c77e29fdde900733199a861609ca7ac1f5e153f"
+    },
+    {
+      "path": "roadmap/stages/S13.md",
+      "bytes": 1577,
+      "sha256": "9bd8b7259f82512187bbe5ca0bcd6ebc72f77fe591b7ff48fe5be9a57eba1faf"
+    },
+    {
+      "path": "roadmap/stages/S14.md",
+      "bytes": 1732,
+      "sha256": "1dcb3b7c75ab24e0a62eb968856e15bbad6508a31e59879081e6ef1c93b2b242"
+    },
+    {
+      "path": "roadmap/stages/S15.md",
+      "bytes": 882,
+      "sha256": "4b2e191fafa2d0237d0aea6ab3a31ee366915d5d255373bdd51341486ce267ce"
+    },
+    {
+      "path": "roadmap/stages/S16.md",
+      "bytes": 1573,
+      "sha256": "f58972ecc1bc7f6c4f68c5a9cee2b9ea7c28cded898c00d2ab964640beda8a38"
+    },
+    {
+      "path": "roadmap/stages/S17.md",
+      "bytes": 1100,
+      "sha256": "4aa476616a4d5cc53b10e53309d4d42204a336e80e3abcc49ed4da0ce49550f1"
+    },
+    {
+      "path": "roadmap/tasks/S00-01_workspace.md",
+      "bytes": 7917,
+      "sha256": "5958dbb8ad70479f1b78de1fcb4a42de5046b92efcf5f394c4dab6a717e5077e"
+    },
+    {
+      "path": "roadmap/tasks/S00-02_toolchain.md",
+      "bytes": 7558,
+      "sha256": "7e5c32ce8715d45c0540222b70e72038654464aa684b239f69cbb61f98ff6b96"
+    },
+    {
+      "path": "roadmap/tasks/S00-03_app_factory.md",
+      "bytes": 7116,
+      "sha256": "b8cabdee52aeabc3aec9229a4b821a01cf124ccfc9e2a089a771dbda7c05b1df"
+    },
+    {
+      "path": "roadmap/tasks/S00-04_settings.md",
+      "bytes": 7214,
+      "sha256": "70a8888f39f22c6a294f0ddb2f473940bbe6052c6ff7446b26773c42e32fecc4"
+    },
+    {
+      "path": "roadmap/tasks/S00-05_js_harness.md",
+      "bytes": 7256,
+      "sha256": "d0e31b17a034b139069d2116141c2b686de8f00bc0bd9c446427aad73d2d4a75"
+    },
+    {
+      "path": "roadmap/tasks/S00-06_error_contract.md",
+      "bytes": 7170,
+      "sha256": "0d15695cb95c0571e785ff5b4fa2640e7d67a4a4ded439ab22659d6f5dcdfe68"
+    },
+    {
+      "path": "roadmap/tasks/S00-07_ci_baseline.md",
+      "bytes": 7203,
+      "sha256": "049cea24d69ed04bb42a7e37c460d716db7463270c4abf3a925d30cd69850440"
+    },
+    {
+      "path": "roadmap/tasks/S01-01_local_supabase.md",
+      "bytes": 7390,
+      "sha256": "12ddefb9a90a1f7fa1e3be5147fb742c2a2b2045939751507d4cacfb7394efbe"
+    },
+    {
+      "path": "roadmap/tasks/S01-02_migration_baseline.md",
+      "bytes": 7370,
+      "sha256": "9c73c716f06330780ef1c9e945bdbc0e0d40b49accffb1b7195b00a79964ec67"
+    },
+    {
+      "path": "roadmap/tasks/S01-03_transaction_context.md",
+      "bytes": 7262,
+      "sha256": "8e9633c4613deb5b46284e6e14d2f562a907e4a07e8b66778fb8c8099654aa18"
+    },
+    {
+      "path": "roadmap/tasks/S01-04_profile_schema.md",
+      "bytes": 7517,
+      "sha256": "e9e5e4ebb6741eed4598fb6c20ffade1bf86ce4def3ef558815d6f2d7502f3be"
+    },
+    {
+      "path": "roadmap/tasks/S01-05_profile_rls.md",
+      "bytes": 7362,
+      "sha256": "aa0a3bd27af14d867da4fd981dd8b63558c25812492eaaa43664183ba657a54e"
+    },
+    {
+      "path": "roadmap/tasks/S01-06_auth_storage.md",
+      "bytes": 7488,
+      "sha256": "bb3e0e187c7c13e278c35d4c12f5ba3b3d180e468b78d396e15a19d4b5315e95"
+    },
+    {
+      "path": "roadmap/tasks/S01-07_migration_ci.md",
+      "bytes": 7261,
+      "sha256": "1579b4247d46498e005d7183c116344d06b1e29ae4a82256b4b4f1e372de898c"
+    },
+    {
+      "path": "roadmap/tasks/S02-01_design_tokens.md",
+      "bytes": 7173,
+      "sha256": "708d5be9ada638da133e2b92dca80256de7074dfb9b36a6dac7789819be320bf"
+    },
+    {
+      "path": "roadmap/tasks/S02-02_form_primitives.md",
+      "bytes": 7223,
+      "sha256": "dc546a4daa0009c2195a88581c49d3e6e4691893ec0cec098c999a1e595e2625"
+    },
+    {
+      "path": "roadmap/tasks/S02-03_theme_clock.md",
+      "bytes": 7407,
+      "sha256": "cb71fcfd9d8b7efab6ef23c48ccf2da516bba1abd6bbd14f9f52d0113b8dd8c2"
+    },
+    {
+      "path": "roadmap/tasks/S02-04_localization.md",
+      "bytes": 7140,
+      "sha256": "2201d060f6793d10c04b58784fb501f5f31f0fe44060f563e885a55428fbde9a"
+    },
+    {
+      "path": "roadmap/tasks/S02-05_http_client.md",
+      "bytes": 7169,
+      "sha256": "9ec9b3762114c9960a14a01c9da59392c48a1228e77d3067336b87bf2dfe22e6"
+    },
+    {
+      "path": "roadmap/tasks/S03-01_auth_gateway.md",
+      "bytes": 7163,
+      "sha256": "34fab6df1d3b185ee352f8b82f82403be2fd7bd91104a24d4a79e1d26474aaf5"
+    },
+    {
+      "path": "roadmap/tasks/S03-02_jwt_validation.md",
+      "bytes": 7232,
+      "sha256": "f0290575e166ba3c1bb1310da729041242c17b562ea0491090e338beb0f51289"
+    },
+    {
+      "path": "roadmap/tasks/S03-03_signup_request.md",
+      "bytes": 7596,
+      "sha256": "464c2224a3cb1bfa2b1260ac0398d892b91f9beecea114b9aca09b7a4178358f"
+    },
+    {
+      "path": "roadmap/tasks/S03-04_verify_email.md",
+      "bytes": 7712,
+      "sha256": "b019afb5d76d17e9cf60fbbe9e21570493dc218d4f9991bc663468200d1a880b"
+    },
+    {
+      "path": "roadmap/tasks/S03-05_password_login.md",
+      "bytes": 7253,
+      "sha256": "843756c74606257750242a7e2ecdfcd4e67810bc20ba3888aa29c11bcc38d642"
+    },
+    {
+      "path": "roadmap/tasks/S03-06_refresh_session.md",
+      "bytes": 7396,
+      "sha256": "7fef57d70761396cb6e1789ce73d3ace016a7771f1961884b3ca8ac345146829"
+    },
+    {
+      "path": "roadmap/tasks/S03-07_logout.md",
+      "bytes": 7165,
+      "sha256": "c68ed7d713e416c01cf90347108ab65050b3b722f80a7b53c7ca2c5acaebd62c"
+    },
+    {
+      "path": "roadmap/tasks/S03-08_password_recovery.md",
+      "bytes": 7398,
+      "sha256": "2a118f95fb504fe2f65c9b5db8e1e82c7dd91dabef239741fd1fc966b5c33551"
+    },
+    {
+      "path": "roadmap/tasks/S03-09_csrf_rate_limits.md",
+      "bytes": 7390,
+      "sha256": "435344aca509df5c22ec8fb088cbc71315babbb1e5c25bcfcbf8899d4eaba6d5"
+    },
+    {
+      "path": "roadmap/tasks/S03-10_registration_ui.md",
+      "bytes": 7479,
+      "sha256": "a263cd3309336e5e84fba0eb5daf9d8c18f5ed88d660daf56b835fcfa108a98c"
+    },
+    {
+      "path": "roadmap/tasks/S03-11_auth_local_e2e.md",
+      "bytes": 7211,
+      "sha256": "eb3d878b9f1190e04a7426e7cd7b7e15e00e31ce1a728a3c12c3027d23ec0d67"
+    },
+    {
+      "path": "roadmap/tasks/S04-01_oauth_attempt.md",
+      "bytes": 7388,
+      "sha256": "14088f86d93ccd073473d30ab1bafd971ce7bc63e6cec5f68b05ed47960ce74a"
+    },
+    {
+      "path": "roadmap/tasks/S04-02_oauth_callback.md",
+      "bytes": 7355,
+      "sha256": "e82ea6eff2a7857bb09d9d824907de1130dea817d9080ce87494ec301f0cb1c2"
+    },
+    {
+      "path": "roadmap/tasks/S04-03_apple_adapter.md",
+      "bytes": 7421,
+      "sha256": "5cb0bc07442f9442d3f8956413cd374715ce7c58a2f4b08c07257a7816a1ff97"
+    },
+    {
+      "path": "roadmap/tasks/S04-04_identity_linking.md",
+      "bytes": 7287,
+      "sha256": "9da75909ec0803a6b45657189888fe15dc8678a653c4adb717f21f23b55795fe"
+    },
+    {
+      "path": "roadmap/tasks/S04-05_coach_bootstrap.md",
+      "bytes": 7380,
+      "sha256": "0f11dfcf07750df58f5f0bdfbe19d31075516351bb1529623aaf24c04e5e4f00"
+    },
+    {
+      "path": "roadmap/tasks/S04-06_profile_preferences.md",
+      "bytes": 7430,
+      "sha256": "ff4beac1812d3cfc32d31054fea9094a1256d333c1c3936aea6248c8a7eb0a1d"
+    },
+    {
+      "path": "roadmap/tasks/S05-01_onboarding_model.md",
+      "bytes": 7259,
+      "sha256": "a577a5f674c9570d1a179ac324bc36b1ac08b31023604431ca66ace110ccbff9"
+    },
+    {
+      "path": "roadmap/tasks/S05-02_guest_onboarding.md",
+      "bytes": 7411,
+      "sha256": "eacd964a1c37b753270883c7889eeb9eeab45f2e49f269110b237990ee157c37"
+    },
+    {
+      "path": "roadmap/tasks/S05-03_public_pages.md",
+      "bytes": 7483,
+      "sha256": "6866d5105b9c7c36ba53dc230fce9294c4bdc07c6a35d18bab9863bcee6ad1a0"
+    },
+    {
+      "path": "roadmap/tasks/S05-04_entitlement_projection.md",
+      "bytes": 7693,
+      "sha256": "beec1e0557fe90c82c12606a1d30f09d629ef0983c7b04021310a27dab80ffef"
+    },
+    {
+      "path": "roadmap/tasks/S05-05_server_guards.md",
+      "bytes": 7271,
+      "sha256": "d9683b8425db24b71a35e77057bbdfe9f1cd64f61d5d686790d515d3f4077f85"
+    },
+    {
+      "path": "roadmap/tasks/S05-06_coach_access.md",
+      "bytes": 7506,
+      "sha256": "afa9ac2bdc9127037db6cb5fe3fdef26b8186e7a0cacef8a6aded3970a783e6d"
+    },
+    {
+      "path": "roadmap/tasks/S05-07_command_receipts.md",
+      "bytes": 7438,
+      "sha256": "4f3d191f52b66e6e8476145f363a347664d6175521d511fca3943d610d621741"
+    },
+    {
+      "path": "roadmap/tasks/S06-01_exercise_drafts.md",
+      "bytes": 7445,
+      "sha256": "17b56efbf5ea0042ed8eebe830e96caef8b951fdb11d3853e87df3b26559b50a"
+    },
+    {
+      "path": "roadmap/tasks/S06-02_measurement_types.md",
+      "bytes": 7354,
+      "sha256": "39a8c862aa289cc3b54378c763db8974867ac7f4f6d43856d4500526e81fd8a9"
+    },
+    {
+      "path": "roadmap/tasks/S06-03_exercise_publish.md",
+      "bytes": 7375,
+      "sha256": "9aa3dc051ab853baad2e76017800758c68938317e89ef49d7b37472911c61108"
+    },
+    {
+      "path": "roadmap/tasks/S06-04_exercise_browse.md",
+      "bytes": 7284,
+      "sha256": "1941936d97e8abe23a59c896b8e16879aa2801b273963a22825386b0b6a337d6"
+    },
+    {
+      "path": "roadmap/tasks/S06-05_exercise_editor_ui.md",
+      "bytes": 7199,
+      "sha256": "a3e3b033bfdf6b4e4dfb5ee476f8f0638d82ab415ec57e06af45937bd8577846"
+    },
+    {
+      "path": "roadmap/tasks/S06-06_planning_metadata.md",
+      "bytes": 7426,
+      "sha256": "ecf2447c00e28bdbb3f8f7ab85bf1362a73ec92cf9e6906c567cde2d035265fe"
+    },
+    {
+      "path": "roadmap/tasks/S07-01_program_identity.md",
+      "bytes": 7350,
+      "sha256": "a903c27b43793b3aaa88ba434c92c4d83f1c137d7bbbdd3438fb92ff488adbac"
+    },
+    {
+      "path": "roadmap/tasks/S07-02_workout_structure.md",
+      "bytes": 7393,
+      "sha256": "7572fb83e20ad35fd9c22a19073fcc3a7a0050f0435656c986b9009e0bc0514b"
+    },
+    {
+      "path": "roadmap/tasks/S07-03_block_structure.md",
+      "bytes": 7132,
+      "sha256": "778a0512b6cd844898ff2f78a5d78fa3b7d8ac43ad5299498e89e06346ba495e"
+    },
+    {
+      "path": "roadmap/tasks/S07-04_prescriptions.md",
+      "bytes": 7271,
+      "sha256": "e45f6d02ed87b92bdd482e4271a9534ca53c9ae8395968be16d26c6cbcf45598"
+    },
+    {
+      "path": "roadmap/tasks/S07-05_set_targets.md",
+      "bytes": 7248,
+      "sha256": "93e96676cbcc4373b73b1fbcf6378a6c57d981bdea39bfc17306ad7c797d036b"
+    },
+    {
+      "path": "roadmap/tasks/S07-06_publish_tree.md",
+      "bytes": 7494,
+      "sha256": "f58d45c65c130f6a13dc267054e3835a36fc6bea0b690a3e6c18ad4a53979fda"
+    },
+    {
+      "path": "roadmap/tasks/S07-07_clone_derivative.md",
+      "bytes": 7282,
+      "sha256": "ef6e563af1f16d50f6b4f9cc4f59707b0449dbcfd15b48ebad19b170f2ee4ae1"
+    },
+    {
+      "path": "roadmap/tasks/S07-08_program_catalog.md",
+      "bytes": 7326,
+      "sha256": "37e9c522503644f841d2dfedd79826bb97da91ef6fdfed45887c8f6f1ad8c6d0"
+    },
+    {
+      "path": "roadmap/tasks/S07-09_builder_ui.md",
+      "bytes": 7498,
+      "sha256": "d03dcdf13a9bf358eccf0e182828623b16390677c9f57c78671b3fd1a41b379a"
+    },
+    {
+      "path": "roadmap/tasks/S08-01_single_plan.md",
+      "bytes": 7312,
+      "sha256": "6deeabf53503472567564c5c03e953d5f1ae79356824477ba32e9ada4fa6eac3"
+    },
+    {
+      "path": "roadmap/tasks/S08-02_primary_assignment.md",
+      "bytes": 7451,
+      "sha256": "8f1a266eafba902da844f2ed9e88efde4d84c4fc5ff651e417691ba13285e5f8"
+    },
+    {
+      "path": "roadmap/tasks/S08-03_training_weeks.md",
+      "bytes": 7624,
+      "sha256": "d5200b99591a34e671abf195e5bd2dbbef28c4223b43d465731c87747e56019d"
+    },
+    {
+      "path": "roadmap/tasks/S08-04_scheduled_occurrences.md",
+      "bytes": 7393,
+      "sha256": "a01ea87cf331a270ef3fd822525d8e668c2fe62b9d9f99c99131a846b3843cc8"
+    },
+    {
+      "path": "roadmap/tasks/S08-05_coach_assignment_ui.md",
+      "bytes": 7380,
+      "sha256": "bcec1221927c6bb471039b4504df28568f285b46e3267034871a41f87cf3ee31"
+    },
+    {
+      "path": "roadmap/tasks/S08-06_client_today.md",
+      "bytes": 7154,
+      "sha256": "fe3d2753170eab05932bc449c062da3606fb6083cb991ca523defbc0280cccd9"
+    },
+    {
+      "path": "roadmap/tasks/S09-01_session_start.md",
+      "bytes": 7462,
+      "sha256": "6c8f3bc14ff0952ed40a710faba30cf7739f5cba0e92594504ccaddd540c404d"
+    },
+    {
+      "path": "roadmap/tasks/S09-02_record_sets.md",
+      "bytes": 7515,
+      "sha256": "beb25d3a3ae9d10f8b348b4d0891a535441761c565b772e0daa7f2851077e538"
+    },
+    {
+      "path": "roadmap/tasks/S09-03_session_timing.md",
+      "bytes": 7319,
+      "sha256": "f209e7068bd768d1e339486ea08ca970ee4f31c051702c46d29a0aa7d1cb5827"
+    },
+    {
+      "path": "roadmap/tasks/S09-04_complete_session.md",
+      "bytes": 7635,
+      "sha256": "27cc3e57b50c655aae578a7007ee1ade04cc0f0460d65154c39d98c69e986765"
+    },
+    {
+      "path": "roadmap/tasks/S09-05_abandon_session.md",
+      "bytes": 7295,
+      "sha256": "03645ce6f44bc723dddc4eef3db59d31dc7041c30e6bb2c5792c7a1ec1f4f6ec"
+    },
+    {
+      "path": "roadmap/tasks/S09-06_manual_session.md",
+      "bytes": 7433,
+      "sha256": "383ca2ee006b146fb78de4ad90f5149bce692e53a3efc4eb6193f16de98321fe"
+    },
+    {
+      "path": "roadmap/tasks/S09-07_workout_c3.md",
+      "bytes": 7520,
+      "sha256": "c37892dc4027130bbb6c27e195ff2c241b3fc309f6b346346c2e9025c7d76fbc"
+    },
+    {
+      "path": "roadmap/tasks/S09-08_offline_outbox.md",
+      "bytes": 7489,
+      "sha256": "a548d991438aeb36290d1ac96741b3ca48ff20998727bb460bbff124599bdc56"
+    },
+    {
+      "path": "roadmap/tasks/S09-09_progress_history.md",
+      "bytes": 7576,
+      "sha256": "4196c524b091f8c62e7f456c4404c5742701ec8fabb58493b5d7b37ef0066321"
+    },
+    {
+      "path": "roadmap/tasks/S09-10_training_roundtrip.md",
+      "bytes": 7137,
+      "sha256": "f14dd3c19c38a2ffea983d3be49d7ce9f986c796c524ecdceea3b827a8c31756"
+    },
+    {
+      "path": "roadmap/tasks/S10-01_media_links.md",
+      "bytes": 7333,
+      "sha256": "9bacf1540953373a66fc796ac76bab980fa25eabb39e9464ba5225fbd30ed896"
+    },
+    {
+      "path": "roadmap/tasks/S10-02_media_versions.md",
+      "bytes": 7542,
+      "sha256": "8482dd2c0f52f50a1b56c28af7fb6cfd39c6cbb7127466834bbb572173dff85e"
+    },
+    {
+      "path": "roadmap/tasks/S10-03_weekly_review_tasks.md",
+      "bytes": 7416,
+      "sha256": "6c95a98de4101c7ee7269fc9eb41b3a24d213bb1bd804a140d0d896b26ce9424"
+    },
+    {
+      "path": "roadmap/tasks/S10-04_private_notes.md",
+      "bytes": 7261,
+      "sha256": "8e0934ffd8d25710b5a4c6e787d5c010be5a460aa51c376d4bef009255e1e228"
+    },
+    {
+      "path": "roadmap/tasks/S10-05_review_draft.md",
+      "bytes": 7250,
+      "sha256": "acc94e9954ab496b01a66bacdd51de7db56a20a3773a45ad75abb85baf7889b1"
+    },
+    {
+      "path": "roadmap/tasks/S10-06_review_publish.md",
+      "bytes": 7165,
+      "sha256": "30e533f7e02b1bd8d7011e801b4dd93a1e65e9e29f30f26f191a298a91fd6109"
+    },
+    {
+      "path": "roadmap/tasks/S10-07_late_evidence.md",
+      "bytes": 7204,
+      "sha256": "ea2716bafae1169019252de7af948e683b9ab4b02be7ccd633486e2da0be034e"
+    },
+    {
+      "path": "roadmap/tasks/S10-08_coach_a1.md",
+      "bytes": 7314,
+      "sha256": "6793455c9b17348935644dacef9857ecd1e9b96e5b6e137793de7a928985e5ba"
+    },
+    {
+      "path": "roadmap/tasks/S10-09_member_feedback.md",
+      "bytes": 7343,
+      "sha256": "13ec1a795e27405c82f8a19864b369c22f9e7f0c286e6841bc460f2e30386cc5"
+    },
+    {
+      "path": "roadmap/tasks/S11-01_rules_versioning.md",
+      "bytes": 7470,
+      "sha256": "a51a0cf016ae6b982a4bbc2fe9b6346ed87b11e584a33c265b58e09eb1e7f944"
+    },
+    {
+      "path": "roadmap/tasks/S11-02_compatibility_engine.md",
+      "bytes": 7398,
+      "sha256": "dc0b0fa67c04ba5beecd5736c0600ca973e37809a1804e56d83a66785146a42a"
+    },
+    {
+      "path": "roadmap/tasks/S11-03_availability_candidates.md",
+      "bytes": 7493,
+      "sha256": "17aa606f43719ae3d59d2eaa13352b912dbfbdb547dca452fe53adb1adb60a16"
+    },
+    {
+      "path": "roadmap/tasks/S11-04_planning_preview.md",
+      "bytes": 7450,
+      "sha256": "6493d2a4531e1930bab34d9e8a95fbcd281c379801ed53c0c26a8cc10cacdb91"
+    },
+    {
+      "path": "roadmap/tasks/S11-05_planning_apply.md",
+      "bytes": 7720,
+      "sha256": "b97e881c3846400c846ff8139bf4c389bba8bf56511b3fdc8ee56737dca35fd0"
+    },
+    {
+      "path": "roadmap/tasks/S11-06_essential_main_change.md",
+      "bytes": 7283,
+      "sha256": "3fb88b8c1e29fd377431a3490cb35dbfecf5b98d13ff0ce3f6c6b8c337af6f27"
+    },
+    {
+      "path": "roadmap/tasks/S11-07_essential_add_replace.md",
+      "bytes": 7389,
+      "sha256": "b77d1e30271c09fb9f82f71dbe8640501045a621b0df193a93d360705e4d84de"
+    },
+    {
+      "path": "roadmap/tasks/S11-08_move_and_skip.md",
+      "bytes": 7299,
+      "sha256": "59ee4373dd2ceb5e7317d32e8e1683d6a4b0d8621c70e2427338a189f5f9da4b"
+    },
+    {
+      "path": "roadmap/tasks/S11-09_coach_permissions.md",
+      "bytes": 7502,
+      "sha256": "fe9ec12e3e613939cb3ba87d9d61a3e902ba57728a297109c492a0882c0e7d8b"
+    },
+    {
+      "path": "roadmap/tasks/S11-10_change_requests.md",
+      "bytes": 7348,
+      "sha256": "cb452397fa6698c5aefdc6642d623a2db3188aa6839cf4fc296d447048cd27e5"
+    },
+    {
+      "path": "roadmap/tasks/S11-11_approve_request.md",
+      "bytes": 7335,
+      "sha256": "87a426fdda350b4159795c2ab77899865e95a67db594c7976e96fde3aed4d428"
+    },
+    {
+      "path": "roadmap/tasks/S11-12_planner_properties.md",
+      "bytes": 7435,
+      "sha256": "41f7e57047b68760190046737a20c25fc96b07162d0995ffc94e93cb5d5202fb"
+    },
+    {
+      "path": "roadmap/tasks/S12-01_assessment_protocol.md",
+      "bytes": 7559,
+      "sha256": "ff83e076d312f967a2d3b200760ef614c7745e7f7e407b9aeb0b48a19e70ebf2"
+    },
+    {
+      "path": "roadmap/tasks/S12-02_assessment_assignment.md",
+      "bytes": 7439,
+      "sha256": "b532cb32f080f45a7fe6d465d808f248caac52cc78b567328d4941b8b10982ae"
+    },
+    {
+      "path": "roadmap/tasks/S12-03_criterion_results.md",
+      "bytes": 7364,
+      "sha256": "65cb2801eac70accc2acda0dad38ce8a20afc92c4aac3b6a4a6112c3f38fa26d"
+    },
+    {
+      "path": "roadmap/tasks/S12-04_readiness_publish.md",
+      "bytes": 7290,
+      "sha256": "305485b6d4631d69f947e9e61214854d094d546b194d06f5a50770c021b3f96d"
+    },
+    {
+      "path": "roadmap/tasks/S12-05_assessment_ui.md",
+      "bytes": 7319,
+      "sha256": "74bcb77f38286fa87c923dc780002cd327823da367bad2aef3a871df191c273d"
+    },
+    {
+      "path": "roadmap/tasks/S13-01_stripe_gateway.md",
+      "bytes": 7302,
+      "sha256": "5f6b26935039252911c8db5a0a1547e9bb96dbf15ff8c2b096518c862ff36c97"
+    },
+    {
+      "path": "roadmap/tasks/S13-02_checkout_attempts.md",
+      "bytes": 7407,
+      "sha256": "9011b516f9b1e682644e910b8120533cfa8b049fc3f7da9a4ec8cccb0f212ce0"
+    },
+    {
+      "path": "roadmap/tasks/S13-03_webhook_inbox.md",
+      "bytes": 7487,
+      "sha256": "a3f23055ea1b6460ba1e84226ab2e11cb0ffd3ea57bb156b1955befc3bab1ec5"
+    },
+    {
+      "path": "roadmap/tasks/S13-04_subscription_projection.md",
+      "bytes": 7554,
+      "sha256": "12d4bf6b0716c2a0ce10d777346871a0a9e2c4feb76c4ce76077384c9c25b583"
+    },
+    {
+      "path": "roadmap/tasks/S13-05_trial_claims.md",
+      "bytes": 7425,
+      "sha256": "49bf2dc3e0903e0dd2bc64ef43c19770e75adc2546607fe80e3938c79d781422"
+    },
+    {
+      "path": "roadmap/tasks/S13-06_billing_portal.md",
+      "bytes": 7132,
+      "sha256": "e90eb294121efcba9a2920aa1f76a28479e62d726b051571043754677e2ef6fc"
+    },
+    {
+      "path": "roadmap/tasks/S13-07_tier_transitions.md",
+      "bytes": 7607,
+      "sha256": "1e1a0b7e5b208a0eccf91ad8f4850cd2864d24bd149fb427c59d8c933af8fd47"
+    },
+    {
+      "path": "roadmap/tasks/S13-08_billing_ui_flow.md",
+      "bytes": 7282,
+      "sha256": "fc935fc364872012a02f04b964edce01941dd5be09bf6fad375b243cb45d8567"
+    },
+    {
+      "path": "roadmap/tasks/S13-09_billing_testmode.md",
+      "bytes": 6332,
+      "sha256": "5adef80370ce5b8cf09a160d19eaa95eae79ef27278b5100d369fd30d759343f"
+    },
+    {
+      "path": "roadmap/tasks/S14-01_processing_permissions.md",
+      "bytes": 7350,
+      "sha256": "66e72c3ac67315caf818033a5dc1128512729c1e1383c82b1b74fd2fce432422"
+    },
+    {
+      "path": "roadmap/tasks/S14-02_media_access_boundary.md",
+      "bytes": 7367,
+      "sha256": "0b48f912d7ba6568e047cc1f41ed71fa2d50aca1788b5aff3baa364b51519028"
+    },
+    {
+      "path": "roadmap/tasks/S14-03_analysis_jobs.md",
+      "bytes": 7514,
+      "sha256": "7d735edde07cdb467c80eb97aeddea0e29c34ee40690254afe70025835c42d42"
+    },
+    {
+      "path": "roadmap/tasks/S14-04_evidence_manifest.md",
+      "bytes": 7449,
+      "sha256": "6ed9cf1aedaae069879d93f986c47cf538b1dd0f788267ae9579ed186d035cb8"
+    },
+    {
+      "path": "roadmap/tasks/S14-05_observations_schema.md",
+      "bytes": 7383,
+      "sha256": "bdb2101040cfc6bab016131d381c0b8273163874374a8d8bc97fe9598db9cb76"
+    },
+    {
+      "path": "roadmap/tasks/S14-06_adaptation_draft.md",
+      "bytes": 7468,
+      "sha256": "681f6501921385b2a7e31988d9144e04112f3a174acc531d7e0f6f215986d0fd"
+    },
+    {
+      "path": "roadmap/tasks/S14-07_ai_evaluation.md",
+      "bytes": 7410,
+      "sha256": "b655e0b8a002eddeaaf67ece7008bcf21f5f6353101a153baa54c5f99255f086"
+    },
+    {
+      "path": "roadmap/tasks/S14-08_guarded_auto_apply.md",
+      "bytes": 7549,
+      "sha256": "d4a8a91f6ad0b852817ceb0cc7ff5dcd99093e8166d65291936369703b196db2"
+    },
+    {
+      "path": "roadmap/tasks/S14-09_analysis_status_ui.md",
+      "bytes": 7311,
+      "sha256": "e8428bb7bf9602d18a75eb2baa700340a66318c2dd278b1dfbc982d794091859"
+    },
+    {
+      "path": "roadmap/tasks/S15-01_proplus_service_contract.md",
+      "bytes": 6325,
+      "sha256": "e6aa0d9a95833a6d49dba6b3dae3102480bd73a1636362a6ba860ab4b689f39f"
+    },
+    {
+      "path": "roadmap/tasks/S15-02_call_allowance.md",
+      "bytes": 7390,
+      "sha256": "b71f0bb9149e71511d94d246ddef89cc4e55046495c0c528bddfb9eec47d6d86"
+    },
+    {
+      "path": "roadmap/tasks/S15-03_chat_delivery.md",
+      "bytes": 7459,
+      "sha256": "8cce75277bfaa1c3ec0d98ffd7442562cd5bc0ff0814cc43b444dee9dcd749b7"
+    },
+    {
+      "path": "roadmap/tasks/S16-01_accessibility_i18n.md",
+      "bytes": 7158,
+      "sha256": "2bd99f8ffb11901ec4fc204d99f7554698c1f2066da44e6b613b27444d0d9320"
+    },
+    {
+      "path": "roadmap/tasks/S16-02_security_regressions.md",
+      "bytes": 7245,
+      "sha256": "02aa0f2cb5c1bc493f25da8b8f96d4443091fe0442242183910e5ec3ad39d41e"
+    },
+    {
+      "path": "roadmap/tasks/S16-03_observability.md",
+      "bytes": 7235,
+      "sha256": "3c2ecc8492c413b39ebce0e391160ba8cb83c7aae706f4c32d3f9046beb20786"
+    },
+    {
+      "path": "roadmap/tasks/S16-04_privacy_lifecycle.md",
+      "bytes": 7563,
+      "sha256": "ad788dc43573f8f5e89f693acb3933c4606d52599c2aa3d1904f4add494ad49c"
+    },
+    {
+      "path": "roadmap/tasks/S16-05_load_and_indexes.md",
+      "bytes": 7395,
+      "sha256": "35d8c0f2b342d941ddb0db4eafdb6f2820090a9bf3bf53bb4bd1e905fd6661bd"
+    },
+    {
+      "path": "roadmap/tasks/S16-06_container_build.md",
+      "bytes": 7303,
+      "sha256": "f957ee43c4b502177c1d3670c0001afed10cd6ef04cd00c927aba3e4e15dc7e4"
+    },
+    {
+      "path": "roadmap/tasks/S16-07_backup_restore.md",
+      "bytes": 6352,
+      "sha256": "4a3e9b51e8992d3ab16459374ccd1ed4e76eeeb171c0c66225b6648724c363c1"
+    },
+    {
+      "path": "roadmap/tasks/S16-08_release_matrix.md",
+      "bytes": 7402,
+      "sha256": "dbba166ddc6496e7e5c5b5804dbeee89b01bbc4979d34f7fc9332eea00f17ec7"
+    },
+    {
+      "path": "roadmap/tasks/S17-01_smtp_oauth_live.md",
+      "bytes": 6252,
+      "sha256": "548de143ee5a637955a7609eb39d9640b9780399fcee7559b0f6e75ec0fbb7cd"
+    },
+    {
+      "path": "roadmap/tasks/S17-02_video_access_live.md",
+      "bytes": 6372,
+      "sha256": "eb8624cec03129fac392104c049501aaa97a7366c2a34dc2a938b6cd0716b300"
+    },
+    {
+      "path": "roadmap/tasks/S17-03_ai_release_evaluation.md",
+      "bytes": 6380,
+      "sha256": "cecf86a64742fe02206fe04dc96cb5c62c95dc1771cae4c71381b3bf9d0b5442"
+    },
+    {
+      "path": "roadmap/tasks/S17-04_commerce_ready.md",
+      "bytes": 6272,
+      "sha256": "6fbb4b3b0607527719bd9d58c38ed70626a6f66ce37cf36aa8cfc4f9647bdd10"
+    },
+    {
+      "path": "roadmap/tasks/S17-05_production_release.md",
+      "bytes": 6378,
+      "sha256": "97e6d1aa053e0a8447bc76a1a9d95b50140a9b1ea8ad714b39a484082c179109"
+    },
+    {
+      "path": "roadmap/tasks.json",
+      "bytes": 283343,
+      "sha256": "a0a1d557538287fcf1d4b942dca2f983521691ecf049df87438351ca4d368e13"
+    },
+    {
+      "path": "tools/roadmap.py",
+      "bytes": 8642,
+      "sha256": "354c53a77ff33032302d869654240be3fb6af812b88b0fe920b2955215d6dd83"
+    },
+    {
+      "path": "tools/tests/test_roadmap.py",
+      "bytes": 5644,
+      "sha256": "140e7872aa01b087c2c13b1cb633dca0f2269f9a84c92f35e066b96d8cdd31b1"
+    }
+  ]
+}

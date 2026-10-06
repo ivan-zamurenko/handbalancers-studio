@@ -1,0 +1,167 @@
+[
+  {
+    "id": "CAT-01",
+    "expected_result": "Каждый действующий тариф видит опубликованный общий каталог; чужой private недоступен",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "PLAN-01",
+    "expected_result": "Два параллельных выбора основной не создают две текущие основные программы",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "PLAN-02",
+    "expected_result": "Дополнительное занятие другого источника создаёт occurrence в том же плане, без второго назначения main",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "PLAN-03",
+    "expected_result": "По умолчанию занятой день предлагает замену, не удваивает нагрузку",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "PLAN-04",
+    "expected_result": "Нет допустимого сочетания — объяснение и альтернативы; нет скрытого apply",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "PLAN-05",
+    "expected_result": "Недостаток метаданных — insufficient_data, не гарантия совместимости",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "PLAN-06",
+    "expected_result": "Одно выполнение учтено один раз; нерелевантный источник не закрывает этап основной",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "PLAN-07",
+    "expected_result": "После preview пришёл новый факт или правка — старый apply отвергнут",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "PLAN-08",
+    "expected_result": "Существующая active/paused session не меняется перепланированием",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "COACH-01",
+    "expected_result": "Неразрешённое клиентское изменение становится запросом без изменения расписания",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "COACH-02",
+    "expected_result": "Одобрение проверяет актуальную ревизию; разрешённые переносы не требуют ручного approval",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "COACH-03",
+    "expected_result": "Private notes отсутствуют в клиентском ответе/экспорте/уведомлении",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "COACH-04",
+    "expected_result": "Publish feedback не меняет будущую программу автоматически",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "VER-01",
+    "expected_result": "Ни один child published программы не меняется обычным UPDATE",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "VER-02",
+    "expected_result": "Персональное изменение не затрагивает каталог/чужие назначения",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "TRAIN-01",
+    "expected_result": "Повтор Start/Complete после таймаута не удваивает факт",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "TRAIN-02",
+    "expected_result": "Offline/reload сохраняет собственный draft, другой аккаунт его не видит",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "TRAIN-03",
+    "expected_result": "Два устройства не молча перезаписывают один подход",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "TRAIN-04",
+    "expected_result": "Missing/0/skipped различаются; partial не становится full",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "TRAIN-05",
+    "expected_result": "Вручную записанное занятие не выдумывает упражнений/целей",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "VIDEO-01",
+    "expected_result": "Новая ссылка создаёт новую evidence-version, старый review сохраняет исходную",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "VIDEO-02",
+    "expected_result": "Недоступное/непригодное видео не даёт уверенную оценку техники",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "AI-01",
+    "expected_result": "AI не может менять факты, роли, цену или общий каталог",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "AI-02",
+    "expected_result": "Proposal stale после изменения тренером не применяется",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "AI-03",
+    "expected_result": "Repeat apply создаёт одну будущую версию и один diff",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "ASSESS-01",
+    "expected_result": "Тест использует обычные set_logs, без второго журнала фактов",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "ASSESS-02",
+    "expected_result": "Критерии и версия методики сохраняются; missing evidence не not_ready",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "THEME-01",
+    "expected_result": "auto/light/dark, границы времени и ручной приоритет",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "THEME-02",
+    "expected_result": "Смена темы не теряет ввод, draft feedback и выбранного клиента",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "TIME-01",
+    "expected_result": "Воскресная граница, DST/поездки и корректная история без удаления",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "BILL-01",
+    "expected_result": "Redirect без webhook не активирует доступ; repeat event не удваивает эффект",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "SEC-01",
+    "expected_result": "Подмена IDs проверяется на всей цепочке plan/session/exercise/video/review",
+    "status": "required_not_executed_on_application"
+  },
+  {
+    "id": "SEC-02",
+    "expected_result": "RLS работает под реальной ограниченной runtime-ролью; pool не течёт контекстом",
+    "status": "required_not_executed_on_application"
+  }
+]

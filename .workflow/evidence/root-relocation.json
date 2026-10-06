@@ -1,0 +1,32 @@
+{
+  "task": "root-relocation",
+  "reason": "Explicit user instruction to keep all project files at project root and commit/push work.",
+  "original_baseline": "1f4f757",
+  "preserved_ref": "baseline/s00-01",
+  "branch": "task/execution-v4",
+  "base_sha": "9e124a5",
+  "source": "execution-v4/",
+  "destination": "project root",
+  "prior_work": "Existing tracked deletions predate this operation. No old runtime restored; existing Git history and nested repository metadata preserved.",
+  "verification": {
+    "tests": "python3 -m unittest discover -s tools/tests -v: 21 passed",
+    "workflow": "python3 tools/roadmap.py validate: 134 tasks valid",
+    "baseline_files_preserved": 264,
+    "modified_from_baseline": [
+      ".workflow/CURRENT.md",
+      ".workflow/origin.json",
+      ".workflow/state.json",
+      "AGENTS.md",
+      "README.md"
+    ],
+    "diff_check": "passed"
+  },
+  "push_status": "pending",
+  "review": {
+    "result": "no_blockers",
+    "reviewer": "review_s00_01",
+    "checks": "Independently confirmed all 264 baseline files, 21 tests and valid 134-task graph. Only intended metadata/docs changed."
+  },
+  "prior_approval_blocker": "Automatic approval review rejected combined commit/push because the staged replacement records 181 pre-existing old-file deletions. Remote main remains unchanged; explicit user confirmation requested for publishing this replacement tree in task/execution-v4.",
+  "authorization": "Owner explicitly requested deleting old project branch and making new project branch primary; this authorizes replacing the old tree, publishing V4, changing default branch and removing main. Archive tag will preserve old tip."
+}

@@ -1,0 +1,247 @@
+[
+  {
+    "task": "S00-03",
+    "module": "foundation",
+    "contract": "GET /health/live → 200 {status:\"ok\"}."
+  },
+  {
+    "task": "S00-06",
+    "module": "foundation",
+    "contract": "Error: {error:{code,message_key,field_errors:[],request_id}}; значения полей/секреты не возвращать."
+  },
+  {
+    "task": "S03-03",
+    "module": "auth",
+    "contract": "POST /api/auth/register {first_name,last_name,email,password} → 202 {state:\"verification_pending\"}; 422/429/503 по контракту."
+  },
+  {
+    "task": "S03-04",
+    "module": "auth",
+    "contract": "POST /api/auth/verify-email {email,token}; POST /api/auth/resend-verification {email}. Token хранит/проверяет Supabase, не свой OTP алгоритм."
+  },
+  {
+    "task": "S03-05",
+    "module": "auth",
+    "contract": "POST /api/auth/login {email,password}; GET /api/session → sanitized user/profile/entitlements, никогда tokens."
+  },
+  {
+    "task": "S03-07",
+    "module": "auth",
+    "contract": "POST /api/auth/logout → 204; CSRF обязателен."
+  },
+  {
+    "task": "S03-08",
+    "module": "auth",
+    "contract": "POST /api/auth/recovery/request; POST /api/auth/recovery/confirm. Supabase-вариант OTP/PKCE закрепить интеграционным тестом."
+  },
+  {
+    "task": "S04-01",
+    "module": "accounts",
+    "contract": "POST /api/auth/oauth/google/start → разрешённый authorization_url. Supabase управляет upstream OAuth state/nonce; app отдельно связывает attempt с браузером."
+  },
+  {
+    "task": "S04-02",
+    "module": "accounts",
+    "contract": "GET /auth/callback?code=...&attempt=...; redirect только на разрешённый локальный путь, code не хранить в access log."
+  },
+  {
+    "task": "S04-06",
+    "module": "accounts",
+    "contract": "GET/PATCH /api/me/profile; GET/PATCH /api/me/preferences {theme_preference,expected_revision}."
+  },
+  {
+    "task": "S05-02",
+    "module": "onboarding",
+    "contract": "POST /api/onboarding/draft (pre-auth CSRF); PUT /api/me/onboarding (trusted actor,expected_revision)."
+  },
+  {
+    "task": "S05-06",
+    "module": "onboarding",
+    "contract": "GET /api/coach/clients; GET /api/coach/clients/{id}; связь provision оператором/позже проверенным billing flow."
+  },
+  {
+    "task": "S06-01",
+    "module": "catalog",
+    "contract": "POST /api/coach/exercises; GET/PATCH /api/coach/exercises/{id}."
+  },
+  {
+    "task": "S06-03",
+    "module": "catalog",
+    "contract": "POST /api/coach/exercises/{id}/publish {expected_revision}; Idempotency-Key."
+  },
+  {
+    "task": "S06-04",
+    "module": "catalog",
+    "contract": "GET /api/catalog/exercises?query=&category=&cursor=; GET /api/catalog/exercises/{id}/versions/{version}."
+  },
+  {
+    "task": "S07-01",
+    "module": "programs",
+    "contract": "POST /api/programs; GET/PATCH /api/programs/{id}; actor/visibility server-owned."
+  },
+  {
+    "task": "S07-02",
+    "module": "programs",
+    "contract": "POST /api/program-versions/{id}/workouts; PUT /api/program-versions/{id}/workout-order {ids,expected_revision}."
+  },
+  {
+    "task": "S07-03",
+    "module": "programs",
+    "contract": "POST /api/program-workouts/{id}/blocks; PATCH /api/workout-blocks/{id}."
+  },
+  {
+    "task": "S07-04",
+    "module": "programs",
+    "contract": "POST /api/workout-blocks/{id}/exercises; PATCH /api/program-exercises/{id}."
+  },
+  {
+    "task": "S07-05",
+    "module": "programs",
+    "contract": "PUT /api/program-exercises/{id}/targets {targets,expected_revision}."
+  },
+  {
+    "task": "S07-06",
+    "module": "programs",
+    "contract": "POST /api/program-versions/{id}/publish; Idempotency-Key, expected_revision."
+  },
+  {
+    "task": "S07-07",
+    "module": "programs",
+    "contract": "POST /api/program-versions/{id}/clone {mode:new_revision|private_derivative}; проверка actor/доступа."
+  },
+  {
+    "task": "S07-08",
+    "module": "programs",
+    "contract": "GET /api/catalog/programs; GET /api/me/programs; GET /api/program-versions/{id}/tree."
+  },
+  {
+    "task": "S08-02",
+    "module": "planning",
+    "contract": "POST /api/coach/clients/{id}/assignments — сначала только явное тренерское назначение; self-service через preview после S11."
+  },
+  {
+    "task": "S08-06",
+    "module": "planning",
+    "contract": "GET /api/me/plan; GET /api/me/calendar?from=&to=; bounded interval и ownership."
+  },
+  {
+    "task": "S09-01",
+    "module": "training",
+    "contract": "POST /api/scheduled-workouts/{id}/start; Idempotency-Key; expected occurrence revision."
+  },
+  {
+    "task": "S09-02",
+    "module": "training",
+    "contract": "PUT /api/sessions/{id}/set-logs/{log_id} {session_exercise_id,target_set_id,set_number,side,status,reps|duration_ms|load_kg,expected_revision}."
+  },
+  {
+    "task": "S09-03",
+    "module": "training",
+    "contract": "POST /api/sessions/{id}/pause; /resume; /reconcile-time с explicit gap choice."
+  },
+  {
+    "task": "S09-04",
+    "module": "training",
+    "contract": "POST /api/sessions/{id}/complete {expected_revision,completion_kind,reason}; Idempotency-Key."
+  },
+  {
+    "task": "S09-05",
+    "module": "training",
+    "contract": "POST /api/sessions/{id}/abandon {reason,expected_revision}."
+  },
+  {
+    "task": "S09-06",
+    "module": "training",
+    "contract": "POST /api/me/manual-sessions {performed_on,minutes,note}; Idempotency-Key."
+  },
+  {
+    "task": "S09-09",
+    "module": "training",
+    "contract": "GET /api/me/progress; GET /api/me/sessions?cursor=; GET /api/sessions/{id}."
+  },
+  {
+    "task": "S10-02",
+    "module": "reviews",
+    "contract": "POST /api/session-exercises/{id}/video {url,expected_revision}; GET metadata; remove controlled action."
+  },
+  {
+    "task": "S10-05",
+    "module": "reviews",
+    "contract": "POST /api/coach/reviews/{id}/draft; PATCH /api/coach/review-versions/{id}."
+  },
+  {
+    "task": "S10-06",
+    "module": "reviews",
+    "contract": "POST /api/coach/review-versions/{id}/publish {expected_revision}; Idempotency-Key."
+  },
+  {
+    "task": "S10-09",
+    "module": "reviews",
+    "contract": "GET /api/me/reviews; GET /api/sessions/{id}/report."
+  },
+  {
+    "task": "S11-04",
+    "module": "planning",
+    "contract": "POST /api/plans/{id}/previews {operation,target_occurrence_id,source_program_workout_id,source_program_version_id,date,expected_plan_revision}."
+  },
+  {
+    "task": "S11-05",
+    "module": "planning",
+    "contract": "POST /api/plans/{id}/previews/{preview_id}/apply {expected_plan_revision}; Idempotency-Key."
+  },
+  {
+    "task": "S11-08",
+    "module": "planning",
+    "contract": "POST /api/scheduled-workouts/{id}/skip {reason,expected_revision}; move через previews."
+  },
+  {
+    "task": "S11-09",
+    "module": "planning",
+    "contract": "PATCH /api/coach/plans/{id}/permissions; PUT /api/coach/plans/{id}/permitted-options."
+  },
+  {
+    "task": "S11-10",
+    "module": "planning",
+    "contract": "POST /api/plans/{id}/change-requests; POST /api/coach/change-requests/{id}/reject; client cancel route."
+  },
+  {
+    "task": "S11-11",
+    "module": "planning",
+    "contract": "POST /api/coach/change-requests/{id}/preview; POST /api/coach/change-requests/{id}/approve {preview_id,expected_plan_revision}; Idempotency-Key."
+  },
+  {
+    "task": "S12-02",
+    "module": "assessments",
+    "contract": "POST /api/coach/clients/{id}/assessments; GET /api/me/assessments."
+  },
+  {
+    "task": "S12-04",
+    "module": "assessments",
+    "contract": "POST /api/coach/assessment-results/{id}/publish; отдельно создать plan preview по решению."
+  },
+  {
+    "task": "S13-02",
+    "module": "billing",
+    "contract": "POST /api/checkout {plan_code,terms_version}; Idempotency-Key; GET /api/me/checkout-attempts/{id}."
+  },
+  {
+    "task": "S13-03",
+    "module": "billing",
+    "contract": "POST /api/webhooks/stripe — узкое server-to-server CSRF-исключение с обязательной Stripe подписью."
+  },
+  {
+    "task": "S13-06",
+    "module": "billing",
+    "contract": "POST /api/billing-portal → url; всегда no-store и CSRF."
+  },
+  {
+    "task": "S14-08",
+    "module": "analysis",
+    "contract": "POST /api/analysis/proposals/{id}/apply — trusted internal/authorized route, не произвольный client diff."
+  },
+  {
+    "task": "S16-03",
+    "module": "operations",
+    "contract": "GET /health/ready; доступ к расширенным metrics только operator, не публичный профиль."
+  }
+]

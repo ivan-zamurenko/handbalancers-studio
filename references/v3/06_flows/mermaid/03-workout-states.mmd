@@ -1,0 +1,10 @@
+stateDiagram-v2
+[*] --> inProgress
+inProgress --> paused: Пауза
+paused --> inProgress: Продолжить
+inProgress --> completed: Complete full или partial
+paused --> completed: Завершить
+inProgress --> abandoned: Прекратить
+paused --> abandoned: Прекратить
+completed --> [*]
+abandoned --> [*]

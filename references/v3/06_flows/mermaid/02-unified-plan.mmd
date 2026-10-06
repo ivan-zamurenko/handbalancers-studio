@@ -1,0 +1,18 @@
+flowchart TD
+library["Все опубликованные общие программы"] --> choose["Действие клиента"]
+choose --> main["Сделать основной"]
+choose --> workout["Выбрать конкретное занятие"]
+workout --> check["Проверка единого плана"]
+main --> check
+check --> allowed{"Разрешено правилами и правами?"}
+allowed -->|Да| preview["Preview изменений"]
+allowed -->|Нужно решение тренера| request["Запрос без изменения календаря"]
+allowed -->|Конфликт или мало данных| explain["Объяснить и предложить альтернативу"]
+request --> coach["Тренер: свежая проверка"]
+coach --> preview
+preview --> confirm["Подтверждение и повторная проверка"]
+confirm --> commit["Атомарный apply"]
+commit --> calendar["Один календарь: main и additional"]
+calendar --> session["Факт тренировки"]
+session --> context["Новый контекст нагрузки"]
+context --> check

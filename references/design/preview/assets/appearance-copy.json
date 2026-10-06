@@ -1,0 +1,14 @@
+{
+  "uk": {
+    "theme": "Тема",
+    "auto": "Авто",
+    "light": "Світла",
+    "dark": "Темна"
+  },
+  "en": {
+    "theme": "Appearance",
+    "auto": "Auto",
+    "light": "Light",
+    "dark": "Dark"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "model": "gpt-6-astra",
+  "reasoning": {
+    "effort": "max"
+  },
+  "input": "Implement the single approved task supplied in this request; follow its scope and test-first acceptance criteria."
+}

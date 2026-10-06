@@ -1,0 +1,30 @@
+{
+  "scope": "execution kit structural checks, not product runtime",
+  "counts": {
+    "json_files": 13,
+    "toml_files": 3,
+    "tasks": 134,
+    "task_cards": 134,
+    "acceptance_scenarios": 552,
+    "stages": 18,
+    "application_tasks_done": 0,
+    "design_pngs": 12,
+    "current_viewer_links_checked": 477
+  },
+  "errors": [],
+  "passed": true,
+  "limitations": [
+    "No application runtime or live DB migrations were implemented",
+    "Codex configuration parsed and documentation-checked, not CLI-runtime tested",
+    "Viewer checked via in-memory Chromium DOM; HTTP/file navigation blocked in environment",
+    "Historical v3 links are archival, current viewer links checked separately"
+  ],
+  "skill_validation": "passed quick_validate.py and package_skill.py",
+  "workflow_tests": {
+    "red_failures": 16,
+    "green_passed": 16,
+    "scope": "workflow utility only"
+  },
+  "reference_theme_tests": 5,
+  "viewer_dom_checks": 11
+}

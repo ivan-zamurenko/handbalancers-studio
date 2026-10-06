@@ -1,0 +1,728 @@
+{
+  "version": 1,
+  "integration_branch": "task/execution-v4",
+  "remote_verified": true,
+  "active_task": null,
+  "tasks": {
+    "S00-01": {
+      "status": "done",
+      "evidence": ".workflow/evidence/S00-01.json",
+      "push_status": "pending"
+    },
+    "S00-02": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S00-03": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S00-04": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S00-05": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S00-06": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S00-07": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S01-01": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S01-02": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S01-03": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S01-04": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S01-05": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S01-06": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S01-07": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S02-01": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S02-02": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S02-03": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S02-04": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S02-05": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S03-01": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S03-02": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S03-03": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S03-04": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S03-05": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S03-06": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S03-07": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S03-08": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S03-09": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S03-10": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S03-11": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S04-01": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S04-02": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S04-03": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S04-04": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S04-05": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S04-06": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S05-01": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S05-02": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S05-03": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S05-04": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S05-05": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S05-06": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S05-07": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S06-01": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S06-02": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S06-03": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S06-04": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S06-05": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S06-06": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S07-01": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S07-02": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S07-03": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S07-04": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S07-05": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S07-06": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S07-07": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S07-08": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S07-09": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S08-01": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S08-02": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S08-03": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S08-04": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S08-05": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S08-06": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S09-01": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S09-02": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S09-03": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S09-04": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S09-05": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S09-06": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S09-07": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S09-08": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S09-09": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S09-10": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S10-01": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S10-02": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S10-03": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S10-04": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S10-05": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S10-06": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S10-07": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S10-08": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S10-09": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S11-01": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S11-02": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S11-03": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S11-04": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S11-05": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S11-06": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S11-07": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S11-08": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S11-09": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S11-10": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S11-11": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S11-12": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S12-01": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S12-02": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S12-03": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S12-04": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S12-05": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S13-01": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S13-02": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S13-03": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S13-04": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S13-05": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S13-06": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S13-07": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S13-08": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S13-09": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S14-01": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S14-02": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S14-03": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S14-04": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S14-05": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S14-06": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S14-07": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S14-08": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S14-09": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S15-01": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S15-02": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S15-03": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S16-01": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S16-02": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S16-03": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S16-04": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S16-05": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S16-06": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S16-07": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S16-08": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S17-01": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S17-02": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S17-03": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S17-04": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S17-05": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    }
+  },
+  "gates": {
+    "G_AI_QUALITY": {
+      "status": "pending",
+      "evidence": null
+    },
+    "G_AUTH_PROVIDERS": {
+      "status": "pending",
+      "evidence": null
+    },
+    "G_COMMERCE": {
+      "status": "pending",
+      "evidence": null
+    },
+    "G_INFRA_TEST": {
+      "status": "pending",
+      "evidence": null
+    },
+    "G_METHOD": {
+      "status": "pending",
+      "evidence": null
+    },
+    "G_PRIVACY": {
+      "status": "pending",
+      "evidence": null
+    },
+    "G_PRODUCTION": {
+      "status": "pending",
+      "evidence": null
+    },
+    "G_PROPLUS": {
+      "status": "pending",
+      "evidence": null
+    },
+    "G_RULES": {
+      "status": "pending",
+      "evidence": null
+    },
+    "G_SMTP": {
+      "status": "pending",
+      "evidence": null
+    },
+    "G_STRIPE_TEST": {
+      "status": "pending",
+      "evidence": null
+    },
+    "G_VIDEO": {
+      "status": "pending",
+      "evidence": null
+    }
+  }
+}

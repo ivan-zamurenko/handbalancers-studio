@@ -1,0 +1,20 @@
+sequenceDiagram
+participant client as Клиент или тренер
+participant api as FastAPI
+participant planner as Планировщик
+participant db as PostgreSQL
+client->>api: Запрос замены с expected revision
+api->>db: Прочитать план, права, правила и факты
+api->>planner: Построить допустимый diff
+planner-->>api: Outcome и объяснения
+api->>db: Сохранить preview и fingerprint
+api-->>client: Показать изменения
+client->>api: Apply preview и idempotency key
+api->>db: Транзакция, lock и повторная проверка
+alt Контекст изменился
+db-->>api: Conflict
+api-->>client: Новый preview необходим
+else Контекст актуален
+api->>db: Изменения, revision, audit, commit
+api-->>client: Сохраненный результат
+end

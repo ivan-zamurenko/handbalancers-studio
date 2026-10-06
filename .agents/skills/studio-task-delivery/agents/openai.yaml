@@ -1,0 +1,4 @@
+interface:
+  display_name: "Studio Task Delivery"
+  short_description: "Ship one Studio task with tests first and a small commit"
+  default_prompt: "Use $studio-task-delivery to execute the next approved Studio task card."

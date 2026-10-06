@@ -1,0 +1,13 @@
+flowchart TD
+facts["Факт: подходы и точные версии видео"] --> report["Версия отчета"]
+report --> route{"Режим сопровождения"}
+route -->|Essential| self["История и самостоятельный выбор"]
+route -->|Plus| ai["AI: пригодность и критерии"]
+route -->|Pro или Pro+| human["Тренер: анализ и private notes"]
+human --> publish["Опубликованный клиентский feedback"]
+ai --> proposal["Предложение адаптации"]
+publish --> proposal
+proposal --> validate["Права, методика и ожидаемая ревизия"]
+validate --> valid{"Контекст актуален?"}
+valid -->|Нет| stale["Устарело: пересчитать"]
+valid -->|Да| future["Новая версия только будущего плана"]

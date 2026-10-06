@@ -1,0 +1,24 @@
+{
+  "scope": "in-memory DOM render of generated HTML; not application or HTTP/file navigation",
+  "browser": "Chromium",
+  "checks": [
+    "desktop_overview",
+    "desktop_no_overflow",
+    "search_exact_task",
+    "task_navigation",
+    "task_has_command_and_tests",
+    "theme_switch",
+    "mobile_task_no_overflow",
+    "mobile_navigation",
+    "mobile_document_search",
+    "mobile_navigation_closes",
+    "mobile_overview_no_overflow"
+  ],
+  "passed": 11,
+  "errors": [],
+  "app_tasks_completed": 0,
+  "not_tested": [
+    "HTTP and file navigation blocked by environment administrator policy",
+    "cross-reload localStorage persistence"
+  ]
+}

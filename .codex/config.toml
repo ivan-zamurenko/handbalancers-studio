@@ -1,0 +1,17 @@
+# Project-scoped baseline. Review before trusting this workspace.
+# Verified against official config docs on 2026-10-06; not runtime-tested here.
+model = "gpt-6-astra"
+model_reasoning_effort = "high"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+[sandbox_workspace_write]
+network_access = false
+
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 1
+
+[agents.studio_reviewer]
+description = "Review one Studio task diff against its acceptance cases. Read-only; no implementation or migration changes."
+config_file = "agents/reviewer.toml"

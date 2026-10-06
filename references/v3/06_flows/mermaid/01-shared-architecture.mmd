@@ -1,0 +1,14 @@
+flowchart TD
+member["Клиент: C1 и C3"] --> api["FastAPI: auth, права, команды"]
+coach["Тренер: A1"] --> api
+api --> programSvc["Каталог и версии программ"]
+api --> planSvc["Единый планировщик: preview и apply"]
+api --> trainingSvc["Факты тренировки"]
+api --> reviewSvc["Проверка и оценка"]
+programSvc --> db[("PostgreSQL")]
+planSvc --> db
+trainingSvc --> db
+reviewSvc --> db
+auth["Supabase Auth"] --> api
+stripe["Проверенные события Stripe"] --> api
+analysis["AI: предложение, не прямой SQL"] --> api

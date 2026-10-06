@@ -1,0 +1,4740 @@
+{
+  "version": "3.0",
+  "status": "CONSOLIDATED LOGICAL DESIGN; NOT SQL, NOT A DEPLOYED SCHEMA",
+  "scope": "member + owner coach + shared backend",
+  "source": "v1 dictionary, v2 refinements, latest owner approvals; physical design proposals remain explicit",
+  "relationship_scope": "Overview edges only. Required composite constraints and SQL validation are specified in MODEL_CURRENT.md; not executable here.",
+  "tables": [
+    {
+      "name": "studio.users",
+      "stage": "01 · Auth",
+      "purpose": "Продуктовый профиль; Auth остаётся в Supabase.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "auth_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "unique"
+          ]
+        },
+        {
+          "name": "first_name",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "last_name",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "role",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "locale",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "timezone",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "row_version",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "auth_user_id → auth.users.id; role member|coach; locale uk|en; IANA timezone проверяется сервером. UPDATE role недоступен обычному runtime-пути. Email/password не дублируются как источник идентичности.",
+      "historical_existing_by_brief": true,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio.onboarding_profiles",
+      "stage": "01 · Auth",
+      "purpose": "Текущая анкета, а не объективная оценка.",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "goal_codes",
+          "type": "text[]",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "self_reported_level",
+          "type": "smallint",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "session_minutes",
+          "type": "smallint",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "weekdays",
+          "type": "smallint[]",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "completed_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "row_version",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "1–4 уникальных направления из handstand/strength/mobility/fitness; level 1–3; minutes ∈ {30,45,60,90}; 1–3 уникальных дня в ISO 1–7. Анкета завершена; гостевой draft не создаёт чужой профиль.",
+      "historical_existing_by_brief": true,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio.categories",
+      "stage": "02 · Каталог",
+      "purpose": "Категории упражнений.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "nullable": false,
+          "flags": [
+            "unique"
+          ]
+        },
+        {
+          "name": "names",
+          "type": "jsonb",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "sort_order",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "archived_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        }
+      ],
+      "rules": "names — локализованный небольшой словарь uk/en, а не произвольная доменная БД. Архивация не удаляет связи истории.",
+      "historical_existing_by_brief": true,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio.exercises",
+      "stage": "02 · Каталог",
+      "purpose": "Стабильная идентичность и редактируемый draft упражнения.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "created_by_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "draft_tracking_kind",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "draft_demo_url",
+          "type": "text",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "archived_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "row_version",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "Корневой ID стабилен. Публикация создаёт exercise_versions. Удаление используемого упражнения запрещено. Member не редактирует общий каталог.",
+      "historical_existing_by_brief": true,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio.exercise_translations",
+      "stage": "02 · Каталог",
+      "purpose": "Редактируемые draft-переводы упражнения.",
+      "columns": [
+        {
+          "name": "exercise_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "locale",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "instructions",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "coaching_cues",
+          "type": "text",
+          "nullable": true,
+          "flags": []
+        }
+      ],
+      "rules": "PK(exercise_id,locale); locale uk|en. Published version копирует переводы как immutable snapshot.",
+      "historical_existing_by_brief": true,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio.exercise_categories",
+      "stage": "02 · Каталог",
+      "purpose": "Many-to-many упражнений и категорий.",
+      "columns": [
+        {
+          "name": "exercise_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "category_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "PK(exercise_id,category_id). Каскад разрешён для удаления draft-связи, но не истории выполнения.",
+      "historical_existing_by_brief": true,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio.exercise_versions",
+      "stage": "02 · Каталог",
+      "purpose": "Неизменяемая опубликованная инструкция упражнения.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "exercise_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "version_number",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "tracking_kind",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "translations_snapshot",
+          "type": "jsonb",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "demo_url",
+          "type": "text",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "metadata_schema_version",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "published_by_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "published_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "planning_metadata",
+          "type": "jsonb",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "UNIQUE(exercise_id,version_number), UNIQUE(id,exercise_id). tracking_kind reps|duration|reps_load|duration_load. UPDATE/DELETE запрещены обычным продуктовым ролям. planning_metadata — версионируемая typed-разметка владельца; неизвестные характеристики не равны нулевой нагрузке. Не содержит выдуманные физиологические нормы.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated",
+      "updated_for_v3": true
+    },
+    {
+      "name": "studio.programs",
+      "stage": "03 · Программы",
+      "purpose": "Идентичность программы и её владелец.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "owner_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "visibility",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "archived_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "visibility private|catalog (слово shared в v2 означает catalog). owner_user_id обязателен. Каталог публикует coach; member создаёт private. kind training|assessment. Private относится к явному владельцу; каталог не раскрывает персональные копии.",
+      "historical_existing_by_brief": true,
+      "status": "proposed_v3_not_migrated",
+      "updated_for_v3": true
+    },
+    {
+      "name": "studio.program_versions",
+      "stage": "03 · Программы",
+      "purpose": "Версия и корень транзакционной блокировки дерева программы.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "program_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "version_number",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "publication_state",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "translations_snapshot",
+          "type": "jsonb",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "schema_version",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "published_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "published_by_user_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "row_version",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "source_program_version_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "created_by_user_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "created_actor_type",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "origin_analysis_run_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        }
+      ],
+      "rules": "UNIQUE(program_id,version_number). publication_state draft|published; корень и всё дерево published immutable. source_program_version_id → исходная опубликованная версия. created_actor_type member|coach|ai; member/coach требуют user_id, ai требует analysis_run_id. Публикация AI только доверенной командой; отсутствие published_by_user_id допустимо исключительно для проверенного AI/system-пути. Не использовать вымышленного AI-user.",
+      "historical_existing_by_brief": true,
+      "status": "proposed_v3_not_migrated",
+      "updated_for_v3": true
+    },
+    {
+      "name": "studio.program_workouts",
+      "stage": "03 · Программы",
+      "purpose": "Шаблон конкретного занятия программы.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "program_version_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "week_number",
+          "type": "smallint",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "position",
+          "type": "smallint",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "titles",
+          "type": "jsonb",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "planned_minutes",
+          "type": "smallint",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "planning_metadata",
+          "type": "jsonb",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "standalone_allowed",
+          "type": "boolean",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "UNIQUE(program_version_id,week_number,position), UNIQUE(id,program_version_id). Позиции/неделя > 0; плановая длительность > 0. Это не календарное occurrence. planning_metadata typed и замораживается с версией; standalone_allowed задаёт автор, а не вычисляется из названия занятия.",
+      "historical_existing_by_brief": true,
+      "status": "proposed_v3_not_migrated",
+      "updated_for_v3": true
+    },
+    {
+      "name": "studio.workout_blocks",
+      "stage": "03 · Программы",
+      "purpose": "Блок шаблонного занятия.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "program_workout_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "program_version_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "position",
+          "type": "smallint",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "block_kind",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "title",
+          "type": "jsonb",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "UNIQUE(program_workout_id,position), UNIQUE(id,program_version_id). Composite FK гарантирует принадлежность workout той же program version. MVP: последовательное выполнение; circuits отдельно согласуются.",
+      "historical_existing_by_brief": true,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio.program_exercises",
+      "stage": "03 · Программы",
+      "purpose": "Предписание упражнения в блоке, не само упражнение.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "workout_block_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "program_version_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "exercise_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "exercise_version_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "position",
+          "type": "smallint",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "side_mode",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "notes_snapshot",
+          "type": "jsonb",
+          "nullable": true,
+          "flags": []
+        }
+      ],
+      "rules": "UNIQUE(workout_block_id,position), UNIQUE(id,program_version_id). Composite FK exercise_version/exercise_id. Повтор одного exercise_id в разных позициях допустим.",
+      "historical_existing_by_brief": true,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio.program_set_targets",
+      "stage": "03 · Программы",
+      "purpose": "Одна целевая строка подхода и стороны.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "program_exercise_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "program_version_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "set_number",
+          "type": "smallint",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "side",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "tracking_kind",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "reps_min",
+          "type": "integer",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "reps_max",
+          "type": "integer",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "duration_ms_min",
+          "type": "bigint",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "duration_ms_max",
+          "type": "bigint",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "load_kg",
+          "type": "numeric",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "rest_ms",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "UNIQUE(program_exercise_id,set_number,side). side bilateral|left|right. CHECK строго по tracking_kind, min≤max, rest≥0; не относящиеся к измерению поля NULL. Стороны не складываются случайно.",
+      "historical_existing_by_brief": true,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio.coach_member_access",
+      "stage": "04 · Назначения",
+      "purpose": "Явное разрешение тренеру работать с персональными данными клиента.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "coach_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "granted_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "revoked_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        }
+      ],
+      "rules": "Один действующий grant на пару coach/user. source и правовое/договорное основание согласуются. Само наличие роли coach не должно выдавать случайный доступ к любому журналу.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio.user_programs",
+      "stage": "04 · Назначения",
+      "purpose": "Программа, закреплённая за конкретным человеком по фиксированной версии.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "program_version_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "assignment_source",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "starts_on",
+          "type": "date",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "ends_on",
+          "type": "date",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "timezone_snapshot",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "schedule_snapshot",
+          "type": "jsonb",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "replaces_assignment_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "row_version",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "training_plan_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "assignment_role",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "assigned_by_user_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "analysis_run_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        }
+      ],
+      "rules": "UNIQUE(id,user_id,training_plan_id,program_version_id). Composite FK(plan_id,user_id). Только published version. assignment_role main|assessment; source self|coach|ai. Partial UNIQUE(training_plan_id) WHERE assignment_role='main' AND status IN('active','paused'). Pending не даёт вторую текущую основную; активация всегда транзакционная. Версия назначения immutable: адаптация создаёт successor, старое superseded. Assessment — этап единого плана, не второй независимый календарь. Human source требует assigned_by_user_id; ai требует analysis_run_id.",
+      "historical_existing_by_brief": true,
+      "status": "proposed_v3_not_migrated",
+      "updated_for_v3": true
+    },
+    {
+      "name": "studio.training_weeks",
+      "stage": "04 · Назначения",
+      "purpose": "Границы и цель недели; не счётчик с обнулением истории.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "starts_on",
+          "type": "date",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "ends_on",
+          "type": "date",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "starts_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "ends_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "timezone_snapshot",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "target_minutes",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "plan_snapshot",
+          "type": "jsonb",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "training_plan_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "UNIQUE(user_id,starts_on), UNIQUE(id,user_id). Воскресенье локального календаря; ends_on=starts_on+7 дней; target≥0. UTC duration может различаться из-за DST. Прошлые цели не пересчитываются из новой анкеты. Week принадлежит единому training_plan того же user. Бюджет недели сохраняется явным snapshot; допзанятие не переписывает прошлую цель молча.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated",
+      "updated_for_v3": true
+    },
+    {
+      "name": "studio.scheduled_workouts",
+      "stage": "04 · Назначения",
+      "purpose": "Реальное плановое вхождение шаблонного занятия в календарь.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "program_version_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "program_workout_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "training_week_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "scheduled_for",
+          "type": "date",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "skip_reason",
+          "type": "text",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "replaced_occurrence_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "row_version",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "training_plan_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "origin_kind",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "user_program_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "sequence_number",
+          "type": "integer",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "scheduled_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        }
+      ],
+      "rules": "UNIQUE(id,user_id,training_plan_id,program_version_id). origin_kind main|additional|assessment. Для main обязательны assignment и sequence_number; additional ссылается на source program_workout/version, но не требует второго назначения. FK occurrence→plan/user и workout→source version; assignment при наличии должен принадлежать plan/user и той же версии. Для assignment-based occurrence UNIQUE(user_program_id,sequence_number), а для отдельных additional повтор защищается idempotency. status planned|in_progress|completed|skipped|missed|cancelled. scheduled_for обязателен; scheduled_at только при выбранном времени. Terminal/начатые occurrence не перепланируются. Источник и статус явно отличимы.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated",
+      "updated_for_v3": true
+    },
+    {
+      "name": "studio.training_sessions",
+      "stage": "05 · Тренировка",
+      "purpose": "Фактически начатое или вручную внесённое занятие.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "user_program_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "program_version_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "scheduled_workout_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "completion_kind",
+          "type": "text",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "started_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "completed_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "performed_on",
+          "type": "date",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "timezone_snapshot",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "actual_duration_ms",
+          "type": "bigint",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "manual_minutes",
+          "type": "integer",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "completion_reason",
+          "type": "text",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "data_revision",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "row_version",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "training_plan_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "UNIQUE(id,user_id), UNIQUE(scheduled_workout_id). source guided|manual. Guided требует occurrence и source program_version_id, но user_program_id может быть NULL для additional. Composite FK на occurrence подтверждает plan/user/source version; assignment при наличии согласован с occurrence, а не обязательно с текущим main. Manual не выдумывает prescriptions. Partial UNIQUE(user_id) WHERE status IN('in_progress','paused'). completed требует completion_kind full|partial. Terminal-коррекция отдельная и аудируемая; session snapshots не зависят от будущего main.",
+      "historical_existing_by_brief": true,
+      "status": "proposed_v3_not_migrated",
+      "updated_for_v3": true
+    },
+    {
+      "name": "studio.session_exercises",
+      "stage": "05 · Тренировка",
+      "purpose": "Снимок конкретного выполнения упражнения.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "training_session_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "program_exercise_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "program_version_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "exercise_version_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "position",
+          "type": "smallint",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "tracking_kind",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "prescription_snapshot",
+          "type": "jsonb",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "snapshot_schema_version",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "row_version",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "UNIQUE(training_session_id,position), UNIQUE(id,user_id). Composite/ancestry checks связывают session, source prescription и version. Snapshot содержит имена, инструкцию, единицы и target IDs. Не зависит от последнего каталога. source program_version относится к конкретному occurrence (включая additional), а не автоматически к текущему main. Snapshot цели неизменяем при перепланировании.",
+      "historical_existing_by_brief": true,
+      "status": "proposed_v3_not_migrated",
+      "updated_for_v3": true
+    },
+    {
+      "name": "studio.set_logs",
+      "stage": "05 · Тренировка",
+      "purpose": "Фактический подход.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "session_exercise_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "target_set_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "set_number",
+          "type": "smallint",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "side",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "tracking_kind",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "reps",
+          "type": "integer",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "duration_ms",
+          "type": "bigint",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "load_kg",
+          "type": "numeric",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "skip_reason",
+          "type": "text",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "recorded_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "row_version",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "UNIQUE(session_exercise_id,set_number,side). status done|skipped; skipped → фактические значения NULL. done → ровно допустимые метрики tracking_kind. Чужой target запрещён ancestry guard. Дополнительный подход может иметь target_set_id=NULL; он не подменяет выполненность другого target.",
+      "historical_existing_by_brief": true,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio.session_time_segments",
+      "stage": "05 · Тренировка",
+      "purpose": "Интервалы реального времени между start/resume и pause/finish.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "training_session_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "started_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "ended_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "CHECK ended_at≥started_at; partial UNIQUE(training_session_id) WHERE ended_at IS NULL. Не допускаются перекрытия завершённых интервалов; DB exclusion/transaction guard. Source manual_correction отдельно audited.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio.exercise_video_submissions",
+      "stage": "05 · Тренировка",
+      "purpose": "Идентичность контрольного подания; один текущий ролик на session exercise.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "session_exercise_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "unique"
+          ]
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "submitted_by_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "submitted_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "removed_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "revision",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "UNIQUE(session_exercise_id). revision указывает на immutable exercise_video_versions(submission_id,version_number); пара принадлежит тому же user. Сменить текущую версию и создать evidence атомарно. После удаления/отзыва доступа не сохранять тайно доступный media payload. Метаданные истории согласно политике, отдельной от исходных байтов.",
+      "historical_existing_by_brief": true,
+      "status": "proposed_v3_not_migrated",
+      "updated_for_v3": true
+    },
+    {
+      "name": "studio.training_reports",
+      "stage": "06 · Отчёты/review",
+      "purpose": "Версионный, детерминированный отчёт о факте.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "training_session_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "version_number",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "source_data_revision",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "algorithm_version",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "schema_version",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "payload",
+          "type": "jsonb",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "generated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "UNIQUE(training_session_id,version_number). Published report immutable. Payload — производный snapshot, а не основное место хранения логов. Не содержит private notes и необоснованной оценки техники.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio.review_tasks",
+      "stage": "06 · Отчёты/review",
+      "purpose": "Единица работы тренера: неделя либо отдельное занятие.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "coach_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "scope",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "training_week_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "training_session_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "evidence_revision",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "due_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "row_version",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "scope weekly|session; ровно соответствующий anchor. UNIQUE(scope,user_id,anchor) реализуется двумя partial indexes. statuses collecting|ready|in_review|waiting_for_evidence|published|needs_update. Weekly human task создаётся по реальному договору, не автоматически всем тарифам.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio.review_task_sessions",
+      "stage": "06 · Отчёты/review",
+      "purpose": "Сессии, включённые в проверку.",
+      "columns": [
+        {
+          "name": "review_task_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "training_session_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "PK(review_task_id,training_session_id). Все сессии принадлежат тому же user, что task. Не хранить массив сессий без FK в обычном mutable JSON.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio.review_versions",
+      "stage": "06 · Отчёты/review",
+      "purpose": "Черновик/опубликованная версия выводов тренера.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "review_task_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "version_number",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "publication_state",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "author_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "client_summary",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "evidence_manifest",
+          "type": "jsonb",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "conclusion_code",
+          "type": "text",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "published_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "row_version",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "UNIQUE(review_task_id,version_number). draft можно редактировать; published — immutable вместе с feedback. Evidence manifest фиксирует session/data/video revisions. Late evidence порождает needs_update и новую версию, не изменяет старую.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio.review_feedback",
+      "stage": "06 · Отчёты/review",
+      "purpose": "Видимый клиенту комментарий к конкретному упражнению.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "review_version_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "session_exercise_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "technique_status",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "reviewed_video_version_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        }
+      ],
+      "rules": "FK review/exercise/user и reviewed_video_version_id того же клиента/упражнения. Published parent замораживает feedback. technique_status not_reviewed|reviewed|insufficient_evidence. Private note не входит в эти строки.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated",
+      "updated_for_v3": true
+    },
+    {
+      "name": "studio.coach_private_notes",
+      "stage": "06 · Отчёты/review",
+      "purpose": "Приватные рабочие заметки тренера.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "coach_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "session_exercise_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "row_version",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "Отдельная таблица и coach-only DTO. Member API не выполняет SELECT этих полей. Никакой автоматической отправки AI; история правок/удаление — по согласованной политике.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio.assessment_protocols",
+      "stage": "07 · Оценивание",
+      "purpose": "Одна версионированная ревизия методики с опубликованной тестовой программой.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "protocol_key",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "version_number",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "publication_state",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "definition",
+          "type": "jsonb",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "schema_version",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "created_by_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "published_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "test_program_version_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "UNIQUE(protocol_key,version_number). Эта таблица уже содержит ревизии, отдельную assessment_protocol_versions не создавать без причины. FK на published test program version. Draft редактируем, published критерии/definition immutable. Числа и формулы определяет владелец.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated",
+      "updated_for_v3": true
+    },
+    {
+      "name": "studio.assessment_runs",
+      "stage": "07 · Оценивание",
+      "purpose": "Назначение и решение по одной исходной/повторной оценке.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "assessment_protocol_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "assessment_kind",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "based_on_assessment_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "submitted_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "row_version",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "training_plan_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "assigned_by_user_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        }
+      ],
+      "rules": "user/plan/protocol version; assessment_kind baseline|reassessment. states assigned|in_progress|submitted|reviewing|published|needs_more_information|cancelled. Факты в обычных sessions. Публикация результатов отдельная. Assigned_by_user_id nullable только для доверенного AI/system-пути с аудитом.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated",
+      "updated_for_v3": true
+    },
+    {
+      "name": "studio.assessment_test_runs",
+      "stage": "07 · Оценивание",
+      "purpose": "Одна попытка конкретного теста с собственной инструкцией/видео.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "assessment_run_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "test_code",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "attempt_number",
+          "type": "smallint",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "source_session_exercise_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "nullable": true,
+          "flags": []
+        }
+      ],
+      "rules": "UNIQUE(assessment_run_id,test_code,attempt_number). Это anchor попытки и source_session_exercise_id, не второй журнал фактов/видео. До начала source может быть NULL; после появления проверяются user и run-session membership. Instructions берутся из опубликованной методики/source snapshot. Независимых youtube_url и копий подходов не создавать.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated",
+      "updated_for_v3": true
+    },
+    {
+      "name": "studio.assessment_results",
+      "stage": "07 · Оценивание",
+      "purpose": "Версия итогового вывода по тестовой программе; не копия сырых результатов.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "assessment_run_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "version_number",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "publication_state",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "readiness",
+          "type": "text",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "author_type",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "author_user_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "analysis_run_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "evidence_manifest",
+          "type": "jsonb",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "summary",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "published_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        }
+      ],
+      "rules": "UNIQUE(assessment_run_id,version_number). publication_state draft|published. readiness ready|not_ready|needs_more_data обязательно при публикации. Author coach|ai: ровно соответствующий author/analysis FK; published immutable. evidence_manifest фиксирует версии фактов, критериев и видео. self_reported_level остаётся в onboarding.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated",
+      "updated_for_v3": true
+    },
+    {
+      "name": "studio.billing_customers",
+      "stage": "08 · Billing",
+      "purpose": "Связь продуктового пользователя со Stripe Customer.",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "stripe_customer_id",
+          "type": "text",
+          "nullable": false,
+          "flags": [
+            "unique"
+          ]
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "Создаётся сервером идемпотентно; не по присланному клиентом чужому customer ID.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio.subscriptions",
+      "stage": "08 · Billing",
+      "purpose": "История и проверенная проекция Stripe Subscription.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "stripe_subscription_id",
+          "type": "text",
+          "nullable": false,
+          "flags": [
+            "unique"
+          ]
+        },
+        {
+          "name": "stripe_customer_id",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "plan_code",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "plan_catalog_version",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "currency",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "amount_minor",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "current_period_start",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "current_period_end",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "cancel_at_period_end",
+          "type": "boolean",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "trial_end",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "terms_snapshot",
+          "type": "jsonb",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "livemode",
+          "type": "boolean",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "synced_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "plan_code essential|plus|pro|pro_plus. Сумма в minor units, не float. Проверенные server mapping/Stripe price. Partial unique для непогашенных конкурентных подписок проектируется по точной state policy. active/trialing не приходит от браузера.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio.checkout_attempts",
+      "stage": "08 · Billing",
+      "purpose": "Защита от двойного checkout и неизвестного исхода внешнего запроса.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "plan_code",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "plan_catalog_version",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "idempotency_key",
+          "type": "text",
+          "nullable": false,
+          "flags": [
+            "unique"
+          ]
+        },
+        {
+          "name": "request_hash",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "stripe_checkout_session_id",
+          "type": "text",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "stripe_subscription_id",
+          "type": "text",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "last_error_code",
+          "type": "text",
+          "nullable": true,
+          "flags": []
+        }
+      ],
+      "rules": "states reserved|creating|open|awaiting_webhook|completed|expired|failed|unknown. При timeout сначала reconcile; не создавать новую подписку вслепую. Цена/валюта определяются сервером.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio.trial_claims",
+      "stage": "08 · Billing",
+      "purpose": "Атомарное ограничение одного trial на аккаунт.",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "checkout_attempt_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "subscription_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "claimed_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "Reservation/consumed/released_after_verified_failure. UNIQUE user защищает одновременный trial. Не отпускать reservation при неизвестном исходе Stripe. Один аккаунт не равно один человек.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio_private.webhook_events",
+      "stage": "08 · Billing",
+      "purpose": "Долговечный inbox проверенных событий провайдера.",
+      "columns": [
+        {
+          "name": "provider_event_id",
+          "type": "text",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "provider",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "event_type",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "object_id",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "livemode",
+          "type": "boolean",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "provider_created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "received_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "attempts",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "next_retry_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "processed_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "payload_encrypted",
+          "type": "text",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "last_error_code",
+          "type": "text",
+          "nullable": true,
+          "flags": []
+        }
+      ],
+      "rules": "Сначала подпись, затем insert; event ID уникален. Не гарантирует порядок. Полный payload хранить только при обоснованной необходимости и ограниченном retention; не логировать его в stdout.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio_private.web_sessions",
+      "stage": "01 · Auth",
+      "purpose": "BFF transport envelope над Supabase Auth session, без собственных паролей.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "session_key_hash",
+          "type": "text",
+          "nullable": false,
+          "flags": [
+            "unique"
+          ]
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "upstream_session_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "encrypted_tokens",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "access_expires_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "last_seen_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "revoked_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "row_version",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "Opaque cookie; ciphertext не ключ шифрования. Lock/CAS при refresh; upstream logout и local revocation тестируются. Клиент не получает refresh token и DB credentials.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio_private.auth_attempts",
+      "stage": "01 · Auth",
+      "purpose": "Короткоживущая одноразовая попытка PKCE/state и безопасный перенос onboarding.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "state_hash",
+          "type": "text",
+          "nullable": false,
+          "flags": [
+            "unique"
+          ]
+        },
+        {
+          "name": "provider",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "encrypted_verifier",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "nonce_hash",
+          "type": "text",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "allowed_return_path",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "consumed_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "onboarding_draft",
+          "type": "jsonb",
+          "nullable": true,
+          "flags": []
+        }
+      ],
+      "rules": "TTL и одноразовое consume в транзакции. Redirect только allowlist. Guest draft переносится лишь при новом signup. Не содержит пароль.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio_private.idempotency_records",
+      "stage": "04 · Команды",
+      "purpose": "Повтор команды без второго эффекта.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "actor_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "operation",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "idempotency_key",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "request_hash",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "response_resource_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "response_code",
+          "type": "smallint",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "UNIQUE(actor_user_id,operation,idempotency_key). Один key с другим body → 409. Owner/auth проверяются до чтения результата. Retention и replay response не заменяют уникальность business rows.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio_private.audit_events",
+      "stage": "04 · Команды",
+      "purpose": "Минимальный аудит чувствительных переходов и исправлений.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "actor_user_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "action",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "entity_type",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "entity_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "correlation_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "happened_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "redacted_change",
+          "type": "jsonb",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "actor_type",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "analysis_run_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        }
+      ],
+      "rules": "Append-only. actor_type member|coach|ai|system; human требует actor_user_id, AI ссылается на реальный analysis_run_id. Polymorphic entity только для журнала, не core ownership. Редактированные изменения без секретов, raw media и полного private note.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated",
+      "updated_for_v3": true
+    },
+    {
+      "name": "studio.seed_runs",
+      "stage": "Техническое",
+      "purpose": "Необязательный технический журнал синтетического seed.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "seed_name",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "executed_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "Только локальные/разрешённые тестовые данные; не бизнес-сущность. Наличие в старом брифе не делает таблицу обязательной в новой baseline.",
+      "historical_existing_by_brief": true,
+      "status": "proposed_v3_not_migrated",
+      "updated_for_v3": true
+    },
+    {
+      "name": "studio.conversations",
+      "stage": "09 · Pro+ / после согласования",
+      "purpose": "Один приватный канал между клиентом и тренером.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "coach_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "member_last_read_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "coach_last_read_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "Только при выборе встроенного чата; иначе согласованный внешний канал не требует этой таблицы. Ограничение доступности/времени ответа отдельно.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio.messages",
+      "stage": "09 · Pro+ / после согласования",
+      "purpose": "Сообщения встроенного чата, не private coach notes.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "conversation_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "sender_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "sent_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "edited_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "deleted_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "row_version",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "Только участники; write entitlement; согласованная политика после окончания подписки. Idempotency при отправке. Не добавлять бинарные attachments без нового решения.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio.coaching_call_periods",
+      "stage": "09 · Pro+ / после согласования",
+      "purpose": "Период предоставления двух 30-минутных звонков.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "subscription_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "starts_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "ends_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "included_call_count",
+          "type": "smallint",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "included_call_minutes",
+          "type": "smallint",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "UNIQUE(subscription_id,starts_at). Начало периода согласуется: billing month либо календарный; не выбирать молча. Значения текущего договора 2 и 30.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio.coaching_calls",
+      "stage": "09 · Pro+ / после согласования",
+      "purpose": "Запрос, подтверждение и факт звонка.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "coaching_call_period_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "coach_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "starts_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "ends_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "meeting_url",
+          "type": "text",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "completed_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "row_version",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "requested|confirmed|completed|cancelled|no_show. Перенос сохраняет связь истории. Правила no-show/переноса/сгорания кредита ещё не согласованы. Пересечение времени coach запрещается при confirmed.",
+      "historical_existing_by_brief": false,
+      "status": "proposed_v3_not_migrated"
+    },
+    {
+      "name": "studio.user_preferences",
+      "stage": "01 · Auth",
+      "status": "proposed_v3_not_migrated",
+      "historical_existing_by_brief": false,
+      "updated_for_v3": true,
+      "purpose": "Предпочтения внешнего вида для каждой роли.",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "theme_preference",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "revision",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "FK user_id. theme_preference auto|light|dark; default auto. Храним выбор, не вычисленную текущую тему. CAS revision."
+    },
+    {
+      "name": "studio.training_plans",
+      "stage": "04 · План",
+      "status": "proposed_v3_not_migrated",
+      "historical_existing_by_brief": false,
+      "updated_for_v3": true,
+      "purpose": "Единый личный план пользователя, общий для клиента и админки.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "management_mode",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "planning_rule_set_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "coach_user_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "row_version",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "archived_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        }
+      ],
+      "rules": "UNIQUE(id,user_id). Partial UNIQUE(user_id) WHERE status IN ('active','paused'). management_mode self|ai|coach; status active|paused|archived. Нулевое основное назначение допустимо до выбора. Любое событие, меняющее планировочный контекст (включая факт нагрузки), инвалидирует старый preview. История archived сохраняется."
+    },
+    {
+      "name": "studio.exercise_video_versions",
+      "stage": "05 · Выполнение",
+      "status": "proposed_v3_not_migrated",
+      "historical_existing_by_brief": false,
+      "updated_for_v3": true,
+      "purpose": "Точная ревизия ссылки/evidence для проверки и анализа.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "submission_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "version_number",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "provider",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "provider_asset_id",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "canonical_url",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "submitted_by_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "submitted_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "access_status",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "UNIQUE(submission_id,version_number), UNIQUE(id,user_id). Provider youtube|vimeo|google_drive по включённым адаптерам, а не все автоматически. Содержимое версии immutable; access_status может обновляться. Строгая нормализация URL, отсутствие секретов/токенов в canonical_url; доступ контролируется адаптером. Не хранить прямые краткоживущие credentials в публичном JSON."
+    },
+    {
+      "name": "studio.assessment_criteria",
+      "stage": "07 · Оценка",
+      "status": "proposed_v3_not_migrated",
+      "historical_existing_by_brief": false,
+      "updated_for_v3": true,
+      "purpose": "Критерии конкретной версии тестовой методики.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "assessment_protocol_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "criterion_code",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "program_exercise_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "method",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "unit",
+          "type": "text",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "rubric",
+          "type": "jsonb",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "UNIQUE(assessment_protocol_id,criterion_code). Criterion/exercise должен принадлежать версии тестовой программы протокола. rubric typed/версионированный; отсутствие thresholds не заполняется автоматически. Публикация протокола замораживает дерево."
+    },
+    {
+      "name": "studio.assessment_run_sessions",
+      "stage": "07 · Оценка",
+      "status": "proposed_v3_not_migrated",
+      "historical_existing_by_brief": false,
+      "updated_for_v3": true,
+      "purpose": "Связь тестовой попытки с обычными тренировочными сессиями.",
+      "columns": [
+        {
+          "name": "assessment_run_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "training_session_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "PK(assessment_run_id,training_session_id). Composite owner integrity; session действительно содержит тестовые source-workouts данного protocol либо явный допустимый anchor."
+    },
+    {
+      "name": "studio.assessment_criterion_results",
+      "stage": "07 · Оценка",
+      "status": "proposed_v3_not_migrated",
+      "historical_existing_by_brief": false,
+      "updated_for_v3": true,
+      "purpose": "Выводы по критериям, составляющие версию оценки.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "assessment_result_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "assessment_criterion_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "assessment_test_run_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "session_exercise_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "observed_value",
+          "type": "jsonb",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "evidence_manifest",
+          "type": "jsonb",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "UNIQUE(assessment_result_id,assessment_criterion_id). Критерий принадлежит протоколу run, все evidence того же user. status meets|does_not_meet|not_assessable|missing|unable_to_perform. observed_value только типизированное наблюдение/производный вывод, raw sets не дублируются. Freeze с assessment_results."
+    },
+    {
+      "name": "studio.planning_rule_sets",
+      "stage": "06 · Планировщик",
+      "status": "proposed_v3_not_migrated",
+      "historical_existing_by_brief": false,
+      "updated_for_v3": true,
+      "purpose": "Published правила совместимости и допустимых преобразований.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "rule_set_key",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "version_number",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "publication_state",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "definition",
+          "type": "jsonb",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "schema_version",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "created_by_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "published_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        }
+      ],
+      "rules": "UNIQUE(rule_set_key,version_number). draft|published, immutable after publish. Typed rule definition по методике владельца, без выдуманных нормативов. Catalog-политика, применяемая к плану, фиксируется версией."
+    },
+    {
+      "name": "studio.plan_permissions",
+      "stage": "06 · Планировщик",
+      "status": "proposed_v3_not_migrated",
+      "historical_existing_by_brief": false,
+      "updated_for_v3": true,
+      "purpose": "Разрешённые действия клиента в конкретном едином плане.",
+      "columns": [
+        {
+          "name": "training_plan_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "allow_self_move",
+          "type": "boolean",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "allow_listed_replacements",
+          "type": "boolean",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "allow_listed_additions",
+          "type": "boolean",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "require_request_for_other_changes",
+          "type": "boolean",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "row_version",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "updated_by_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "FK(plan,user). Права не расширяют entitlement. Essential self-policy, Pro/Pro+ owner-policy. Изменение permissions инвалидирует preview. Списки workout options хранятся FK-строками, не произвольным массивом UUID в JSON."
+    },
+    {
+      "name": "studio.permitted_workout_options",
+      "stage": "06 · Планировщик",
+      "status": "proposed_v3_not_migrated",
+      "historical_existing_by_brief": false,
+      "updated_for_v3": true,
+      "purpose": "Разрешённые тренером дополнительные занятия/замены.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "training_plan_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "option_kind",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "program_workout_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "program_version_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "replaces_program_workout_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        }
+      ],
+      "rules": "option_kind replacement|additional. FK workout/version; replacement ссылается на заменяемый слот/источник и не означает произвольную эквивалентность. Набор относится к plan. Не обходит правила совместимости; изменения через права тренера."
+    },
+    {
+      "name": "studio.planning_previews",
+      "stage": "06 · Планировщик",
+      "status": "proposed_v3_not_migrated",
+      "historical_existing_by_brief": false,
+      "updated_for_v3": true,
+      "purpose": "Серверный предварительный расчёт и журнал применённого набора изменений.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "training_plan_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "requested_by_user_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "operation",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "base_plan_revision",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "context_fingerprint",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "planning_rule_set_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "outcome",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "requested_change",
+          "type": "jsonb",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "changes",
+          "type": "jsonb",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "explanations",
+          "type": "jsonb",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "applied_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        }
+      ],
+      "rules": "state ready|blocked|applied|expired|stale; outcome allowed|conflict|insufficient_data|requires_approval. Apply только allowed/ready после повторной проверки всех зависимостей. changes typed серверный diff, не исполняемый код и не клиентский SQL. Явные UUID в diff перепроверяются по ownership. Applied preview сохраняет before/after; отдельную дублирующую event-таблицу не требуется, audit уже есть."
+    },
+    {
+      "name": "studio.schedule_change_requests",
+      "stage": "06 · Планировщик",
+      "status": "proposed_v3_not_migrated",
+      "historical_existing_by_brief": false,
+      "updated_for_v3": true,
+      "purpose": "Желание клиента изменить контролируемый тренером план.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "training_plan_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "requested_by_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "operation",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "target_occurrence_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "source_program_workout_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "source_program_version_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "desired_date",
+          "type": "date",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "expected_plan_revision",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "resolved_by_user_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "applied_preview_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "resolved_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        }
+      ],
+      "rules": "status pending|applied|rejected|cancelled|stale. Запрос не меняет календарь. Review/approve получает fresh preview и применяет транзакционно. Target того же plan/user, source доступен по тарифу и published. applied требует applied_preview_id."
+    },
+    {
+      "name": "studio.analysis_runs",
+      "stage": "09 · AI",
+      "status": "proposed_v3_not_migrated",
+      "historical_existing_by_brief": false,
+      "updated_for_v3": true,
+      "purpose": "Долговечное задание/попытка анализа для конкретного клиента.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "provider",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "model_version",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "configuration_version",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "assessment_protocol_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "input_fingerprint",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "attempt",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "finished_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "error_code",
+          "type": "text",
+          "nullable": true,
+          "flags": []
+        }
+      ],
+      "rules": "queued|access_check|quality_check|analyzing|succeeded|needs_input|failed|cancelled. Версия модели и методики фиксируются, metadata не подтверждает качество. Не создавать параллельно analysis_jobs без отдельного назначения. Повторы/ключи и lease уточнить в реализации."
+    },
+    {
+      "name": "studio.analysis_inputs",
+      "stage": "09 · AI",
+      "status": "proposed_v3_not_migrated",
+      "historical_existing_by_brief": false,
+      "updated_for_v3": true,
+      "purpose": "Точные версии допустимого evidence одного analysis run.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "analysis_run_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "video_version_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "training_session_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "session_data_revision",
+          "type": "integer",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "context_snapshot",
+          "type": "jsonb",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "quality_status",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "Хотя бы один тип evidence/context задан; same-user FK. Snapshot версионирован, не содержит секретов и не заменяет core FK. Permission и актуальность доступа проверяются при выдаче материалa и применении. Отзыв доступа предотвращает новую внешнюю обработку."
+    },
+    {
+      "name": "studio.analysis_observations",
+      "stage": "09 · AI",
+      "status": "proposed_v3_not_migrated",
+      "historical_existing_by_brief": false,
+      "updated_for_v3": true,
+      "purpose": "Наблюдение AI по конкретному входу/критерию.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "analysis_run_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "analysis_input_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "assessment_criterion_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "start_ms",
+          "type": "bigint",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "end_ms",
+          "type": "bigint",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "observability",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "observation",
+          "type": "jsonb",
+          "nullable": false,
+          "flags": []
+        }
+      ],
+      "rules": "Input относится к этому run. 0≤start≤end при видео; not_assessable не превращается в плохую технику. observed|not_assessable. Typed observation со ссылкой на методику; никаких медицинских гарантий."
+    },
+    {
+      "name": "studio.adaptation_proposals",
+      "stage": "09 · AI",
+      "status": "proposed_v3_not_migrated",
+      "historical_existing_by_brief": false,
+      "updated_for_v3": true,
+      "purpose": "Типизированные изменения будущего плана, отдельно от исполнения.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "training_plan_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "base_assignment_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "base_program_version_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "expected_plan_revision",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "expected_assignment_revision",
+          "type": "integer",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "analysis_run_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "review_version_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "changes",
+          "type": "jsonb",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "applied_assignment_id",
+          "type": "uuid",
+          "nullable": true,
+          "flags": []
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "applied_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        }
+      ],
+      "rules": "draft|validated|applied|stale|rejected|needs_more_data. Явный источник AI или coach review; все anchor того же пользователя. Apply только доверенная операция после проверки базовых версий и permissions. Одна команда создаёт один successor assignment. Не менять начатое/выполненное и чужой каталог."
+    },
+    {
+      "name": "studio.processing_permissions",
+      "stage": "08 · Видео",
+      "status": "proposed_v3_not_migrated",
+      "historical_existing_by_brief": false,
+      "updated_for_v3": true,
+      "purpose": "Фиксация согласованных разрешений обработки, не юридический шаблон.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "purpose",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "policy_version",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "granted_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "flags": []
+        },
+        {
+          "name": "revoked_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "flags": []
+        }
+      ],
+      "rules": "purpose personalization|model_training; status granted|revoked. Разные цели не подразумевают друг друга. Законные основания/текст/сроки должен утвердить владелец с нужной проверкой. Runtime не создаёт согласие задним числом."
+    }
+  ],
+  "relationship_overview": [
+    [
+      "studio.users.auth_user_id",
+      "auth.users.id"
+    ],
+    [
+      "studio.onboarding_profiles.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.exercises.created_by_user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.exercise_translations.exercise_id",
+      "studio.exercises.id"
+    ],
+    [
+      "studio.exercise_categories.exercise_id",
+      "studio.exercises.id"
+    ],
+    [
+      "studio.exercise_categories.category_id",
+      "studio.categories.id"
+    ],
+    [
+      "studio.exercise_versions.exercise_id",
+      "studio.exercises.id"
+    ],
+    [
+      "studio.programs.owner_user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.program_versions.program_id",
+      "studio.programs.id"
+    ],
+    [
+      "studio.program_workouts.program_version_id",
+      "studio.program_versions.id"
+    ],
+    [
+      "studio.workout_blocks.program_workout_id",
+      "studio.program_workouts.id"
+    ],
+    [
+      "studio.program_exercises.workout_block_id",
+      "studio.workout_blocks.id"
+    ],
+    [
+      "studio.program_exercises.exercise_version_id",
+      "studio.exercise_versions.id"
+    ],
+    [
+      "studio.program_set_targets.program_exercise_id",
+      "studio.program_exercises.id"
+    ],
+    [
+      "studio.coach_member_access.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.coach_member_access.coach_user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.user_programs.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.user_programs.program_version_id",
+      "studio.program_versions.id"
+    ],
+    [
+      "studio.user_programs.replaces_assignment_id",
+      "studio.user_programs.id"
+    ],
+    [
+      "studio.training_weeks.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.scheduled_workouts.user_program_id",
+      "studio.user_programs.id"
+    ],
+    [
+      "studio.scheduled_workouts.training_week_id",
+      "studio.training_weeks.id"
+    ],
+    [
+      "studio.scheduled_workouts.program_workout_id",
+      "studio.program_workouts.id"
+    ],
+    [
+      "studio.training_sessions.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.training_sessions.user_program_id",
+      "studio.user_programs.id"
+    ],
+    [
+      "studio.training_sessions.scheduled_workout_id",
+      "studio.scheduled_workouts.id"
+    ],
+    [
+      "studio.session_exercises.training_session_id",
+      "studio.training_sessions.id"
+    ],
+    [
+      "studio.session_exercises.program_exercise_id",
+      "studio.program_exercises.id"
+    ],
+    [
+      "studio.session_exercises.exercise_version_id",
+      "studio.exercise_versions.id"
+    ],
+    [
+      "studio.set_logs.session_exercise_id",
+      "studio.session_exercises.id"
+    ],
+    [
+      "studio.set_logs.target_set_id",
+      "studio.program_set_targets.id"
+    ],
+    [
+      "studio.session_time_segments.training_session_id",
+      "studio.training_sessions.id"
+    ],
+    [
+      "studio.exercise_video_submissions.session_exercise_id",
+      "studio.session_exercises.id"
+    ],
+    [
+      "studio.training_reports.training_session_id",
+      "studio.training_sessions.id"
+    ],
+    [
+      "studio.review_tasks.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.review_tasks.training_week_id",
+      "studio.training_weeks.id"
+    ],
+    [
+      "studio.review_tasks.training_session_id",
+      "studio.training_sessions.id"
+    ],
+    [
+      "studio.review_task_sessions.review_task_id",
+      "studio.review_tasks.id"
+    ],
+    [
+      "studio.review_task_sessions.training_session_id",
+      "studio.training_sessions.id"
+    ],
+    [
+      "studio.review_versions.review_task_id",
+      "studio.review_tasks.id"
+    ],
+    [
+      "studio.review_feedback.review_version_id",
+      "studio.review_versions.id"
+    ],
+    [
+      "studio.review_feedback.session_exercise_id",
+      "studio.session_exercises.id"
+    ],
+    [
+      "studio.coach_private_notes.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.coach_private_notes.session_exercise_id",
+      "studio.session_exercises.id"
+    ],
+    [
+      "studio.assessment_runs.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.assessment_runs.assessment_protocol_id",
+      "studio.assessment_protocols.id"
+    ],
+    [
+      "studio.assessment_runs.based_on_assessment_id",
+      "studio.assessment_runs.id"
+    ],
+    [
+      "studio.assessment_test_runs.assessment_run_id",
+      "studio.assessment_runs.id"
+    ],
+    [
+      "studio.assessment_test_runs.source_session_exercise_id",
+      "studio.session_exercises.id"
+    ],
+    [
+      "studio.billing_customers.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.subscriptions.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.checkout_attempts.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.trial_claims.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.trial_claims.checkout_attempt_id",
+      "studio.checkout_attempts.id"
+    ],
+    [
+      "studio.trial_claims.subscription_id",
+      "studio.subscriptions.id"
+    ],
+    [
+      "studio_private.web_sessions.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio_private.idempotency_records.actor_user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.conversations.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.messages.conversation_id",
+      "studio.conversations.id"
+    ],
+    [
+      "studio.messages.sender_user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.coaching_call_periods.subscription_id",
+      "studio.subscriptions.id"
+    ],
+    [
+      "studio.coaching_calls.coaching_call_period_id",
+      "studio.coaching_call_periods.id"
+    ],
+    [
+      "studio.user_preferences.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.training_plans.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.training_plans.planning_rule_set_id",
+      "studio.planning_rule_sets.id"
+    ],
+    [
+      "studio.training_plans.coach_user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.user_programs.training_plan_id",
+      "studio.training_plans.id"
+    ],
+    [
+      "studio.user_programs.analysis_run_id",
+      "studio.analysis_runs.id"
+    ],
+    [
+      "studio.training_weeks.training_plan_id",
+      "studio.training_plans.id"
+    ],
+    [
+      "studio.scheduled_workouts.training_plan_id",
+      "studio.training_plans.id"
+    ],
+    [
+      "studio.scheduled_workouts.program_version_id",
+      "studio.program_versions.id"
+    ],
+    [
+      "studio.training_sessions.training_plan_id",
+      "studio.training_plans.id"
+    ],
+    [
+      "studio.program_versions.source_program_version_id",
+      "studio.program_versions.id"
+    ],
+    [
+      "studio.program_versions.origin_analysis_run_id",
+      "studio.analysis_runs.id"
+    ],
+    [
+      "studio.exercise_video_versions.submission_id",
+      "studio.exercise_video_submissions.id"
+    ],
+    [
+      "studio.exercise_video_versions.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.review_feedback.reviewed_video_version_id",
+      "studio.exercise_video_versions.id"
+    ],
+    [
+      "studio.assessment_protocols.test_program_version_id",
+      "studio.program_versions.id"
+    ],
+    [
+      "studio.assessment_criteria.assessment_protocol_id",
+      "studio.assessment_protocols.id"
+    ],
+    [
+      "studio.assessment_criteria.program_exercise_id",
+      "studio.program_exercises.id"
+    ],
+    [
+      "studio.assessment_runs.training_plan_id",
+      "studio.training_plans.id"
+    ],
+    [
+      "studio.assessment_run_sessions.assessment_run_id",
+      "studio.assessment_runs.id"
+    ],
+    [
+      "studio.assessment_run_sessions.training_session_id",
+      "studio.training_sessions.id"
+    ],
+    [
+      "studio.assessment_results.assessment_run_id",
+      "studio.assessment_runs.id"
+    ],
+    [
+      "studio.assessment_results.analysis_run_id",
+      "studio.analysis_runs.id"
+    ],
+    [
+      "studio.assessment_criterion_results.assessment_result_id",
+      "studio.assessment_results.id"
+    ],
+    [
+      "studio.assessment_criterion_results.assessment_criterion_id",
+      "studio.assessment_criteria.id"
+    ],
+    [
+      "studio.assessment_criterion_results.assessment_test_run_id",
+      "studio.assessment_test_runs.id"
+    ],
+    [
+      "studio.assessment_criterion_results.session_exercise_id",
+      "studio.session_exercises.id"
+    ],
+    [
+      "studio.plan_permissions.training_plan_id",
+      "studio.training_plans.id"
+    ],
+    [
+      "studio.permitted_workout_options.training_plan_id",
+      "studio.training_plans.id"
+    ],
+    [
+      "studio.permitted_workout_options.program_workout_id",
+      "studio.program_workouts.id"
+    ],
+    [
+      "studio.permitted_workout_options.program_version_id",
+      "studio.program_versions.id"
+    ],
+    [
+      "studio.permitted_workout_options.replaces_program_workout_id",
+      "studio.program_workouts.id"
+    ],
+    [
+      "studio.planning_previews.training_plan_id",
+      "studio.training_plans.id"
+    ],
+    [
+      "studio.planning_previews.planning_rule_set_id",
+      "studio.planning_rule_sets.id"
+    ],
+    [
+      "studio.schedule_change_requests.training_plan_id",
+      "studio.training_plans.id"
+    ],
+    [
+      "studio.schedule_change_requests.target_occurrence_id",
+      "studio.scheduled_workouts.id"
+    ],
+    [
+      "studio.schedule_change_requests.source_program_workout_id",
+      "studio.program_workouts.id"
+    ],
+    [
+      "studio.schedule_change_requests.source_program_version_id",
+      "studio.program_versions.id"
+    ],
+    [
+      "studio.schedule_change_requests.applied_preview_id",
+      "studio.planning_previews.id"
+    ],
+    [
+      "studio.analysis_runs.assessment_protocol_id",
+      "studio.assessment_protocols.id"
+    ],
+    [
+      "studio.analysis_inputs.analysis_run_id",
+      "studio.analysis_runs.id"
+    ],
+    [
+      "studio.analysis_inputs.video_version_id",
+      "studio.exercise_video_versions.id"
+    ],
+    [
+      "studio.analysis_inputs.training_session_id",
+      "studio.training_sessions.id"
+    ],
+    [
+      "studio.analysis_observations.analysis_run_id",
+      "studio.analysis_runs.id"
+    ],
+    [
+      "studio.analysis_observations.analysis_input_id",
+      "studio.analysis_inputs.id"
+    ],
+    [
+      "studio.analysis_observations.assessment_criterion_id",
+      "studio.assessment_criteria.id"
+    ],
+    [
+      "studio.adaptation_proposals.training_plan_id",
+      "studio.training_plans.id"
+    ],
+    [
+      "studio.adaptation_proposals.base_assignment_id",
+      "studio.user_programs.id"
+    ],
+    [
+      "studio.adaptation_proposals.base_program_version_id",
+      "studio.program_versions.id"
+    ],
+    [
+      "studio.adaptation_proposals.analysis_run_id",
+      "studio.analysis_runs.id"
+    ],
+    [
+      "studio.adaptation_proposals.review_version_id",
+      "studio.review_versions.id"
+    ],
+    [
+      "studio.adaptation_proposals.applied_assignment_id",
+      "studio.user_programs.id"
+    ],
+    [
+      "studio.processing_permissions.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio_private.audit_events.analysis_run_id",
+      "studio.analysis_runs.id"
+    ],
+    [
+      "studio.scheduled_workouts.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.session_exercises.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.set_logs.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.exercise_video_submissions.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.training_reports.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.review_task_sessions.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.review_feedback.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.assessment_results.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.coaching_call_periods.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.coaching_calls.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.assessment_run_sessions.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.assessment_criterion_results.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.plan_permissions.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.planning_previews.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.schedule_change_requests.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.analysis_runs.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.analysis_inputs.user_id",
+      "studio.users.id"
+    ],
+    [
+      "studio.adaptation_proposals.user_id",
+      "studio.users.id"
+    ]
+  ]
+}

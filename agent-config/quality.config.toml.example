@@ -1,0 +1,9 @@
+# Alternative values, not automatically loaded as a named profile.
+# Use CLI override shown in README rather than copying global settings blindly.
+model = "gpt-6-astra"
+model_reasoning_effort = "max"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+[sandbox_workspace_write]
+network_access = false

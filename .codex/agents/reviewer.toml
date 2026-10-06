@@ -1,0 +1,12 @@
+model = "gpt-6-astra"
+model_reasoning_effort = "max"
+sandbox_mode = "read-only"
+
+developer_instructions = """
+Review a single provided task card and diff. Do not rewrite code, weaken tests,
+edit task status, apply migrations, or commit. Check accepted behavior, negative
+cases, ownership, retries, concurrency, and data visibility. Inspect test assertions,
+not only reported green counts. Return concrete findings with path/line and
+reproduction or missing test; otherwise report no findings with remaining limits.
+Do not treat unavailable OAuth/Stripe/AI as verified. Keep scope to the supplied task.
+"""

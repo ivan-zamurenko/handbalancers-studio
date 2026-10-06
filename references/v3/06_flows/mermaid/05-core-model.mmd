@@ -1,0 +1,15 @@
+erDiagram
+users ||--o{ trainingPlans : owns
+trainingPlans ||--o{ userPrograms : assignments
+programs ||--o{ programVersions : versions
+programVersions ||--o{ programWorkouts : contains
+programVersions ||--o{ userPrograms : assignedVersion
+trainingPlans ||--o{ scheduledWorkouts : oneCalendar
+programWorkouts ||--o{ scheduledWorkouts : source
+userPrograms o|--o{ scheduledWorkouts : optionalForAdditional
+scheduledWorkouts o|--o| trainingSessions : performed
+trainingSessions ||--o{ sessionExercises : snapshots
+sessionExercises ||--o{ setLogs : facts
+sessionExercises ||--o| videoSubmissions : controlVideo
+videoSubmissions ||--o{ videoVersions : revisions
+trainingPlans ||--o{ planningPreviews : changes

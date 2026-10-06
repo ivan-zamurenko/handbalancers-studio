@@ -1,0 +1,84 @@
+{
+  "name": "Handbalancer's Studio / C1-A1-C3",
+  "version": "2.0",
+  "source": "Selected HTML prototype; CSS is authoritative for responsive layout. Not an exported Figma variable collection.",
+  "colors": {
+    "light": {
+      "bg": "#fafafa",
+      "surface": "#ffffff",
+      "raised": "#f0f1f2",
+      "text": "#1d1d1f",
+      "muted": "#5e6167",
+      "line": "#d5d7db",
+      "green": "#216e45",
+      "soft": "#e7f1eb",
+      "button": "#1d1d1f",
+      "button-text": "#ffffff",
+      "warning": "#725017"
+    },
+    "dark": {
+      "bg": "#090909",
+      "surface": "#121413",
+      "raised": "#1a1d1b",
+      "text": "#f5f5f4",
+      "muted": "#a7aba8",
+      "line": "#303530",
+      "green": "#72c991",
+      "soft": "#17261d",
+      "button": "#f5f5f4",
+      "button-text": "#101210",
+      "warning": "#dec58b"
+    }
+  },
+  "font": {
+    "family": "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', Arial, sans-serif",
+    "assetsIncluded": false
+  },
+  "spacingPx": [
+    8,
+    12,
+    16,
+    24,
+    32,
+    48,
+    72
+  ],
+  "radiusPx": {
+    "button": 6,
+    "panel": 8,
+    "badge": 4
+  },
+  "controlMinHeightPx": {
+    "default": 44,
+    "practicePrimary": 50
+  },
+  "breakpointsPx": {
+    "mobileMax": 780,
+    "tabletMax": 1190,
+    "wideMin": 1550
+  },
+  "referenceWidthsPx": [
+    390,
+    1440
+  ],
+  "testedWidthsPx": [
+    360,
+    390,
+    768,
+    1440
+  ],
+  "appearance": {
+    "modes": [
+      "auto",
+      "light",
+      "dark"
+    ],
+    "default": "auto",
+    "lightStartHour": 7,
+    "darkStartHour": 20,
+    "timeSource": "browser local time",
+    "automaticTransitionDeferredWhileWorkoutActive": true,
+    "manualChangeImmediate": true,
+    "scheduleStatus": "proposed default, not user-specified exact hours"
+  }
+}
