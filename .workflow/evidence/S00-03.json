@@ -1,0 +1,68 @@
+{
+  "task_id": "S00-03",
+  "status": "done",
+  "branch": "task/execution-v4",
+  "base_sha": "f2e7d546c303a4c4fe2a6563c99bafd32bfaafd4",
+  "changed_paths": [
+    "server/studio/main.py",
+    "server/studio/health.py",
+    "server/tests/conftest.py",
+    "server/tests/contracts/foundation/test_app_factory.py",
+    "pyproject.toml",
+    "uv.lock",
+    "README.md",
+    "docs/toolchain-lock.md",
+    ".workflow/state.json",
+    ".workflow/CURRENT.md",
+    ".workflow/evidence/S00-03.json"
+  ],
+  "red": {
+    "command": "uv run --locked pytest server/tests/contracts/foundation/test_app_factory.py -q",
+    "observed_failure": "3 assertion failures: studio.main app factory does not exist. Tests were collected successfully; no missing-framework import used as RED.",
+    "not_an_environment_failure": true
+  },
+  "green": {
+    "command": "uv run --locked pytest server/tests/contracts/foundation/test_app_factory.py -q",
+    "exit_code": 0,
+    "summary": "3 passed, 1 upstream StarletteDeprecationWarning about httpx; not suppressed."
+  },
+  "regression_commands": [
+    {
+      "command": "uv run --locked pytest -q",
+      "exit_code": 0,
+      "summary": "27 passed, 1 documented upstream warning; includes real clean/repeat dependency installation tests"
+    },
+    {
+      "command": "uv run --locked ruff check server/studio server/tests",
+      "exit_code": 0,
+      "summary": "All checks passed"
+    },
+    {
+      "command": "uv run --locked ruff format --check server/studio server/tests",
+      "exit_code": 0,
+      "summary": "5 files already formatted"
+    },
+    {
+      "command": "python3 tools/roadmap.py validate",
+      "exit_code": 0,
+      "summary": "134 tasks valid"
+    }
+  ],
+  "manual_checks": [
+    "Real Uvicorn subprocess with studio.main:create_app --factory, listening on a reserved 127.0.0.1 ephemeral socket: GET /health/live returned 200 and exact {status: ok}; process terminated in finally.",
+    "No DB or external provider was used; startup test audits socket connection/DNS/sendto attempts in a fresh isolated Python process before importing studio.",
+    "Checked dependency updates: FastAPI 0.142.2, Uvicorn 0.54.0, dev HTTPX 0.28.1; exact transitive versions in uv.lock."
+  ],
+  "scope_deviations": [
+    "pyproject.toml/uv.lock: add exact FastAPI/Uvicorn runtime and HTTPX test dependencies, register server/tests in pytest discovery.",
+    "README.md and docs/toolchain-lock.md: document first usable server command and pinned new libraries.",
+    "Use owner-designated project branch task/execution-v4."
+  ],
+  "review": {
+    "reviewer": "read-only agent review_s00_03",
+    "result": "no_blocking_findings",
+    "findings": []
+  },
+  "push_status": "pending_at_commit",
+  "notes": "Typed Settings is S00-04, not part of this card; current injected settings mapping is copied per app. Starlette 1.7.0 warns about a future httpx2 migration; pinned combination passes and warning remains visible. First uv add used unsupported --exact, corrected to --bounds exact before installing; initial loopback smoke bind was sandbox-blocked and passed with authorization. Neither is TDD RED. Push result follows commit in user report/next checkpoint."
+}

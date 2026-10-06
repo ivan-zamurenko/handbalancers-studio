@@ -1,32 +1,35 @@
 # Поточний checkpoint
 
-S00-02 завершено: toolchain відтворюється, новий пакет studio встановлюється.
-Проєкт працює в корені; основна гілка GitHub — `task/execution-v4`.
-База цієї картки: `2ee4403`. Origin: `ivan-zamurenko/handbalancers-studio`.
-Push S00-02 виконується після комміту; фактичний SHA та результат — у звіті
-власнику. Стан evidence на момент комміту: `pending_at_commit`.
+S00-03 завершено: фабрика FastAPI та `/health/live` працюють без БД/провайдерів.
+Проєкт у корені, гілка `task/execution-v4`; origin — `ivan-zamurenko/handbalancers-studio`.
+База S00-03: `f2e7d54` (S00-02 успішно запушено).
+Push S00-03 виконується після комміту; фактичний SHA та результат — у звіті
+власнику. Evidence зберігає статус на момент комміту: `pending_at_commit`.
 
 ## Перевірено
 
-- Python 3.13.3, Node 24.21.0, npm 11.19.0, uv 0.12.23.
-- Editable import із `server/studio` в ізольованому Python поза root.
-- Чисте та повторне встановлення не змінюють uv.lock/package-lock.json.
-- 24 тести пройшли; Ruff для нових файлів і граф 134 задач — без помилок.
-- Зібрано wheel/sdist нового пакета без старого runtime або локальних кешів.
-- Незалежне read-only рев’ю: блокувальних зауважень немає.
+- Три нові тести спочатку впали через відсутню фабрику, після реалізації пройшли.
+- `GET /health/live` → 200 `{"status":"ok"}` без мережевих звернень.
+- Два застосунки не ділять змінювані settings, state, overrides або routes.
+- Свіжий subprocess перевіряє відсутність I/O при import/startup/shutdown.
+- `uv run --locked pytest -q`: 27 passed, 1 upstream warning.
+- Ruff і граф 134 задач — без помилок; незалежне рев’ю — без блокерів.
+- Реальний Uvicorn на loopback також повернув 200; процес після перевірки зупинено.
 
-Команди й RED/GREEN: `.workflow/evidence/S00-02.json`.
-Версії, джерела та локальний PATH: `docs/toolchain-lock.md`.
+Starlette попереджає про майбутній перехід TestClient із httpx на httpx2;
+зафіксовані версії сумісні, warning не приховано.
+Команди, RED/GREEN і межі: `.workflow/evidence/S00-03.json`.
+Версії та локальний PATH: `docs/toolchain-lock.md`.
 
 ## Наступний крок
 
-S00-03: прочитати `roadmap/tasks/S00-03_app_factory.md`, написати тести
-app factory до реалізації. Додати потрібні HTTP-залежності й оновити lock.
-Зараз HTTP-застосунку, JS harness, БД та інтеграцій ще немає.
+S00-04: прочитати `roadmap/tasks/S00-04_settings.md`, написати тести
+типізованих Settings, перевірки APP_ENV та нерозголошення секретів.
+Наразі factory приймає копію явно переданого mapping, без читання environment.
+БД, UI, авторизацію та платежі ще не реалізовано.
 
 ## Домовленості
 
-Старий код не використовувати та не відновлювати. Основна гілка нового
-проєкту — `task/execution-v4`; стару main видалено, її вершина збережена
-в `archive/pre-execution-v4`. Окремих папок/worktrees для проєкту не створювати.
-Документи й референси ZIP не є доказом виконаних тестів нового застосунку.
+Старий runtime не використовувати й не відновлювати. Усе створювати в корені.
+Основна гілка — `task/execution-v4`; стару main видалено, історію збережено
+під тегом `archive/pre-execution-v4`. Не створювати окремий проєкт/worktree.

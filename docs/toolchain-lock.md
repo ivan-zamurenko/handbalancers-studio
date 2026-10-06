@@ -42,11 +42,21 @@ python3 -m unittest discover -s tools/tests -v
 Інший тест двічі встановлює Python/npm залежності в тимчасовій копії
 й порівнює байти обох lock-файлів. Перший цикл починається з чистого середовища.
 
+## Доповнення S00-03
+
+Додано FastAPI 0.142.2 і Uvicorn 0.54.0 як runtime-залежності,
+HTTPX 0.28.1 як test dependency. Точні транзитивні версії — в uv.lock.
+Інсталяцію й контракти перевірено на Python 3.13.3.
+
+Starlette 1.7.0 попереджає, що його TestClient у майбутньому вимагатиме
+httpx2 замість httpx. Поточний pinned набір сумісний, тести проходять;
+warning не приховується. Перехід на інший HTTP-клієнт не входить у S00-03.
+
 ## Поточна межа
 
-Runtime-залежності та npm dev-залежності поки порожні: у S00-02 ще немає
-HTTP-застосунку або JS-тестів. FastAPI/Uvicorn/HTTPX додаються з app factory,
-інші бібліотеки — разом із першою задачею, що їх використовує. Playwright/axe
+Є лише фабрика FastAPI та `/health/live`. npm dev-залежності поки порожні,
+JS harness ще не реалізовано. Інші бібліотеки додаються разом із першою
+задачею, що їх використовує. Playwright/axe
 та JS harness — наступні відповідні картки. Порожній npm lock фіксує початковий
 стан tooling і дозволяє `npm ci`, але не свідчить про готові browser-тести.
 Версію PostgreSQL потрібно обрати при створенні реального локального стенда.
@@ -56,3 +66,6 @@ HTTP-застосунку або JS-тестів. FastAPI/Uvicorn/HTTPX дода
 - [uv: locked sync та editable install](https://docs.astral.sh/uv/concepts/projects/sync/)
 - [uv build backend: module-root / module-name](https://docs.astral.sh/uv/concepts/build-backend/)
 - [Node 24.21.0 release та контрольні суми](https://nodejs.org/dist/v24.21.0/)
+
+- [FastAPI: TestClient](https://fastapi.tiangolo.com/tutorial/testing/)
+- [Uvicorn: application factory](https://www.uvicorn.org/settings/)
