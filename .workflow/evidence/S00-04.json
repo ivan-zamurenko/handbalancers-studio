@@ -1,0 +1,69 @@
+{
+  "task_id": "S00-04",
+  "status": "done",
+  "branch": "task/execution-v4",
+  "base_sha": "4d5a7311b704914334413440cd410d14e8ff94bf",
+  "changed_paths": [
+    "server/studio/settings.py",
+    "server/studio/main.py",
+    ".env.example",
+    "server/tests/unit/foundation/test_settings.py",
+    "server/tests/contracts/foundation/test_app_factory.py",
+    "pyproject.toml",
+    "uv.lock",
+    "README.md",
+    "docs/toolchain-lock.md",
+    ".workflow/CURRENT.md",
+    ".workflow/state.json",
+    ".workflow/evidence/S00-04.json"
+  ],
+  "red": {
+    "command": "uv run --locked pytest server/tests/unit/foundation/test_settings.py -q",
+    "observed_failure": "21 cases failed assertion Settings are not implemented; test collection and dependencies working.",
+    "not_an_environment_failure": true
+  },
+  "green": {
+    "command": "uv run --locked pytest server/tests/unit/foundation/test_settings.py server/tests/contracts/foundation/test_app_factory.py -q --tb=short",
+    "exit_code": 0,
+    "summary": "26 passed, 1 existing upstream warning (23 settings cases + 3 factory contracts)"
+  },
+  "regression_commands": [
+    {
+      "command": "uv run --locked pytest -q --tb=short",
+      "exit_code": 0,
+      "summary": "50 passed, 1 unchanged upstream Starlette warning"
+    },
+    {
+      "command": "uv run --locked ruff check server/studio server/tests",
+      "exit_code": 0,
+      "summary": "All checks passed"
+    },
+    {
+      "command": "uv run --locked ruff format --check server/studio server/tests",
+      "exit_code": 0,
+      "summary": "7 files already formatted"
+    },
+    {
+      "command": "python3 tools/roadmap.py validate",
+      "exit_code": 0,
+      "summary": "134 tasks valid"
+    }
+  ],
+  "manual_checks": [
+    "Actual isolated Python process startup with synthetic production HTTP origin/key/DSN fails, ValidationError present and marker absent from stdout/stderr.",
+    "No real environment secrets read or printed; tests use synthetic fixture and subprocess environment values.",
+    "No dependency upgrades: Pydantic 2.13.5 is now a declared direct dependency with same locked version."
+  ],
+  "scope_deviations": [
+    "Wire validated Settings into main.py; adapt prior app-factory isolation/startup tests to typed immutable settings and explicit test environment without weakening network checks.",
+    "Declare already-locked Pydantic directly in pyproject/uv.lock; explicit allowlisted environment loader uses no implicit dotenv or new dependency.",
+    "README/doc toolchain updates describe startup APP_ENV and bounded validation."
+  ],
+  "review": {
+    "reviewer": "read-only agent review_s00_03 (S00-04 follow-up)",
+    "result": "no_blocking_findings",
+    "findings": []
+  },
+  "push_status": "pending_at_commit",
+  "notes": "21 missing-module failures were initial RED. Additional malformed-JSON diagnostic test then failed with raw synthetic secret in errors(); fixed by redacting JSON validation before exposing diagnostics. Prior isolation test now checks distinct typed immutable Settings and blocked mutation; no startup/network assertions weakened. Settings require explicit APP_ENV; staging/production require HTTPS origin and nonblank key. Cipher/key-format validation and service-specific credentials remain in future tasks. No implicit dotenv loading. Supabase remains planned DB/Auth per Execution V4; no service connection performed."
+}

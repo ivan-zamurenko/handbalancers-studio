@@ -5,6 +5,8 @@ import subprocess
 import sys
 import textwrap
 
+import pytest
+
 
 def factory():
     assert importlib.util.find_spec("studio.main") is not None, "App factory is not implemented"
@@ -37,9 +39,11 @@ def test_isolated_app_instances(test_settings):
     first = create_app(test_settings)
     second = create_app(test_settings)
     assert first is not second
-    first.state.settings["app_env"] = "changed"
+    assert first.state.settings is not second.state.settings
+    with pytest.raises(TypeError):
+        first.state.settings.app_env = "changed"
     first.state.only_first = []
-    assert second.state.settings == {"app_env": "test"}
+    assert second.state.settings.app_env == "test"
     assert test_settings == {"app_env": "test"}
     assert not hasattr(second.state, "only_first")
     first.dependency_overrides[object()] = lambda: None
@@ -66,7 +70,7 @@ def test_no_startup_network(tmp_path):
         import studio
         from studio.main import create_app
         from fastapi.testclient import TestClient
-        with TestClient(create_app()) as client:
+        with TestClient(create_app({"app_env": "test"})) as client:
             response = client.get("/health/live")
             assert response.status_code == 200
             assert response.json() == {"status": "ok"}

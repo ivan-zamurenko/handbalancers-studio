@@ -54,7 +54,7 @@ warning не приховується. Перехід на інший HTTP-кл�
 
 ## Поточна межа
 
-Є лише фабрика FastAPI та `/health/live`. npm dev-залежності поки порожні,
+Є фабрика FastAPI, `/health/live` та типізовані Settings. npm dev-залежності поки порожні,
 JS harness ще не реалізовано. Інші бібліотеки додаються разом із першою
 задачею, що їх використовує. Playwright/axe
 та JS harness — наступні відповідні картки. Порожній npm lock фіксує початковий
@@ -69,3 +69,15 @@ JS harness ще не реалізовано. Інші бібліотеки до�
 
 - [FastAPI: TestClient](https://fastapi.tiangolo.com/tutorial/testing/)
 - [Uvicorn: application factory](https://www.uvicorn.org/settings/)
+
+## Доповнення S00-04
+
+Pydantic 2.13.5, уже наявний у lock, оголошено прямою залежністю Settings.
+Жодних транзитивних версій не оновлено. Environment loader явно читає тільки
+задекларовані імена; BaseModel не читає environment або dotenv неявно.
+Це дозволяє передавати ізольовані test settings без доступу до секретів машини.
+Налаштування незмінні, секретні поля — SecretStr. Помилки валідації перебудовуються
+без початкових даних і контексту, включно з некоректним JSON. Повідомлення
+навмисно загальне: перевірити APP_ENV, PUBLIC_ORIGIN та поля секретів.
+
+- [Pydantic: wrap validators](https://pydantic.dev/docs/validation/latest/concepts/validators/)

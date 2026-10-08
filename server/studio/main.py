@@ -1,16 +1,16 @@
 """Application factory: assemble a fresh application without external I/O."""
 
 from collections.abc import Mapping
-from copy import deepcopy
 
 from fastapi import FastAPI
 
 from studio.health import liveness
+from studio.settings import Settings, load_settings
 
 
-def create_app(settings: Mapping[str, object] | None = None) -> FastAPI:
+def create_app(settings: Settings | Mapping[str, object] | None = None) -> FastAPI:
+    validated = load_settings() if settings is None else Settings.model_validate(settings)
     app = FastAPI(title="Handbalancer's Studio")
-    # Typed environment validation is introduced in S00-04.
-    app.state.settings = deepcopy(dict(settings)) if settings is not None else {}
+    app.state.settings = validated
     app.add_api_route("/health/live", liveness, methods=["GET"])
     return app
