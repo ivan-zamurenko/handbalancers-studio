@@ -96,4 +96,4 @@ def load_settings() -> Settings:
     }
     # Empty optional env-example fields mean unset, not a usable credential.
     values = {name: value for name, value in values.items() if value != "" or name == "app_env"}
-    return Settings(**values)
+    return Settings.model_validate(values)

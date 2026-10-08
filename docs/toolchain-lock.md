@@ -30,7 +30,7 @@ export UV_CACHE_DIR="$PWD/.local-tools/uv-cache"
 export npm_config_cache="$PWD/.local-tools/npm-cache"
 uv sync --locked
 npm ci
-python3 -m unittest discover -s tools/tests -v
+uv run --locked python -m unittest discover -s tools/tests -v
 ```
 
 Ці локальні шляхи не входять до Git. У новому checkout спочатку встановіть
@@ -97,3 +97,29 @@ Harness використовує тільки виділений loopback origin
 
 - [Playwright: запуск тестового сервера](https://playwright.dev/docs/test-webserver)
 - [Playwright: ізоляція контекстів](https://playwright.dev/docs/browser-contexts)
+
+## Доповнення S00-07
+
+Dev-залежності: mypy 2.4.0 (перевірка типів) і PyYAML 6.0.3 (структурна
+перевірка workflow). Версії та транзитивні хеші зафіксовано в uv.lock.
+Повний локальний gate: `python3 tools/checks.py`, після встановлення залежностей
+і Chromium з налаштуванням PATH та PLAYWRIGHT_BROWSERS_PATH, наведеними вище.
+
+Workflow використовує ubuntu-24.04 та ті самі Python/Node/uv версії.
+Теги нижче звірено з GitHub Releases і upstream Git refs 2026-10-08:
+
+| Action | Release | Commit SHA |
+|---|---|---|
+| actions/checkout | v7.0.1 | 3d3c42e5aac5ba805825da76410c181273ba90b1 |
+| actions/setup-python | v7.0.0 | 5fda3b95a4ea91299a34e894583c3862153e4b97 |
+| actions/setup-node | v7.1.0 | 949feb2413d6458794dcd2491c4babbbce0c15c1 |
+| astral-sh/setup-uv | v10.2.0 | c18668ad3cf93ea998bef934396af7bb5c839dc7 |
+
+Оновлення цих SHA потребує повторної перевірки upstream.
+Ruff/format/mypy охоплюють runtime і новий check runner; успадкований tooling
+комплекту покрито виконуваними тестами, без масового переформатування.
+Окремі pytest-запуски не дозволяють приховати порожній unit/HTTP/tooling suite.
+Tooling suite запускає наявний справжній browser harness послідовно.
+
+- [GitHub Actions: secure use](https://docs.github.com/en/actions/reference/security/secure-use)
+- [uv у GitHub Actions](https://docs.astral.sh/uv/guides/integration/github/)

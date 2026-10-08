@@ -1,0 +1,52 @@
+{
+  "task_id": "S00-07",
+  "status": "done",
+  "branch": "task/execution-v4",
+  "base_sha": "dde6a1c07b9e84ffdf861afea937c9ac7a10b535",
+  "changed_paths": [
+    ".github/workflows/ci.yml",
+    "tools/checks.py",
+    "tools/tests/test_s00_07_ci_baseline.py",
+    "pyproject.toml",
+    "uv.lock",
+    "server/studio/settings.py",
+    "server/studio/shared/http.py",
+    "README.md",
+    "docs/toolchain-lock.md",
+    ".workflow/CURRENT.md",
+    ".workflow/state.json",
+    ".workflow/evidence/S00-07.json"
+  ],
+  "red": {
+    "command": "python3 -m unittest discover -s tools/tests -p test_s00_07_ci_baseline.py -v",
+    "observed_failure": "4 assertion failures: workflow and fail-closed check runner absent.",
+    "not_an_environment_failure": true
+  },
+  "green": {
+    "command": "python3 tools/checks.py (pinned tools in PATH; project browser/cache environment)",
+    "exit_code": 0,
+    "summary": "Ruff check/format and mypy passed (9 source files); 23 unit + 8 HTTP + 33 tooling tests passed, 8 subtests, 14 Node tests. Tooling includes real Chromium harness. Roadmap valid: 134 tasks."
+  },
+  "regression_commands": [
+    "uv run --locked python -m unittest discover -s tools/tests -p test_s00_07_ci_baseline.py -v: 5 passed",
+    "uv run --locked ruff check server/studio tools/checks.py tools/tests/test_s00_07_ci_baseline.py: passed"
+  ],
+  "manual_checks": [
+    "Action release tags resolved to actual upstream full commit SHAs.",
+    "Workflow contents:read; checkout persist-credentials:false; no secrets/deploy.",
+    "Known Starlette TestClient deprecation warning remains visible."
+  ],
+  "scope_deviations": [
+    "pyproject.toml/uv.lock: pin mypy and PyYAML dev dependencies for actual type checking and structural workflow tests.",
+    "Minimal type-annotation corrections to existing runtime if required by first mypy gate; no runtime behavior changes intended.",
+    "README/docs/toolchain-lock.md document CI commands and action provenance."
+  ],
+  "review": {
+    "reviewer": "review_s00_03",
+    "result": "no blocking findings; independent 5 tests and 5 subtests passed",
+    "findings": []
+  },
+  "push_status": "pending_at_commit",
+  "notes": "Single coherent CI card: dependency locks, two minimal typing corrections, tests and handoff account for file count. Remote CI result is reported after push, not assumed.",
+  "remote_ci": "pending_after_push"
+}

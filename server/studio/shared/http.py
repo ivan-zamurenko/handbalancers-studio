@@ -5,13 +5,15 @@ from uuid import uuid4
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException
 from starlette.requests import Request
+from starlette.responses import JSONResponse
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 from studio.shared.errors import error_response
 from studio.shared.logging import record_access
 
 
-async def validation_error(request: Request, exc: RequestValidationError):
+async def validation_error(request: Request, exc: Exception) -> JSONResponse:
+    assert isinstance(exc, RequestValidationError)
     # Only fixed input sections are exposed. Dynamic keys/indices and validator
     # messages can contain submitted values, so they never enter the response.
     sections = set()
@@ -27,7 +29,8 @@ async def validation_error(request: Request, exc: RequestValidationError):
     return error_response(422, request.state.request_id, fields)
 
 
-async def http_error(request: Request, exc: HTTPException):
+async def http_error(request: Request, exc: Exception) -> JSONResponse:
+    assert isinstance(exc, HTTPException)
     headers = {
         name: value
         for name, value in (exc.headers or {}).items()

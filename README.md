@@ -3,7 +3,7 @@
 Нова реалізація за комплектом Execution V4 від 2026-10-06 у корені цього проєкту.
 Попередня Git-історія збережена; старий runtime, акаунти та дані не використовуються.
 Реалізовано безпечне створення репозиторію (S00-01) та відтворюване
-встановлення Python/JS toolchain (S00-02), фабрику HTTP-застосунку та liveness (S00-03), безпечні типізовані налаштування (S00-04), Node/Playwright перевірки (S00-05), єдиний контракт HTTP-помилок (S00-06).
+встановлення Python/JS toolchain (S00-02), фабрику HTTP-застосунку та liveness (S00-03), безпечні типізовані налаштування (S00-04), Node/Playwright перевірки (S00-05), єдиний контракт HTTP-помилок (S00-06), автоматичні перевірки CI (S00-07).
 `references/` — матеріали наданого комплекту, не код застосунку й не джерело
 нових вимог. Пріоритет мають актуальне доручення користувача та специфікація V4.
 
@@ -15,7 +15,9 @@
 ```sh
 uv sync --locked
 npm ci
-python3 -m unittest discover -s tools/tests -v
+export PLAYWRIGHT_BROWSERS_PATH="$PWD/.local-tools/playwright-browsers"
+./node_modules/.bin/playwright install chromium
+python3 tools/checks.py
 python3 tools/roadmap.py validate
 python3 tools/roadmap.py next
 ```
@@ -41,6 +43,19 @@ APP_ENV=local-dev PUBLIC_ORIGIN=http://127.0.0.1:8000 uv run --locked uvicorn st
 
 Тести застосунку: `uv run --locked pytest server/tests -q`.
 Усі поточні тести разом: `uv run --locked pytest -q`.
+
+## Автоматичні перевірки CI
+
+GitHub Actions запускає той самий `python3 tools/checks.py` на кожний push
+і pull request. Перевіряються Ruff, форматування та mypy для `server/studio`
+і `tools/checks.py`, потім Python unit/HTTP/tooling тести, реальний Chromium,
+Node-тести та граф задач. Відсутній обов’язковий набір тестів або помилка
+команди зупиняють pipeline з помилкою.
+
+CI встановлює залежності через `uv sync --locked` та `npm ci`, перевіряє
+незмінність lock-файлів і працює з правами `contents: read` без production
+секретів. Версії Actions зафіксовано повними перевіреними commit SHA.
+Автоматичного deploy немає; успіх CI підтверджує лише реалізовані перевірки.
 
 ## HTTP-помилки та журнал
 
