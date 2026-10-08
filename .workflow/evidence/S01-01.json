@@ -1,0 +1,79 @@
+{
+  "task_id": "S01-01",
+  "status": "blocked",
+  "branch": "task/execution-v4",
+  "base_sha": "05ef7f3d3a383a4eed0d2ea927c2cfc80d6460b5",
+  "changed_paths": [
+    "supabase/config.toml",
+    "tools/local_stack.py",
+    "server/tests/support/database_guard.py",
+    "tools/tests/test_s01_01_local_supabase.py",
+    "pyproject.toml",
+    ".workflow/CURRENT.md",
+    ".workflow/state.json",
+    ".workflow/evidence/S01-01.json"
+  ],
+  "scope_deviations": [
+    "pyproject.toml: pytest pythonpath=['.'] connects the tools namespace used by the shared database test guard. Observed uv run pytest tools/tests failure: ModuleNotFoundError tools; unittest from root passed. No dependency changes."
+  ],
+  "red": {
+    "command": "python3 -m unittest discover -s tools/tests -p test_s01_01_local_supabase.py -v",
+    "observed_failure": "8 assertion failures: Local stack guard is absent",
+    "not_an_environment_failure": true
+  },
+  "green": {
+    "command": ".local-tools/uv-env/bin/uv run --locked python -m unittest discover -s tools/tests -p test_s01_01_local_supabase.py -v",
+    "exit_code": 0,
+    "summary": "16 tests passed; normal pytest invocation also passed with 16 subtests"
+  },
+  "red_followups": [
+    "12-test run: remote Docker inspected before rejection; profile credentials absent; explicit Docker env missing",
+    "15-test run: explicit start absent; runner did not use prepared profile password",
+    "16-test run after review: direct fixture with PGHOSTADDR did not raise UnsafeDatabaseTarget"
+  ],
+  "regression_commands": [
+    {
+      "command": "uv run --locked pytest tools/tests server/tests -q",
+      "exit_code": 0,
+      "summary": "80 passed, 24 subtests passed; existing Starlette/httpx deprecation warning. PATH and browser/cache settings from docs/toolchain-lock.md."
+    },
+    {
+      "command": "uv run --locked ruff check tools/local_stack.py tools/tests/test_s01_01_local_supabase.py server/tests/support/database_guard.py",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --locked mypy --explicit-package-bases tools/local_stack.py server/tests/support/database_guard.py",
+      "exit_code": 0
+    }
+  ],
+  "intermediate_repairs": [
+    "Patch application misplaced nested functions; focused tests detected IndentationError, structure repaired without weakening assertions.",
+    "Initial pytest tooling run: 33 existing tests passed, 15 new tests failed importing tools. Fixed pytest root pythonpath; affected suite then passed.",
+    "Mypy namespace invocation required --explicit-package-bases; no package hierarchy introduced."
+  ],
+  "review": {
+    "reviewer": "read-only subagent",
+    "result": "resolved; read-only re-review found no remaining must-fix issues",
+    "findings": ["Direct libpq override bypass reproduced RED and fixed in shared verifier; runner verifies the cleaned child environment"]
+  },
+  "environment": {
+    "db_status": "env_blocked",
+    "reason": "Docker executable/daemon unavailable; /usr/local/bin/docker is a broken link",
+    "cli": "2.120.0 installed in ignored .local-tools/supabase-cli",
+    "actual_check": "Real start test exited 2; status exited 1 with Docker error, no config parse error, private ES256 signing key created",
+    "unverified": [
+      "Simultaneous dev/test startup, actual container labels and mounts for CLI 2.120.0",
+      "Live DB credential override and cross-profile rejection; SUPABASE_DB_PASSWORD is passed but its effect is not established without a running stack",
+      "Live JWT isolation and managed auth roundtrip",
+      "Dev volume/data preservation across repeated test runs and concurrent DB connections"
+    ]
+  },
+  "manual_checks": [
+    "Supabase CLI 2.120.0 and ES256 JWK generation executed locally; key values not printed",
+    "Guard accepts only 127.0.0.1 URLs on test ports, no DNS/query overrides; Docker inspected via explicit Unix socket",
+    "Supabase CLI can publish ports on all interfaces; URL guard is not a firewall or a Docker security sandbox",
+    "No SQL schema changes, resets, stops, volume deletion, remote linking or deployments executed"
+  ],
+  "next_step": "Install/start local Docker, then start dev and test profiles and verify actual credentials/volumes before marking S01-01 done. Do not unblock dependent S01 tasks from tooling tests alone.",
+  "push_status": "pending_at_commit"
+}

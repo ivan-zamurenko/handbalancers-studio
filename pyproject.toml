@@ -31,6 +31,7 @@ module-root = "server"
 
 [tool.pytest.ini_options]
 testpaths = ["tools/tests", "server/tests"]
+pythonpath = ["."]
 
 [tool.ruff]
 target-version = "py313"
