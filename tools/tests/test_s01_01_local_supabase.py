@@ -2,14 +2,18 @@
 
 import importlib
 import json
+import os
 import subprocess
 import sys
 import tempfile
 import tomllib
 import unittest
+from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
 from pathlib import Path
 from unittest.mock import patch
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -21,6 +25,7 @@ class LocalSupabaseTests(unittest.TestCase):
 
     def container(self):
         return {
+            "Id": "test-container-id",
             "Name": "/supabase_db_handbalancer-studio-test",
             "State": {"Running": True},
             "Config": {"Labels": {"com.supabase.cli.project": "handbalancer-studio-test"}},
@@ -39,7 +44,7 @@ class LocalSupabaseTests(unittest.TestCase):
     def verify(self, stack, **overrides):
         arguments = {
             "app_env": "test",
-            "database_url": "postgresql://postgres:secret@127.0.0.1:55322/postgres",
+            "database_url": "postgresql://studio_local_test:secret@127.0.0.1:55322/postgres",
             "supabase_url": "http://127.0.0.1:55321",
             "project_id": "handbalancer-studio-test",
         }
@@ -50,10 +55,10 @@ class LocalSupabaseTests(unittest.TestCase):
         stack = self.stack()
         urls = {
             "database_url": [
-                "postgresql://postgres:secret@db.example.com:55322/postgres",
-                "postgresql://postgres:secret@127.0.0.1:54322/postgres",
-                "postgresql://postgres:secret@127.0.0.1:55322/postgres?host=db.example.com",
-                "postgresql://postgres:secret@127.0.0.1:55322/production",
+                "postgresql://studio_local_test:secret@db.example.com:55322/postgres",
+                "postgresql://studio_local_test:secret@127.0.0.1:54322/postgres",
+                "postgresql://studio_local_test:secret@127.0.0.1:55322/postgres?host=db.example.com",
+                "postgresql://studio_local_test:secret@127.0.0.1:55322/production",
             ],
             "supabase_url": [
                 "https://project.supabase.co",
@@ -107,6 +112,17 @@ class LocalSupabaseTests(unittest.TestCase):
             for overrides in ({"app_env": "dev"}, {"project_id": "handbalancer-studio-dev"}):
                 with self.assertRaises(stack.UnsafeDatabaseTarget):
                     self.verify(stack, **overrides)
+            inspect.assert_not_called()
+
+    def test_only_dedicated_test_login_is_allowed(self):
+        stack = self.stack()
+        with patch.object(stack, "inspect_database", return_value=self.container()) as inspect:
+            for username in ("postgres", "studio_local_dev"):
+                with self.assertRaises(stack.UnsafeDatabaseTarget):
+                    self.verify(
+                        stack,
+                        database_url=f"postgresql://{username}:secret@127.0.0.1:55322/postgres",
+                    )
             inspect.assert_not_called()
 
     def test_docker_failure_is_closed_and_redacted(self):
@@ -196,6 +212,12 @@ class LocalSupabaseTests(unittest.TestCase):
             )
             self.assertNotIn("DOCKER_CONTEXT", run.call_args.kwargs["env"])
 
+    def test_docker_client_does_not_inherit_global_credentials(self):
+        stack = self.stack()
+        with patch.dict("os.environ", {"DOCKER_CONFIG": "/production/docker"}, clear=True):
+            environment = stack.docker_environment()
+        self.assertEqual(environment.get("DOCKER_CONFIG"), str(ROOT / ".local-tools/docker-client"))
+
     def test_profile_credentials_are_private_distinct_and_stable(self):
         stack = self.stack()
         with tempfile.TemporaryDirectory() as directory:
@@ -249,7 +271,7 @@ class LocalSupabaseTests(unittest.TestCase):
         for override in ("PGHOSTADDR", "PGSERVICE", "PGSERVICEFILE"):
             environment = {
                 "APP_ENV": "test",
-                "DATABASE_URL": "postgresql://postgres:fixture@127.0.0.1:55322/postgres",
+                "DATABASE_URL": "postgresql://studio_local_test:fixture@127.0.0.1:55322/postgres",
                 "SUPABASE_URL": "http://127.0.0.1:55321",
                 "SUPABASE_PROJECT_ID": "handbalancer-studio-test",
                 override: "198.51.100.1",
@@ -280,8 +302,12 @@ class LocalSupabaseTests(unittest.TestCase):
                 subprocess.CompletedProcess([], 0, json.dumps(key)),
                 subprocess.CompletedProcess([], 0, "do-not-print-credentials"),
             ]
-            with patch.object(stack.subprocess, "run", side_effect=results) as run:
+            with (
+                patch.object(stack.subprocess, "run", side_effect=results) as run,
+                patch.object(stack, "provision_local_login", create=True) as provision,
+            ):
                 stack.start("test", root=root)
+            provision.assert_called_once_with("test", root=root)
             commands = [call.args[0] for call in run.call_args_list]
             self.assertEqual(commands[0], ["supabase", "--version"])
             self.assertIn("signing-key", commands[1])
@@ -296,12 +322,15 @@ class LocalSupabaseTests(unittest.TestCase):
             credentials = json.loads(
                 (root / ".local-tools/supabase/test/credentials.json").read_text()
             )
-            self.assertEqual(environment["SUPABASE_DB_PASSWORD"], credentials["db_password"])
+            self.assertNotIn("SUPABASE_DB_PASSWORD", environment)
             self.assertEqual(environment["SUPABASE_AUTH_JWT_SECRET"], credentials["jwt_secret"])
             key_path = root / ".local-tools/supabase/test/supabase/signing_keys.json"
             self.assertEqual(json.loads(key_path.read_text()), [key])
             self.assertEqual(key_path.stat().st_mode & 0o777, 0o600)
-            with patch.object(stack.subprocess, "run", side_effect=[results[0], results[2]]) as run:
+            with (
+                patch.object(stack.subprocess, "run", side_effect=[results[0], results[2]]) as run,
+                patch.object(stack, "provision_local_login", create=True),
+            ):
                 stack.start("test", root=root)
             self.assertEqual(run.call_count, 2)
             self.assertEqual(json.loads(key_path.read_text()), [key])
@@ -346,10 +375,195 @@ class LocalSupabaseTests(unittest.TestCase):
                 stack.run_tests([sys.executable, "-m", "pytest"], root=root)
             environment = run.call_args.kwargs["env"]
             self.assertIn(credentials["db_password"], environment["DATABASE_URL"])
+            self.assertTrue(
+                environment["DATABASE_URL"].startswith("postgresql://studio_local_test:")
+            )
             self.assertNotIn("PGHOSTADDR", environment)
             self.assertNotIn("PGSERVICE", environment)
             self.assertNotIn("SUPABASE_SERVICE_ROLE_KEY", environment)
 
+    def test_local_login_provisioning_is_guarded_and_keeps_password_off_argv(self):
+        stack = self.stack()
+        self.assertTrue(
+            hasattr(stack, "provision_local_login"), "Local login provisioning is absent"
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            workdir = stack.prepare("test", root=root)
+            password = stack.read_credentials(workdir)["db_password"]
+            with (
+                patch.object(stack, "inspect_database", return_value=self.container()),
+                patch.object(
+                    stack.subprocess, "run", return_value=subprocess.CompletedProcess([], 0)
+                ) as run,
+            ):
+                stack.provision_local_login("test", root=root)
+            arguments = run.call_args.args[0]
+            self.assertIn("test-container-id", arguments)
+            self.assertNotIn(password, " ".join(arguments))
+            sql = run.call_args.kwargs["input"]
+            self.assertIn("studio_local_test", sql)
+            self.assertIn("NOSUPERUSER", sql)
+            self.assertIn("NOBYPASSRLS", sql)
+            self.assertNotIn("ALTER ROLE postgres", sql)
+            self.assertEqual(run.call_args.kwargs["timeout"], 15)
+            invalid = self.container()
+            invalid["Config"]["Labels"] = {}
+            with (
+                patch.object(stack, "inspect_database", return_value=invalid),
+                patch.object(stack.subprocess, "run") as run,
+            ):
+                with self.assertRaises(stack.UnsafeDatabaseTarget):
+                    stack.provision_local_login("test", root=root)
+                run.assert_not_called()
+
+
+def live_isolation():
+    import psycopg
+
+    from tools import local_stack as stack
+
+    checks = unittest.TestCase()
+    credentials = {
+        profile: stack.read_credentials(ROOT / ".local-tools/supabase" / profile)
+        for profile in ("dev", "test")
+    }
+    target = {
+        "APP_ENV": "test",
+        "DATABASE_URL": "postgresql://studio_local_test:"
+        + credentials["test"]["db_password"]
+        + "@127.0.0.1:55322/postgres",
+        "SUPABASE_URL": "http://127.0.0.1:55321",
+        "SUPABASE_PROJECT_ID": stack.PROJECTS["test"],
+    }
+    with patch.dict(os.environ, target):
+        from server.tests.support.database_guard import require_test_database
+
+        require_test_database()
+        dev_container = stack.inspect_database(stack.PROJECTS["dev"])
+        test_container = stack.inspect_database(stack.PROJECTS["test"])
+        checks.assertNotEqual(dev_container["Id"], test_container["Id"])
+        checks.assertTrue(
+            {
+                mount.get("Name") for mount in dev_container["Mounts"] if mount["Type"] == "volume"
+            }.isdisjoint(
+                {
+                    mount.get("Name")
+                    for mount in test_container["Mounts"]
+                    if mount["Type"] == "volume"
+                }
+            )
+        )
+        statuses = {}
+        for profile in ("dev", "test"):
+            workdir = ROOT / ".local-tools/supabase" / profile
+            statuses[profile] = json.loads(
+                stack.cli_output(
+                    ["status", "--workdir", str(workdir), "--output", "json"],
+                    workdir,
+                    stack.docker_environment(),
+                )
+            )
+        checks.assertTrue(statuses["dev"]["ANON_KEY"] != statuses["test"]["ANON_KEY"])
+        for profile, port in (("dev", 54321), ("test", 55321)):
+            endpoint = f"http://127.0.0.1:{port}/rest/v1/"
+            with urlopen(
+                Request(
+                    endpoint,
+                    headers={
+                        "apikey": statuses[profile]["ANON_KEY"],
+                        "Authorization": "Bearer " + statuses[profile]["ANON_KEY"],
+                    },
+                ),
+                timeout=5,
+            ) as response:
+                checks.assertEqual(response.status, 200)
+            other = "test" if profile == "dev" else "dev"
+            with checks.assertRaises(HTTPError) as rejected:
+                urlopen(
+                    Request(
+                        endpoint,
+                        headers={
+                            "apikey": statuses[other]["ANON_KEY"],
+                            "Authorization": "Bearer " + statuses[other]["ANON_KEY"],
+                        },
+                    ),
+                    timeout=5,
+                )
+            checks.assertEqual(rejected.exception.code, 401)
+            rejected.exception.close()
+        connections = {}
+        try:
+            for profile, port in (("dev", 54322), ("test", 55322)):
+                connections[profile] = psycopg.connect(
+                    host="127.0.0.1",
+                    port=port,
+                    dbname="postgres",
+                    user=f"studio_local_{profile}",
+                    password=credentials[profile]["db_password"],
+                    connect_timeout=5,
+                )
+                other = "test" if profile == "dev" else "dev"
+                with (
+                    checks.assertRaises(psycopg.OperationalError),
+                    psycopg.connect(
+                        host="127.0.0.1",
+                        port=port,
+                        dbname="postgres",
+                        user=f"studio_local_{profile}",
+                        password=credentials[other]["db_password"],
+                        connect_timeout=5,
+                    ),
+                ):
+                    pass
+                connection = connections[profile]
+                checks.assertEqual(
+                    connection.execute(
+                        "SELECT rolsuper, rolcreatedb, rolcreaterole, rolinherit, rolreplication, rolbypassrls FROM pg_roles WHERE rolname = current_user"
+                    ).fetchone(),
+                    (False, False, False, False, False, False),
+                )
+                with checks.assertRaises(psycopg.errors.InsufficientPrivilege):
+                    connection.execute("SELECT * FROM auth.users LIMIT 0")
+                connection.rollback()
+                connection.execute("CREATE TEMP TABLE s01_isolation_probe (value text)")
+                connection.execute("INSERT INTO s01_isolation_probe VALUES (%s)", (profile,))
+                connection.commit()
+                checks.assertIsNotNone(
+                    connection.execute(
+                        "SELECT oid FROM pg_class WHERE relnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'auth') AND relname = 'users'"
+                    ).fetchone()
+                )
+            with ThreadPoolExecutor(max_workers=2) as executor:
+                list(executor.map(stack.provision_local_login, ("test", "test")))
+            for _ in range(2):
+                checks.assertEqual(
+                    stack.run_tests(
+                        [
+                            sys.executable,
+                            "-c",
+                            "from server.tests.support.database_guard import require_test_database; require_test_database()",
+                        ]
+                    ),
+                    0,
+                )
+                for profile, connection in connections.items():
+                    checks.assertEqual(
+                        connection.execute("SELECT value FROM s01_isolation_probe").fetchall(),
+                        [(profile,)],
+                    )
+            checks.assertEqual(
+                stack.inspect_database(stack.PROJECTS["dev"])["Id"], dev_container["Id"]
+            )
+        finally:
+            for connection in connections.values():
+                connection.close()
+
 
 if __name__ == "__main__":
+    if sys.argv[1:] == ["--live"]:
+        outcome = unittest.TextTestRunner(verbosity=2).run(
+            unittest.FunctionTestCase(live_isolation)
+        )
+        raise SystemExit(not outcome.wasSuccessful())
     unittest.main()

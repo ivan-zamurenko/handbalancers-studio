@@ -78,6 +78,7 @@ def docker_environment() -> dict[str, str]:
         if key in {"PATH", "HOME", "TMPDIR", "LANG", "LC_ALL"}
     }
     environment["DOCKER_HOST"] = host
+    environment["DOCKER_CONFIG"] = str(ROOT / ".local-tools/docker-client")
     return environment
 
 
@@ -143,7 +144,6 @@ def start(profile: str, *, root: Path = ROOT) -> None:
         fcntl.flock(lock, fcntl.LOCK_EX)
         credentials = read_credentials(workdir)
         environment.update(
-            SUPABASE_DB_PASSWORD=credentials["db_password"],
             SUPABASE_AUTH_JWT_SECRET=credentials["jwt_secret"],
             SUPABASE_EXPERIMENTAL_STACK="0",
         )
@@ -170,6 +170,7 @@ def start(profile: str, *, root: Path = ROOT) -> None:
         config["auth"]["signing_keys_path"] = "./signing_keys.json"
         config_path.write_text(config_text(config))
         cli_output(["start", "--workdir", str(workdir)], workdir, environment)
+        provision_local_login(profile, root=root)
 
 
 def verify_test_target(
@@ -190,6 +191,7 @@ def verify_test_target(
         api = urlsplit(supabase_url)
         valid = (
             database.scheme in {"postgresql", "postgresql+psycopg"}
+            and database.username == "studio_local_test"
             and database.hostname == "127.0.0.1"
             and database.port == 55322
             and database.path == "/postgres"
@@ -208,6 +210,14 @@ def verify_test_target(
         valid = False
     if not valid:
         raise UnsafeDatabaseTarget("Only dedicated loopback test endpoints are allowed")
+    verify_container("test")
+
+
+def verify_container(profile: str) -> dict[str, Any]:
+    if profile not in PROJECTS:
+        raise UnsafeDatabaseTarget("Only local dev and test profiles are allowed")
+    project_id = PROJECTS[profile]
+    port = "55322" if profile == "test" else "54322"
     container = inspect_database(project_id)
     name = f"supabase_db_{project_id}"
     try:
@@ -216,7 +226,7 @@ def verify_test_target(
             and container["State"]["Running"] is True
             and container["Config"]["Labels"]["com.supabase.cli.project"] == project_id
             and any(
-                binding["HostPort"] == "55322" and binding["HostIp"] in {"127.0.0.1", "0.0.0.0"}
+                binding["HostPort"] == port and binding["HostIp"] in {"127.0.0.1", "0.0.0.0"}
                 for binding in container["NetworkSettings"]["Ports"]["5432/tcp"]
             )
             and any(
@@ -230,6 +240,57 @@ def verify_test_target(
         valid = False
     if not valid:
         raise UnsafeDatabaseTarget("Running test container, port and volume markers are required")
+    return container
+
+
+def provision_local_login(profile: str, *, root: Path = ROOT) -> None:
+    container = verify_container(profile)
+    credentials = read_credentials(root / ".local-tools/supabase" / profile)
+    username = f"studio_local_{profile}"
+    password = credentials["db_password"]
+    sql = f"""
+BEGIN;
+SET LOCAL lock_timeout = '5s';
+SET LOCAL statement_timeout = '10s';
+SELECT pg_advisory_xact_lock(190101);
+DO $local_login$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = '{username}') THEN
+        CREATE ROLE {username};
+    END IF;
+END
+$local_login$;
+ALTER ROLE {username} LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE
+    NOINHERIT NOREPLICATION NOBYPASSRLS PASSWORD '{password}';
+GRANT CONNECT, TEMPORARY ON DATABASE postgres TO {username};
+COMMIT;
+"""
+    try:
+        subprocess.run(
+            [
+                "docker",
+                "exec",
+                "-i",
+                container["Id"],
+                "psql",
+                "-X",
+                "--no-password",
+                "-U",
+                "supabase_admin",
+                "-d",
+                "postgres",
+                "--set",
+                "ON_ERROR_STOP=1",
+            ],
+            input=sql,
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=15,
+            env=docker_environment(),
+        )
+    except (OSError, subprocess.SubprocessError, KeyError):
+        raise UnsafeDatabaseTarget("Could not provision the verified local login") from None
 
 
 def run_tests(command: list[str], *, root: Path = ROOT) -> int:
@@ -242,7 +303,7 @@ def run_tests(command: list[str], *, root: Path = ROOT) -> int:
     if (workdir / "credentials.json").exists():
         password = ":" + read_credentials(workdir)["db_password"]
     environment.setdefault(
-        "DATABASE_URL", f"postgresql://postgres{password}@127.0.0.1:55322/postgres"
+        "DATABASE_URL", f"postgresql://studio_local_test{password}@127.0.0.1:55322/postgres"
     )
     environment.setdefault("SUPABASE_URL", "http://127.0.0.1:55321")
     environment.setdefault("SUPABASE_PROJECT_ID", PROJECTS["test"])

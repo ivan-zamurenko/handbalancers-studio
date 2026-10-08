@@ -1,6 +1,7 @@
 {
   "task_id": "S01-01",
-  "status": "blocked",
+  "status": "done",
+  "resumed_from": "613fa6f",
   "branch": "task/execution-v4",
   "base_sha": "05ef7f3d3a383a4eed0d2ea927c2cfc80d6460b5",
   "changed_paths": [
@@ -14,7 +15,9 @@
     ".workflow/evidence/S01-01.json"
   ],
   "scope_deviations": [
-    "pyproject.toml: pytest pythonpath=['.'] connects the tools namespace used by the shared database test guard. Observed uv run pytest tools/tests failure: ModuleNotFoundError tools; unittest from root passed. No dependency changes."
+    "pyproject.toml: pytest pythonpath=['.'] connects the tools namespace used by the shared database test guard. Observed uv run pytest tools/tests failure: ModuleNotFoundError tools; unittest from root passed. No dependency changes.",
+    "Owner approved separate studio_local_dev/test DB logins on 2026-10-08 after live PostgreSQL rejected generated passwords: CLI ignores SUPABASE_DB_PASSWORD. Revise the mistaken postgres-user test assumption, retaining own-password success and cross-profile denial. Managed Supabase roles remain unchanged. Local role provisioning in tools/local_stack.py only, no product schema migration.",
+    "Owner approved HTTP test correction: /auth/v1/settings is public and apikey alone does not prove JWT isolation. Actual Authorization Bearer probes on /rest/v1/ returned own=200, foreign=401 in both directions. Preserve those assertions, change only the incorrect request mechanism. This is a test-assumption correction, not an implementation RED."
   ],
   "red": {
     "command": "python3 -m unittest discover -s tools/tests -p test_s01_01_local_supabase.py -v",
@@ -24,18 +27,21 @@
   "green": {
     "command": ".local-tools/uv-env/bin/uv run --locked python -m unittest discover -s tools/tests -p test_s01_01_local_supabase.py -v",
     "exit_code": 0,
-    "summary": "16 tests passed; normal pytest invocation also passed with 16 subtests"
+    "summary": "19 tests passed; pytest also passed with 16 subtests"
   },
   "red_followups": [
     "12-test run: remote Docker inspected before rejection; profile credentials absent; explicit Docker env missing",
     "15-test run: explicit start absent; runner did not use prepared profile password",
-    "16-test run after review: direct fixture with PGHOSTADDR did not raise UnsafeDatabaseTarget"
+    "16-test run after review: direct fixture with PGHOSTADDR did not raise UnsafeDatabaseTarget",
+    "Dedicated Docker client config RED: None != isolated DOCKER_CONFIG path; fixed without changing global Docker configuration",
+    "19-test run: 4 failed, 15 passed; provisioning absent, start did not provision, guard accepted postgres, runner used postgres DSN. Same command then passed 19 tests and 16 subtests",
+    "Live RED with --with psycopg[binary]==3.3.3 python -m tools.tests.test_s01_01_local_supabase --live: password authentication failed for studio_local_dev before provisioning; same test GREEN after provisioning"
   ],
   "regression_commands": [
     {
       "command": "uv run --locked pytest tools/tests server/tests -q",
       "exit_code": 0,
-      "summary": "80 passed, 24 subtests passed; existing Starlette/httpx deprecation warning. PATH and browser/cache settings from docs/toolchain-lock.md."
+      "summary": "83 passed, 24 subtests passed; existing Starlette/httpx deprecation warning. PATH and browser/cache settings from docs/toolchain-lock.md."
     },
     {
       "command": "uv run --locked ruff check tools/local_stack.py tools/tests/test_s01_01_local_supabase.py server/tests/support/database_guard.py",
@@ -49,31 +55,37 @@
   "intermediate_repairs": [
     "Patch application misplaced nested functions; focused tests detected IndentationError, structure repaired without weakening assertions.",
     "Initial pytest tooling run: 33 existing tests passed, 15 new tests failed importing tools. Fixed pytest root pythonpath; affected suite then passed.",
-    "Mypy namespace invocation required --explicit-package-bases; no package hierarchy introduced."
+    "Mypy namespace invocation required --explicit-package-bases; no package hierarchy introduced.",
+    "Live provisioning via managed postgres rejected role attribute changes. Transaction rolled back; use local supabase_admin via verified container Id for bootstrap only. Managed roles not altered.",
+    "First resumed regression command omitted PLAYWRIGHT_BROWSERS_PATH: 81 passed, 2 browser failures. Correct environment, unchanged tests: 83 passed. Not counted as behavior RED."
   ],
   "review": {
     "reviewer": "read-only subagent",
-    "result": "resolved; read-only re-review found no remaining must-fix issues",
-    "findings": ["Direct libpq override bypass reproduced RED and fixed in shared verifier; runner verifies the cleaned child environment"]
+    "result": "resolved; final read-only scoped re-review found no remaining blockers",
+    "findings": [
+      "Direct libpq override bypass reproduced RED and fixed in shared verifier; runner verifies the cleaned child environment",
+      "Follow-up reviewer: negative DB endpoint tests retained postgres username and could fail for the wrong reason. Updated them to allowed studio_local_test; exact card command passes 19 tests without weakening endpoint assertions."
+    ]
   },
   "environment": {
-    "db_status": "env_blocked",
-    "reason": "Docker executable/daemon unavailable; /usr/local/bin/docker is a broken link",
+    "db_status": "passed",
+    "runtime": "Dedicated Colima studio-s01 VM, 4 CPUs/6 GiB/40 GiB, local Unix socket, Docker server 29.5.2. Global Docker context and credentials unchanged.",
     "cli": "2.120.0 installed in ignored .local-tools/supabase-cli",
-    "actual_check": "Real start test exited 2; status exited 1 with Docker error, no config parse error, private ES256 signing key created",
+    "actual_check": "Real start dev and start test exited 0. Full live isolation helper passed (2.328s): distinct containers/volumes, own passwords accepted, foreign passwords denied, six privilege flags false, auth.users read denied, two concurrent test role provisions, two guarded child runs preserving both session sentinels; own Authorization JWT 200 and cross-profile JWT 401 in both directions.",
+    "live_command": "DOCKER_HOST=unix://$HOME/.colima/studio-s01/docker.sock DOCKER_CONTEXT=default PATH=$PWD/.local-tools/supabase-cli/node_modules/.bin:$PWD/.local-tools/node/bin:/opt/homebrew/bin:$PATH .local-tools/uv-env/bin/uv run --locked --with 'psycopg[binary]==3.3.3' python -m tools.tests.test_s01_01_local_supabase --live",
     "unverified": [
-      "Simultaneous dev/test startup, actual container labels and mounts for CLI 2.120.0",
-      "Live DB credential override and cross-profile rejection; SUPABASE_DB_PASSWORD is passed but its effect is not established without a running stack",
-      "Live JWT isolation and managed auth roundtrip",
-      "Dev volume/data preservation across repeated test runs and concurrent DB connections"
+      "Real Google/Apple/email account roundtrips belong to later auth cards; no external-provider readiness claimed",
+      "Host firewall/LAN isolation; CLI published ports may bind all interfaces"
     ]
   },
   "manual_checks": [
     "Supabase CLI 2.120.0 and ES256 JWK generation executed locally; key values not printed",
     "Guard accepts only 127.0.0.1 URLs on test ports, no DNS/query overrides; Docker inspected via explicit Unix socket",
     "Supabase CLI can publish ports on all interfaces; URL guard is not a firewall or a Docker security sandbox",
-    "No SQL schema changes, resets, stops, volume deletion, remote linking or deployments executed"
+    "Only approved studio_local_dev/test connection roles provisioned, no product schema changes, resets, stops, volume deletion, remote linking or deployments",
+    "PostgreSQL and Supabase managed roles remain unchanged. Private passwords/ES256 keys stay in ignored .local-tools; SQL secrets use stdin, not process argv.",
+    "Local status JWT_SECRET field is not proof of runtime JWT separation; actual authenticated HTTP requests verify own/cross acceptance"
   ],
-  "next_step": "Install/start local Docker, then start dev and test profiles and verify actual credentials/volumes before marking S01-01 done. Do not unblock dependent S01 tasks from tooling tests alone.",
+  "next_step": "S01-02: Alembic baseline for studio/studio_private, leaving managed auth untouched. S01-01 local live gates passed.",
   "push_status": "pending_at_commit"
 }
