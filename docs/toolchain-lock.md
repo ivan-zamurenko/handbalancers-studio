@@ -54,11 +54,8 @@ warning не приховується. Перехід на інший HTTP-кл�
 
 ## Поточна межа
 
-Є фабрика FastAPI, `/health/live` та типізовані Settings. npm dev-залежності поки порожні,
-JS harness ще не реалізовано. Інші бібліотеки додаються разом із першою
-задачею, що їх використовує. Playwright/axe
-та JS harness — наступні відповідні картки. Порожній npm lock фіксує початковий
-стан tooling і дозволяє `npm ci`, але не свідчить про готові browser-тести.
+Є фабрика FastAPI, `/health/live` та типізовані Settings. У S00-05 додано JS/browser harness; npm містить лише test tooling. Інші бібліотеки додаються разом із першою
+задачею, що їх використовує. Axe та перевірки реальних UI-екранів додаються у відповідних наступних картках.
 Версію PostgreSQL потрібно обрати при створенні реального локального стенда.
 
 ## Джерела
@@ -81,3 +78,22 @@ Pydantic 2.13.5, уже наявний у lock, оголошено прямою 
 навмисно загальне: перевірити APP_ENV, PUBLIC_ORIGIN та поля секретів.
 
 - [Pydantic: wrap validators](https://pydantic.dev/docs/validation/latest/concepts/validators/)
+
+## Доповнення S00-05
+
+`@playwright/test` 1.64.0 — точна dev-залежність, транзитивні версії й integrity
+у package-lock.json. Chromium 156.0.8078.4 (revision 1248) встановлено через
+`npx playwright install chromium`; Playwright керує сумісною ревізією браузера.
+Браузери розміщено в ігнорованій `.local-tools/playwright-browsers`.
+Перед запуском установлення/тестів задавайте
+`PLAYWRIGHT_BROWSERS_PATH="$PWD/.local-tools/playwright-browsers"`.
+`npm ci` не замінює команду встановлення браузера.
+
+Node runner: `npm run test:js`. Chromium: `npm run test:e2e`.
+Harness використовує тільки виділений loopback origin 127.0.0.1:8765,
+не читає конфігурацію реального сервера й не використовує зайнятий порт.
+Тести UI інших браузерів/тем/розмірів ще не виконувалися: у цій картці є
+лише справжня liveness-відповідь та ізоляція тестових браузерних контекстів.
+
+- [Playwright: запуск тестового сервера](https://playwright.dev/docs/test-webserver)
+- [Playwright: ізоляція контекстів](https://playwright.dev/docs/browser-contexts)

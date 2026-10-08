@@ -1,0 +1,75 @@
+{
+  "task_id": "S00-05",
+  "status": "done",
+  "branch": "task/execution-v4",
+  "base_sha": "0e94641e99b57c5fd80475b0c7309532bbec4ec6",
+  "changed_paths": [
+    "playwright.config.js",
+    "tools/test-origin.mjs",
+    "tools/tests/test_s00_05_js_harness.py",
+    "tests/js/test-origin.test.js",
+    "tests/e2e/foundation.spec.js",
+    "package.json",
+    "package-lock.json",
+    "README.md",
+    "docs/toolchain-lock.md",
+    ".workflow/state.json",
+    ".workflow/CURRENT.md",
+    ".workflow/evidence/S00-05.json"
+  ],
+  "red": {
+    "command": "python3 -m unittest discover -s tools/tests -p test_s00_05_js_harness.py -v",
+    "observed_failure": "3 tests ran, 5 assertion failures including subtests: browser harness configuration absent. No browser-install/environment failure counted as RED.",
+    "not_an_environment_failure": true
+  },
+  "green": {
+    "command": "python3 -m unittest discover -s tools/tests -p test_s00_05_js_harness.py -v",
+    "exit_code": 0,
+    "summary": "4 passed in 11.157s: real Chromium health, 2 browser-context tests, existing-server refusal and unsafe-origin refusal subtests."
+  },
+  "regression_commands": [
+    {
+      "command": "npm run test:js",
+      "exit_code": 0,
+      "summary": "14 Node tests passed"
+    },
+    {
+      "command": "uv run --locked pytest -q --tb=short",
+      "exit_code": 0,
+      "summary": "54 passed, 3 subtests passed, 1 existing upstream warning; includes actual browser tests and locked install regressions"
+    },
+    {
+      "command": "uv run --locked ruff check tools/tests/test_s00_05_js_harness.py",
+      "exit_code": 0,
+      "summary": "All checks passed"
+    },
+    {
+      "command": "uv run --locked ruff format --check tools/tests/test_s00_05_js_harness.py",
+      "exit_code": 0,
+      "summary": "Formatted"
+    },
+    {
+      "command": "python3 tools/roadmap.py validate",
+      "exit_code": 0,
+      "summary": "134 tasks valid"
+    }
+  ],
+  "manual_checks": [
+    "Playwright 1.64.0 installed and locked; Chromium 156.0.8078.4 revision1248 downloaded to ignored project cache.",
+    "Browser/local-server runs used permission escalation for loopback and Chromium process access; no external app or database used.",
+    "Runner rejects unsafe TEST_BASE_URL during config evaluation, before webServer/browser; errors do not echo arbitrary URL values.",
+    "Fresh browser state demonstrated by writing and asserting synthetic state in first test, then checking empty state in next. No UI functionality fabricated."
+  ],
+  "scope_deviations": [
+    "package.json/package-lock.json: add exact Playwright dev dependency and Node/Playwright scripts.",
+    "README/docs/toolchain-lock.md: browser installation and local-only test commands."
+  ],
+  "review": {
+    "reviewer": "read-only agent review_s00_03 (S00-05 follow-up)",
+    "result": "no_blocking_findings",
+    "findings": [],
+    "limits": "Reviewer inspected code and writer results; did not rerun browser concurrently to avoid fixed-port conflict."
+  },
+  "push_status": "pending_at_commit",
+  "notes": "Default project branch task/execution-v4 retained per owner instruction. Dedicated origin only http://127.0.0.1:8765; localhost, ordinary dev port and external hosts intentionally refused. Existing server never reused. Explicit local-test Settings avoid inherited production configuration. Browser package/caches/report artifacts ignored. Cross-browser/UI layout checks await actual UI tasks. Push result is reported after commit."
+}
