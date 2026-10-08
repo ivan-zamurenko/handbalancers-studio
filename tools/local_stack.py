@@ -265,6 +265,10 @@ ALTER ROLE {username} LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE
 GRANT CONNECT, TEMPORARY ON DATABASE postgres TO {username};
 COMMIT;
 """
+    execute_local_sql(container, sql)
+
+
+def execute_local_sql(container: dict[str, Any], sql: str) -> None:
     try:
         subprocess.run(
             [
@@ -290,7 +294,72 @@ COMMIT;
             env=docker_environment(),
         )
     except (OSError, subprocess.SubprocessError, KeyError):
-        raise UnsafeDatabaseTarget("Could not provision the verified local login") from None
+        raise UnsafeDatabaseTarget("Could not apply verified local operator SQL") from None
+
+
+def read_migration_password(workdir: Path) -> str:
+    path = workdir / "migration_credentials.json"
+    try:
+        value = json.loads(path.read_text())
+        password = value["password"]
+        if path.stat().st_mode & 0o077 or not isinstance(password, str) or len(password) != 64:
+            raise ValueError
+        if any(character not in "0123456789abcdef" for character in password):
+            raise ValueError
+        return password
+    except (OSError, ValueError, KeyError, TypeError):
+        raise UnsafeDatabaseTarget("Provision private local migration credentials first") from None
+
+
+def provision_migration_roles(profile: str, *, root: Path = ROOT) -> None:
+    container = verify_container(profile)
+    workdir = prepare(profile, root=root)
+    with (workdir / ".prepare.lock").open("w") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        path = workdir / "migration_credentials.json"
+        if not path.exists():
+            descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+            with os.fdopen(descriptor, "w") as output:
+                json.dump({"password": secrets.token_hex(32)}, output)
+        password = read_migration_password(workdir)
+        statements = ["BEGIN; SET LOCAL lock_timeout = '5s'; SET LOCAL statement_timeout = '10s'; SELECT pg_advisory_xact_lock(190102);"]
+        for role in ("migration_owner", "studio_web", "studio_auth_runtime", "studio_worker"):
+            login = "LOGIN" if role == "migration_owner" else "NOLOGIN"
+            statements.append(f"""
+DO $role$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = '{role}') THEN
+        CREATE ROLE {role};
+    END IF;
+END
+$role$;
+ALTER ROLE {role} {login} NOSUPERUSER NOCREATEDB NOCREATEROLE
+    NOINHERIT NOREPLICATION NOBYPASSRLS;
+""")
+        statements.extend([
+            f"ALTER ROLE migration_owner PASSWORD '{password}';",
+            "GRANT CONNECT, CREATE ON DATABASE postgres TO migration_owner;",
+            "GRANT studio_web, studio_auth_runtime, studio_worker TO migration_owner WITH INHERIT FALSE;",
+            "COMMIT;",
+        ])
+        execute_local_sql(container, "\n".join(statements))
+
+
+def run_migrations(profile: str, *, root: Path = ROOT) -> None:
+    verify_container(profile)
+    password = read_migration_password(root / ".local-tools/supabase" / profile)
+    port = 55322 if profile == "test" else 54322
+    environment = docker_environment()
+    environment["STUDIO_MIGRATION_DATABASE_URL"] = (
+        f"postgresql+psycopg://migration_owner:{password}@127.0.0.1:{port}/postgres"
+    )
+    try:
+        subprocess.run(
+            [sys.executable, "-m", "alembic", "-c", str(root / "alembic.ini"), "upgrade", "head"],
+            cwd=root, env=environment, capture_output=True, text=True, check=True, timeout=120,
+        )
+    except (OSError, subprocess.SubprocessError):
+        raise UnsafeDatabaseTarget("Local migration failed; output withheld") from None
 
 
 def run_tests(command: list[str], *, root: Path = ROOT) -> int:
@@ -330,6 +399,8 @@ def main() -> int:
     prepare_parser.add_argument("profile", choices=PROJECTS)
     start_parser = commands.add_parser("start")
     start_parser.add_argument("profile", choices=PROJECTS)
+    for action in ("provision-migrations", "migrate"):
+        commands.add_parser(action).add_argument("profile", choices=PROJECTS)
     test_parser = commands.add_parser("test")
     test_parser.add_argument("command", nargs=argparse.REMAINDER)
     args = parser.parse_args()
@@ -340,6 +411,14 @@ def main() -> int:
         if args.action == "start":
             start(args.profile)
             print(f"Local {args.profile} stack started; credentials remain private")
+            return 0
+        if args.action == "provision-migrations":
+            provision_migration_roles(args.profile)
+            print(f"Local {args.profile} migration roles provisioned; credentials remain private")
+            return 0
+        if args.action == "migrate":
+            run_migrations(args.profile)
+            print(f"Local {args.profile} migrations applied")
             return 0
         command = args.command[1:] if args.command[:1] == ["--"] else args.command
         return run_tests(command)

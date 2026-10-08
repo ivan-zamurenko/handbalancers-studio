@@ -418,6 +418,43 @@ class LocalSupabaseTests(unittest.TestCase):
                 run.assert_not_called()
 
 
+    def test_migration_provisioning_has_separate_private_operator_access(self):
+        stack = self.stack()
+        self.assertTrue(hasattr(stack, "provision_migration_roles"), "Migration provisioning absent")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            workdir = stack.prepare("test", root=root)
+            with patch.object(stack, "verify_container", return_value=self.container()), patch.object(stack.subprocess, "run", return_value=subprocess.CompletedProcess([], 0)) as run:
+                stack.provision_migration_roles("test", root=root)
+                password = stack.read_migration_password(workdir)
+                stack.provision_migration_roles("test", root=root)
+            self.assertEqual(stack.read_migration_password(workdir), password)
+            self.assertNotEqual(password, stack.read_credentials(workdir)["db_password"])
+            self.assertEqual((workdir / "migration_credentials.json").stat().st_mode & 0o777, 0o600)
+            self.assertNotIn(password, " ".join(run.call_args.args[0]))
+            sql = run.call_args.kwargs["input"]
+            self.assertIn("migration_owner LOGIN NOSUPERUSER", sql)
+            for role in ("studio_web", "studio_auth_runtime", "studio_worker"):
+                self.assertIn(f"{role} NOLOGIN NOSUPERUSER", sql)
+            self.assertNotIn("studio_local_test", sql)
+            with patch.object(stack, "verify_container", side_effect=stack.UnsafeDatabaseTarget), patch.object(stack.subprocess, "run") as run:
+                with self.assertRaises(stack.UnsafeDatabaseTarget):
+                    stack.provision_migration_roles("test", root=root)
+                run.assert_not_called()
+
+    def test_migration_runner_is_local_and_drops_external_overrides(self):
+        stack = self.stack()
+        self.assertTrue(hasattr(stack, "run_migrations"), "Migration runner absent")
+        with patch.dict(os.environ, {"PGHOSTADDR": "remote", "STUDIO_MIGRATION_DATABASE_URL": "postgresql://remote"}, clear=True), patch.object(stack, "verify_container") as verify, patch.object(stack, "read_migration_password", return_value="a" * 64), patch.object(stack.subprocess, "run", return_value=subprocess.CompletedProcess([], 0)) as run:
+            stack.run_migrations("test")
+        verify.assert_called_once_with("test")
+        environment = run.call_args.kwargs["env"]
+        self.assertEqual(environment["STUDIO_MIGRATION_DATABASE_URL"], "postgresql+psycopg://migration_owner:" + "a" * 64 + "@127.0.0.1:55322/postgres")
+        self.assertNotIn("PGHOSTADDR", environment)
+        self.assertNotIn("a" * 64, " ".join(run.call_args.args[0]))
+        self.assertEqual(run.call_args.args[0][-2:], ["upgrade", "head"])
+
+
 def live_isolation():
     import psycopg
 

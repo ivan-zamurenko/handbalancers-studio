@@ -1,0 +1,71 @@
+{
+  "task_id": "S01-02",
+  "status": "done",
+  "branch": "task/execution-v4",
+  "base_sha": "920dae911d9bfdd632a88f97747115b06a83dc26",
+  "changed_paths": [
+    "alembic.ini",
+    "pyproject.toml",
+    "server/alembic/env.py",
+    "server/alembic/versions/0001_schemas.py",
+    "server/studio/db.py",
+    "server/tests/integration/database/test_migration_baseline.py",
+    "tools/local_stack.py",
+    "tools/tests/test_s01_01_local_supabase.py",
+    "uv.lock",
+    ".workflow/CURRENT.md",
+    ".workflow/state.json",
+    ".workflow/evidence/S01-02.json"
+  ],
+  "scope_deviations": [
+    "pyproject.toml and uv.lock: install/pin the approved SQLAlchemy 2, Alembic and psycopg3 stack before executable integration tests; dependency setup is not behavior RED.",
+    "tools/local_stack.py and tools/tests/test_s01_01_local_supabase.py: explicit local operator provisioning for migration_owner and NOLOGIN runtime roles using the existing verified container boundary. Separate private migration password; never promote studio_local_dev/test or change managed Supabase roles.",
+    "Keep migration-only configuration in alembic.ini/server/alembic/env.py; no migration credentials in application settings or HTTP handlers."
+  ],
+  "scenario": "Real PostgreSQL upgrade, restricted role ownership/grants, managed-schema exclusion in actual Alembic autogeneration, rollback and concurrent migration commands.",
+  "red": {
+    "status": "not_observed_before_resume",
+    "detail": "The working tree already contained the S01-02 implementation and tests when this task resumed. The first direct pytest run was refused by the local test-target guard because APP_ENV and test endpoints were absent; this was not a behavior RED. The first guarded behavior run had 5 passed and 1 failed because two Alembic Python API calls shared thread-unsafe process-global context (KeyError: config), not because baseline behavior was absent. The concurrency test was corrected to run two independent Alembic CLI processes."
+  },
+  "green": {
+    "command": "python tools/local_stack.py test -- uv run --locked pytest server/tests/integration/database/test_migration_baseline.py -q",
+    "exit_code": 0,
+    "summary": "6 passed against the isolated local PostgreSQL test profile; real empty-database upgrade, grants, managed schemas, rollback and separate-process concurrency verified."
+  },
+  "regression_commands": [
+    {
+      "command": "uv run --locked python -m unittest tools.tests.test_s01_01_local_supabase",
+      "exit_code": 0,
+      "summary": "21 tests passed."
+    },
+    {
+      "command": "uv run --locked ruff check server/alembic/env.py server/alembic/versions/0001_schemas.py server/studio/db.py server/tests/integration/database/test_migration_baseline.py tools/local_stack.py tools/tests/test_s01_01_local_supabase.py",
+      "exit_code": 0,
+      "summary": "All checks passed."
+    },
+    {
+      "command": "MYPYPATH=server uv run --locked mypy --explicit-package-bases server/alembic/env.py server/alembic/versions/0001_schemas.py server/studio/db.py tools/local_stack.py",
+      "exit_code": 0,
+      "summary": "Success: no issues found in 4 source files."
+    },
+    {
+      "command": "uv lock --check",
+      "exit_code": 0,
+      "summary": "Resolved 38 packages; lockfile is synchronized."
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "summary": "Final staged diff passed git diff --check after checkpoint updates."
+    }
+  ],
+  "review": {
+    "concurrency_test": "The prior test invoked Alembic's Python command API concurrently in threads; Alembic's process-global EnvironmentContext is not thread-safe. The requirement concerns concurrent migration commands, so the test now starts two CLI subprocesses and still verifies one migration head.",
+    "grant_contract": "The integration test asserts the exact studio/studio_private schema USAGE matrix and verifies migration_owner is a non-superuser without CREATEDB/CREATEROLE/BYPASSRLS."
+  },
+  "unverified": [
+    "A pre-implementation behavioral RED could not be observed because implementation and tests pre-existed in the resumed dirty working tree; no RED is claimed.",
+    "Hosted operator provisioning and production databases were not exercised; only isolated local test PostgreSQL was used."
+  ],
+  "push_status": "pending_at_commit"
+}

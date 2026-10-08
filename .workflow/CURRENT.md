@@ -1,10 +1,18 @@
 # Поточний checkpoint
 
-S01-01 завершено: реальна ізоляція dev/test перевірена на двох локальних Supabase.
-Проєкт у корені, гілка task/execution-v4; origin — ivan-zamurenko/handbalancers-studio.
-Попередній checkpoint: 613fa6f. SHA follow-up комміту й push — у звіті після комміту.
+S01-02 завершено локально: Alembic baseline створює studio/studio_private та
+мінімальні ролі; managed auth/storage/realtime не змінюються. Проєкт у корені,
+гілка task/execution-v4; origin — ivan-zamurenko/handbalancers-studio.
+База перед коммітом: 920dae911d9bfdd632a88f97747115b06a83dc26. SHA комміту й push
+зафіксувати у звіті після комміту.
 
 ## Перевірено
+
+- S01-02 checks: PostgreSQL integration — 6 passed; local-stack unittest — 21 passed;
+  Ruff, scoped mypy та `uv lock --check` пройшли. Evidence: `.workflow/evidence/S01-02.json`.
+- TDD caveat: implementation і тести вже були в незакомміченій копії під час resume;
+  попередній поведінковий RED не зафіксований. Guarded запуск знайшов thread-unsafe
+  Alembic API в harness; перевірку виправлено на два окремі CLI-процеси.
 
 - S01-01: 19 unittest-тестів; pytest також GREEN.
 - Affected suite: 83 тести, 24 subtests; наявний Starlette warning не приховано.
@@ -16,7 +24,7 @@ S01-01 завершено: реальна ізоляція dev/test переві
 - Реальні HTTP JWT-перевірки: власний токен 200, чужий 401 в обох напрямках.
 - Guard перевіряє URL, Docker socket, project label, container/volume name та порт.
 - Прямий fixture-guard відхиляє PG* overrides; runner очищує їх перед запуском.
-- Test runner не запускає/не скидає БД. Product DDL ще немає.
+- Test runner не запускає/не скидає БД; S01-02 додає тільки schema/role baseline.
 - Read-only review: PGHOSTADDR bypass виправлено; негативні endpoint-тести незалежні від username guard.
 - Supabase CLI 2.120.0 встановлено в .local-tools/supabase-cli, ES256 генерація працює.
 - Docker server 29.5.2 у Colima studio-s01, 4 CPU/6 GiB/40 GiB. Обидва профілі працюють.
@@ -24,9 +32,9 @@ S01-01 завершено: реальна ізоляція dev/test переві
 
 ## Наступний крок
 
-S01-02: Alembic baseline для studio/studio_private. Картку ще не розпочато.
+S01-03: transaction context. Перейти лише після перевірки залежності S01-02 у checkout.
 Службовий auth лишається під керуванням Supabase, без подвійного DDL.
-Локальне середовище для DB-команд (додатково до docs/toolchain-lock.md):
+Локальне середовище для DB-команд:
 
 ```sh
 export PATH="$PWD/.local-tools/supabase-cli/node_modules/.bin:/opt/homebrew/bin:$PATH"
@@ -34,12 +42,15 @@ export DOCKER_HOST="unix://$HOME/.colima/studio-s01/docker.sock"
 unset DOCKER_CONTEXT
 uv run --locked python tools/local_stack.py start dev
 uv run --locked python tools/local_stack.py start test
+python tools/local_stack.py provision-migrations test
+python tools/local_stack.py test -- uv run --locked pytest server/tests/integration/database/test_migration_baseline.py -q
 uv run --locked --with 'psycopg[binary]==3.3.3' python -m tools.tests.test_s01_01_local_supabase --live
 ```
 
 SUPABASE_DB_PASSWORD не працює для local CLI. Окремі DB-логіни створюються
 через перевірений container ID і локальну bootstrap-роль supabase_admin.
-Managed ролі не змінюються; міграційних чи runtime-прав ці логіни ще не мають.
+Hosted provisioning виконується окремо операторським шляхом; baseline не змінює
+managed Supabase roles.
 Ключі не друкувати; .local-tools/supabase містить приватні локальні файли.
 Supabase може публікувати Docker-порти на всіх інтерфейсах: guard URL не є firewall.
 Реальні Google/Apple/email flows ще не перевірені й належать наступним auth-карткам.
