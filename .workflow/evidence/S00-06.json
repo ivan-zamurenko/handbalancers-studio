@@ -1,0 +1,71 @@
+{
+  "task_id": "S00-06",
+  "status": "done",
+  "branch": "task/execution-v4",
+  "base_sha": "e8c7b83dde25ad82a6bb22257d14dd4463b11623",
+  "changed_paths": [
+    "server/studio/shared/__init__.py",
+    "server/studio/shared/errors.py",
+    "server/studio/shared/http.py",
+    "server/studio/shared/logging.py",
+    "server/studio/main.py",
+    "server/tests/contracts/foundation/test_error_contract.py",
+    "README.md",
+    ".workflow/CURRENT.md",
+    ".workflow/state.json",
+    ".workflow/evidence/S00-06.json"
+  ],
+  "red": {
+    "command": "uv run --locked pytest server/tests/contracts/foundation/test_error_contract.py -q --tb=short",
+    "observed_failure": "4 failures: missing error envelope on 422/404/403/405; 500 is plaintext instead of JSON; no correlated studio.access records.",
+    "not_an_environment_failure": true
+  },
+  "green": {
+    "command": "uv run --locked pytest server/tests/contracts/foundation/test_error_contract.py -q --tb=short",
+    "exit_code": 0,
+    "summary": "5 passed, 1 existing upstream warning"
+  },
+  "regression_commands": [
+    {
+      "command": "uv run --locked pytest -q --tb=short",
+      "exit_code": 0,
+      "summary": "59 passed, 3 subtests passed, 1 existing upstream warning; includes real Chromium harness"
+    },
+    {
+      "command": "npm run test:js",
+      "exit_code": 0,
+      "summary": "14 passed"
+    },
+    {
+      "command": "uv run --locked ruff check server/studio/shared server/studio/main.py server/tests/contracts/foundation/test_error_contract.py",
+      "exit_code": 0,
+      "summary": "Passed; intentional boundary catch documents BLE001 exception"
+    },
+    {
+      "command": "uv run --locked ruff format --check server/studio/shared server/studio/main.py server/tests/contracts/foundation/test_error_contract.py",
+      "exit_code": 0,
+      "summary": "6 files already formatted"
+    },
+    {
+      "command": "python3 tools/roadmap.py validate",
+      "exit_code": 0,
+      "summary": "134 tasks valid"
+    }
+  ],
+  "manual_checks": [
+    "Real loopback Uvicorn with app created BEFORE Uvicorn logging configuration: synthetic SQL exception returns redacted 500. Correlation ID matches header/body/stdout log. Synthetic URL query, Cookie, Authorization, caller request ID and SQL marker absent from stdout/stderr; no traceback. Process terminated after probe.",
+    "Reviewer independently probed late ASGI exception after response.start: sanitized traceback, correlation header retained, no second response.start.",
+    "No real credentials, external app, DB or runtime copied from old project."
+  ],
+  "scope_deviations": [
+    "main.py registers exception handlers and correlation middleware; shared/__init__.py adds package.",
+    "README documents HTTP envelope and safe access logging."
+  ],
+  "review": {
+    "reviewer": "read-only agent review_s00_03 (S00-06 follow-up)",
+    "result": "no_blocking_findings",
+    "findings": []
+  },
+  "push_status": "pending_at_commit",
+  "notes": "All IDs generated server-side, caller X-Request-ID ignored. field_errors expose fixed input sections only, not dynamic field names or values. Uvicorn raw access logger is filtered; studio.access records only request_id/status. After headers are sent a new envelope is impossible; original exception text is suppressed. Dependency versions unchanged. Push result reported after commit."
+}

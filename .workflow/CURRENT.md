@@ -1,33 +1,32 @@
 # Поточний checkpoint
 
-S00-05 завершено: Node test runner і Playwright працюють із локальним test app.
+S00-06 завершено: єдиний HTTP error envelope та server-generated request_id.
 Проєкт у корені, гілка `task/execution-v4`; origin — `ivan-zamurenko/handbalancers-studio`.
-База S00-05: `0e94641` (S00-04 успішно запушено).
-Push цієї картки — після комміту; SHA та результат у звіті власнику.
-Evidence фіксує момент перед push: `pending_at_commit`.
+База S00-06: `e8c7b83` (S00-05 успішно запушено).
+Push після комміту; SHA та результат у звіті власнику. Evidence фіксує момент
+перед push: `pending_at_commit`.
 
 ## Перевірено
 
-- 14 Node-тестів пройшли; дозволено лише http://127.0.0.1:8765.
-- 4 Python harness-тести пройшли, включно зі справжніми Chromium-сценаріями.
-- Браузер бачить реальну liveness-відповідь 200 {"status":"ok"}.
-- Cookies/localStorage/sessionStorage між тестами ізольовані.
-- Runner відхиляє зовнішні адреси, dev-порт 8000 та зайнятий test-порт.
-- Повний pytest: 54 passed, 3 subtests passed, 1 відомий Starlette warning.
-- Ruff і граф задач валідні, read-only рев'ю без блокерів.
+- 422/500/стандартні HTTP-помилки мають error:{code,message_key,field_errors,request_id}.
+- Клієнт не отримує SQL, exception detail, traceback або значення полів.
+- X-Request-ID однаковий у header, error body та studio.access; caller ID ігнорується.
+- Access-log лише ID/статус; Uvicorn raw URL log відфільтровано.
+- Реальний loopback Uvicorn підтвердив відсутність синтетичних секретів у stdout/stderr.
+- 59 Python-тестів, 3 subtests, 14 Node-тестів пройшли. Один відомий Starlette warning.
+- Ruff/граф задач валідні. Незалежне рев'ю без блокерів.
 
-Команди: `npm run test:js`, `npm run test:e2e`.
-Для браузера потрібен `PLAYWRIGHT_BROWSERS_PATH="$PWD/.local-tools/playwright-browsers"`;
-встановлення Chromium: `npx playwright install chromium`. PATH та версії —
-у docs/toolchain-lock.md. Повний pytest тепер потребує браузера і loopback.
-Вузькі backend-тести: `uv run --locked pytest server/tests -q`.
+field_errors наразі вказують лише розділ body/query/path/header/cookie, не
+динамічні назви полів. Після відправлення заголовків новий 500 envelope неможливий;
+виняток замінюється безпечним повідомленням без первісних деталей.
+Команди й RED/GREEN: `.workflow/evidence/S00-06.json`.
 
 ## Наступний крок
 
-S00-06: прочитати `roadmap/tasks/S00-06_error_contract.md`, почати з тестів
-єдиного контракту HTTP-помилок. UI, БД, auth, платежі ще не реалізовано.
-Supabase залишається запланованим PostgreSQL/Auth; браузер працюватиме через FastAPI.
-Поточний browser harness не призначений для staging/production.
+S00-07: прочитати `roadmap/tasks/S00-07_ci_baseline.md`, почати з тестів CI baseline.
+Повний pytest потребує Chromium/loopback; PLAYWRIGHT_BROWSERS_PATH та PATH —
+у README і docs/toolchain-lock.md. Backend-only: `uv run --locked pytest server/tests -q`.
+UI, БД, auth та платежі ще не реалізовано. Supabase заплановано для PostgreSQL/Auth.
 
 ## Домовленості
 
