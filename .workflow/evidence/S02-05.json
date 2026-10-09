@@ -1,0 +1,48 @@
+{
+  "task_id": "S02-05",
+  "status": "done",
+  "branch": "task/execution-v4",
+  "base_sha": "008751542b52940cea61d17b9265fddadd675b80",
+  "changed_paths": [
+    "server/static/js/api/client.js",
+    "server/static/js/state/save-status.js",
+    "tests/js/s02-05-http-client.test.js",
+    ".workflow/CURRENT.md",
+    ".workflow/state.json",
+    ".workflow/evidence/S02-05.json"
+  ],
+  "scope_deviations": [],
+  "scenario": "Same-origin fetch credentials and CSRF, stable error vs network distinction, no blind mutation retries, save-status conflict/unauthorized states that preserve caller-owned draft.",
+  "red": {
+    "command": ".local-tools/node/bin/node --test tests/js/s02-05-http-client.test.js",
+    "exit_code": 1,
+    "result": "ERR_MODULE_NOT_FOUND for server/static/js/api/client.js before implementation."
+  },
+  "green": {
+    "command": ".local-tools/node/bin/node --test tests/js/s02-05-http-client.test.js",
+    "exit_code": 0,
+    "result": "5 passed: same-origin credentials/CSRF, no POST retry or generated idempotency key, conflict/draft preservation, unauthorized draft preservation, and distinct network error."
+  },
+  "checks": [
+    {
+      "command": "PLAYWRIGHT_BROWSERS_PATH=$PWD/.local-tools/playwright-browsers node --test tests/js/*.test.js",
+      "exit_code": 0,
+      "result": "34 passed, including browser-backed token tests."
+    },
+    {
+      "command": ".local-tools/node/bin/node --check server/static/js/api/client.js",
+      "exit_code": 0,
+      "result": "JavaScript syntax check passed."
+    },
+    {
+      "command": "VS Code diagnostics for client.js, save-status.js and S02-05 tests",
+      "exit_code": 0,
+      "result": "No errors found."
+    }
+  ],
+  "unverified": [
+    "The application has no product API pages or CSRF middleware/token producer yet; this card reads a server-rendered csrf-token meta value or accepts an explicit caller token, but does not add server issuance/validation.",
+    "UI integration and save-status presentation belong to later product page/card work."
+  ],
+  "push_status": "pending_at_commit"
+}
