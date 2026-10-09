@@ -34,11 +34,11 @@ FROM generate_series(1, 20) AS i;
     )
     with database_engine.begin() as connection:
         before = connection.scalar(text("SELECT 'auth.users'::regclass::oid"))
-        command.upgrade(baseline.configuration(connection), "head")
+        command.upgrade(baseline.configuration(connection), "0002")
         assert connection.scalar(text("SELECT to_regclass('studio.users')")) is not None, (
             "Product profile table absent"
         )
-        command.upgrade(baseline.configuration(connection), "head")
+        command.upgrade(baseline.configuration(connection), "0002")
         assert connection.scalar(text("SELECT 'auth.users'::regclass::oid")) == before
     yield database_engine
 

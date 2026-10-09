@@ -1,35 +1,39 @@
 # Поточний checkpoint
 
-S01-04 завершено: модель User та міграція 0002 для studio.users.
-База перед коммітом: ea472b58eebfd175f6de0aba0d61ba8c15f9264f (S01-03 запушено, CI GREEN).
-Проєкт у корені, task/execution-v4, origin ivan-zamurenko/handbalancers-studio.
-SHA/push/CI S01-04 перевіряються після commit; evidence зберігає pending_at_commit.
+S01-05 завершено: RLS/column grants профілю та приватна provision_member.
+База перед коммітом: 54dc897f36f7b7ae66c81a9ab66724428e49daa5 (S01-04 запушено, CI GREEN).
+Проєкт у корені, task/execution-v4; origin ivan-zamurenko/handbalancers-studio.
+SHA/push/CI перевіряються після commit; evidence зберігає pending_at_commit.
 
 ## Перевірено
 
-- 53 backend-тести, з них 8 нових profile та 14 попередніх DB; 21 tooling unittest.
-- UNIQUE auth_user_id витримує дві одночасні вставки; FK, role/locale та row_version constraints.
-- OAuth names nullable; locale/timezone задаються явно; role default member.
-- Alembic/model parity без auth у product MetaData; migration_owner не володіє managed Auth.
-- На реальному test Supabase upgrade/repeat до 0002: FK правильний, auth OID/columns незмінні.
-- Оператор отримує лише USAGE auth та REFERENCES(id), без SELECT/DML auth.users.
-- Нова таблиця має RLS та закриті runtime grants до S01-05.
-- Ruff/format/mypy GREEN; read-only review без блокерів.
-- RED/GREEN/межі: .workflow/evidence/S01-04.json. Starlette warning не приховано.
-- User docs deletions/Copilot additions залишено недоторканими й поза коммітом.
-  Через відсутні docs локальний roadmap validate падає; контракти прочитано з HEAD.
+- 73 backend-тести, включно з 20 security cases; Ruff/format/mypy GREEN.
+- studio_web читає лише свій active profile, зокрема coach не отримує загальний доступ.
+- UPDATE лише first_name/last_name/locale/timezone; чужі рядки й inactive недоступні.
+- id/auth_user_id/role/is_active/system columns, INSERT/DELETE/TRUNCATE закриті.
+- anon/authenticated не мають schema/table/function доступу.
+- studio_auth_runtime має лише EXECUTE provision_member, без прямих table grants.
+- Provision завжди створює member, ігнорує metadata; repeat не змінює існуючий профіль.
+- Concurrent provision/edits, rollback, temp-table/search_path атака перевірені.
+- 0003 upgrade/repeat на справжньому test Supabase: auth schema незмінна, grants правильні.
+- Read-only review без блокерів. RED/GREEN: .workflow/evidence/S01-05.json.
+- User docs deletions/Copilot additions недоторкані й поза коммітом. Локальний
+  roadmap validate через відсутні docs не GREEN; контракти прочитані з HEAD.
 
 ## Наступний крок
 
-S01-05 — profile security: RLS та column grants. Прочитати відповідну картку.
-Auth endpoints, timezone validation та команди редагування профілю ще не реалізовані.
-S01-03 command_transaction задає studio.user_id лише на одну транзакцію.
-Baseline тести закріплено за 0001; profile suite перевіряє актуальний head.
+S01-06 — прочитати картку roadmap перед тестами.
+Підтвердження provider identity є передумовою приватного provision; auth service
+впроваджується в S03-04, HTTP auth зараз не підключено.
+Provision SECURITY DEFINER належить non-superuser migration_owner, має fixed
+search_path та schema-qualified SQL. GUC actor надходить лише з trusted backend.
+Timestamp/version editing та IANA timezone validation ще не реалізовані.
+Baseline/profile-schema suites закріплені за 0001/0002; security suite тестує head.
 
 ## Локальний стенд
 
 Docker server у Colima studio-s01; окремі dev/test Supabase profiles та credentials.
-Test PostgreSQL 127.0.0.1:55322, HTTP 55321. Реальний test DB вже має revision 0002.
+Test PostgreSQL 127.0.0.1:55322, HTTP 55321. Реальний test DB вже має revision 0003.
 Managed Auth лишається під керуванням Supabase; Alembic лише studio/studio_private.
 
     export PATH="$PWD/.local-tools/uv-env/bin:$PWD/.local-tools/supabase-cli/node_modules/.bin:/opt/homebrew/bin:$PATH"

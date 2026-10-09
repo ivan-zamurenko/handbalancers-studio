@@ -1,0 +1,53 @@
+{
+  "task_id": "S01-05",
+  "status": "done",
+  "branch": "task/execution-v4",
+  "base_sha": "54dc897f36f7b7ae66c81a9ab66724428e49daa5",
+  "scope_deviations": [
+    "Pin S01-04 schema suite to revision 0002 because its explicit pre-security deny expectation is historical; S01-05 suite independently tests current head privileges."
+  ],
+  "trust_boundary": "provision_member is private and executable only by studio_auth_runtime; verified provider identity is a server-side precondition to be enforced by S03-04. No browser role/metadata grants authority.",
+  "notes": [
+    "User docs deletions and Copilot additions remain untouched; current requirements read via git show HEAD.",
+    "READ COMMITTED provision uses separate INSERT and SELECT statements for concurrent idempotency; no unbounded retries."
+  ],
+  "changed_paths": [
+    "server/alembic/versions/0003_profile_security.py",
+    "server/tests/support/actors.py",
+    "server/tests/security/database/test_profile_rls.py",
+    "server/tests/integration/database/test_profile_schema.py",
+    ".workflow/CURRENT.md",
+    ".workflow/state.json",
+    ".workflow/evidence/S01-05.json"
+  ],
+  "red": {
+    "command": "uv run --locked python tools/local_stack.py test -- uv run --locked pytest server/tests/security/database/test_profile_rls.py -q",
+    "exit_code": 1,
+    "result": "7 failed, 10 passed: own-profile read/update absent (permission denied), restricted provision function absent. Existing denial cases already passed under 0002."
+  },
+  "green": {
+    "command": "uv run --locked python tools/local_stack.py test -- uv run --locked pytest server/tests/security/database server/tests/integration/database server/tests/unit server/tests/contracts -q --tb=short",
+    "exit_code": 0,
+    "result": "73 passed, including 20 security cases; one known Starlette deprecation warning."
+  },
+  "checks": [
+    "Ruff check/format for 3 new Python files passed.",
+    "mypy server/studio: 12 source files passed.",
+    "git diff --check passed."
+  ],
+  "manual_checks": {
+    "command": "Guarded local_stack.py test -- uv run --locked python (inline SQLAlchemy/Alembic verification)",
+    "result": "Actual local test Supabase upgraded twice to 0003, unchanged auth.users column signature, 2 RLS policies, first_name UPDATE allowed but role UPDATE denied, provision EXECUTE only auth runtime, anon/authenticated schema usage denied. No dev/hosted migration."
+  },
+  "review": {
+    "reviewer": "review_s00_03",
+    "result": "No blocking findings; independent read-only contract/code review. DB runs executed by writer."
+  },
+  "push_status": "pending_at_commit",
+  "remote_ci": "pending_after_push",
+  "limitations": [
+    "Auth verification and HTTP routes remain future tasks. A fully compromised trusted backend can set another GUC; RLS is defense in depth, not a backend sandbox.",
+    "Profile timestamp/version updates and IANA timezone validation belong to future editing commands; clients cannot alter protected system columns here.",
+    "Uncommitted user docs deletions still block working-tree roadmap validation; no document restore or Copilot edits were included."
+  ]
+}
