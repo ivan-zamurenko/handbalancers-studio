@@ -4,6 +4,7 @@ from alembic import context
 from sqlalchemy import Connection, create_engine, text
 from sqlalchemy.engine import make_url
 from sqlalchemy.pool import NullPool
+from studio.accounts.models import User  # noqa: F401
 from studio.db import Base, include_migration_name
 
 

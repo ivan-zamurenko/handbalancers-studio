@@ -434,6 +434,9 @@ class LocalSupabaseTests(unittest.TestCase):
             self.assertNotIn(password, " ".join(run.call_args.args[0]))
             sql = run.call_args.kwargs["input"]
             self.assertIn("migration_owner LOGIN NOSUPERUSER", sql)
+            self.assertTrue("GRANT USAGE ON SCHEMA auth TO migration_owner;" in sql)
+            self.assertTrue("GRANT REFERENCES (id) ON auth.users TO migration_owner;" in sql)
+            self.assertTrue("GRANT SELECT" not in sql)
             for role in ("studio_web", "studio_auth_runtime", "studio_worker"):
                 self.assertIn(f"{role} NOLOGIN NOSUPERUSER", sql)
             self.assertNotIn("studio_local_test", sql)

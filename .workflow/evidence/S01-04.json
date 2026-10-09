@@ -1,0 +1,49 @@
+{
+  "task_id": "S01-04",
+  "status": "done",
+  "base_sha": "ea472b58eebfd175f6de0aba0d61ba8c15f9264f",
+  "scope_deviations": [
+    "Register account model in Alembic env; separate managed-auth FK metadata is reference-only.",
+    "Pin existing S01-02 baseline tests to revision 0001 and its empty metadata; new card independently verifies 0002/model parity.",
+    "Add narrow local operator auth schema USAGE and auth.users(id) REFERENCES grants; managed table definition/data remain untouched by migrations. Add provisioning unit assertions."
+  ],
+  "notes": [
+    "User docs deletions/Copilot additions remain untouched; requirements read from current HEAD docs.",
+    "locale and timezone are required explicitly; no inferred user preference defaults. Member, active, row_version=1, UUID and creation timestamps have server defaults.",
+    "Existing baseline tests explicitly test revision 0001 with empty metadata; current head/model parity is independently tested in profile suite. No expectations weakened to accept wrong DDL.",
+    "All changes implement one profile-schema card; adjacent operator grants/registry/test compatibility are required for the first cross-schema FK."
+  ],
+  "branch": "task/execution-v4",
+  "red": {
+    "command": "uv run --locked python tools/local_stack.py test -- uv run --locked pytest server/tests/integration/database/test_profile_schema.py -q",
+    "result": "8 setup assertion errors: Product profile table absent after successful baseline upgrade. Real guarded database available; not an environment error.",
+    "provisioning": "New narrow REFERENCES/USAGE assertion failed before implementation in targeted unittest."
+  },
+  "green": {
+    "command": "uv run --locked python tools/local_stack.py test -- uv run --locked pytest server/tests/integration/database server/tests/unit server/tests/contracts -q",
+    "exit_code": 0,
+    "result": "53 passed, 1 existing Starlette warning; includes 8 new profile cases and 14 prior DB cases."
+  },
+  "checks": [
+    "21 local-stack unittests passed.",
+    "mypy server/studio: 12 source files passed.",
+    "Ruff check and format for runtime, new migration and profile tests passed (14 files formatted).",
+    "git diff --check passed."
+  ],
+  "manual_checks": {
+    "command": "Guarded local_stack.py test -- uv run --locked python (inline SQLAlchemy/Alembic verification)",
+    "target": "Verified test Supabase at loopback port 55322 only; no dev/hosted migration.",
+    "result": "provision_migration_roles(test), upgrade head twice reached 0002 against real managed auth.users. auth table OID and column signature unchanged. FK confrelid targets auth.users; product RLS enabled. migration_owner has REFERENCES(id), not SELECT on auth.users."
+  },
+  "review": {
+    "reviewer": "review_s00_03",
+    "result": "No blocking findings. Code/contracts only; writer ran DB suites."
+  },
+  "push_status": "pending_at_commit",
+  "remote_ci": "pending_after_push",
+  "limits": [
+    "S01-05 adds allowed runtime profile policies/column grants. In 0002 all runtime profile access remains denied.",
+    "No login/OAuth/provision endpoint or profile editing command introduced. IANA timezone input validation and updated_at/row_version update behavior belong to consuming commands.",
+    "Working-tree roadmap validation remains blocked by user's pre-existing deleted docs. CI checks committed tree after push."
+  ]
+}

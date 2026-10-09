@@ -339,6 +339,8 @@ ALTER ROLE {role} {login} NOSUPERUSER NOCREATEDB NOCREATEROLE
         statements.extend([
             f"ALTER ROLE migration_owner PASSWORD '{password}';",
             "GRANT CONNECT, CREATE ON DATABASE postgres TO migration_owner;",
+            "GRANT USAGE ON SCHEMA auth TO migration_owner;",
+            "GRANT REFERENCES (id) ON auth.users TO migration_owner;",
             "GRANT studio_web, studio_auth_runtime, studio_worker TO migration_owner WITH INHERIT FALSE;",
             "COMMIT;",
         ])

@@ -73,8 +73,8 @@ def configuration(connection=None):
 def test_upgrade_empty_database(connection):
     assert connection.scalar(text("SELECT to_regnamespace('studio')")) is None
     managed = connection.execute(text("SELECT oid FROM pg_namespace WHERE nspname IN ('auth', 'storage', 'realtime') ORDER BY oid")).all()
-    command.upgrade(configuration(connection), "head")
-    command.upgrade(configuration(connection), "head")
+    command.upgrade(configuration(connection), "0001")
+    command.upgrade(configuration(connection), "0001")
     assert connection.scalar(text("SELECT version_num FROM studio.alembic_version")) == "0001"
     assert connection.execute(text("SELECT nspname, pg_get_userbyid(nspowner) FROM pg_namespace WHERE nspname IN ('studio', 'studio_private') ORDER BY nspname")).all() == [("studio", "migration_owner"), ("studio_private", "migration_owner")]
     assert connection.execute(text("SELECT oid FROM pg_namespace WHERE nspname IN ('auth', 'storage', 'realtime') ORDER BY oid")).all() == managed
@@ -82,7 +82,7 @@ def test_upgrade_empty_database(connection):
 
 
 def test_owner_not_runtime(connection):
-    command.upgrade(configuration(connection), "head")
+    command.upgrade(configuration(connection), "0001")
     assert connection.execute(text(
         "SELECT rolsuper, rolcreatedb, rolcreaterole, rolbypassrls, rolcanlogin "
         "FROM pg_roles WHERE rolname = 'migration_owner'"
@@ -117,14 +117,14 @@ def test_owner_not_runtime(connection):
 
 
 def test_no_managed_autogenerate(connection):
-    command.upgrade(configuration(connection), "head")
-    from studio.db import Base, include_migration_name
+    command.upgrade(configuration(connection), "0001")
+    from studio.db import include_migration_name
 
     context = MigrationContext.configure(connection, opts={
         "include_schemas": True, "include_name": include_migration_name,
         "version_table_schema": "studio",
     })
-    assert compare_metadata(context, Base.metadata) == []
+    assert compare_metadata(context, MetaData()) == []
     metadata = MetaData()
     for schema in ("studio", "studio_private"):
         Table("new_product_table", metadata, Column("id", Integer, primary_key=True), schema=schema)
@@ -134,7 +134,7 @@ def test_no_managed_autogenerate(connection):
 
 def test_upgrade_rolls_back_midway(engine):
     with pytest.raises(RuntimeError, match="abort after DDL"), engine.begin() as connection:
-        command.upgrade(configuration(connection), "head")
+        command.upgrade(configuration(connection), "0001")
         raise RuntimeError("abort after DDL")
     with engine.connect() as connection:
         assert connection.scalar(text("SELECT to_regnamespace('studio')")) is None
@@ -142,7 +142,7 @@ def test_upgrade_rolls_back_midway(engine):
 
 
 def test_downgrade_requires_forward_repair(connection):
-    command.upgrade(configuration(connection), "head")
+    command.upgrade(configuration(connection), "0001")
     with pytest.raises(RuntimeError, match="forward repair"):
         command.downgrade(configuration(connection), "base")
     assert connection.scalar(text("SELECT version_num FROM studio.alembic_version")) == "0001"
@@ -154,7 +154,7 @@ def test_concurrent_upgrade_serializes(engine):
             "STUDIO_MIGRATION_DATABASE_URL": engine.url.render_as_string(hide_password=False)
         }
         result = subprocess.run(
-            [sys.executable, "-m", "alembic", "-c", str(ROOT / "alembic.ini"), "upgrade", "head"],
+            [sys.executable, "-m", "alembic", "-c", str(ROOT / "alembic.ini"), "upgrade", "0001"],
             cwd=ROOT, env=environment, capture_output=True, text=True, check=False, timeout=120,
         )
         assert result.returncode == 0, "Concurrent Alembic command failed"
