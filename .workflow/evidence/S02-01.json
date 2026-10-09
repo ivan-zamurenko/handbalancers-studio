@@ -1,0 +1,34 @@
+{
+  "task_id": "S02-01",
+  "status": "done",
+  "branch": "task/execution-v4",
+  "base_sha": "6190c78ebf80f6082ae735fb90dcdea31111d734",
+  "red": {
+    "command": "node --test tests/js/s02-01-design-tokens.test.js",
+    "exit_code": 1,
+    "result": "7 expected assertion failures: absent palettes/system font/template; browser computed body background transparent instead of approved colors."
+  },
+  "green": {
+    "command": "node --test tests/js/s02-01-design-tokens.test.js",
+    "exit_code": 0,
+    "result": "7 passed; real Chromium computed styles/focus/overflow, light/dark at 390/1440."
+  },
+  "checks": [
+    "node --test tests/js/*.test.js: 21 passed.",
+    "Visually inspected four local Chromium screenshots in .local-tools/s02-01; approved typography, monochrome buttons and semantic green, wrapping UA/EN text without horizontal overflow."
+  ],
+  "review": {
+    "reviewer": "review_s02_01",
+    "result": "No blocking findings; CI browser installation precedes JS tests."
+  },
+  "scope_deviations": [
+    "Updated prior S01-07 evidence/checkpoint with actual successful push/CI outcome."
+  ],
+  "limits": [
+    "Browser fixture verifies CSS only, not Jinja rendering or served product routes; page integration and theme controller are later cards.",
+    "C1/A1/C3 screen layouts not implemented by this foundation card.",
+    "User-deleted docs and untracked Copilot files untouched; working-tree roadmap validate remains blocked by missing docs."
+  ],
+  "push_status": "pending_at_commit",
+  "remote_ci": "pending_after_push"
+}

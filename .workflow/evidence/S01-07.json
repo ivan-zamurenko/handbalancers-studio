@@ -26,7 +26,8 @@
     "12 tooling tests (7 S01-07 + 5 S00-07) passed.",
     "Ruff check/format passed for checker/tests.",
     "MYPYPATH=server uv run --locked mypy --explicit-package-bases tools/check_migrations.py passed.",
-    "Actual local --fresh on previously migrated test DB exited1 before mutation: product schemas present; no reset performed."
+    "Actual local --fresh on previously migrated test DB exited1 before mutation: product schemas present; no reset performed.",
+    "GitHub clean Supabase fresh upgrade, managed-schema preservation, ORM parity and DB isolation job passed."
   ],
   "action_provenance": {
     "supabase/setup-cli": "v3.0.1, refs/tags/v3.0.1 resolved through GitHub API to commit45a513f8c64c0bc8e0e3dfe572b5c95be85f6359; action.yml reviewed at that tag",
@@ -41,10 +42,12 @@
     "resolved": "DB suites execute separately, each empty collection/nonzero aborts gate; separate negative test verifies second-suite exit5."
   },
   "limits": [
-    "Tooling unit mocks cover only subprocess/guard orchestration; DB/RLS evidence comes from actual local DB suites and pending fresh GitHub run.",
-    "Local main test database was not reset; actual pristine managed-Supabase --fresh acceptance is pending remote CI.",
     "User docs deletions/Copilot additions untouched; working-tree roadmap validation still blocked by those missing docs."
   ],
-  "push_status": "pending_at_commit",
-  "remote_ci": "pending_after_push"
+  "push_status": "pushed",
+  "remote_ci": {
+    "status": "success",
+    "sha": "6190c78ebf80f6082ae735fb90dcdea31111d734",
+    "url": "https://github.com/ivan-zamurenko/handbalancers-studio/actions/runs/37938338735"
+  }
 }
