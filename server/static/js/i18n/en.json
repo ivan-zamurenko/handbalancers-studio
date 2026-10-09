@@ -1,0 +1,11 @@
+{
+  "common.cancel": "Cancel",
+  "common.close": "Close",
+  "common.error": "Something went wrong",
+  "common.loading": "Loading",
+  "common.retry": "Try again",
+  "common.save": "Save",
+  "language.label": "Language",
+  "language.english": "English",
+  "language.ukrainian": "Ukrainian"
+}

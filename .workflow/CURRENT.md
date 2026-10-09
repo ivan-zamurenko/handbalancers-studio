@@ -6,6 +6,8 @@ S02-02 завершено локально: доступні Jinja form/error/bu
 async pending/error recovery і компонентні стилі. База: c99f1629dbb91e5487b1a2cb0c09b56f29b37829.
 S02-03 завершено локально: auto/light/dark controller з device clock, workout hold,
 manual override і early boot. База: e57a0352b5fc968d858608efbf4eb81b2eb0d994.
+S02-04 завершено локально: спільні UK/EN dictionaries, locale fallback, language
+partial та Intl number/date formatting. База: a46a61f67630f39be3b12066a3659d7cc42e3f9c.
 Гілка task/execution-v4; origin ivan-zamurenko/handbalancers-studio.
 База комміту: 6190c78ebf80f6082ae735fb90dcdea31111d734 — S01-07 pushed,
 fresh Supabase GitHub CI GREEN (run 37938338735).
@@ -13,6 +15,13 @@ S02-01 push/remote CI перевіряються після комміту.
 
 ## Перевірено
 
+- S02-04 RED: missing `studio.shared.i18n` та missing `format.js` imports.
+- S02-04 GREEN: Python localization tests 4 passed; Intl tests 2 passed; full JS
+  suite 29 passed; Ruff, scoped mypy та editor diagnostics чисті.
+- UK/EN parity/non-empty keys, unknown-locale fallback, business payload isolation,
+  escaped language links і selected locale перевірено.
+- Evidence: `.workflow/evidence/S02-04.json`. Сторінки ще не інтегрували locale
+  resolver; account preference sync та URL propagation залишаються майбутніми.
 - S02-03 RED: controller import `ERR_MODULE_NOT_FOUND` до реалізації.
 - S02-03 GREEN: focused theme tests 6 passed; full JS suite 27 passed з локальним
   Chromium cache; JavaScript syntax та editor diagnostics чисті.
@@ -43,7 +52,7 @@ S02-01 push/remote CI перевіряються після комміту.
 
 ## Наступний крок
 
-S02-04: localization. Прочитати картку через `python tools/roadmap.py next`.
+S02-05: HTTP client. Прочитати картку через `python tools/roadmap.py next`.
 S02-01 не реалізує сторінки C1/A1/C3 або controller тем; base має dark fallback
 референсу, майбутній controller задаватиме фактичну тему/auto.
 HTTP static/templates integration додати при першій сторінці, без fake/demo routes.

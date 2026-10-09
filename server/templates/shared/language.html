@@ -1,0 +1,6 @@
+{% macro language_switch(locale, ukrainian_url, english_url) %}
+  <nav class="language-switch" aria-label="{{ 'Мова' if locale == 'uk' else 'Language' }}">
+    <a href="{{ ukrainian_url }}" lang="uk" hreflang="uk"{% if locale == 'uk' %} aria-current="page"{% endif %}>Українська</a>
+    <a href="{{ english_url }}" lang="en" hreflang="en"{% if locale == 'en' %} aria-current="page"{% endif %}>English</a>
+  </nav>
+{% endmacro %}

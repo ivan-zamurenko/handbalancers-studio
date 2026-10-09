@@ -1,0 +1,67 @@
+{
+  "task_id": "S02-04",
+  "status": "done",
+  "branch": "task/execution-v4",
+  "base_sha": "a46a61f67630f39be3b12066a3659d7cc42e3f9c",
+  "changed_paths": [
+    "server/studio/shared/i18n.py",
+    "server/static/js/i18n/uk.json",
+    "server/static/js/i18n/en.json",
+    "server/static/js/i18n/format.js",
+    "server/templates/shared/language.html",
+    "server/tests/unit/ui/test_localization.py",
+    "tests/js/s02-04-i18n-format.test.js",
+    ".workflow/CURRENT.md",
+    ".workflow/state.json",
+    ".workflow/evidence/S02-04.json"
+  ],
+  "scope_deviations": [
+    "server/static/js/i18n/format.js and tests/js/s02-04-i18n-format.test.js: the card explicitly requires Intl number/date formatting, which belongs in browser JavaScript; Python locale APIs are process-global and are not an appropriate substitute."
+  ],
+  "scenario": "Shared UK/EN locale catalog and language partial, Ukrainian default/fallback, and display translation isolated from plan/status/API values.",
+  "red": {
+    "command": ".local-tools/uv-env/bin/uv run --locked pytest server/tests/unit/ui/test_localization.py -q",
+    "exit_code": 2,
+    "result": "Collection failed with ModuleNotFoundError: studio.shared.i18n; the requested resolver was absent. A separate pinned-Node test also failed to import the not-yet-created format.js."
+  },
+  "green": {
+    "command": ".local-tools/uv-env/bin/uv run --locked pytest server/tests/unit/ui/test_localization.py -q",
+    "exit_code": 0,
+    "result": "4 passed: UK/EN key parity and non-empty values, unsupported-locale fallback, business payload unchanged by translation, and rendered language links/current locale."
+  },
+  "checks": [
+    {
+      "command": ".local-tools/node/bin/node --test tests/js/s02-04-i18n-format.test.js",
+      "exit_code": 0,
+      "result": "2 passed: Intl number/date formatting for UK/EN and unsupported-locale fallback."
+    },
+    {
+      "command": "PLAYWRIGHT_BROWSERS_PATH=$PWD/.local-tools/playwright-browsers node --test tests/js/*.test.js",
+      "exit_code": 0,
+      "result": "29 passed, including browser-backed design token tests."
+    },
+    {
+      "command": ".local-tools/uv-env/bin/uv run --locked ruff check server/studio/shared/i18n.py server/tests/unit/ui/test_localization.py",
+      "exit_code": 0,
+      "result": "All checks passed."
+    },
+    {
+      "command": ".local-tools/uv-env/bin/uv run --locked mypy --explicit-package-bases server/studio/shared/i18n.py",
+      "exit_code": 0,
+      "result": "Success: no issues found in 1 source file."
+    },
+    {
+      "command": "VS Code diagnostics for touched Python/JS/Jinja files",
+      "exit_code": 0,
+      "result": "No errors found."
+    }
+  ],
+  "environment_notes": [
+    "The task shell did not include uv on PATH; reran with the repository-pinned .local-tools/uv-env/bin/uv. The first generic node command resolved system Node 20; the actual RED and GREEN runs used pinned Node 24.21.0."
+  ],
+  "unverified": [
+    "No product routes call the resolver or render the language switch yet; this card provides shared primitives for later pages.",
+    "Persisting authenticated account locale and propagating language URLs are responsibilities of future page/session integration."
+  ],
+  "push_status": "pending_at_commit"
+}
