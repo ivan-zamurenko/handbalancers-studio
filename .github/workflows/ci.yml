@@ -37,3 +37,44 @@ jobs:
         run: python tools/checks.py
       - name: Verify lockfiles remained unchanged
         run: git diff --exit-code -- uv.lock package-lock.json
+
+  database:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version-file: .python-version
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.12.23"
+          enable-cache: false
+      - uses: supabase/setup-cli@45a513f8c64c0bc8e0e3dfe572b5c95be85f6359 # v3.0.1
+        with:
+          version: "2.120.0"
+      - name: Install locked Python dependencies
+        run: uv sync --locked
+      - name: Check migration tooling
+        run: |
+          uv run --locked ruff check tools/check_migrations.py
+          uv run --locked ruff format --check tools/check_migrations.py
+          MYPYPATH=server uv run --locked mypy --explicit-package-bases tools/check_migrations.py
+          uv run --locked python -m tools.check_migrations --heads-only
+      - name: Start isolated test Supabase
+        run: uv run --locked python tools/local_stack.py start test
+      - name: Provision local operator
+        run: uv run --locked python tools/local_stack.py provision-migrations test
+      - name: Check fresh upgrade and database isolation
+        run: uv run --locked python -m tools.check_migrations --fresh
+      - name: Stop only this runner's test stack
+        if: always()
+        run: |
+          if [ -f .local-tools/supabase/test/supabase/config.toml ]; then
+            uv run --locked python -c "from pathlib import Path; from tools import local_stack; p=Path('.local-tools/supabase/test').resolve(); local_stack.cli_output(['stop', '--no-backup', '--workdir', str(p)], p, local_stack.docker_environment())"
+          fi

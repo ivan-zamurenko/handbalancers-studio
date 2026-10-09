@@ -1,0 +1,50 @@
+{
+  "task_id": "S01-07",
+  "status": "done",
+  "branch": "task/execution-v4",
+  "base_sha": "04237ac0272feaa347557187ac1a2d611d7eca7c",
+  "changed_paths": [
+    ".github/workflows/ci.yml",
+    "tools/check_migrations.py",
+    "tools/tests/test_s01_07_migration_ci.py",
+    ".workflow/MIGRATION_RECOVERY.md",
+    ".workflow/evidence/S01-07.json",
+    ".workflow/state.json",
+    ".workflow/CURRENT.md"
+  ],
+  "red": {
+    "command": "uv run --locked python -m unittest tools.tests.test_s01_07_migration_ci -q",
+    "exit_code": 1,
+    "result": "6 assertion failures: migration checker and dedicated database workflow job absent."
+  },
+  "green": {
+    "command": "uv run --locked python -m tools.check_migrations",
+    "exit_code": 0,
+    "result": "Single linear head 0004; 40 real PostgreSQL integration tests + 20 security tests passed in separate processes. No DB skips/xfails allowed."
+  },
+  "checks": [
+    "12 tooling tests (7 S01-07 + 5 S00-07) passed.",
+    "Ruff check/format passed for checker/tests.",
+    "MYPYPATH=server uv run --locked mypy --explicit-package-bases tools/check_migrations.py passed.",
+    "Actual local --fresh on previously migrated test DB exited1 before mutation: product schemas present; no reset performed."
+  ],
+  "action_provenance": {
+    "supabase/setup-cli": "v3.0.1, refs/tags/v3.0.1 resolved through GitHub API to commit45a513f8c64c0bc8e0e3dfe572b5c95be85f6359; action.yml reviewed at that tag",
+    "cli": "2.120.0, exact same version as existing local-stack guard"
+  },
+  "scope_deviations": [
+    "Add .workflow/MIGRATION_RECOVERY.md for forward-fix/restore process required by card; existing irreversible migrations retain downgrade refusal."
+  ],
+  "review": {
+    "reviewer": "review_s00_03",
+    "result": "No blocking findings; independently 6 tooling tests passed before one extra empty-second-suite regression was added.",
+    "resolved": "DB suites execute separately, each empty collection/nonzero aborts gate; separate negative test verifies second-suite exit5."
+  },
+  "limits": [
+    "Tooling unit mocks cover only subprocess/guard orchestration; DB/RLS evidence comes from actual local DB suites and pending fresh GitHub run.",
+    "Local main test database was not reset; actual pristine managed-Supabase --fresh acceptance is pending remote CI.",
+    "User docs deletions/Copilot additions untouched; working-tree roadmap validation still blocked by those missing docs."
+  ],
+  "push_status": "pending_at_commit",
+  "remote_ci": "pending_after_push"
+}

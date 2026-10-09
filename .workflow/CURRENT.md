@@ -1,40 +1,32 @@
 # Поточний checkpoint
 
-S01-06 завершено: private auth storage, моделі й міграція 0004.
-База комміту: 0d406f2ae2ee8a5d12649ccf47367d4f0e68cf58 (S01-05 push/CI GREEN).
+S01-07 реалізовано локально: окремий database CI job та migration gate.
+База комміту: 04237ac0272feaa347557187ac1a2d611d7eca7c (S01-06 push/CI GREEN).
 Гілка task/execution-v4, origin ivan-zamurenko/handbalancers-studio, усе в корені.
-SHA/push/CI перевіряються після commit; evidence зберігає pending_at_commit.
+Фактичний fresh GitHub CI перевіряється після push; до того remote_ci=pending.
 
 ## Перевірено
 
-- 91 backend-тест; 18 storage cases із реальним PostgreSQL та AES-GCM.
-- Cookie/state/browser-binding — випадкові 256-bit значення, у БД лише SHA256.
-- Access/refresh/verifier — AES-256-GCM через cryptography 50.0.2; key_id/version
-  та row/owner/provider/binding/expiry context автентифіковані.
-- Explicit in-memory keyring; ключі не записуються в БД/Git. Old-key decrypt перевірено.
-- Підміна/перенесення ciphertext, revoke/expiry, wrong browser/provider, replay,
-  concurrent consume, rollback та обмежені grants перевірено.
-- Expiry tests чекають справжнього завершення TTL, без зміни ciphertext/AAD.
-- Read-only review без блокерів після цього виправлення.
-- mypy/Ruff/format/lock checks GREEN; відомий Starlette warning лишається.
-- Actual test Supabase upgrade/repeat до 0004: Auth незмінний, grants/RLS правильні.
-- Evidence: .workflow/evidence/S01-06.json.
-- Наявні user docs deletions/Copilot additions не змінено й не включено в commit;
-  локальний roadmap validate через відсутні docs не GREEN. Контракти читалися з HEAD.
+- uv run --locked python -m tools.check_migrations: single linear head 0004,
+  40 integration + 20 security DB-тестів; окремі suite processes, жодних skip/xfail.
+- 12 tooling tests; Ruff/format і mypy checker GREEN.
+- --fresh на наявному локальному test DB відмовив до змін, без reset.
+- --fresh CI вимагає порожні product schemas, existing managed auth.users,
+  upgrade/repeat, незмінні managed definitions, ORM parity та runtime grants/RLS.
+- Supabase CLI 2.120.0 через verified setup-cli v3.0.1 SHA; secrets не друкуються.
+- Cleanup лише test workdir ephemeral CI runner; ніяких dev/hosted операцій.
+- Read-only review без блокерів. Evidence: .workflow/evidence/S01-07.json.
+- Recovery: .workflow/MIGRATION_RECOVERY.md.
+- User docs deletions/Copilot additions не змінено й не staged. Через відсутні
+  docs локальний roadmap validate не GREEN; контракти прочитані з HEAD.
 
-## Межа реалізації та наступний крок
+## Наступний крок
 
-S01-07: прочитати картку перед тестами.
-TokenStore працює в caller-owned транзакції; COMMIT consume обов'язковий перед
-майбутнім external code exchange. NOWAIT не чекає чужого row lock без обмежень.
-read_session перевіряє лише local expiry/revoke, не JWT/current profile/provider.
-HTTP auth/refresh/cookie endpoints і key-loader до застосунку ще не підключені.
-Ключі передаються в TokenCipher(active_key_id, mapping_of_32_byte_keys).
-AuthAttempt user_id може бути NULL до входу; WebSession user_id — NOT NULL FK.
-Draft JSON не додавався наперед; store не приймає passwords/onboarding payload.
-Auth runtime має лише SELECT/INSERT названих private tables та UPDATE
-revoked_at/consumed_at. Ширші refresh/cleanup grants додаються з командою.
-Historical profile schema parity звужено до users; storage suite перевіряє всі head models.
+S02-01: прочитати наступну картку після підтвердження fresh CI.
+Звичайна локальна migration gate: uv run --locked python -m tools.check_migrations.
+--fresh призначено для нового test stack, не для його очищення.
+Сховище S01-06 не є повною автентифікацією; HTTP auth/provider/key-loader ще не підключено.
+External exchange можливий лише після commit consume_attempt.
 
 ## Локальний стенд
 
