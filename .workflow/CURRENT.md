@@ -1,5 +1,21 @@
 # Поточний checkpoint
 
+S01-03 завершено: command_transaction створює Session/транзакцію та задає
+studio.user_id через параметризований set_config(..., true). Actor — UUID із
+довіреної серверної автентифікації; auth ще не підключено.
+База комміту: 53e838e6d469283482b76c0364df667f0df406a3. Push/CI перевіряються після commit.
+
+45 backend-тестів GREEN, включно з 8 новими випадками справжнього RLS,
+commit/rollback, pool reuse та двома одночасними транзакціями. Ruff/format і
+mypy server/studio GREEN; read-only review без блокерів.
+Evidence: .workflow/evidence/S01-03.json.
+
+У робочому дереві до цієї задачі видалено docs/*. Ці видалення й Copilot-файли
+не змінено та не включено в комміт. Через них локальний roadmap validate падає;
+контракти прочитані з HEAD. Повний робочий checkout не оголошується GREEN.
+
+## Попередній checkpoint S01-02
+
 S01-02 завершено локально: Alembic baseline створює studio/studio_private та
 мінімальні ролі; managed auth/storage/realtime не змінюються. Проєкт у корені,
 гілка task/execution-v4; origin — ivan-zamurenko/handbalancers-studio.
@@ -32,7 +48,7 @@ S01-02 завершено локально: Alembic baseline створює stud
 
 ## Наступний крок
 
-S01-03: transaction context. Перейти лише після перевірки залежності S01-02 у checkout.
+S01-04: наступна картка roadmap; прочитати її та релевантний контракт перед тестами.
 Службовий auth лишається під керуванням Supabase, без подвійного DDL.
 Локальне середовище для DB-команд:
 
