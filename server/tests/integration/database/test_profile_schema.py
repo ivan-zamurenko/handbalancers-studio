@@ -156,6 +156,9 @@ def test_model_matches_migration(profiles):
                 "include_name": include_migration_name,
                 "version_table_schema": "studio",
                 "compare_server_default": True,
+                "include_object": lambda obj, name, kind, reflected, compared: (
+                    kind != "table" or name == "users"
+                ),
             },
         )
         assert compare_metadata(context, Base.metadata) == []

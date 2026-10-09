@@ -1,0 +1,75 @@
+{
+  "task_id": "S01-06",
+  "status": "done",
+  "base_sha": "0d406f2ae2ee8a5d12649ccf47367d4f0e68cf58",
+  "scope_deviations": [
+    "Pin cryptography dependency/uv.lock; Alembic registry imports auth models.",
+    "Narrow historical profile-schema metadata parity to users; new auth suite checks full head metadata."
+  ],
+  "design": [
+    "AES-256-GCM via cryptography; fresh 96-bit nonce; version/key_id authenticated with row/owner/field context; explicit 32-byte keys only in process keyring.",
+    "SHA256 of random 256-bit cookie/state/browser binding tokens. Mandatory browser nonce hash for attempts; nullable attempt user_id per task.",
+    "Add explicit local session expires_at in addition to upstream access expiry. No authentication claims or provider I/O.",
+    "Store owns no commit: caller wraps a single command transaction. OAuth consume must COMMIT before future external code exchange.",
+    "No onboarding_draft column/API until the first draft command; no generic JSON input that could persist a password.",
+    "User docs deletions/Copilot additions untouched; relevant requirements read from HEAD.",
+    "Private table policies scope true predicates to studio_auth_runtime only; no global private-schema/default grants. UPDATE limited to revoked_at or consumed_at; broader refresh/cleanup privileges not granted ahead of commands.",
+    "AEAD AAD also binds expiration times and session hash/upstream UUID or attempt provider/browser/state/path. Datetimes canonicalized to UTC; secret DTO fields use SecretStr.",
+    "One coherent schema/store card: most diff is executable crypto/DB negative cases and pinned dependency hashes."
+  ],
+  "branch": "task/execution-v4",
+  "changed_paths": [
+    "server/studio/auth/__init__.py",
+    "server/studio/auth/models.py",
+    "server/studio/auth/token_store.py",
+    "server/alembic/versions/0004_auth_storage.py",
+    "server/alembic/env.py",
+    "server/tests/integration/database/test_auth_storage.py",
+    "server/tests/integration/database/test_profile_schema.py",
+    "pyproject.toml",
+    "uv.lock",
+    ".workflow/CURRENT.md",
+    ".workflow/state.json",
+    ".workflow/evidence/S01-06.json"
+  ],
+  "red": {
+    "command": "uv run --locked python tools/local_stack.py test -- uv run --locked pytest server/tests/integration/database/test_auth_storage.py -q --tb=short",
+    "exit_code": 1,
+    "result": "1 failed, 15 setup assertion errors: Private token store absent. Guarded PostgreSQL fixture available; dependency installation occurred afterwards."
+  },
+  "green": {
+    "command": "uv run --locked python tools/local_stack.py test -- uv run --locked pytest server/tests/security/database server/tests/integration/database server/tests/unit server/tests/contracts -q --tb=short",
+    "exit_code": 0,
+    "result": "91 passed including 18 auth storage cases; one existing Starlette warning."
+  },
+  "checks": [
+    "mypy server/studio tools/checks.py: 16 source files passed.",
+    "Ruff check/format: runtime plus new migration/test passed (17 files).",
+    "uv lock --check: 41 packages, passed.",
+    "git diff --check passed."
+  ],
+  "review": {
+    "reviewer": "review_s00_03",
+    "result": "No blocking findings after expiry-test correction.",
+    "resolved_finding": "Original expiry tests changed an AEAD-bound expiration column, so tag failure could hide missing expiry guards. Replaced with original valid ciphertext plus 1-second TTL and DB-clock wait bounded by 3-second statement timeout. Both corrected scenarios passed. No weakened expectation."
+  },
+  "manual_checks": {
+    "command": "Guarded local_stack.py test -- uv run --locked python (inline SQLAlchemy/Alembic verification)",
+    "result": "Actual test Supabase upgraded twice to 0004. Auth column signature unchanged; both private tables RLS-enabled; only auth runtime SELECT/INSERT and designated column UPDATE; web/worker/anon/authenticated denied. No dev/hosted migration."
+  },
+  "dependencies": {
+    "cryptography": "50.0.2",
+    "cffi": "2.1.1",
+    "pycparser": "3.11",
+    "source": "https://cryptography.io/en/latest/hazmat/primitives/aead/",
+    "key_handling": "Only explicit in-memory 32-byte key map. Random ephemeral fixture keys; no production key generated or persisted."
+  },
+  "push_status": "pending_at_commit",
+  "remote_ci": "pending_after_push",
+  "limitations": [
+    "No HTTP cookie issuance, JWT/provider verification, OAuth exchange or refresh flow yet. Storage read is not complete authentication.",
+    "Consume returns verifier only inside caller transaction; external use must follow successful COMMIT. A rolled-back consume is available again by design.",
+    "A runtime key loader/operational key rotation procedure is not wired into the app yet; constructor supports active key ID and retained old keys.",
+    "Existing uncommitted docs deletions block local roadmap validation; Copilot files/doc deletions untouched and not staged."
+  ]
+}

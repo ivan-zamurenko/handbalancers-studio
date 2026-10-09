@@ -1,39 +1,45 @@
 # Поточний checkpoint
 
-S01-05 завершено: RLS/column grants профілю та приватна provision_member.
-База перед коммітом: 54dc897f36f7b7ae66c81a9ab66724428e49daa5 (S01-04 запушено, CI GREEN).
-Проєкт у корені, task/execution-v4; origin ivan-zamurenko/handbalancers-studio.
+S01-06 завершено: private auth storage, моделі й міграція 0004.
+База комміту: 0d406f2ae2ee8a5d12649ccf47367d4f0e68cf58 (S01-05 push/CI GREEN).
+Гілка task/execution-v4, origin ivan-zamurenko/handbalancers-studio, усе в корені.
 SHA/push/CI перевіряються після commit; evidence зберігає pending_at_commit.
 
 ## Перевірено
 
-- 73 backend-тести, включно з 20 security cases; Ruff/format/mypy GREEN.
-- studio_web читає лише свій active profile, зокрема coach не отримує загальний доступ.
-- UPDATE лише first_name/last_name/locale/timezone; чужі рядки й inactive недоступні.
-- id/auth_user_id/role/is_active/system columns, INSERT/DELETE/TRUNCATE закриті.
-- anon/authenticated не мають schema/table/function доступу.
-- studio_auth_runtime має лише EXECUTE provision_member, без прямих table grants.
-- Provision завжди створює member, ігнорує metadata; repeat не змінює існуючий профіль.
-- Concurrent provision/edits, rollback, temp-table/search_path атака перевірені.
-- 0003 upgrade/repeat на справжньому test Supabase: auth schema незмінна, grants правильні.
-- Read-only review без блокерів. RED/GREEN: .workflow/evidence/S01-05.json.
-- User docs deletions/Copilot additions недоторкані й поза коммітом. Локальний
-  roadmap validate через відсутні docs не GREEN; контракти прочитані з HEAD.
+- 91 backend-тест; 18 storage cases із реальним PostgreSQL та AES-GCM.
+- Cookie/state/browser-binding — випадкові 256-bit значення, у БД лише SHA256.
+- Access/refresh/verifier — AES-256-GCM через cryptography 50.0.2; key_id/version
+  та row/owner/provider/binding/expiry context автентифіковані.
+- Explicit in-memory keyring; ключі не записуються в БД/Git. Old-key decrypt перевірено.
+- Підміна/перенесення ciphertext, revoke/expiry, wrong browser/provider, replay,
+  concurrent consume, rollback та обмежені grants перевірено.
+- Expiry tests чекають справжнього завершення TTL, без зміни ciphertext/AAD.
+- Read-only review без блокерів після цього виправлення.
+- mypy/Ruff/format/lock checks GREEN; відомий Starlette warning лишається.
+- Actual test Supabase upgrade/repeat до 0004: Auth незмінний, grants/RLS правильні.
+- Evidence: .workflow/evidence/S01-06.json.
+- Наявні user docs deletions/Copilot additions не змінено й не включено в commit;
+  локальний roadmap validate через відсутні docs не GREEN. Контракти читалися з HEAD.
 
-## Наступний крок
+## Межа реалізації та наступний крок
 
-S01-06 — прочитати картку roadmap перед тестами.
-Підтвердження provider identity є передумовою приватного provision; auth service
-впроваджується в S03-04, HTTP auth зараз не підключено.
-Provision SECURITY DEFINER належить non-superuser migration_owner, має fixed
-search_path та schema-qualified SQL. GUC actor надходить лише з trusted backend.
-Timestamp/version editing та IANA timezone validation ще не реалізовані.
-Baseline/profile-schema suites закріплені за 0001/0002; security suite тестує head.
+S01-07: прочитати картку перед тестами.
+TokenStore працює в caller-owned транзакції; COMMIT consume обов'язковий перед
+майбутнім external code exchange. NOWAIT не чекає чужого row lock без обмежень.
+read_session перевіряє лише local expiry/revoke, не JWT/current profile/provider.
+HTTP auth/refresh/cookie endpoints і key-loader до застосунку ще не підключені.
+Ключі передаються в TokenCipher(active_key_id, mapping_of_32_byte_keys).
+AuthAttempt user_id може бути NULL до входу; WebSession user_id — NOT NULL FK.
+Draft JSON не додавався наперед; store не приймає passwords/onboarding payload.
+Auth runtime має лише SELECT/INSERT названих private tables та UPDATE
+revoked_at/consumed_at. Ширші refresh/cleanup grants додаються з командою.
+Historical profile schema parity звужено до users; storage suite перевіряє всі head models.
 
 ## Локальний стенд
 
 Docker server у Colima studio-s01; окремі dev/test Supabase profiles та credentials.
-Test PostgreSQL 127.0.0.1:55322, HTTP 55321. Реальний test DB вже має revision 0003.
+Test PostgreSQL 127.0.0.1:55322, HTTP 55321. Реальний test DB вже має revision 0004.
 Managed Auth лишається під керуванням Supabase; Alembic лише studio/studio_private.
 
     export PATH="$PWD/.local-tools/uv-env/bin:$PWD/.local-tools/supabase-cli/node_modules/.bin:/opt/homebrew/bin:$PATH"
