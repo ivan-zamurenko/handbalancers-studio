@@ -1,0 +1,72 @@
+{
+  "task_id": "S02-02",
+  "status": "done",
+  "branch": "task/execution-v4",
+  "base_sha": "c99f1629dbb91e5487b1a2cb0c09b56f29b37829",
+  "changed_paths": [
+    "pyproject.toml",
+    "uv.lock",
+    "server/templates/shared/base.html",
+    "server/templates/shared/forms.html",
+    "server/static/css/components.css",
+    "server/static/js/components/forms.js",
+    "server/static/js/components/dialog.js",
+    "tests/e2e/s02-02-form-primitives.spec.js",
+    ".workflow/CURRENT.md",
+    ".workflow/state.json",
+    ".workflow/evidence/S02-02.json"
+  ],
+  "scope_deviations": [
+    "server/static/js/components/forms.js: submit_pending requires an async form handler so failures can restore the control; it remains a small module separate from the dialog controller.",
+    "server/templates/shared/base.html: include the new component stylesheet and ES modules in the shared shell; no demo or product route is added.",
+    "pyproject.toml and uv.lock: pin Jinja2, required to render the card's actual Jinja macros; it was absent from the runtime dependency set."
+  ],
+  "scenario": "Render the shared Jinja primitives and verify field-label/error associations, native modal keyboard/focus behavior, and repeat-submit blocking with pending recovery after an HTTP error.",
+  "red": {
+    "command": "npx playwright test tests/e2e/s02-02-form-primitives.spec.js",
+    "exit_code": 1,
+    "result": "3 failures before implementation: Jinja TemplateNotFound for shared/forms.html. This is the expected absent-component behavior. The card's --project=chromium option was separately rejected because playwright.config.js has no named projects; the configured default browser is Chromium."
+  },
+  "green": {
+    "command": "npx playwright test tests/e2e/s02-02-form-primitives.spec.js",
+    "exit_code": 0,
+    "result": "4 passed in Chromium. Verifies field label/hint/error and error-summary linkage, modal Tab wrapping/Escape/focus restore, duplicate submit blocking and error recovery after 503, and no horizontal overflow at 390/1440 in light/dark themes."
+  },
+  "checks": [
+    {
+      "command": "npx playwright test",
+      "exit_code": 0,
+      "result": "7 passed, including all S02-02 cases and existing health/context-isolation browser tests."
+    },
+    {
+      "command": "node --test tests/js/*.test.js",
+      "exit_code": 0,
+      "result": "21 passed."
+    },
+    {
+      "command": "uv lock --check",
+      "exit_code": 0,
+      "result": "Resolved 42 packages; lockfile is synchronized."
+    },
+    {
+      "command": "node --check server/static/js/components/forms.js && node --check server/static/js/components/dialog.js && node --check tests/e2e/s02-02-form-primitives.spec.js",
+      "exit_code": 0,
+      "result": "All three JavaScript files parsed successfully."
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "result": "No whitespace errors in reviewed changes."
+    }
+  ],
+  "test_corrections": [
+    "The field initially had both hint and error descriptions; the assertion now verifies both referenced IDs and hint/error text rather than requiring one exact ID.",
+    "The dialog's built-in Close button is the first tabbable control; the focus-cycle assertion accounts for it while still verifying wrap and containment.",
+    "The pending button changes its accessible name from Save to Submitting; the test now uses a stable type=submit locator and separately verifies both labels."
+  ],
+  "unverified": [
+    "No product page or static-file mount exists yet. E2E renders the actual Jinja macros and injects the actual component assets; serving them from a future page remains outside this card.",
+    "The full Python suite was not run; this card's acceptance and affected UI/browser suites passed."
+  ],
+  "push_status": "pending_at_commit"
+}

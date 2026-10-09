@@ -6,10 +6,13 @@
   <title>{% block title %}Handbalancer’s Studio{% endblock %}</title>
   <link rel="stylesheet" href="/static/css/tokens.css">
   <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/components.css">
   {% block head %}{% endblock %}
 </head>
 <body>
   {% block content %}{% endblock %}
+  <script type="module" src="/static/js/components/forms.js"></script>
+  <script type="module" src="/static/js/components/dialog.js"></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>
