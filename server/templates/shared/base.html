@@ -1,9 +1,10 @@
 <!doctype html>
-<html lang="{{ language | default('uk') }}" data-theme="{{ theme | default('dark') }}">
+<html lang="{{ language | default('uk') }}" data-theme="{{ theme | default('dark') }}" data-theme-storage-key="{{ theme_storage_key | default('studio:theme:guest') }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Handbalancer’s Studio{% endblock %}</title>
+  <script src="/static/js/theme-boot.js" nonce="{{ csp_nonce | default('') }}"></script>
   <link rel="stylesheet" href="/static/css/tokens.css">
   <link rel="stylesheet" href="/static/css/base.css">
   <link rel="stylesheet" href="/static/css/components.css">
@@ -13,6 +14,7 @@
   {% block content %}{% endblock %}
   <script type="module" src="/static/js/components/forms.js"></script>
   <script type="module" src="/static/js/components/dialog.js"></script>
+  <script type="module" src="/static/js/state/theme.js"></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

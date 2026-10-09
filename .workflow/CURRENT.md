@@ -4,6 +4,8 @@ S02-01 реалізовано: затверджені C1/A1/C3 tokens, базо�
 системний шрифт, монохромні primary buttons і спільний Jinja base template.
 S02-02 завершено локально: доступні Jinja form/error/button macros, native dialog,
 async pending/error recovery і компонентні стилі. База: c99f1629dbb91e5487b1a2cb0c09b56f29b37829.
+S02-03 завершено локально: auto/light/dark controller з device clock, workout hold,
+manual override і early boot. База: e57a0352b5fc968d858608efbf4eb81b2eb0d994.
 Гілка task/execution-v4; origin ivan-zamurenko/handbalancers-studio.
 База комміту: 6190c78ebf80f6082ae735fb90dcdea31111d734 — S01-07 pushed,
 fresh Supabase GitHub CI GREEN (run 37938338735).
@@ -11,6 +13,14 @@ S02-01 push/remote CI перевіряються після комміту.
 
 ## Перевірено
 
+- S02-03 RED: controller import `ERR_MODULE_NOT_FOUND` до реалізації.
+- S02-03 GREEN: focused theme tests 6 passed; full JS suite 27 passed з локальним
+  Chromium cache; JavaScript syntax та editor diagnostics чисті.
+- Auto межі 07:00–20:00, manual override (включно з OS change), storage failure,
+  workout deferral, visibility/reload і незмінений form value перевірено.
+- Boot script перед CSS; template передає CSP nonce. Сам nonce/CSP middleware ще не
+  генерується застосунком; account preference та workout event producers — майбутні.
+- Evidence: `.workflow/evidence/S02-03.json`.
 - S02-02 RED: 3 expected `TemplateNotFound: shared/forms.html` failures.
 - S02-02 GREEN: focused Playwright 4 passed; full e2e 7 passed; JS suite 21 passed.
 - Verified label/error and summary links, modal Tab wrap/Escape/focus restore, repeat
@@ -33,7 +43,7 @@ S02-01 push/remote CI перевіряються після комміту.
 
 ## Наступний крок
 
-S02-03: theme clock. Прочитати картку через `python tools/roadmap.py next`.
+S02-04: localization. Прочитати картку через `python tools/roadmap.py next`.
 S02-01 не реалізує сторінки C1/A1/C3 або controller тем; base має dark fallback
 референсу, майбутній controller задаватиме фактичну тему/auto.
 HTTP static/templates integration додати при першій сторінці, без fake/demo routes.
