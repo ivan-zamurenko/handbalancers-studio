@@ -1,0 +1,27 @@
+{
+  "task_id": "S03-03",
+  "status": "done",
+  "branch": "task/execution-v4",
+  "base_sha": "02b0f583b134b0a2b9523978800284cbc3e11f42",
+  "red": {
+    "command": "uv run --locked pytest server/tests/contracts/auth/test_signup_request.py -q",
+    "result": "10 failures: route absent, HTTP404."
+  },
+  "green": {
+    "command": "uv run --locked pytest server/tests/contracts/auth/test_signup_request.py -q",
+    "result": "10passed; ruff/scoped mypy passed."
+  },
+  "review": "Independent read-only reviewer:10passed, no blockers.",
+  "scope_deviations": [
+    "main router registry; gateway recognizes existing-email codes without exposing upstream text."
+  ],
+  "decisions": [
+    "Password engineering default8..256 chars; name1..100; email max254 and basic shape. Upstream remains final password policy authority.",
+    "Exact configured Origin required before signup; full CSRF protocol S03-09."
+  ],
+  "limits": [
+    "No DB dependency in signup; no authenticated cookies/profile writes. Provider creates pending managed auth identity.",
+    "Actual gateway wiring and local Supabase verification remain S03-11; unconfigured route fails503."
+  ],
+  "push_status": "pending_at_commit"
+}

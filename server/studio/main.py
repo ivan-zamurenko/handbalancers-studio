@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException
 
+from studio.auth.routes import router as auth_router
 from studio.health import liveness
 from studio.settings import Settings, load_settings
 from studio.shared.http import RequestContextMiddleware, http_error, validation_error
@@ -21,4 +22,5 @@ def create_app(settings: Settings | Mapping[str, object] | None = None) -> FastA
     app.add_exception_handler(RequestValidationError, validation_error)
     app.add_exception_handler(HTTPException, http_error)
     app.add_api_route("/health/live", liveness, methods=["GET"])
+    app.include_router(auth_router)
     return app

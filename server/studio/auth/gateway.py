@@ -5,6 +5,7 @@ from studio.auth.supabase_adapter import SupabaseAuthAdapter, SupabaseAuthError
 
 
 class AuthFailureKind(StrEnum):
+    ACCOUNT_EXISTS = "account_exists"
     TIMEOUT = "timeout"
     INVALID_CREDENTIALS = "invalid_credentials"
     RATE_LIMIT = "rate_limit"
@@ -14,6 +15,7 @@ class AuthFailureKind(StrEnum):
 
 class AuthFailure(Exception):
     _messages: ClassVar[dict[AuthFailureKind, str]] = {
+        AuthFailureKind.ACCOUNT_EXISTS: "Authentication request cannot create an identity",
         AuthFailureKind.TIMEOUT: "Authentication provider timed out",
         AuthFailureKind.INVALID_CREDENTIALS: "Authentication credentials were rejected",
         AuthFailureKind.RATE_LIMIT: "Authentication provider rate limited the request",
@@ -27,6 +29,8 @@ class AuthFailure(Exception):
 
 
 def _classify(error: SupabaseAuthError) -> AuthFailureKind:
+    if error.code in {"user_already_exists", "email_exists"}:
+        return AuthFailureKind.ACCOUNT_EXISTS
     if error.transport_kind == "timeout":
         return AuthFailureKind.TIMEOUT
     if error.status == 429 or error.code in {"over_request_rate_limit", "too_many_requests"}:
