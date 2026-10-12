@@ -1,0 +1,29 @@
+<section class="plans-section wrap" id="plans" aria-labelledby="plans-title">
+  <div class="section-heading centered">
+    <p class="eyebrow">{{ copy('Увага, яку можна відчути.', 'Attention you can feel.') }}</p>
+    {% set heading = 'h1' if page_path == '/plans' else 'h2' %}
+    <{{ heading }} id="plans-title">{{ copy('Ваші цілі. Моя увага.', 'Your goals. My attention.') }}</{{ heading }}>
+  </div>
+  <p class="availability-note" data-availability>{{ copy('Студія готується до відкриття. Реєстрація й оплата ще недоступні. AI-аналіз ще недоступний; опис пакетів показує запланований формат супроводу.', 'The studio is getting ready to open. Registration and payments are not available yet. AI analysis is not available; the plans describe the intended support.') }}</p>
+  <fieldset class="plans-grid">
+    <legend class="sr-only">{{ copy('Оберіть пакет', 'Choose a plan') }}</legend>
+    {% for id, name, amount, uk_description, en_description, uk_features, en_features in plans %}
+    <label class="plan-card" data-plan="{{ id }}" data-price-minor="{{ amount }}">
+      <input type="radio" name="plan" value="{{ id }}" aria-label="{{ name }}" {% if id == 'plus' %}checked{% endif %}>
+      <span class="plan-top"><span class="plan-name">{{ name }}</span>{% if id == 'plus' %}<span class="badge">{{ copy('Рекомендовано', 'Recommended') }}</span>{% endif %}</span>
+      <span class="plan-description">{{ copy(uk_description, en_description) }}</span>
+      <span class="price">{{ ('%.2f' % (amount / 100)).replace('.', ',') if language == 'uk' else '%.2f' % (amount / 100) }}<span class="currency"> €</span></span>
+      <span class="billing-period">{{ copy('/ місяць', '/ month') }}</span>
+      <span class="trial-label">{% if id in ('essential', 'plus') %}{{ copy('7 днів пробного періоду', '7-day trial') }}{% else %}{{ copy('Без пробного періоду', 'No trial period') }}{% endif %}</span>
+      <span class="plan-features">{% for feature in (uk_features if language == 'uk' else en_features) %}<span><span class="checkmark" aria-hidden="true">✓</span>{{ feature }}</span>{% endfor %}</span>
+      <span class="plan-choice" aria-hidden="true">{{ copy('Обрати пакет', 'Choose plan') }} <span>↗</span></span>
+    </label>
+    {% endfor %}
+  </fieldset>
+  <p id="trial-terms" class="trial-terms">{{ copy('Після відкриття: 7 днів пробного періоду для Essential і Plus. Потрібна картка; після 7 днів автоматично списується 19,99 € або 49,99 € на місяць відповідно. Пробний період — один раз на акаунт. Pro та Pro+ — без пробного періоду.', 'After launch: a 7-day trial for Essential and Plus. A card is required; after 7 days, €19.99 or €49.99 is charged automatically each month respectively. One trial per account. Pro and Pro+ have no trial.') }}</p>
+  <div class="plan-action">
+    <button class="primary continue-plan" disabled type="button" data-dialog-open="availability-dialog" data-continue-plan>{{ copy('Продовжити з Plus', 'Continue with Plus') }}</button>
+    <p class="muted storage-status" data-storage-status aria-live="polite"></p>
+    <noscript><p>{{ copy('Увімкніть JavaScript, щоб зберегти вибір пакета. Реєстрація й оплата ще не відкриті.', 'Enable JavaScript to save your plan choice. Registration and payments are not open yet.') }}</p></noscript>
+  </div>
+</section>

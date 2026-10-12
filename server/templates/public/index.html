@@ -1,0 +1,42 @@
+{% extends "public/base.html" %}
+{% block title %}Handbalancer’s Studio — {{ copy('Рухатися вільніше.', 'Move more freely.') }}{% endblock %}
+{% block public_content %}
+<section class="hero wrap" aria-labelledby="hero-title">
+  <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span>{{ copy('Ваше тіло. Нові можливості.', 'Your body. New possibilities.') }}</p>
+  <h1 id="hero-title">{{ copy('Рухатися вільніше.', 'Move more freely.') }}<br><span>{{ copy('Почуватися краще.', 'Feel better.') }}</span></h1>
+  <div class="hero-bottom"><p class="hero-description">{{ copy('Опанувати стійку, стати гнучкішими чи перемкнутися після роботи. Почніть із того, що потрібно саме вам.', 'Learn to handstand, become more flexible or reset after work. Start with what you need most.') }}</p>
+    <a class="btn primary" href="#directions">{{ copy('Знайти свій напрям', 'Find your direction') }} <span aria-hidden="true">↗</span></a>
+  </div>
+  <div class="hero-caption"><span>HANDBALANCER’S STUDIO</span><span>{{ copy('Баланс · Сила · Рухливість', 'Balance · Strength · Mobility') }}</span></div>
+</section>
+<section class="journey-section wrap" aria-labelledby="journey-title">
+  <div class="section-heading"><p class="eyebrow">{{ copy('Крок за кроком', 'Step by step') }}</p>
+    <h2 id="journey-title">{{ copy('Від', 'From') }} <span class="tired">{{ copy('«немає сил»', '“no energy”') }}</span><br>{{ copy('до', 'to') }} <span class="accent">{{ copy('«я це зробив!»', '“I did it!”') }}</span></h2></div>
+  <div class="journey-grid">
+    <article class="journey-card"><p class="eyebrow">{{ copy('Зараз', 'Right now') }}</p><h3>{{ copy('Знайома ситуація?', 'Sound familiar?') }}</h3><p>{{ copy('Важко прокидатися. Мало енергії. Немає сил на тренування. Прогрес стоїть, а тіло ниє після роботи.', 'Waking up feels hard. Energy is low. Training feels out of reach. Progress stalls and your body aches after work.') }}</p></article>
+    <span class="journey-arrow" aria-hidden="true">→</span>
+    <article class="journey-card"><p class="eyebrow">{{ copy('Зі студією', 'With the studio') }}</p><h3>{{ copy('Є зрозумілий шлях.', 'A clear way forward.') }}</h3><p>{{ copy('Зрозумілий старт, посильний план, відстеження прогресу та підтримка. У темпі, який підходить вам.', 'A clear starting point, a manageable plan, progress tracking and support. At a pace that works for you.') }}</p></article>
+    <span class="journey-arrow" aria-hidden="true">→</span>
+    <article class="journey-card"><p class="eyebrow">{{ copy('До чого рухаємося', 'What we work towards') }}</p><h3>{{ copy('Більше свободи руху.', 'More freedom to move.') }}</h3><p>{{ copy('Впевненість у рухах і уважніша практика. Власний поступ, крок за кроком.', 'More confidence in movement and a more mindful practice. Your own progress, step by step.') }}</p><svg class="progress-line" viewBox="0 0 240 50" aria-hidden="true"><path d="M2 45 C50 45 48 32 85 33 S138 20 155 22 S191 5 238 3"/></svg></article>
+  </div>
+</section>
+<section class="directions-section wrap" id="directions" aria-labelledby="directions-title">
+  <div class="section-heading"><p class="eyebrow">{{ copy('Напрями', 'Directions') }}</p><h2 id="directions-title">{{ copy('Почніть із того,', 'Start with what') }}<br>{{ copy('що потрібно вам.', 'you need.') }}</h2></div>
+  <div class="directions-grid">
+    <article class="direction-card"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="33" r="4"/><path d="M10 43h28M17 43l3-17h8l3 17M24 26V14M24 14L16 4M24 14L32 4"/></svg><h3>{{ copy('Стійка на руках', 'Handstands') }}</h3><p>{{ copy('Від страху перевернутися до роботи над балансом. Розвивайте опору й контроль, щоб наближатися до самостійної стійки.', 'From the fear of going upside down to working on balance. Develop support and control as you work towards a freestanding handstand.') }}</p></article>
+    <article class="direction-card"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 24h20M8 16v16M14 12v24M34 12v24M40 16v16M8 24H4M40 24h4"/></svg><h3>{{ copy('Сила', 'Strength') }}</h3><p>{{ copy('Підніматися, утримувати себе, пробувати складніші рухи. Зміцнюйте тіло для практики й повсякденних справ.', 'Lift, support yourself and explore more challenging movements. Build strength for practice and everyday life.') }}</p></article>
+    <article class="direction-card"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="9" r="4"/><path d="M24 14v15M24 18l-9 9H6M24 18l9 9h9M24 29L10 40h28L24 29"/></svg><h3>{{ copy('Гнучкість і рухливість', 'Flexibility & mobility') }}</h3><p>{{ copy('Більше свободи в кожному русі. Розвивайте гнучкість і дбайте про здоров’я суглобів та м’язів.', 'More freedom in every movement. Develop flexibility and care for your joints and muscles.') }}</p></article>
+    <article class="direction-card"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="29" cy="8" r="4"/><path d="M27 14l-8 10 9 7-6 12M19 24l-7 14H5M25 16l8 9h10M23 17l-9-1-7 8"/></svg><h3>{{ copy('Загальна фізична форма', 'Everyday fitness') }}</h3><p>{{ copy('Зробіть паузу для себе після насиченого дня. Поєднуйте силу й рухливість для кращого самопочуття та більшої енергії щодня.', 'Take time for yourself after a busy day. Combine strength and mobility to feel better and bring more energy to your everyday life.') }}</p></article>
+  </div>
+</section>
+<section class="method-section wrap" id="method" aria-labelledby="method-title">
+  <div class="section-heading"><p class="eyebrow">{{ copy('Методика', 'The method') }}</p><h2 id="method-title">{{ copy('Спочатку — ви.', 'You come first.') }}<br>{{ copy('Потім — план.', 'Then the plan.') }}</h2></div>
+  <ol class="method-steps"><li><h3>{{ copy('Визначити напрям', 'Choose your direction') }}</h3><p>{{ copy('Що хочеться змінити? Почніть із власної мети.', 'What would you like to change? Start with your own goal.') }}</p></li><li><h3>{{ copy('Знайти точку старту', 'Find your starting point') }}</h3><p>{{ copy('Врахуйте свій досвід, можливості й час на практику.', 'Consider your experience, capacity and time for practice.') }}</p></li><li><h3>{{ copy('Рухатися крок за кроком', 'Move step by step') }}</h3><p>{{ copy('Практикуйте, відстежуйте поступ і коригуйте план.', 'Practise, track your progress and adjust your plan.') }}</p></li></ol>
+</section>
+{% include "public/plan_cards.html" %}
+<section class="equipment-section wrap" aria-labelledby="equipment-title">
+  <div class="section-heading"><p class="eyebrow">{{ copy('Спорядження для ваших занять', 'Equipment for your practice') }}</p><h2 id="equipment-title">{{ copy('Більше опори.', 'More support.') }}<br>{{ copy('Більше можливостей.', 'More possibilities.') }}</h2><p>{{ copy('Для роботи над балансом, зручної розтяжки та впевненої опори. Обирайте те, що доповнить ваші заняття.', 'For balance practice, comfortable stretching and steady support. Choose what complements your practice.') }}</p></div>
+  <div class="equipment-list"><p>{{ copy('Килимок', 'Mat') }}</p><p>{{ copy('Паралетси', 'Parallettes') }}</p><p>{{ copy('Блоки для йоги', 'Yoga blocks') }}</p></div>
+  <p class="small">{{ copy('Приклади спорядження для практики. Продаж у студії ще не відкрито.', 'Equipment ideas for practice. The studio shop is not open yet.') }}</p>
+</section>
+{% endblock %}

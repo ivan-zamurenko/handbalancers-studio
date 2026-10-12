@@ -6689,6 +6689,61 @@
       "read": [
         "docs/owner-gates.md"
       ]
+    },
+    {
+      "id": "S05-03a",
+      "stage": "05",
+      "slug": "public_preview",
+      "title": "Запустити незалежний публічний лендінг для перегляду",
+      "goal": "Локальний лендінг і тарифи з реальною навігацією, темами та збереженням вибору; без імітації auth/checkout.",
+      "module": "onboarding",
+      "kind": "e2e",
+      "depends_on": [
+        "S02-05",
+        "S03-03"
+      ],
+      "gates": [],
+      "files": [
+        "server/templates/public/index.html",
+        "server/templates/public/plans.html",
+        "server/static/js/features/public/plans.js",
+        "server/templates/public/base.html",
+        "server/templates/public/plan_cards.html",
+        "server/static/css/public.css",
+        "server/studio/public/routes.py",
+        "tools/serve_preview.py"
+      ],
+      "test_file": "tests/e2e/s05-03-public-pages.spec.js",
+      "test_cases": [
+        {
+          "name": "prices_unchanged",
+          "expected": "Essential 1999, Plus 4999, Pro 17999, Pro+ 29999 EUR minor/month."
+        },
+        {
+          "name": "trial_terms_visible",
+          "expected": "7 дней/карта/автосписание для Essential и Plus; Pro/Pro+ без trial."
+        },
+        {
+          "name": "selection_survives_reload",
+          "expected": "Явный выбранный план сохраняется; Plus default только при отсутствии выбора."
+        },
+        {
+          "name": "no_fake_claims",
+          "expected": "Нет выдуманных отзывов и работающего AI при отключённой функции."
+        }
+      ],
+      "api": "Нет нового публичного API.",
+      "db": "Нет изменения схемы.",
+      "notes": "Полный список блоков/копии в MODEL_HANDOFF исторический только там, где нет новой правки. Не добавлять удалённое «Сравнить возможности».",
+      "command": "npx playwright test tests/e2e/s05-03-public-pages.spec.js",
+      "commit": "feat(onboarding): [S05-03a] public landing preview",
+      "status": "todo",
+      "order": 135,
+      "card": "roadmap/tasks/S05-03a_public_preview.md",
+      "read": [
+        "docs/contracts.md",
+        "docs/decisions.md"
+      ]
     }
   ]
 }

@@ -1,0 +1,51 @@
+{% extends "shared/base.html" %}
+{% block head %}
+<meta name="description" content="{{ copy('Стійка на руках, сила й рухливість. Знайдіть власний напрям практики з Handbalancer’s Studio.', 'Handstands, strength and mobility. Find your direction with Handbalancer’s Studio.') }}">
+<link rel="stylesheet" href="/static/css/public.css">
+{% endblock %}
+{% block content %}
+<a class="skip-link" href="#main">{{ copy('До вмісту', 'Skip to content') }}</a>
+<header class="site-header">
+  <div class="header-inner">
+    <a class="wordmark" href="/?lang={{ language }}" aria-label="Handbalancer’s Studio">h<span>.</span></a>
+    <nav class="primary-nav" aria-label="{{ copy('Основна навігація', 'Main navigation') }}">
+      <a href="/?lang={{ language }}#directions">{{ copy('Напрями', 'Directions') }}</a>
+      <a href="/?lang={{ language }}#method">{{ copy('Методика', 'Method') }}</a>
+      <a href="/?lang={{ language }}#plans">{{ copy('Тарифи', 'Plans') }}</a>
+    </nav>
+    <div class="header-controls">
+      <nav class="locale-nav" aria-label="{{ copy('Мова', 'Language') }}">
+        <a href="{{ page_path }}?lang=uk" lang="uk"{% if language == 'uk' %} aria-current="page"{% endif %}>UA</a>
+        <span aria-hidden="true">/</span>
+        <a href="{{ page_path }}?lang=en" lang="en"{% if language == 'en' %} aria-current="page"{% endif %}>EN</a>
+      </nav>
+      <label class="theme-select"><span class="sr-only">{{ copy('Тема', 'Theme') }}</span>
+        <select disabled data-theme-control aria-label="{{ copy('Тема', 'Theme') }}">
+          <option value="auto">{{ copy('Авто', 'Auto') }}</option>
+          <option value="light">{{ copy('Світла', 'Light') }}</option>
+          <option value="dark">{{ copy('Темна', 'Dark') }}</option>
+        </select>
+      </label>
+      <button class="login-link" disabled data-public-interactive type="button" data-dialog-open="availability-dialog">{{ copy('Логін', 'Log in') }}</button>
+    </div>
+  </div>
+</header>
+<main id="main" tabindex="-1">{% block public_content %}{% endblock %}</main>
+<footer class="site-footer wrap">
+  <a class="wordmark" href="/?lang={{ language }}" aria-label="Handbalancer’s Studio">h<span>.</span></a>
+  <span>Handbalancer’s Studio</span>
+  <p>{{ copy('Ваше тіло. Нові можливості.', 'Your body. New possibilities.') }}</p>
+  <a href="/plans?lang={{ language }}">{{ copy('Тарифи', 'Plans') }}</a>
+</footer>
+<dialog class="dialog" id="availability-dialog" aria-labelledby="availability-title">
+  <div class="dialog__surface">
+    <div class="dialog__header"><h2 id="availability-title">{{ copy('Студія готується до відкриття', 'The studio is getting ready') }}</h2>
+      <button type="button" data-dialog-close aria-label="{{ copy('Закрити', 'Close') }}">×</button></div>
+    <div class="dialog__content">
+      <p>{{ copy('Реєстрація й оплата ще не відкриті. Зараз можна переглянути напрями, тарифи та обрати пакет.', 'Registration and payments are not open yet. You can explore directions, plans and choose a package.') }}</p>
+      <p class="muted" data-selection-message></p>
+    </div>
+  </div>
+</dialog>
+{% endblock %}
+{% block scripts %}<script type="module" src="/static/js/features/public/plans.js"></script>{% endblock %}

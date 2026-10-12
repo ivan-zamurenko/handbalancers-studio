@@ -1,0 +1,42 @@
+{
+  "task_id": "S05-03a",
+  "status": "done",
+  "scope_deviations": [
+    "Owner2026-10-12 asks for running landing preview. Extract public-only part of S05-03 into independent child; S03-04..S05-02 and parent S05-03 remain todo. No claim complete authenticated onboarding.",
+    "Add public route registry, static mount, localized copy and public CSS; native dialog describes unavailable signup/payments before continuation.",
+    "Use approved public copy in Execution reference document sections6/7 only, per S05-03. No old runtime/code reused.",
+    "tools/serve_preview.py and .workflow/LOCAL_PREVIEW.md provide repeatable credential-free loopback startup."
+  ],
+  "red": {
+    "command": "npx playwright test tests/e2e/s05-03-public-pages.spec.js --max-failures=1",
+    "result": "Expected200, got404 for landing; 1failed/8notrun. Later H1 regression failed before heading fix."
+  },
+  "green": {
+    "command": "npx playwright test tests/e2e/s05-03-public-pages.spec.js",
+    "result": "10passed, actual owned local HTTP server and Chromium."
+  },
+  "push_status": "pending_at_commit",
+  "branch": "task/execution-v4",
+  "base_sha": "5c8d3e8d15f89db4abd76fb728dbc4d8c781fbe6",
+  "checks": [
+    "72 Python unit/contracts/auth-security tests passed.",
+    "34 JS tests passed; full e2e16passed before added H1/keyboard regression, final public suite10passed.",
+    "Ruff and full server mypy passed; preview entrypoint scoped mypy with MYPYPATH=server passed.",
+    "8 screenshots inspected (hero/plans × light/dark ×390/1440). Element screenshots include sticky-header capture artifacts; actual viewport checked separately.",
+    "Actual dev server started with documented tools/serve_preview.py, 127.0.0.1:8000; /plansHTTP200, H1correct, no overflow/page errors.",
+    "Read-only reviewer independently checked keyboard selection, Enter, Escape/focus restoration on dev server."
+  ],
+  "review": {
+    "reviewer": "review_s02_01",
+    "result": "No safety/misleading behavior blockers; standalone plans H1 fixed with RED/GREEN regression."
+  },
+  "test_corrections": [
+    "Playwright excludes NOSCRIPT itself from text matching; changed assertion to visible noscript p (same required JS message), no weakening."
+  ],
+  "limits": [
+    "Independent public preview only. S03-04..S05-02 and full parent S05-03 remain todo. No actual registration/login/checkout/AI or stock/delivery claims.",
+    "Local only, no deployment. Browser plan preference is not billing or entitlement authority.",
+    "User-deleted docs and untracked Copilot/.vscode work left untouched; working-tree roadmap file validation remains blocked by missing docs."
+  ],
+  "remote_ci": "pending_after_push"
+}

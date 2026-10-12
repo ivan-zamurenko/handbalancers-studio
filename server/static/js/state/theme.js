@@ -111,6 +111,11 @@ export function createThemeController({
 
 if (typeof document !== 'undefined' && document.documentElement) {
   const controller = createThemeController();
+  for (const select of document.querySelectorAll('[data-theme-control]')) {
+    select.disabled = false;
+    select.value = controller.getPreference();
+    select.addEventListener('change', () => controller.setPreference(select.value));
+  }
   document.addEventListener('studio:workout-state', event => {
     const active = typeof event.detail === 'boolean' ? event.detail : event.detail?.active;
     if (typeof active === 'boolean') controller.setWorkoutActive(active);
