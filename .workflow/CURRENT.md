@@ -8,8 +8,8 @@ S02-03 завершено локально: auto/light/dark controller з device
 manual override і early boot. База: e57a0352b5fc968d858608efbf4eb81b2eb0d994.
 S02-04 завершено локально: спільні UK/EN dictionaries, locale fallback, language
 partial та Intl number/date formatting. База: a46a61f67630f39be3b12066a3659d7cc42e3f9c.
-S02-05 завершено локально: same-origin API client, CSRF token handling, classified
-business/network errors і save-state mapping. База: 008751542b52940cea61d17b9265fddadd675b80.
+S02-05 завершено й pushed: same-origin API client, CSRF token handling, classified
+business/network errors і save-state mapping. Commit: f95993992a01637b56a4c2780d79f3af0461dc0f.
 Гілка task/execution-v4; origin ivan-zamurenko/handbalancers-studio.
 База комміту: 6190c78ebf80f6082ae735fb90dcdea31111d734 — S01-07 pushed,
 fresh Supabase GitHub CI GREEN (run 37938338735).
@@ -60,7 +60,10 @@ S02-01 push/remote CI перевіряються після комміту.
 
 ## Наступний крок
 
-S03-01: Auth gateway. Прочитати картку через `python tools/roadmap.py next`.
+S03-01 готовий: stateless HTTP gateway, 13 gateway / 40 unit tests GREEN.
+Оригінальний RED попереднього WIP не зафіксовано; нові hardening RED/GREEN в evidence.
+Наступна картка S03-02 JWT. Поточне доручення — працювати до запущеного лендінгу S05-03.
+Реальні Supabase roundtrips ще не перевірені. Raw gateway dict не trusted identity.
 S02-01 не реалізує сторінки C1/A1/C3 або controller тем; base має dark fallback
 референсу, майбутній controller задаватиме фактичну тему/auto.
 HTTP static/templates integration додати при першій сторінці, без fake/demo routes.

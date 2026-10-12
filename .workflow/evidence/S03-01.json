@@ -1,0 +1,27 @@
+{
+  "task_id": "S03-01",
+  "status": "done",
+  "branch": "task/execution-v4",
+  "base_sha": "f95993992a01637b56a4c2780d79f3af0461dc0f",
+  "scope_deviations": [
+    "pyproject.toml/uv.lock: promote the already-pinned httpx 0.28.1 from dev-only to runtime because the real Supabase HTTP adapter imports and requires it in production."
+  ],
+  "scenario": "Request-scoped Supabase Auth clients, safe classification of timeout/invalid_credentials/rate_limit, and password transient use without persistence or logging.",
+  "red": {
+    "command": "uv run --locked pytest server/tests/unit/auth/test_auth_gateway.py -q",
+    "result": "Existing WIP code/tests predated this turn; original RED unrecorded. New hardening RED: 4 failed/8 passed (infinite/NaN timeout, remote HTTP, array success); later 422 invalid_credentials regression failed before fix."
+  },
+  "green": {
+    "command": "uv run --locked pytest server/tests/unit -q",
+    "result": "40 passed (13 gateway); ruff, scoped mypy, offline lock check passed."
+  },
+  "checks": [
+    "Independent read-only review: no blockers; 12 tests passed before final status-code regression.",
+    "Corrected existing test paths /signup and /token to actual /auth/v1 paths per Supabase REST API; previous StopIteration was a test defect, not behavior RED."
+  ],
+  "unverified": [
+    "No live provider roundtrip yet; responses are untrusted until JWT/identity validation in next cards."
+  ],
+  "push_status": "pending_at_commit",
+  "source": "https://raw.githubusercontent.com/supabase/auth/master/openapi.yaml"
+}

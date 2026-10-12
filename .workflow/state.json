@@ -100,9 +100,9 @@
       "push_status": "pending_at_commit"
     },
     "S03-01": {
-      "status": "todo",
-      "evidence": null,
-      "push_status": "not_started"
+      "status": "done",
+      "evidence": ".workflow/evidence/S03-01.json",
+      "push_status": "pending_at_commit"
     },
     "S03-02": {
       "status": "todo",
