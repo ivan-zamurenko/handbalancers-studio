@@ -9,6 +9,7 @@ REQUIRED_SUITES = {
     "tools/tests": "test_*.py",
     "server/tests/unit": "test_*.py",
     "server/tests/contracts": "test_*.py",
+    "server/tests/security/auth": "test_*.py",
     "tests/js": "*.test.js",
     "tests/e2e": "*.spec.js",
 }
@@ -18,6 +19,7 @@ COMMANDS = (
     ("uv", "run", "--locked", "mypy", "server/studio", "tools/checks.py"),
     ("uv", "run", "--locked", "pytest", "server/tests/unit", "-q"),
     ("uv", "run", "--locked", "pytest", "server/tests/contracts", "-q"),
+    ("uv", "run", "--locked", "pytest", "server/tests/security/auth", "-q"),
     # Includes real Chromium checks against the owned local test server.
     ("uv", "run", "--locked", "pytest", "tools/tests", "-q"),
     ("npm", "run", "test:js"),

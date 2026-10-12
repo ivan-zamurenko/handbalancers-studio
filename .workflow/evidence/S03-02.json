@@ -1,0 +1,32 @@
+{
+  "task_id": "S03-02",
+  "status": "done",
+  "branch": "task/execution-v4",
+  "base_sha": "80d49b0b70ccfab84a17ea96654d32d0952342de",
+  "red": {
+    "command": "uv run --locked pytest server/tests/security/auth/test_jwt_validation.py -q",
+    "result": "12 failures: missing studio.auth.jwt; later CI regression 2 failures for absent security suite."
+  },
+  "green": {
+    "command": "uv run --locked pytest server/tests/unit/auth server/tests/security/auth tools/tests/test_s00_07_ci_baseline.py -q",
+    "result": "33 passed +6 subtests; 14 JWT security cases including actual ES256 signatures, rotation, failed fetch/concurrency/cooldown."
+  },
+  "checks": [
+    "Ruff/check scoped format and full mypy passed.",
+    "Independent read-only review 14/14 tests passed; CI omission resolved with required suite and regression."
+  ],
+  "scope_deviations": [
+    "Pinned PyJWT2.15.1 in pyproject/lock, using existing cryptography.",
+    "tools/checks.py and baseline tooling tests: run mandatory auth security suite in CI.",
+    "Removed pre-existing trailing blank line in shared/i18n.py detected by baseline format gate."
+  ],
+  "limits": [
+    "JWT signature does not prove current product role, local revocation or upstream session freshness; those remain subsequent auth cards.",
+    "Real Supabase roundtrip pending.",
+    "User docs deletions remain untouched."
+  ],
+  "push_status": "pending_at_commit",
+  "sources": [
+    "https://pyjwt.readthedocs.io/en/stable/api.html"
+  ]
+}

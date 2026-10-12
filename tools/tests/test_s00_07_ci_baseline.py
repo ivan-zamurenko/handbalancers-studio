@@ -40,6 +40,7 @@ class CIBaselineTests(unittest.TestCase):
             "tools/tests/test_one.py",
             "server/tests/unit/test_one.py",
             "server/tests/contracts/test_one.py",
+            "server/tests/security/auth/test_one.py",
             "tests/js/one.test.js",
             "tests/e2e/one.spec.js",
         ]
@@ -97,3 +98,12 @@ class CIBaselineTests(unittest.TestCase):
         ) as run:
             self.assertEqual(module.run_checks(ROOT), 5)
             self.assertEqual(run.call_count, 1)
+
+
+def test_auth_security_runs_in_ci():
+    from tools.checks import COMMANDS, REQUIRED_SUITES
+
+    assert "server/tests/security/auth" in REQUIRED_SUITES
+    assert any(
+        "pytest" in command and "server/tests/security/auth" in command for command in COMMANDS
+    )

@@ -62,7 +62,9 @@ S02-01 push/remote CI перевіряються після комміту.
 
 S03-01 готовий: stateless HTTP gateway, 13 gateway / 40 unit tests GREEN.
 Оригінальний RED попереднього WIP не зафіксовано; нові hardening RED/GREEN в evidence.
-Наступна картка S03-02 JWT. Поточне доручення — працювати до запущеного лендінгу S05-03.
+S03-02 готовий: 14 JWT security tests GREEN; обов’язковий suite у CI.
+ES256/RS256, JWKS TTL300s/cooldown30s/deadline5s; ролі лише з БД.
+Наступна картка S03-03 registration. Поточне доручення — працювати до запущеного лендінгу S05-03.
 Реальні Supabase roundtrips ще не перевірені. Raw gateway dict не trusted identity.
 S02-01 не реалізує сторінки C1/A1/C3 або controller тем; base має dark fallback
 референсу, майбутній controller задаватиме фактичну тему/auto.
