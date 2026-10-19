@@ -6781,6 +6781,45 @@
         "docs/contracts.md",
         "docs/decisions.md"
       ]
+    },
+    {
+      "id": "S03-10a",
+      "stage": "03",
+      "slug": "login_preview",
+      "title": "Форма входу для локального перегляду",
+      "goal": "Окремий UI входу за запитом власника; реальна авторизація лишається в S03-10.",
+      "module": "auth",
+      "kind": "e2e",
+      "depends_on": [
+        "S05-03a"
+      ],
+      "gates": [],
+      "files": [
+        "server/studio/public/routes.py",
+        "server/templates/public/base.html",
+        "server/templates/public/login.html",
+        "server/static/css/login.css",
+        "server/static/js/features/auth/login.js"
+      ],
+      "test_file": "tests/e2e/login-form.spec.js",
+      "test_cases": [
+        {
+          "name": "login_preview",
+          "expected": "UK/EN, light/dark, mobile/desktop, password toggle, no credential transmission/storage, disabled submission with and without JS."
+        }
+      ],
+      "api": "GET /login renders public HTML; no authentication command.",
+      "db": "Нет изменения схемы.",
+      "notes": "Explicit independent UI child; S03-10 and its auth dependencies remain todo.",
+      "command": "npx playwright test tests/e2e/login-form.spec.js",
+      "commit": "feat(ui): [S03-10a] login form preview",
+      "status": "todo",
+      "order": 137,
+      "card": "roadmap/tasks/S03-10a_login_preview.md",
+      "read": [
+        "docs/contracts.md",
+        "docs/decisions.md"
+      ]
     }
   ]
 }

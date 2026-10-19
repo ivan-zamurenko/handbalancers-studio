@@ -1,0 +1,31 @@
+{
+  "task_id": "S03-10a",
+  "status": "done",
+  "branch": "task/execution-v4",
+  "red": {
+    "command": "npx playwright test tests/e2e/login-form.spec.js --max-failures=1",
+    "result": "1 failed, 4 not run: login link absent before implementation."
+  },
+  "review_regression": {
+    "command": "npx playwright test tests/e2e/login-form.spec.js --grep \"leaving the preview\"",
+    "red": "Toggle label/aria-pressed stayed visible after pagehide; 1 failed.",
+    "green": "Reset toggle state together with password; regression passed.",
+    "test_correction": "Filled valid email before Enter in JS/no-JS scenarios so native email validation cannot mask submission behavior."
+  },
+  "green": {
+    "command": "npx playwright test",
+    "result": "27 passed, including 6 login and 4 landing refinement cases."
+  },
+  "review": "Read-only reviewer findings addressed; no credential leak found.",
+  "visual": "390/1440 light/dark screenshots inspected on actual preview server at port 8000.",
+  "limits": [
+    "UI only. No live authentication, session, registration or recovery connected.",
+    "Parent S03-10 remains todo; next main task S03-04."
+  ],
+  "push_status": "pending_at_commit",
+  "additional_checks": [
+    "34 JS tests passed with configured local Chromium; initial attempt lacked PLAYWRIGHT_BROWSERS_PATH.",
+    "18 Python contract tests passed.",
+    "Scoped Ruff, formatting and mypy passed."
+  ]
+}

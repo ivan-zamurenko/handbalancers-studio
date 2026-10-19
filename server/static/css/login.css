@@ -1,0 +1,24 @@
+.login-section { max-width: 560px; padding-top: 64px; padding-bottom: 64px; }
+.login-heading { text-align: center; margin-bottom: 32px; }
+.login-heading .eyebrow { margin-bottom: 20px; font-size: 10px; }
+.login-heading h1 { font-size: 38px; line-height: 1.15; font-weight: 500; letter-spacing: -.04em; }
+.login-heading > p:last-child { margin-top: 16px; font-size: 15px; color: var(--muted); }
+.login-card { padding: 32px; border: 1px solid var(--line); border-radius: var(--radius-panel); background: var(--surface); }
+.login-status { color: var(--muted); font-size: 13px; margin-bottom: 28px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+.login-card .form-field { margin-bottom: 20px; }
+.login-card input { min-height: 48px; font-size: 16px; }
+.password-control { display: flex; flex-direction: column; align-items: flex-end; }
+.password-toggle, .login-help button, .login-signup button { border: 0; padding: 0; font-size: 12px; font-weight: 400; text-decoration: underline; text-underline-offset: 4px; }
+.password-toggle { min-height: 36px; color: var(--muted); }
+.login-card button:disabled { cursor: not-allowed; }
+.login-help { display: flex; justify-content: flex-end; margin-top: -20px; margin-bottom: 16px; }
+.login-submit { width: 100%; min-height: 50px; justify-content: space-between; padding-inline: 20px; }
+.login-submit:disabled { opacity: .5; }
+.login-signup { margin-top: 24px; text-align: center; font-size: 13px; color: var(--muted); }
+.login-signup button { margin-left: 4px; color: var(--text); font-size: 13px; }
+.login-back { display: block; width: fit-content; margin: 28px auto 0; padding: 12px; font-size: 13px; color: var(--muted); text-decoration: none; }
+@media(max-width: 780px) {
+  .login-section { padding-top: 40px; padding-bottom: 40px; }
+  .login-heading h1 { font-size: 32px; }
+  .login-card { padding: 24px; }
+}

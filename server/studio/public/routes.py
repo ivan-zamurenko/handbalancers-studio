@@ -98,3 +98,8 @@ async def index(request: Request) -> HTMLResponse:
 @router.get("/plans", response_class=HTMLResponse, include_in_schema=False)
 async def plans_page(request: Request) -> HTMLResponse:
     return render(request, "public/plans.html")
+
+
+@router.get("/login", response_class=HTMLResponse, include_in_schema=False)
+async def login_page(request: Request) -> HTMLResponse:
+    return render(request, "public/login.html")

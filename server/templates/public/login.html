@@ -1,0 +1,35 @@
+{% extends "public/base.html" %}
+{% block title %}{{ copy('Вхід', 'Log in') }} — Handbalancer’s Studio{% endblock %}
+{% block head %}{{ super() }}<link rel="stylesheet" href="/static/css/login.css">{% endblock %}
+{% block public_content %}
+<section class="login-section wrap" aria-labelledby="login-title">
+  <div class="login-heading"><p class="eyebrow">Handbalancer’s Studio</p><h1 id="login-title">{{ copy('Раді бачити вас знову.', 'Good to see you again.') }}</h1><p>{{ copy('Ваш простір для практики.', 'Your space to practise.') }}</p></div>
+  <div class="login-card">
+    <p id="login-status" class="login-status">{{ copy('Вхід ще не підключено. Зараз можна переглянути форму; email і пароль не надсилаються.', 'Sign-in is not connected yet. You can preview the form; your email and password are not sent.') }}</p>
+    {# Intentionally no field names until real CSRF/session integration. No credential payload. #}
+    <form id="login-form" method="post" action="/login" aria-describedby="login-status">
+      <div class="form-field">
+        <label class="form-field__label" for="login-email">Email</label>
+        <input class="form-field__control" id="login-email" type="email" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false" required maxlength="254">
+      </div>
+      <div class="form-field">
+        <label class="form-field__label" for="login-password">{{ copy('Пароль', 'Password') }}</label>
+        <div class="password-control"><input class="form-field__control" id="login-password" type="password" autocomplete="current-password" required maxlength="256">
+          <button type="button" class="password-toggle" data-password-toggle aria-controls="login-password" aria-pressed="false" data-show="{{ copy('Показати пароль', 'Show password') }}" data-hide="{{ copy('Приховати пароль', 'Hide password') }}" disabled>{{ copy('Показати пароль', 'Show password') }}</button>
+        </div>
+      </div>
+      <div class="login-help"><button type="button" data-login-interactive data-dialog-open="recovery-unavailable" disabled>{{ copy('Забули пароль?', 'Forgot password?') }}</button></div>
+      <button class="primary login-submit" type="submit" disabled aria-describedby="login-status">{{ copy('Увійти', 'Log in') }} <span aria-hidden="true">↗</span></button>
+    </form>
+    <p class="login-signup">{{ copy('Ще немає акаунта?', 'New here?') }} <button type="button" data-login-interactive data-dialog-open="availability-dialog" disabled>{{ copy('Реєстрація', 'Register') }}</button></p>
+    <noscript><p class="small">{{ copy('JavaScript потрібен лише для показу пароля та додаткових пояснень. Вхід ще недоступний.', 'JavaScript is needed for the password toggle and additional information. Sign-in is not available yet.') }}</p></noscript>
+  </div>
+  <a class="login-back" href="/?lang={{ language }}">← {{ copy('На головну', 'Back to home') }}</a>
+</section>
+<dialog class="dialog" id="recovery-unavailable" aria-labelledby="recovery-title">
+  <div class="dialog__surface"><div class="dialog__header"><h2 id="recovery-title">{{ copy('Відновлення доступу', 'Account recovery') }}</h2><button type="button" data-dialog-close aria-label="{{ copy('Закрити', 'Close') }}">×</button></div>
+    <div class="dialog__content"><p>{{ copy('Відновлення пароля стане доступним разом із входом. Зараз запит на скидання пароля не надсилається.', 'Password recovery will be available when sign-in opens. No password reset request is sent at this stage.') }}</p></div>
+  </div>
+</dialog>
+{% endblock %}
+{% block scripts %}<script type="module" src="/static/js/features/auth/login.js"></script>{% endblock %}

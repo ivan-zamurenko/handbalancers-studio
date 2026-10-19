@@ -26,7 +26,7 @@
           <option value="dark">{{ copy('Темна', 'Dark') }}</option>
         </select>
       </label>
-      <button class="login-link" disabled data-public-interactive type="button" data-dialog-open="availability-dialog">{{ copy('Логін', 'Log in') }}</button>
+      <a class="login-link btn" href="/login?lang={{ language }}"{% if page_path == '/login' %} aria-current="page"{% endif %}>{{ copy('Логін', 'Log in') }}</a>
     </div>
   </div>
 </header>
