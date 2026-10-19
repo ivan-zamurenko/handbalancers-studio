@@ -1,0 +1,36 @@
+{
+  "task_id": "S04-01a",
+  "status": "done",
+  "scope": "Local server implementation only; provider readiness env_blocked.",
+  "red": [
+    {
+      "command": "uv run python tools/local_stack.py test uv run pytest server/tests/integration/auth/test_oauth_flow.py -q",
+      "result": "3 setup errors: OAuthService module absent; DB fixture initialized successfully."
+    },
+    {
+      "command": "uv run pytest server/tests/contracts/auth/test_oauth_http.py -q",
+      "result": "1 failed: start returned404 instead of503."
+    },
+    {
+      "command": "guarded pytest test_oauth_flow.py -k 'rate_limit or logout'",
+      "result": "2 failed: rate limiter absent, csrf_token absent."
+    }
+  ],
+  "green": [
+    "40 migration/storage tests +20 DB isolation tests passed via tools.check_migrations.",
+    "12 final OAuth DB tests passed with signed synthetic JWT and real PostgreSQL/role/locks.",
+    "75 unit/contracts/security tests passed (including upcoming UI feedback test).",
+    "Ruff, formatting, mypy passed; migration CI-tooling8passed."
+  ],
+  "review": "Read-only review: owner role rejection and CI suite coverage findings fixed; final no blockers. Additional role tests added alongside fix, no separate observed RED claimed.",
+  "test_corrections": [
+    "CI test previously zipped two executed suites against entire DB_SUITES; third suite added. Preserve stop-on-second-failure assertion, compare first two only; add successful all-suites test."
+  ],
+  "limits": [
+    "No real Google/Apple or Supabase code-exchange roundtrip.",
+    "No refresh/profile completion/password authentication.",
+    "User confirms providers not configured; no credentials in environment.",
+    "Deleted user docs left untouched; full file validator deferred to clean CI checkout."
+  ],
+  "push_status": "pending_at_commit"
+}

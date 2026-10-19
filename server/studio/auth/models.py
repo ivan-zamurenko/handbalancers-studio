@@ -51,3 +51,11 @@ class AuthAttempt(Base):
     allowed_return_path: Mapped[str] = mapped_column(Text, nullable=False)
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     consumed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class AuthRateLimit(Base):
+    __tablename__ = "auth_rate_limits"
+    __table_args__ = (CheckConstraint("attempts BETWEEN 1 AND 11"), {"schema": "studio_private"})
+    bucket_hash: Mapped[str] = mapped_column(Text, primary_key=True)
+    window_start: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    attempts: Mapped[int] = mapped_column(Integer, nullable=False)

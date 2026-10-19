@@ -1,83 +1,22 @@
-# Оновлення: компонування входу й OAuth
-
-S03-10b: дії пароля в рядку, submit по центру; 8 browser tests GREEN.
-Попередній b179821 pushed/CI success, run 39268424649.
-Далі явний запит — Google/Apple OAuth. Конфігурація провайдерів поки відсутня
-у поточному середовищі; реальний roundtrip має окремий gate.
-
 # Поточний checkpoint — 2026-10-19
 
-S05-03b завершено, commit e878f85: підписані кроки практики та SVG спорядження.
-S03-10a завершено: форма /login, UK/EN, дві теми, мобільний і широкий екран.
-27 браузерних тестів GREEN; read-only review враховано, вигляд перевірено.
-Вхід поки лише UI: submit вимкнено, email/пароль не надсилаються.
-Сервер preview запущено на http://127.0.0.1:8000 та /login.
-Push/CI цих двох коммітів перевіряються після фінального комміту.
-Наступний основний крок — S03-04 verify email, потім решта auth/session/CSRF.
-S03-10 і повний S05-03 лишаються todo. Незалежні UI зрізи не закривають їх.
-User docs deletions, .vscode і Copilot файли збережено без змін.
+Явний запит: компонування login і Google/Apple OAuth.
+S03-10b commit 93c7836: дії пароля в одному рядку, submit по центру; 8 browser GREEN.
+S04-01a: серверний PKCE, real DB спроби/сесії, member provision, current profile,
+CSRF logout, DB rate limit;12 OAuth DB +60 DB regression GREEN. Міграція0005.
+Review owner-role guard і CI coverage виправлено. Новий integration/auth включено в CI.
+G_AUTH_PROVIDERS env_blocked: власник підтвердив, що Google/Apple не налаштовані.
+Runtime flags false, credentials відсутні. Не називати live OAuth готовим.
+Інструкція docs/oauth-setup.md, preview навмисно не читає credentials.
+Session завершується разом із JWT; refresh/profile completion/email входу ще немає.
+Далі UI кнопок/повідомлень/виходу, потім push і CI.
+Батьківські S03/S04 залишаються todo; основний наступний крок S03-04.
+Гілка task/execution-v4; origin ivan-zamurenko/handbalancers-studio.
+Власні preview PID23006, port8000; не зупиняти сторонні процеси.
+User docs deletions, .vscode та Copilot файли не чіпати.
 
-# Поточний checkpoint — 2026-10-12
-
-Локальний лендінг запущено: http://127.0.0.1:8000 і /plans.
-S05-03a — незалежний публічний зріз для перегляду за дорученням власника
-працювати до запущеного лендінгу. Повний S05-03 та S03-04..S05-02 залишаються todo.
-Тести → код → перевірки → окремі комміти збережено; порядок public preview
-виділено явно, не позначаючи пропущені auth/onboarding залежності завершеними.
-
-## Зроблено цього проходу
-
-- S03-01: gateway, commit80d49b0 (push), 13gatewaytests. Початковий WIP уже
-  містив код; оригінальний RED невідомий, нові hardening RED/GREEN зафіксовано.
-- S03-02: JWT ES256/RS256, claims/JWKS bounded refresh, commit02b0f58 (push/CIgreen).
-  TTL300s/cooldown30s/fetch deadline5s. JWT не заміняє role/revoke/freshness checks.
-  Security suite додано до CI. Виправлено попередній format дефект i18n.py.
-- S03-03: register input→pending202 без cookie/DB profile, commit5c8d3e8 (push/CIgreen,
-  run38285362953). Gateway runtime config ще не підключено: default503.
-- S05-03a: approved public copy, index/plans, static mount, native radios,
-  theme/locale selectors, remembered plan, honest unavailable dialog, no fake APIs.
-  Push/CI S05-03a перевіряються після комміту.
-
-## Перевірено
-
-72 Python unit/contracts/security tests; 34JS; full e2e16 до додаткового тесту H1;
-фінальний public e2e10GREEN. Ruff і mypyGREEN. 390/1440 ×light/dark переглянуто.
-Read-only review: no blockers; H1 на standaloneplans виправлено з regression.
-Graph validatorGREEN. Working-tree roadmap file validation неGREEN через
-user-deleted docs; їх не відновлювали, прочитані контракти з HEAD.
-Реальний devserverHTTP200, без горизонтального overflow та JS помилок.
-
-## Запуск
-
-    export PATH="$PWD/.local-tools/uv-env/bin:$PATH"
-    export UV_CACHE_DIR="$PWD/.local-tools/uv-cache"
-    uv run --locked python tools/serve_preview.py
-
-Залишено власний процес на127.0.0.1:8000; для нового запуску вільний порт8000.
-Інструкція .workflow/LOCAL_PREVIEW.md. Публічний preview не читає provider secrets.
-Працюють секції, мови, теми, тарифи та вибір. Вхід/оплата/AI ще недоступні,
-це видно на сторінці й у діалозі. Немає deployment або реальних платежів.
-
-## Наступний крок
-
-Основна послідовність: S03-04 verify email, далі auth/profile/onboarding;
-потім інтегрувати public preview з повним S05-03. Не вважати frontend choice
-server entitlement, raw gateway dict — verified identity, JWT — current product role.
-
-## Стенд та домовленості
-
-Гілка task/execution-v4, origin ivan-zamurenko/handbalancers-studio.
-Новий runtime з нуля у корені; старий не використовувати/відновлювати.
-Архів історії archive/pre-execution-v4. User docs deletions/Copilot/.vscode не чіпати.
-
-Docker Colima studio-s01; test PostgreSQL127.0.0.1:55322, HTTP55321, migration0004.
-Managed Auth належить Supabase. 18auth-storage DBtests пройшли цього проходу.
-
-    export PATH="$PWD/.local-tools/node/bin:$PWD/.local-tools/uv-env/bin:$PWD/.local-tools/supabase-cli/node_modules/.bin:/opt/homebrew/bin:$PATH"
-    export PLAYWRIGHT_BROWSERS_PATH="$PWD/.local-tools/playwright-browsers"
-    export DOCKER_HOST="unix://$HOME/.colima/studio-s01/docker.sock"
-    unset DOCKER_CONTEXT
-    uv run --locked python -m tools.check_migrations
-
---fresh лише для нового teststack, без reset. Ключі не друкувати.
-Google/Apple/email live roundtrips не виконано. External exchange після commit consume_attempt.
+Запуск preview: uv run --locked python tools/serve_preview.py (див .workflow/LOCAL_PREVIEW.md).
+Для тестів PATH .local-tools/uv-env/bin і .local-tools/node/bin;
+UV_CACHE_DIR=.local-tools/uv-cache, PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers.
+DB: DOCKER_HOST=unix://$HOME/.colima/studio-s01/docker.sock; unset DOCKER_CONTEXT;
+uv run python -m tools.check_migrations. Не використовувати --fresh на існуючій БД.

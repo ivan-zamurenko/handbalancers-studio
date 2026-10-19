@@ -89,9 +89,20 @@ class MigrationCITests(unittest.TestCase):
         ):
             self.assertEqual(checker.run_guarded(), 5)
             self.assertEqual(run.call_count, 2)
-            for call, suite in zip(run.call_args_list, checker.DB_SUITES, strict=True):
+            for call, suite in zip(run.call_args_list, checker.DB_SUITES[:2], strict=True):
                 self.assertIn(suite, call.args[0])
                 self.assertEqual(sum(item in checker.DB_SUITES for item in call.args[0]), 1)
+
+    def test_auth_suite_is_required_and_run(self):
+        checker = self.checker()
+        self.assertIn("server/tests/integration/auth", checker.DB_SUITES)
+        with (
+            patch.object(checker, "require_test_database"),
+            patch.object(checker.subprocess, "run", return_value=SimpleNamespace(returncode=0)) as run,
+        ):
+            self.assertEqual(checker.run_guarded(), 0)
+            self.assertEqual(run.call_count, len(checker.DB_SUITES))
+            self.assertIn("server/tests/integration/auth", run.call_args.args[0])
 
     def test_guard_failure_precedes_mutation(self):
         checker = self.checker()

@@ -1,5 +1,6 @@
 """Explicit configuration with secret-safe validation diagnostics."""
 
+import base64
 import os
 from typing import Literal, Self
 from urllib.parse import urlsplit
@@ -19,6 +20,10 @@ class Settings(BaseModel):
     auth_database_url: SecretStr | None = None
     worker_database_url: SecretStr | None = None
     oauth_client_secret: SecretStr | None = None
+    supabase_url: str | None = None
+    supabase_publishable_key: SecretStr | None = None
+    oauth_google_enabled: bool = False
+    oauth_apple_enabled: bool = False
     stripe_secret_key: SecretStr | None = None
     stripe_webhook_secret: SecretStr | None = None
 
@@ -49,6 +54,49 @@ class Settings(BaseModel):
                 or not settings.token_encryption_key.get_secret_value().strip()
             ):
                 raise ValueError("Deployment requires HTTPS origin and encryption key")
+            if settings.oauth_google_enabled or settings.oauth_apple_enabled:
+                if not all(
+                    (
+                        settings.public_origin,
+                        settings.supabase_url,
+                        settings.supabase_publishable_key,
+                        settings.auth_database_url,
+                        settings.token_encryption_key,
+                    )
+                ):
+                    raise ValueError("OAuth configuration incomplete")
+                provider = urlsplit(settings.supabase_url)
+                if (
+                    provider.scheme not in {"https", "http"}
+                    or not provider.hostname
+                    or provider.username
+                    or provider.password
+                    or provider.query
+                    or provider.fragment
+                    or provider.path not in {"", "/"}
+                    or (
+                        provider.scheme == "http"
+                        and (
+                            settings.app_env in {"staging", "production"}
+                            or provider.hostname not in {"127.0.0.1", "localhost"}
+                        )
+                    )
+                ):
+                    raise ValueError("Invalid provider origin")
+                from sqlalchemy.engine import make_url
+                from sqlalchemy.exc import ArgumentError
+
+                try:
+                    database = make_url(settings.auth_database_url.get_secret_value())
+                    if database.drivername != "postgresql+psycopg" or not database.database:
+                        raise ValueError("Invalid auth database")
+                except ArgumentError:
+                    raise ValueError("Invalid auth database") from None
+                key = base64.b64decode(
+                    settings.token_encryption_key.get_secret_value(), validate=True
+                )
+                if len(key) != 32:
+                    raise ValueError("Invalid encryption key")
             return settings
         except (ValidationError, ValueError):
             # hide_input_in_errors alone does not protect errors()/json(). Rebuild

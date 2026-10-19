@@ -6856,6 +6856,47 @@
         "docs/contracts.md",
         "docs/decisions.md"
       ]
+    },
+    {
+      "id": "S04-01a",
+      "stage": "04",
+      "slug": "oauth_runtime",
+      "title": "Серверний OAuth PKCE для Google та Apple",
+      "goal": "Незалежний серверний зріз за явним запитом власника; зовнішній gate окремо.",
+      "module": "auth",
+      "kind": "integration",
+      "depends_on": [
+        "S01-06",
+        "S03-02"
+      ],
+      "gates": [],
+      "files": [
+        "server/studio/auth/oauth.py",
+        "server/studio/auth/oauth_routes.py",
+        "server/studio/auth/runtime.py",
+        "server/studio/auth/rate_limit.py",
+        "server/studio/accounts/provisioning.py",
+        "server/alembic/versions/0005_auth_profile.py"
+      ],
+      "test_file": "server/tests/integration/auth/test_oauth_flow.py",
+      "test_cases": [
+        {
+          "name": "oauth_flow",
+          "expected": "Real DB: PKCE isolation, browser binding, replay/concurrency, verified profile/session, rotation, inactive denial, rate budget, CSRF logout, upstream outage."
+        }
+      ],
+      "api": "POST /api/auth/oauth/{provider}/start; GET /auth/callback; GET /api/session; POST /api/auth/logout.",
+      "db": "0005: auth_profile narrow function and private auth_rate_limits.",
+      "notes": "Parents S03/S04 remain todo; no refresh or profile completion. Providers disabled until configured; live gate env_blocked.",
+      "command": "uv run python -m tools.check_migrations",
+      "commit": "feat(auth): [S04-01a] add server OAuth PKCE flow",
+      "status": "todo",
+      "order": 139,
+      "card": "roadmap/tasks/S04-01a_oauth_runtime.md",
+      "read": [
+        "docs/contracts.md",
+        "docs/decisions.md"
+      ]
     }
   ]
 }

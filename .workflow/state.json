@@ -693,6 +693,11 @@
       "status": "done",
       "evidence": ".workflow/evidence/S03-10b.json",
       "push_status": "pending_at_commit"
+    },
+    "S04-01a": {
+      "status": "done",
+      "evidence": ".workflow/evidence/S04-01a.json",
+      "push_status": "pending_at_commit"
     }
   },
   "gates": {
@@ -702,7 +707,7 @@
     },
     "G_AUTH_PROVIDERS": {
       "status": "pending",
-      "evidence": null
+      "evidence": ".workflow/evidence/S04-01a.json"
     },
     "G_COMMERCE": {
       "status": "pending",

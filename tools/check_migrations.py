@@ -22,7 +22,11 @@ from server.tests.support.database_guard import require_test_database
 from tools import local_stack
 
 ROOT = Path(__file__).resolve().parents[1]
-DB_SUITES = ("server/tests/integration/database", "server/tests/security/database")
+DB_SUITES = (
+    "server/tests/integration/database",
+    "server/tests/security/database",
+    "server/tests/integration/auth",
+)
 
 
 class MigrationCheckError(ValueError):
