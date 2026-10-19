@@ -17,7 +17,7 @@ for (const width of [390,1440]) for (const theme of ['light','dark']) {
     await page.getByRole('button',{name:'Приховати пароль',exact:true}).click();
     await expect(password).toHaveAttribute('type','password');
     await expect(page.getByRole('button',{name:'Увійти',exact:true})).toBeDisabled();
-    await expect(page.locator('#login-status')).toContainText('Вхід ще не підключено');
+    await expect(page.locator('#login-status')).toContainText('Вхід через email ще не підключено');
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
     const requests=[];page.on('request', r=>requests.push(r.url()+' '+(r.postData()||'')));
     await password.press('Enter');

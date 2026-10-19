@@ -26,10 +26,13 @@
           <option value="dark">{{ copy('Темна', 'Dark') }}</option>
         </select>
       </label>
-      <a class="login-link btn" href="/login?lang={{ language }}"{% if page_path == '/login' %} aria-current="page"{% endif %}>{{ copy('Логін', 'Log in') }}</a>
+      <span data-auth-status hidden>{{ copy("Ви увійшли", "Signed in") }}</span>
+      <button type="button" data-logout hidden>{{ copy("Вийти", "Log out") }}</button>
+      <a data-login-link class="login-link btn" href="/login?lang={{ language }}"{% if page_path == '/login' %} aria-current="page"{% endif %}>{{ copy('Логін', 'Log in') }}</a>
     </div>
   </div>
 </header>
+<script type="module" src="/static/js/features/auth/session.js"></script>
 <main id="main" tabindex="-1">{% block public_content %}{% endblock %}</main>
 <footer class="site-footer wrap">
   <a class="wordmark" href="/?lang={{ language }}" aria-label="Handbalancer’s Studio">h<span>.</span></a>

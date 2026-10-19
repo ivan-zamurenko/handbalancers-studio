@@ -77,10 +77,19 @@ def render(request: Request, template: str) -> HTMLResponse:
     def copy(uk: str, en: str) -> str:
         return uk if language == "uk" else en
 
+    oauth = getattr(request.app.state, "oauth_service", None)
+    providers: frozenset[str] = getattr(oauth, "providers", frozenset())
     return templates.TemplateResponse(
         request=request,
         name=template,
-        context={"language": language, "copy": copy, "plans": PLANS, "page_path": request.url.path},
+        context={
+            "language": language,
+            "copy": copy,
+            "plans": PLANS,
+            "page_path": request.url.path,
+            "oauth_providers": providers,
+            "oauth_feedback": request.query_params.get("oauth", ""),
+        },
         headers={
             "Cache-Control": "no-store",
             "X-Content-Type-Options": "nosniff",

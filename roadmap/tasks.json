@@ -6897,6 +6897,48 @@
         "docs/contracts.md",
         "docs/decisions.md"
       ]
+    },
+    {
+      "id": "S04-03a",
+      "stage": "04",
+      "slug": "oauth_ui",
+      "title": "Кнопки Google/Apple і стани OAuth",
+      "goal": "Підключити форму до серверного OAuth, показувати лише configured providers.",
+      "module": "auth",
+      "kind": "e2e",
+      "depends_on": [
+        "S04-01a",
+        "S03-10b"
+      ],
+      "gates": [],
+      "files": [
+        "server/templates/public/login.html",
+        "server/templates/public/base.html",
+        "server/static/css/login.css",
+        "server/static/css/public.css",
+        "server/static/js/features/auth/login.js",
+        "server/static/js/features/auth/session.js",
+        "server/studio/public/routes.py"
+      ],
+      "test_file": "tests/e2e/oauth-ui.spec.js",
+      "test_cases": [
+        {
+          "name": "oauth_ui",
+          "expected": "Configured buttons, pending/recoverable error, guest/logout visibility, UK/EN and both themes/widths."
+        }
+      ],
+      "api": "Existing OAuth endpoints.",
+      "db": "No schema changes.",
+      "notes": "Providers hidden until configured. Fixture availability and HTTP failures are synthetic UI boundaries only.",
+      "command": "npx playwright test tests/e2e/login-form.spec.js tests/e2e/oauth-ui.spec.js",
+      "commit": "feat(ui): [S04-03a] connect OAuth login controls",
+      "status": "todo",
+      "order": 140,
+      "card": "roadmap/tasks/S04-03a_oauth_ui.md",
+      "read": [
+        "docs/contracts.md",
+        "docs/decisions.md"
+      ]
     }
   ]
 }

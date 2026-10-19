@@ -18,3 +18,37 @@ window.addEventListener('pagehide', () => {
   if (password) { password.value = ''; password.type = 'password'; }
   if (toggle) { toggle.setAttribute('aria-pressed', 'false'); toggle.textContent = toggle.dataset.show; }
 });
+
+
+const providers = [...document.querySelectorAll('[data-oauth-provider]')];
+const message = document.getElementById('oauth-message');
+let starting = false;
+for (const button of providers) {
+  button.disabled = false;
+  button.addEventListener('click', async () => {
+    if (starting) return;
+    starting = true;
+    for (const control of providers) control.disabled = true;
+    message.textContent = message.dataset.pending;
+    try {
+      const response = await fetch(`/api/auth/oauth/${button.dataset.oauthProvider}/start`, {
+        method: 'POST', credentials: 'same-origin', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({return_to: '/plans'}), signal: AbortSignal.timeout(8000),
+      });
+      if (!response.ok) throw new Error('Unavailable');
+      const result = await response.json();
+      const target = new URL(result.authorization_url);
+      if (!['https:', 'http:'].includes(target.protocol)) throw new Error('Invalid destination');
+      window.location.assign(target.href);
+    } catch {
+      starting = false;
+      message.textContent = message.dataset.error;
+      for (const control of providers) control.disabled = false;
+    }
+  });
+}
+window.addEventListener('pageshow', () => {
+  starting = false;
+  for (const control of providers) control.disabled = false;
+  if (message) message.textContent = '';
+});

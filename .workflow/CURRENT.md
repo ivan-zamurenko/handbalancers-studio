@@ -9,7 +9,9 @@ G_AUTH_PROVIDERS env_blocked: власник підтвердив, що Google/A
 Runtime flags false, credentials відсутні. Не називати live OAuth готовим.
 Інструкція docs/oauth-setup.md, preview навмисно не читає credentials.
 Session завершується разом із JWT; refresh/profile completion/email входу ще немає.
-Далі UI кнопок/повідомлень/виходу, потім push і CI.
+S04-01a commit73c84da. S04-03a UI готовий: configured buttons, OAuth feedback,
+CSRF logout, правильні guest/authenticated стани. 33 browser загалом +5 final OAuth GREEN.
+Далі push/CI, після конфігурації провайдерів — окремі live roundtrips.
 Батьківські S03/S04 залишаються todo; основний наступний крок S03-04.
 Гілка task/execution-v4; origin ivan-zamurenko/handbalancers-studio.
 Власні preview PID23006, port8000; не зупиняти сторонні процеси.

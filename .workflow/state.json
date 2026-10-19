@@ -698,6 +698,11 @@
       "status": "done",
       "evidence": ".workflow/evidence/S04-01a.json",
       "push_status": "pending_at_commit"
+    },
+    "S04-03a": {
+      "status": "done",
+      "evidence": ".workflow/evidence/S04-03a.json",
+      "push_status": "pending_at_commit"
     }
   },
   "gates": {

@@ -24,3 +24,12 @@
   .login-heading h1 { font-size: 32px; }
   .login-card { padding: 24px; }
 }
+
+.oauth-options { display: grid; gap: 12px; }
+.oauth-button { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; min-height: 48px; border: 1px solid var(--line); border-radius: 6px; font-size: 14px; background: var(--surface); color: var(--text); }
+.oauth-button svg { width: 20px; height: 20px; flex-shrink: 0; }
+.oauth-button:hover { background: var(--soft); }
+.oauth-button:disabled { opacity: .55; }
+.login-divider { display: flex; align-items: center; gap: 16px; margin: 24px 0; font-size: 12px; color: var(--muted); }
+.login-divider::before, .login-divider::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+.oauth-feedback { margin-bottom: 24px; padding: 12px; border: 1px solid var(--line); border-radius: 6px; }

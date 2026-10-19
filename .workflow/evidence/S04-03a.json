@@ -1,0 +1,28 @@
+{
+  "task_id": "S04-03a",
+  "status": "done",
+  "red": [
+    {
+      "command": "uv run pytest server/tests/contracts/auth/test_oauth_http.py -q (feedback case later moved to test_oauth_public.py)",
+      "result": "1 failed: cancellation message absent."
+    },
+    {
+      "command": "npx playwright test tests/e2e/oauth-ui.spec.js --grep 'guest does'",
+      "result": "1 failed: hidden logout remained visible due button CSS."
+    }
+  ],
+  "green": [
+    "33 browser tests passed before additional visibility case; final affected OAuth suite5passed including visibility case.",
+    "12 login/OAuth browser scenarios passed before adding visibility case.",
+    "Screenshots 390/1440 light/dark inspected; providers rendered in an explicit fixture only."
+  ],
+  "test_corrections": [
+    "Existing login status assertion now specifies email authentication since OAuth can be configured separately."
+  ],
+  "limits": [
+    "Owner confirms Google/Apple not configured; UI currently hides provider buttons.",
+    "No real provider roundtrip.",
+    "Password form remains disabled."
+  ],
+  "push_status": "pending_at_commit"
+}
