@@ -56,3 +56,18 @@ test('leaving the preview clears password and resets visibility state',async({pa
   await expect(page.getByLabel('Пароль',{exact:true})).toHaveAttribute('type','password');
   await expect(page.getByRole('button',{name:'Показати пароль',exact:true})).toHaveAttribute('aria-pressed','false');
 });
+
+for (const width of [390, 1440]) test(`login actions align ${width}`, async ({page}) => {
+  await page.setViewportSize({width, height: 900});
+  await page.goto('/login');
+  const show = await page.getByRole('button', {name: 'Показати пароль', exact: true}).boundingBox();
+  const recovery = await page.getByRole('button', {name: 'Забули пароль?', exact: true}).boundingBox();
+  expect(Math.abs((show.y + show.height / 2) - (recovery.y + recovery.height / 2))).toBeLessThan(2);
+  const alignment = await page.locator('.login-submit').evaluate(button => {
+    const text = [...button.childNodes].find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
+    const range = document.createRange(); range.selectNodeContents(text);
+    const label = range.getBoundingClientRect(), box = button.getBoundingClientRect();
+    return Math.abs(label.x + label.width / 2 - box.x - box.width / 2);
+  });
+  expect(alignment).toBeLessThan(2);
+});

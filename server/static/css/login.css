@@ -11,8 +11,10 @@
 .password-toggle, .login-help button, .login-signup button { border: 0; padding: 0; font-size: 12px; font-weight: 400; text-decoration: underline; text-underline-offset: 4px; }
 .password-toggle { min-height: 36px; color: var(--muted); }
 .login-card button:disabled { cursor: not-allowed; }
-.login-help { display: flex; justify-content: flex-end; margin-top: -20px; margin-bottom: 16px; }
-.login-submit { width: 100%; min-height: 50px; justify-content: space-between; padding-inline: 20px; }
+.login-help { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: -12px; margin-bottom: 20px; }
+.login-help button { min-height: 44px; text-decoration: none; font-size: 12px; }
+.login-help button:hover { text-decoration: underline; }
+.login-submit { width: 100%; min-height: 50px; justify-content: center; padding-inline: 20px; }
 .login-submit:disabled { opacity: .5; }
 .login-signup { margin-top: 24px; text-align: center; font-size: 13px; color: var(--muted); }
 .login-signup button { margin-left: 4px; color: var(--text); font-size: 13px; }

@@ -15,11 +15,11 @@
       <div class="form-field">
         <label class="form-field__label" for="login-password">{{ copy('Пароль', 'Password') }}</label>
         <div class="password-control"><input class="form-field__control" id="login-password" type="password" autocomplete="current-password" required maxlength="256">
-          <button type="button" class="password-toggle" data-password-toggle aria-controls="login-password" aria-pressed="false" data-show="{{ copy('Показати пароль', 'Show password') }}" data-hide="{{ copy('Приховати пароль', 'Hide password') }}" disabled>{{ copy('Показати пароль', 'Show password') }}</button>
+
         </div>
       </div>
-      <div class="login-help"><button type="button" data-login-interactive data-dialog-open="recovery-unavailable" disabled>{{ copy('Забули пароль?', 'Forgot password?') }}</button></div>
-      <button class="primary login-submit" type="submit" disabled aria-describedby="login-status">{{ copy('Увійти', 'Log in') }} <span aria-hidden="true">↗</span></button>
+      <div class="login-help"><button type="button" class="password-toggle" data-password-toggle aria-controls="login-password" aria-pressed="false" data-show="{{ copy('Показати пароль', 'Show password') }}" data-hide="{{ copy('Приховати пароль', 'Hide password') }}" disabled>{{ copy('Показати пароль', 'Show password') }}</button><button type="button" data-login-interactive data-dialog-open="recovery-unavailable" disabled>{{ copy('Забули пароль?', 'Forgot password?') }}</button></div>
+      <button class="primary login-submit" type="submit" disabled aria-describedby="login-status">{{ copy('Увійти', 'Log in') }}</button>
     </form>
     <p class="login-signup">{{ copy('Ще немає акаунта?', 'New here?') }} <button type="button" data-login-interactive data-dialog-open="availability-dialog" disabled>{{ copy('Реєстрація', 'Register') }}</button></p>
     <noscript><p class="small">{{ copy('JavaScript потрібен лише для показу пароля та додаткових пояснень. Вхід ще недоступний.', 'JavaScript is needed for the password toggle and additional information. Sign-in is not available yet.') }}</p></noscript>

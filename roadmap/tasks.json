@@ -6820,6 +6820,42 @@
         "docs/contracts.md",
         "docs/decisions.md"
       ]
+    },
+    {
+      "id": "S03-10b",
+      "stage": "03",
+      "slug": "login_layout",
+      "title": "Вирівняти допоміжні дії форми входу",
+      "goal": "Дії пароля в один рядок, напис Увійти по центру.",
+      "module": "auth",
+      "kind": "e2e",
+      "depends_on": [
+        "S03-10a"
+      ],
+      "gates": [],
+      "files": [
+        "server/templates/public/login.html",
+        "server/static/css/login.css"
+      ],
+      "test_file": "tests/e2e/login-form.spec.js",
+      "test_cases": [
+        {
+          "name": "aligned_actions",
+          "expected": "Same row and centered submit at 390/1440."
+        }
+      ],
+      "api": "GET /login renders public HTML; no authentication command.",
+      "db": "Нет изменения схемы.",
+      "notes": "Explicit independent UI child; S03-10 and its auth dependencies remain todo.",
+      "command": "npx playwright test tests/e2e/login-form.spec.js",
+      "commit": "fix(ui): [S03-10b] align login actions",
+      "status": "todo",
+      "order": 138,
+      "card": "roadmap/tasks/S03-10b_login_layout.md",
+      "read": [
+        "docs/contracts.md",
+        "docs/decisions.md"
+      ]
     }
   ]
 }
