@@ -17,7 +17,11 @@
     <span class="journey-arrow" aria-hidden="true">→</span>
     <article class="journey-card"><p class="eyebrow">{{ copy('Зі студією', 'With the studio') }}</p><h3>{{ copy('Є зрозумілий шлях.', 'A clear way forward.') }}</h3><p>{{ copy('Зрозумілий старт, посильний план, відстеження прогресу та підтримка. У темпі, який підходить вам.', 'A clear starting point, a manageable plan, progress tracking and support. At a pace that works for you.') }}</p></article>
     <span class="journey-arrow" aria-hidden="true">→</span>
-    <article class="journey-card"><p class="eyebrow">{{ copy('До чого рухаємося', 'What we work towards') }}</p><h3>{{ copy('Більше свободи руху.', 'More freedom to move.') }}</h3><p>{{ copy('Впевненість у рухах і уважніша практика. Власний поступ, крок за кроком.', 'More confidence in movement and a more mindful practice. Your own progress, step by step.') }}</p><svg class="progress-line" viewBox="0 0 240 50" aria-hidden="true"><path d="M2 45 C50 45 48 32 85 33 S138 20 155 22 S191 5 238 3"/></svg></article>
+    <article class="journey-card"><p class="eyebrow">{{ copy('До чого рухаємося', 'What we work towards') }}</p><h3>{{ copy('Більше свободи руху.', 'More freedom to move.') }}</h3><p>{{ copy('Впевненість у рухах і уважніша практика. Власний поступ, крок за кроком.', 'More confidence in movement and a more mindful practice. Your own progress, step by step.') }}</p><ol class="practice-path" aria-label="{{ copy('Шлях практики', 'Practice journey') }}">
+      <li><span class="path-marker" aria-hidden="true">1</span><span>{{ copy('Початок', 'Start') }}</span></li>
+      <li><span class="path-marker" aria-hidden="true">2</span><span>{{ copy('Практика', 'Practice') }}</span></li>
+      <li><span class="path-marker" aria-hidden="true">3</span><span>{{ copy('Впевненість', 'Confidence') }}</span></li>
+    </ol></article>
   </div>
 </section>
 <section class="directions-section wrap" id="directions" aria-labelledby="directions-title">
@@ -36,7 +40,11 @@
 {% include "public/plan_cards.html" %}
 <section class="equipment-section wrap" aria-labelledby="equipment-title">
   <div class="section-heading"><p class="eyebrow">{{ copy('Спорядження для ваших занять', 'Equipment for your practice') }}</p><h2 id="equipment-title">{{ copy('Більше опори.', 'More support.') }}<br>{{ copy('Більше можливостей.', 'More possibilities.') }}</h2><p>{{ copy('Для роботи над балансом, зручної розтяжки та впевненої опори. Обирайте те, що доповнить ваші заняття.', 'For balance practice, comfortable stretching and steady support. Choose what complements your practice.') }}</p></div>
-  <div class="equipment-list"><p>{{ copy('Килимок', 'Mat') }}</p><p>{{ copy('Паралетси', 'Parallettes') }}</p><p>{{ copy('Блоки для йоги', 'Yoga blocks') }}</p></div>
+  <div class="equipment-list">
+    <p><svg viewBox="0 0 64 48" aria-hidden="true"><path d="M16 13h35l-9 27H8l8-27Z"/><path d="M16 13c-1-5 3-9 7-9h30c5 0 7 5 5 9l-7 21"/><path d="M51 4c-5 0-7 9-1 9h1M17 22h20M14 30h20"/></svg><span>{{ copy('Килимок', 'Mat') }}</span></p>
+    <p><svg viewBox="0 0 64 48" aria-hidden="true"><path d="M9 31V20c0-2 1-3 3-4l21-8c3-1 5 1 5 4v12M5 34l9-3M33 27l9-3M23 40V29c0-2 1-3 3-4l21-8c3-1 5 1 5 4v12M19 43l9-3M47 36l9-3M12 16v13M26 25v13"/></svg><span>{{ copy('Паралетси', 'Parallettes') }}</span></p>
+    <p><svg viewBox="0 0 64 48" aria-hidden="true"><path d="m7 25 19-8 20 8-19 8-20-8Zm0 0v13l20 8 19-8V25M27 33v13M22 14 40 6l17 7-18 8-17-7Zm0 0v5M39 21v6M57 13v14l-11 5"/></svg><span>{{ copy('Блоки для йоги', 'Yoga blocks') }}</span></p>
+  </div>
   <p class="small">{{ copy('Приклади спорядження для практики. Продаж у студії ще не відкрито.', 'Equipment ideas for practice. The studio shop is not open yet.') }}</p>
 </section>
 {% endblock %}

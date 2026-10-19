@@ -6744,6 +6744,43 @@
         "docs/contracts.md",
         "docs/decisions.md"
       ]
+    },
+    {
+      "id": "S05-03b",
+      "stage": "05",
+      "slug": "landing_refinement",
+      "title": "Уточнити схему поступу та іконки спорядження",
+      "goal": "Підписаний шлях практики та компактні SVG спорядження за запитом2026-10-19.",
+      "module": "onboarding",
+      "kind": "e2e",
+      "depends_on": [
+        "S05-03a"
+      ],
+      "gates": [],
+      "files": [
+        "server/templates/public/index.html",
+        "server/static/css/public.css",
+        "server/static/js/features/public/plans.js"
+      ],
+      "test_file": "tests/e2e/landing-refinement.spec.js",
+      "test_cases": [
+        {
+          "name": "clear_progress_and_equipment",
+          "expected": "Labelled stages,3equipmenticons,UK/EN,light/dark390/1440,nooverflow."
+        }
+      ],
+      "api": "Нет нового публичного API.",
+      "db": "Нет изменения схемы.",
+      "notes": "Latest owner request replaces illustrative curve. No measured progress claims.",
+      "command": "npx playwright test tests/e2e/landing-refinement.spec.js",
+      "commit": "feat(ui): [S05-03b] clarify progress and equipment",
+      "status": "todo",
+      "order": 136,
+      "card": "roadmap/tasks/S05-03b_landing_refinement.md",
+      "read": [
+        "docs/contracts.md",
+        "docs/decisions.md"
+      ]
     }
   ]
 }

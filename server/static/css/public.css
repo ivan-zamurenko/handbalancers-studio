@@ -42,7 +42,6 @@ html[data-theme='dark'] .tired { color: #d59494; }
 .journey-card h3 { margin: 26px 0 16px; font-size: 20px; letter-spacing: -.03em; }
 .journey-card > p:last-of-type { color: var(--muted); font-size: 14px; line-height: 1.7; }
 .journey-arrow { color: var(--accent); font-size: 24px; align-self: center; }
-.progress-line { width: 100%; height: 80px; padding: 16px 0 24px; fill: none; stroke: var(--accent); stroke-width: 2; }
 .directions-section { border-top: 1px solid var(--line); }
 .directions-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
 .direction-card { border: 1px solid var(--line); border-radius: var(--radius-panel); background: var(--surface); padding: 28px 24px; transition: transform .3s, box-shadow .3s; }
@@ -149,10 +148,12 @@ html[data-theme='dark'] .tired { color: #d59494; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
-@media (prefers-reduced-motion: no-preference) {
-  .progress-line.is-visible path { animation: trace-line 1.2s ease both; }
-}
-@keyframes trace-line {
-  from { stroke-dasharray: 300; stroke-dashoffset: 300; }
-  to { stroke-dasharray: 300; stroke-dashoffset: 0; }
-}
+
+.practice-path { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); list-style: none; margin: 28px 0 0; padding: 0; gap: 6px; }
+.practice-path li { position: relative; display: grid; justify-items: center; gap: 12px; font-size: 11px; color: var(--muted); text-align: center; }
+.practice-path li:not(:last-child)::after { content: ''; position: absolute; top: 15px; left: calc(50% + 20px); width: calc(100% - 34px); height: 1px; background: var(--line); }
+.path-marker { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid var(--line); border-radius: 50%; font-size: 12px; font-variant-numeric: tabular-nums; }
+.practice-path li:last-child { color: var(--accent); }
+.practice-path li:last-child .path-marker { background: var(--soft); border-color: var(--accent); }
+.equipment-list p { display: flex; align-items: center; gap: 20px; }
+.equipment-list svg { width: 54px; height: 44px; flex-shrink: 0; fill: none; stroke: var(--text); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }

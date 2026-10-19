@@ -1,0 +1,17 @@
+{
+  "task_id": "S05-03b",
+  "status": "done",
+  "branch": "task/execution-v4",
+  "base_sha": "bd051b6906d145889642b451ccddc6eb993314fc",
+  "red": "Focused browser test: missing .practice-path,1failed3notrun before implementation.",
+  "green": "4focusedpassed; broader browser regression27passed including upcoming loginUI.",
+  "review": "Read-only review no blockers; decorative SVGs have visible localized labels; no fake metrics.",
+  "checks": [
+    "light/dark390/1440 browser layout; visual screenshots .local-tools/oct19.",
+    "Removed old curve, CSS keyframes and JS observer together."
+  ],
+  "limits": [
+    "No inventory or checkout enabled."
+  ],
+  "push_status": "pending_at_commit"
+}

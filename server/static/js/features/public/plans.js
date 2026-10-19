@@ -33,17 +33,3 @@ for (const radio of radios) radio.addEventListener('change', () => {
   render();
 });
 render();
-
-// One entrance for the illustrative line; no invented metric or result.
-if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
-  const line = document.querySelector('.progress-line');
-  if (line) {
-    const observer = new IntersectionObserver(entries => {
-      if (entries.some(entry => entry.isIntersecting)) {
-        line.classList.add('is-visible');
-        observer.disconnect();
-      }
-    });
-    observer.observe(line);
-  }
-}

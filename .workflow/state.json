@@ -677,6 +677,11 @@
     "S05-03a": {
       "status": "done",
       "evidence": ".workflow/evidence/S05-03a.json",
+      "push_status": "pushed"
+    },
+    "S05-03b": {
+      "status": "done",
+      "evidence": ".workflow/evidence/S05-03b.json",
       "push_status": "pending_at_commit"
     }
   },
