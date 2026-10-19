@@ -1,0 +1,21 @@
+{
+  "task_id": "S03-10c",
+  "red": {
+    "command": "npx playwright test tests/e2e/login-form.spec.js --grep 'inline animated' --max-failures=1",
+    "result": "1failed3notrun: old toggle x49 was outside right half of field (expected >195)."
+  },
+  "green": {
+    "command": "npx playwright test tests/e2e/login-form.spec.js tests/e2e/oauth-ui.spec.js",
+    "result": "16passed"
+  },
+  "test_corrections": [
+    "Latest owner request supersedes old same-row positioning assertion; submit centering remains checked.",
+    "New test initially reused a role/name locator after accessible name changed, causing5failures. Use stable data locator and explicitly assert both localized names; no behavioral expectations removed."
+  ],
+  "review": "Read-only reviewer: no blockers.",
+  "visual": "Open/closed screenshots inspected,390/1440 light/dark. Actual preview8000 serves updated assets/template.",
+  "limits": [
+    "OAuth external provider gate unchanged. Email login remains preview."
+  ],
+  "push_status": "pending_at_commit"
+}

@@ -57,12 +57,35 @@ test('leaving the preview clears password and resets visibility state',async({pa
   await expect(page.getByRole('button',{name:'Показати пароль',exact:true})).toHaveAttribute('aria-pressed','false');
 });
 
-for (const width of [390, 1440]) test(`login actions align ${width}`, async ({page}) => {
+for (const width of [390, 1440]) for (const theme of ['light', 'dark']) test(`inline animated password eye ${width} ${theme}`, async ({page}) => {
   await page.setViewportSize({width, height: 900});
   await page.goto('/login');
-  const show = await page.getByRole('button', {name: 'Показати пароль', exact: true}).boundingBox();
-  const recovery = await page.getByRole('button', {name: 'Забули пароль?', exact: true}).boundingBox();
-  expect(Math.abs((show.y + show.height / 2) - (recovery.y + recovery.height / 2))).toBeLessThan(2);
+  await page.getByLabel('Тема').selectOption(theme);
+  const toggle = page.locator('[data-password-toggle]');
+  await expect(toggle).toHaveAccessibleName('Показати пароль');
+  const input = page.getByLabel('Пароль', {exact: true});
+  const box = await input.boundingBox(), eye = await toggle.boundingBox();
+  expect(eye.x).toBeGreaterThan(box.x + box.width / 2);
+  expect(eye.x + eye.width).toBeLessThanOrEqual(box.x + box.width);
+  expect(eye.y).toBeGreaterThanOrEqual(box.y);
+  expect(eye.y + eye.height).toBeLessThanOrEqual(box.y + box.height);
+  expect(eye.width).toBeGreaterThanOrEqual(44);
+  await expect(toggle.locator('svg')).toHaveCount(1);
+  await input.fill('synthetic-password');
+  const animations = await toggle.evaluate(button => {
+    getComputedStyle(button.querySelector('.eye-open')).transform;
+    button.click();
+    return button.getAnimations({subtree:true}).length;
+  });
+  expect(animations).toBeGreaterThan(0);
+  await expect(input).toHaveAttribute('type','text');
+  await expect(toggle).toHaveAttribute('aria-pressed','true');
+  await expect(toggle).toHaveAccessibleName('Приховати пароль');
+  await toggle.focus();
+  await page.keyboard.press('Space');
+  await expect(input).toHaveAttribute('type','password');
+  await expect(toggle).toHaveAttribute('aria-pressed','false');
+  await expect(input).toHaveValue('synthetic-password');
   const alignment = await page.locator('.login-submit').evaluate(button => {
     const text = [...button.childNodes].find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
     const range = document.createRange(); range.selectNodeContents(text);
@@ -70,4 +93,15 @@ for (const width of [390, 1440]) test(`login actions align ${width}`, async ({pa
     return Math.abs(label.x + label.width / 2 - box.x - box.width / 2);
   });
   expect(alignment).toBeLessThan(2);
+});
+
+test('password eye respects reduced motion and English labels', async ({page}) => {
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.goto('/login?lang=en');
+  const toggle=page.locator('[data-password-toggle]');
+  await expect(toggle).toHaveAccessibleName('Show password');
+  await toggle.click();
+  await expect(page.getByRole('button',{name:'Hide password',exact:true})).toHaveAttribute('aria-pressed','true');
+  expect(await toggle.evaluate(button => button.getAnimations({subtree:true}).length)).toBe(0);
+  await expect(page.getByLabel('Password',{exact:true})).toHaveAttribute('type','text');
 });

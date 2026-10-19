@@ -9,14 +9,14 @@ if (password && toggle) {
     const visible = password.type === 'password';
     password.type = visible ? 'text' : 'password';
     toggle.setAttribute('aria-pressed', String(visible));
-    toggle.textContent = visible ? toggle.dataset.hide : toggle.dataset.show;
+    toggle.setAttribute('aria-label', visible ? toggle.dataset.hide : toggle.dataset.show);
   });
 }
 for (const control of document.querySelectorAll('[data-login-interactive]')) control.disabled = false;
 // A browser history entry must not keep the preview password visible or populated.
 window.addEventListener('pagehide', () => {
   if (password) { password.value = ''; password.type = 'password'; }
-  if (toggle) { toggle.setAttribute('aria-pressed', 'false'); toggle.textContent = toggle.dataset.show; }
+  if (toggle) { toggle.setAttribute('aria-pressed', 'false'); toggle.setAttribute('aria-label', toggle.dataset.show); }
 });
 
 

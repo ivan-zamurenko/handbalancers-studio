@@ -6939,6 +6939,44 @@
         "docs/contracts.md",
         "docs/decisions.md"
       ]
+    },
+    {
+      "id": "S03-10c",
+      "stage": "03",
+      "slug": "password_eye",
+      "title": "Анімоване око в полі пароля",
+      "goal": "Кнопка справа всередині поля: закрите/відкрите око, плавний перехід і маскування пароля.",
+      "module": "auth",
+      "kind": "e2e",
+      "depends_on": [
+        "S03-10b",
+        "S04-03a"
+      ],
+      "gates": [],
+      "files": [
+        "server/templates/public/login.html",
+        "server/static/css/login.css",
+        "server/static/js/features/auth/login.js"
+      ],
+      "test_file": "tests/e2e/login-form.spec.js",
+      "test_cases": [
+        {
+          "name": "inline_eye",
+          "expected": "Inside input,44px target,animated toggle,password masking,keyboard,UK/EN,reduced motion,390/1440 light/dark."
+        }
+      ],
+      "api": "Existing OAuth endpoints.",
+      "db": "No schema changes.",
+      "notes": "Latest owner request replaces same-row text toggle. No auth backend changes.",
+      "command": "npx playwright test tests/e2e/login-form.spec.js tests/e2e/oauth-ui.spec.js",
+      "commit": "feat(ui): [S03-10c] animate inline password eye",
+      "status": "todo",
+      "order": 141,
+      "card": "roadmap/tasks/S03-10c_password_eye.md",
+      "read": [
+        "docs/contracts.md",
+        "docs/decisions.md"
+      ]
     }
   ]
 }

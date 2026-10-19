@@ -1,3 +1,11 @@
+# Остання зміна — око в полі пароля
+
+S03-10c: SVG око справа всередині input; плавні 240ms переходи,
+маскування/показ,44px target,UK/EN labels,keyboard,reduced motion.
+16 affected browser tests GREEN; read-only review clean; screenshots checked.
+Попередній5aeaa5c pushed/CI success(run39271551048).
+Поточні commit/push/CI перевіряються після комміту. Preview8000 оновлено.
+
 # Поточний checkpoint — 2026-10-19
 
 Явний запит: компонування login і Google/Apple OAuth.
