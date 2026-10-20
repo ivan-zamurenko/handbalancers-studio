@@ -22,6 +22,7 @@ class Settings(BaseModel):
     oauth_client_secret: SecretStr | None = None
     supabase_url: str | None = None
     supabase_publishable_key: SecretStr | None = None
+    auth_email_enabled: bool = False
     oauth_google_enabled: bool = False
     oauth_apple_enabled: bool = False
     stripe_secret_key: SecretStr | None = None
@@ -54,7 +55,11 @@ class Settings(BaseModel):
                 or not settings.token_encryption_key.get_secret_value().strip()
             ):
                 raise ValueError("Deployment requires HTTPS origin and encryption key")
-            if settings.oauth_google_enabled or settings.oauth_apple_enabled:
+            if (
+                settings.auth_email_enabled
+                or settings.oauth_google_enabled
+                or settings.oauth_apple_enabled
+            ):
                 if not all(
                     (
                         settings.public_origin,

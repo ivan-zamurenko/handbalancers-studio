@@ -1,0 +1,36 @@
+{
+  "task_id": "S03-04",
+  "status": "done",
+  "scope_deviations": [
+    "Reuse existing verified-token provisioning/session operation for email and OAuth; thin route registry and explicit email runtime enable flag are necessary to run without social providers.",
+    "Local stack must copy confirmation template into isolated workdir; configure and verify real mail catcher delivery.",
+    "Extend existing DB rate limit with a bounded quota for resend, no schema changes."
+  ],
+  "external": "Cloud database provisioning and Google/Apple remain pending; this card uses only isolated local Supabase.",
+  "red": {
+    "command": "uv run --locked pytest server/tests/integration/auth/test_verify_email.py::test_verify_route_validates_six_digit_code -q",
+    "result": "1failed: HTTP404 instead of422; endpoint absent. Additional flag test failed422 instead of503 before binding fix."
+  },
+  "green": {
+    "command": "uv run --locked python tools/local_stack.py test uv run --locked pytest server/tests/integration/auth -q; pytest server/tests/unit server/tests/contracts server/tests/security/auth tools/tests/test_s01_01_local_supabase.py -q",
+    "result": "31 Auth integration passed (9 new real Supabase/mail/JWT/DB tests);96 regression passed with16 subtests; ruff and mypy passed. Explicit rollback assertion rerun recorded separately."
+  },
+  "review": "Read-only reviewer: 3 findings fixed (email enable flag, true rollback injection, concurrent quotas); final review no blockers.",
+  "test_corrections": [
+    "Initial secret echo test used abc, accidentally matching a random correlation UUID. Replaced with nonhex sensitive-invalid-code; still asserts rejected input absent from entire response.",
+    "Local CLI missing from PATH caused setup errors; added existing .local-tools/supabase-cli/node_modules/.bin. Not counted as behavior RED."
+  ],
+  "decisions": [
+    "Email verification runtime independently opt-in with AUTH_EMAIL_ENABLED; default false.",
+    "Existing signed JWT/confirmed user/UUID match and NULL-only provisioning shared with OAuth; transaction creates profile+session and revokes old cookie atomically.",
+    "Verify max10/IP and10/email/minute; resend max10/IP and1/email/minute. HMAC buckets contain no raw email/IP.",
+    "Supabase stores/checks OTP. Unknown/confirmed/provider cooldown resend outcomes remain neutral202; local quota429 and provider outage503.",
+    "Local test stack restarted with preserved data to load confirmation template; cloud untouched."
+  ],
+  "limits": [
+    "Cloud project tables and limited runtime login not provisioned; AUTH_DATABASE_URL still needs environment setup.",
+    "Email/password login, refresh/recovery and registration/verification UI are next roadmap cards.",
+    "External SMTP and Google/Apple live gates not passed."
+  ],
+  "push_status": "pending_at_commit"
+}

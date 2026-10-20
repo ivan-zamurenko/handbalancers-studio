@@ -23,7 +23,7 @@ def build_oauth(settings: Settings) -> OAuthService | None:
         )
         if enabled
     )
-    if not providers:
+    if not providers and not settings.auth_email_enabled:
         return None
     assert settings.auth_database_url and settings.token_encryption_key
     assert settings.supabase_url and settings.supabase_publishable_key and settings.public_origin

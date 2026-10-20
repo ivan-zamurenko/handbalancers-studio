@@ -11,6 +11,7 @@ from starlette.exceptions import HTTPException
 from studio.auth.oauth_routes import router as oauth_router
 from studio.auth.routes import router as auth_router
 from studio.auth.runtime import build_oauth
+from studio.auth.verification_routes import router as verification_router
 from studio.health import liveness
 from studio.public.routes import router as public_router
 from studio.settings import Settings, load_settings
@@ -23,12 +24,18 @@ def create_app(settings: Settings | Mapping[str, object] | None = None) -> FastA
     app = FastAPI(title="Handbalancer's Studio")
     app.state.settings = validated
     app.state.oauth_service = build_oauth(validated)
+    app.state.verification_service = (
+        app.state.oauth_service if validated.auth_email_enabled else None
+    )
+    if validated.auth_email_enabled and app.state.oauth_service is not None:
+        app.state.auth_gateway = app.state.oauth_service.gateway
     configure_access_logging()
     app.add_middleware(RequestContextMiddleware)
     app.add_exception_handler(RequestValidationError, validation_error)
     app.add_exception_handler(HTTPException, http_error)
     app.add_api_route("/health/live", liveness, methods=["GET"])
     app.include_router(auth_router)
+    app.include_router(verification_router)
     app.include_router(oauth_router)
     app.include_router(public_router)
     app.mount(

@@ -71,6 +71,9 @@ class AuthGateway:
     async def verify_email(self, email: str, token: str) -> dict[str, object] | None:
         return await self._call("/verify", {"email": email, "token": token, "type": "signup"})
 
+    async def resend_verification(self, email: str) -> dict[str, object] | None:
+        return await self._call("/resend", {"email": email, "type": "signup"})
+
     async def password_login(self, email: str, password: str) -> dict[str, object] | None:
         return await self._call(
             "/token?grant_type=password", {"email": email, "password": password}

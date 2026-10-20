@@ -47,6 +47,10 @@ enable_signup = true
 enable_confirmations = true
 otp_length = 6
 
+[auth.email.template.confirmation]
+subject = "Handbalancer’s Studio — код підтвердження"
+content_path = "./supabase/templates/confirmation.html"
+
 [realtime]
 enabled = false
 

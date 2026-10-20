@@ -122,6 +122,14 @@ class OAuthService:
                 session, attempt, provider=provider, binding=binding
             )
         payload = await self.gateway.oauth_exchange(code, pending.verifier.get_secret_value())
+        return await self.accept_identity(
+            payload, old_cookie=old_cookie, return_path=pending.allowed_return_path
+        )
+
+    async def accept_identity(
+        self, payload: object, *, old_cookie: str | None = None, return_path: str = "/plans"
+    ) -> OAuthResult:
+        """Shared verified-token boundary for email and social login."""
         if not isinstance(payload, dict):
             raise InvalidIdentity()
         access, refresh, user = (
@@ -156,7 +164,7 @@ class OAuthService:
         return OAuthResult(
             handle_user_id(profile),
             handle.cookie,
-            pending.allowed_return_path,
+            return_path,
             bool(profile["first_name"] and profile["last_name"]),
         )
 

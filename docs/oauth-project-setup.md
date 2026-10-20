@@ -38,6 +38,22 @@ Google повертається до Supabase callback, а Supabase — до л�
 
 ## 3. Локальний сервер
 
+`AUTH_DATABASE_URL` — рядок підключення PostgreSQL, не API key.
+Базові host/port/database видно через Connect у Supabase dashboard. Для цього
+застосунку потрібен окремий LOGIN з паролем та успадкованими правами
+`studio_auth_runtime`; готового ключа з назвою AUTH_DATABASE_URL у Supabase немає.
+Рядок має починатися з `postgresql+psycopg://`. Через session pooler username
+для custom login має формат `LOGIN.PROJECT_REF`; hostname і порт беруться з
+Connect, а пароль належить саме цьому LOGIN. Не копіювати postgres/admin
+connection у runtime field. Пароль з URL не надсилати в чат або Git.
+
+Таблиці створюються Alembic migrations 0001–0006 у схемах `studio` і
+`studio_private`, а не вручну в Table Editor. На локальному стенді вони вже є.
+У хмарному проєкті ці міграції ще не виконано. Спочатку перевірити порожню нову
+БД та права migration owner, застосувати міграції, потім створити runtime LOGIN
+і заповнити AUTH_DATABASE_URL. Managed `auth` таблицями керує Supabase.
+
+
 `.env.local` підготовлено і виключено з Git; права доступу0600.
 SUPABASE_URL/PUBLIC_ORIGIN задані, TOKEN_ENCRYPTION_KEY згенеровано локально.
 Не перегенеровувати ключ під час звичайного перезапуску.
@@ -50,6 +66,10 @@ SUPABASE_URL/PUBLIC_ORIGIN задані, TOKEN_ENCRYPTION_KEY згенерова
 та окремий runtime login. Їх застосування до віддаленої БД ще не виконано:
 потрібен підключений Supabase або захищене локальне з’єднання. Не запускати
 міграції старого runtime. Без перевірки нової БД не позначати цей крок готовим.
+
+Для email API після підключення DB/ключів та шаблону підтвердження:
+AUTH_EMAIL_ENABLED=true. Це незалежний прапорець від Google/Apple.
+Email/password login і сторінки реєстрації ще мають окремі наступні roadmap картки.
 
 Після налаштування Google, DB та ключів: OAUTH_GOOGLE_ENABLED=true.
 OAUTH_APPLE_ENABLED=false до окремого налаштування Apple.
@@ -92,3 +112,5 @@ Apple web OAuth не передає повне ім’я. Google може пер
 - https://supabase.com/docs/guides/auth/redirect-urls
 - https://github.com/supabase/auth/blob/master/internal/api/provider/oidc.go
 - https://github.com/supabase/auth/blob/master/internal/utilities/request.go
+
+Підключення PostgreSQL: https://supabase.com/docs/guides/database/connecting-to-postgres

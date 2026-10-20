@@ -64,6 +64,11 @@ def prepare(profile: str, *, root: Path = ROOT) -> Path:
                 )
         if (directory / "signing_keys.json").exists():
             config["auth"]["signing_keys_path"] = "./signing_keys.json"
+        template_dir = directory / "templates"
+        template_dir.mkdir(exist_ok=True)
+        (template_dir / "confirmation.html").write_text(
+            (ROOT / "supabase/templates/confirmation.html").read_text()
+        )
         (directory / "config.toml").write_text(config_text(config))
     return workdir
 
