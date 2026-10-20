@@ -133,6 +133,7 @@ async def session_snapshot(request: Request) -> JSONResponse:
         {
             "authenticated": True,
             "user": profile,
+            "entitlements": [],
             "csrf_token": service_for(request).csrf_token(cookie),
         },
         headers=HEADERS,

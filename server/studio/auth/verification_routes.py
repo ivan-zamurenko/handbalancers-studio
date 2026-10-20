@@ -12,6 +12,7 @@ from studio.auth.oauth import OAuthRateLimited, OAuthService
 from studio.auth.oauth_routes import HEADERS, secure, session_name
 from studio.auth.routes import same_origin
 from studio.auth.schemas import Email
+from studio.auth.sessions import password_login
 from studio.auth.token_store import StoreError
 from studio.auth.verification import resend, verify_email
 
@@ -94,3 +95,45 @@ async def resend_verification(request: Request, data: EmailInput) -> JSONRespons
     except (AuthFailure, OAuthRateLimited) as error:
         raise translate(error) from None
     return JSONResponse({"state": "verification_pending"}, status_code=202, headers=HEADERS)
+
+
+class LoginInput(EmailInput):
+    password: SecretStr = Field(repr=False)
+
+    @field_validator("password")
+    @classmethod
+    def bounded_password(cls, value: SecretStr) -> SecretStr:
+        if not 1 <= len(value.get_secret_value()) <= 256:
+            raise ValueError("Invalid password length")
+        return value
+
+
+@router.post("/login")
+async def login(request: Request, data: LoginInput) -> JSONResponse:
+    same_origin(request)
+    try:
+        result = await password_login(
+            service_for(request),
+            data.email,
+            data.password.get_secret_value(),
+            client_key=client_key(request),
+            old_cookie=request.cookies.get(session_name(request)),
+        )
+    except (AuthFailure, InvalidIdentity, StoreError, OAuthRateLimited) as error:
+        failure = translate(error)
+        # Unknown email, wrong password, unconfirmed and inactive identity are indistinguishable.
+        if failure.status_code == 422:
+            failure = HTTPException(401)
+        raise failure from None
+    response = JSONResponse(
+        {"state": "authenticated", "profile_complete": result.profile_complete}, headers=HEADERS
+    )
+    response.set_cookie(
+        session_name(request),
+        result.cookie.get_secret_value(),
+        httponly=True,
+        secure=secure(request),
+        samesite="lax",
+        path="/",
+    )
+    return response

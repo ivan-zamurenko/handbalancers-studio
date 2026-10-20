@@ -1,0 +1,35 @@
+{
+  "task_id": "S03-05",
+  "status": "done",
+  "scope_deviations": [
+    "Thin login endpoint joins existing email verification router to reuse independent email runtime guard and cookie helpers without circular imports.",
+    "Add no-store at existing HTTP middleware for all auth/session outcomes, including validation and outages.",
+    "Reuse local Supabase fixtures, expose generated test password as fixture for real login tests.",
+    "Existing /api/session now includes entitlements:[] as required shape, without inventing grants."
+  ],
+  "red": {
+    "command": "uv run --locked pytest server/tests/contracts/auth/test_password_login.py -q",
+    "result": "4failed: missing endpoint HTTP404."
+  },
+  "green": {
+    "commands": [
+      "uv run --locked pytest server/tests/contracts/auth/test_password_login.py -q",
+      "uv run --locked python tools/local_stack.py test uv run --locked pytest server/tests/integration/auth -q",
+      "uv run --locked pytest server/tests/unit server/tests/contracts server/tests/security/auth -q",
+      "ruff check/format server/studio; mypy server/studio"
+    ],
+    "results": [
+      "4 contract tests passed",
+      "35 Auth integration passed, including4 new password cases",
+      "79 regression passed",
+      "lint/format/types passed"
+    ]
+  },
+  "review": "Read-only reviewer: no blockers. Verified guards, atomic session rotation, generic failures and bounded quotas.",
+  "limits": [
+    "Entitlements module not ready: snapshot returns empty entitlements; no paid access inferred.",
+    "Cloud DB, Google/Apple gates unchanged. This proves local Supabase password flow only.",
+    "Login form wiring and full user journey remain S03-10/S03-11; session refresh is next S03-06."
+  ],
+  "push_status": "pending_at_commit"
+}

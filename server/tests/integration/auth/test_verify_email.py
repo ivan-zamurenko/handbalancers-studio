@@ -65,10 +65,15 @@ def live():
 
 
 @pytest.fixture
-def member(live):
+def member_password():
+    return secrets.token_urlsafe(24)
+
+
+@pytest.fixture
+def member(live, member_password):
     gateway, engine = live
     email = f"verify-{uuid4().hex}@example.test"
-    payload = asyncio.run(gateway.signup(email, secrets.token_urlsafe(24), "Іван", "Тестовий"))
+    payload = asyncio.run(gateway.signup(email, member_password, "Іван", "Тестовий"))
     auth_id = payload["user"]["id"] if "user" in payload else payload["id"]
     service = OAuthService(
         auth_transaction=lambda: role_session(engine, "studio_auth_runtime"),

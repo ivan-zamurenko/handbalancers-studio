@@ -117,12 +117,12 @@
     "S03-04": {
       "status": "done",
       "evidence": ".workflow/evidence/S03-04.json",
-      "push_status": "pending_at_commit"
+      "push_status": "pushed"
     },
     "S03-05": {
-      "status": "todo",
-      "evidence": null,
-      "push_status": "not_started"
+      "status": "done",
+      "evidence": ".workflow/evidence/S03-05.json",
+      "push_status": "pending_at_commit"
     },
     "S03-06": {
       "status": "todo",

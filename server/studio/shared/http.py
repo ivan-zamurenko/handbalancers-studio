@@ -62,6 +62,14 @@ class RequestContextMiddleware:
                     for key, value in message.get("headers", [])
                     if key.lower() != b"x-request-id"
                 ]
+                if scope.get("path", "").startswith("/api/auth/") or scope.get("path") in {
+                    "/api/session",
+                    "/auth/callback",
+                }:
+                    headers = [
+                        (key, value) for key, value in headers if key.lower() != b"cache-control"
+                    ]
+                    headers.append((b"cache-control", b"no-store"))
                 message = {**message, "headers": [*headers, (b"x-request-id", request_id.encode())]}
             await send(message)
 
