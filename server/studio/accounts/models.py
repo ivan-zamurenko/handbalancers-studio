@@ -41,6 +41,7 @@ class User(Base):
     auth_user_id: Mapped[UUID] = mapped_column(
         Uuid, ForeignKey(_auth_users.c.id, name="fk_users_auth_user_id"), nullable=False
     )
+    display_name: Mapped[str | None] = mapped_column(Text)
     first_name: Mapped[str | None] = mapped_column(Text)
     last_name: Mapped[str | None] = mapped_column(Text)
     role: Mapped[str] = mapped_column(Text, nullable=False, server_default=text("'member'"))

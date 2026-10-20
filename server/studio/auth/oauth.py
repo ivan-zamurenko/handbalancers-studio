@@ -141,7 +141,7 @@ class OAuthService:
         if user.get("id") != str(identity.user_id):
             raise InvalidIdentity()
         with self.transaction() as session:
-            profile = provision(session, identity)
+            profile = provision(session, identity, metadata=user.get("user_metadata"))
             handle = self.store.create_session(
                 session,
                 user_id=handle_user_id(profile),

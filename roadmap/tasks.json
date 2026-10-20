@@ -6977,6 +6977,45 @@
         "docs/contracts.md",
         "docs/decisions.md"
       ]
+    },
+    {
+      "id": "S04-02a",
+      "stage": "04",
+      "slug": "oauth_profile_data",
+      "title": "Автоматичний імпорт даних OAuth профілю",
+      "goal": "Заповнювати відсутні імена з перевіреної OAuth identity без перезапису профілю.",
+      "module": "auth",
+      "kind": "integration",
+      "depends_on": [
+        "S04-01a"
+      ],
+      "gates": [],
+      "files": [
+        "server/alembic/versions/0006_oauth_profile_data.py",
+        "server/studio/accounts/models.py",
+        "server/studio/accounts/provisioning.py",
+        "server/studio/auth/oauth.py",
+        "docs/oauth-project-setup.md"
+      ],
+      "test_file": "server/tests/integration/auth/test_oauth_profile.py",
+      "test_cases": [
+        {
+          "name": "oauth_profile_import",
+          "expected": "Verified UUID; normalized optional names; no guessed surname or role; NULL-only atomic fill; repeated/concurrent login; malformed metadata; narrow grants."
+        }
+      ],
+      "api": "Existing OAuth endpoints.",
+      "db": "0006: optional display_name and narrow provisioning function.",
+      "notes": "Owner-requested child. Live provider gate remains env_blocked; Apple Developer account absent.",
+      "command": "uv run --locked python -m tools.check_migrations",
+      "commit": "feat(auth): [S04-02a] import OAuth profile data",
+      "status": "todo",
+      "order": 142,
+      "card": "roadmap/tasks/S04-02a_oauth_profile_data.md",
+      "read": [
+        "docs/contracts.md",
+        "docs/decisions.md"
+      ]
     }
   ]
 }

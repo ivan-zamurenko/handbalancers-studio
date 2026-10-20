@@ -1,0 +1,31 @@
+{
+  "task_id": "S04-02a",
+  "red": {
+    "command": "uv run --locked python tools/local_stack.py test uv run --locked pytest server/tests/integration/auth/test_oauth_profile.py -q",
+    "result": "3 failed, 4 passed: profile metadata not imported. Log .local-tools/oauth-profile-red.log."
+  },
+  "green": {
+    "command": "uv run --locked python -m tools.check_migrations; affected unit/contracts/auth security pytest; ruff check/format; mypy server",
+    "result": "82 real DB tests (40 database integration,20 database security,22 OAuth integration),75 non-DB tests; lint/format/type checks passed. Final DB log .local-tools/oauth-profile-final-db.log."
+  },
+  "test_corrections": [
+    "ORM parity previously compared current ORM to historical 0002. It now upgrades to head inside rolled-back transaction; historical schema security tests remain unchanged.",
+    "Initial regression had one transient expired_attempt failure; root cause unproven. Test and runtime unchanged; targeted rerun and final full DB regression passed."
+  ],
+  "review": "Read-only reviewer: no blockers; reviewed identity ordering, grants, NULL-only atomic fill, concurrency and ORM parity.",
+  "external": {
+    "status": "env_blocked",
+    "supabase_url": "https://dwckvtuhgelhsbjyhpks.supabase.co",
+    "apple_developer_account": false,
+    "remote_migrations": "not_applied",
+    "providers": "not_configured",
+    "live_roundtrip": "not_run",
+    "site_url": "http://127.0.0.1:8000 assumed local test origin"
+  },
+  "limits": [
+    "Provider HTTP exchange synthetic; DB and concurrency real.",
+    "Email remains in managed Auth. Avatar not copied. Apple web OAuth does not supply full name.",
+    "Private ignored .env.local created0600; publishable key and runtime DB connection still missing."
+  ],
+  "push_status": "pending_at_commit"
+}

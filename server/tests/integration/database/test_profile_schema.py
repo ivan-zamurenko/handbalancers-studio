@@ -143,12 +143,15 @@ def test_runtime_has_no_profile_access_before_security_card(profiles):
                 scope.rollback()
 
 
-def test_model_matches_migration(profiles):
+def test_model_matches_head_migrations(profiles):
     from studio.accounts.models import User
     from studio.db import Base, include_migration_name
 
     assert "auth.users" not in Base.metadata.tables
     with profiles.connect() as connection:
+        transaction = connection.begin()
+        # Current ORM must match head; other tests retain historical 0002 guarantees.
+        command.upgrade(baseline.configuration(connection), "head")
         context = MigrationContext.configure(
             connection,
             opts={
@@ -162,13 +165,14 @@ def test_model_matches_migration(profiles):
             },
         )
         assert compare_metadata(context, Base.metadata) == []
-    with Session(profiles) as session, session.begin():
-        user = User(auth_user_id=auth_id(10), locale="uk", timezone="Europe/Kyiv")
-        session.add(user)
-        session.flush()
-        assert isinstance(user.id, UUID)
-        assert user.role == "member"
-        assert user.first_name is None
+        with Session(connection) as session, session.begin():
+            user = User(auth_user_id=auth_id(10), locale="uk", timezone="Europe/Kyiv")
+            session.add(user)
+            session.flush()
+            assert isinstance(user.id, UUID)
+            assert user.role == "member"
+            assert user.first_name is None
+        transaction.rollback()
 
 
 def test_failed_command_rolls_back_profile(profiles):

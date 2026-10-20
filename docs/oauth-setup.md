@@ -1,5 +1,7 @@
 # Google та Apple: налаштування нового проєкту
 
+Конкретні адреси й кроки для проєкту власника: [oauth-project-setup.md](oauth-project-setup.md).
+
 Стан: код OAuth PKCE підготовлено; провайдери ще не налаштовані власником.
 Реальні Google/Apple roundtrips не перевірено. Локальні тести використовують
 справжню PostgreSQL і підписані тестові JWT, але синтетичний upstream.
@@ -54,7 +56,7 @@ https://supabase.com/docs/guides/auth/sessions/pkce-flow
   відповідного провайдера; спочатку перевірити на ізольованому staging.
 
 Перед запуском застосувати міграції до нової БД через окремий migration operator.
-Runtime не робить міграцій і не підвищує DB privileges. Поточний head 0005.
+Runtime не робить міграцій і не підвищує DB privileges. Поточний head 0006.
 `tools/serve_preview.py` навмисно не читає provider credentials. Для налаштованого
 runtime: `uv run uvicorn studio.main:create_app --factory --host 127.0.0.1 --port 8000`.
 Не використовувати тестові DB passwords у staging.
@@ -72,3 +74,7 @@ email verification/password login і повний onboarding залишають�
 Локальний вихід відкликає cookie негайно; збій Supabase logout цього не скасовує.
 OAuth start: 10 спроб за хвилину на IP через DB quota; за reverse proxy потрібне
 окремо налаштоване довірене визначення адреси (X-Forwarded-For тут не довіряємо).
+
+Автозаповнення профілю: після JWT/UUID перевірки переносимо full_name/name
+у display_name, окремі first/last — лише за явними полями. Заповнюємо NULL,
+зберігаємо ручні значення й ролі. Email належить managed auth.users.
