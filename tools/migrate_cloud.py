@@ -26,6 +26,28 @@ POOLER_HOST = "aws-1-eu-west-1.pooler.supabase.com"
 TARGET_REVISION = "0006"
 
 
+def safe_failure_reason(error: Exception, phase: str) -> str:
+    """Classify libpq failures without returning raw messages, URLs or usernames."""
+    original = getattr(error, "orig", error)
+    message = str(original).casefold()
+    patterns = (
+        ("pooler_auth_throttled", ("circuit breaker open", "too many authentication errors")),
+        ("authentication_rejected", ("password authentication failed", "wrong password")),
+        ("tls_verification", ("certificate verify failed", "root certificate file",
+                              "does not match host name")),
+        ("tls_connection_error", ("ssl error",)),
+        ("dns_resolution", ("could not translate host name", "name or service not known",
+                            "nodename nor servname")),
+        ("connection_timeout", ("timeout expired", "connection timed out")),
+        ("pooler_routing", ("tenant or user not found",)),
+        ("connection_refused", ("connection refused",)),
+    )
+    for reason, fragments in patterns:
+        if any(fragment in message for fragment in fragments):
+            return reason
+    return "unclassified_connection_error" if phase == "connect" else "database_operation_failed"
+
+
 def upgrade_verified(connection: Connection, *, adopt_bootstrap: bool = False) -> str:
     require(connection.in_transaction(), "An enclosing transaction is required")
     require(single_head(ROOT / "server/alembic") == TARGET_REVISION, "Unapproved migration head")
@@ -102,11 +124,16 @@ def main() -> int:
         poolclass=NullPool, hide_parameters=True, connect_args={"connect_timeout": 10},
     )
     del password
+    phase = "connect"
     try:
         with engine.begin() as connection:
+            phase = "verify_and_apply"
             upgrade_verified(connection, adopt_bootstrap=arguments.adopt_bootstrap)
             if not arguments.apply:
+                phase = "rollback"
                 connection.rollback()
+            else:
+                phase = "commit"
         outcome = "Applied" if arguments.apply else "Checked and rolled back"
         operation = "baseline adoption" if arguments.adopt_bootstrap else "migration upgrade"
         print(f"{outcome} {operation} to Alembic {TARGET_REVISION}; ownership and RLS verified.", flush=True)
@@ -115,8 +142,13 @@ def main() -> int:
         sqlstate = getattr(getattr(error, "orig", None), "sqlstate", None) or "unavailable"
         print(
             f"Migration failed ({type(error).__name__}, SQLSTATE {sqlstate}); "
-            "uncommitted changes rolled back. No credentials logged.", flush=True,
+            f"phase={phase}; reason={safe_failure_reason(error, phase)}. "
+            "No credentials logged.", flush=True,
         )
+        if phase == "connect":
+            print("Connection was not established; migration SQL did not start.", flush=True)
+        elif phase == "commit":
+            print("Commit outcome is unknown; verify database state before retrying.", flush=True)
         if isinstance(error, MigrationCheckError):
             print(str(error), flush=True)  # Only our fixed diagnostics, never SQL/parameters.
         return 1

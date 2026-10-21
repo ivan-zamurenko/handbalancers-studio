@@ -72,3 +72,41 @@ def test_cloud_command_refuses_noninteractive_password_entry(monkeypatch, capsys
         migrate_cloud.main()
     assert failure.value.code == 2
     assert "local interactive terminal" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize(("private_message", "expected"), [
+    ('FATAL: password authentication failed for user "private-user"', "authentication_rejected"),
+    ('connection failed: SSL error: certificate verify failed private-path', "tls_verification"),
+    ('root certificate file "private-path" does not exist', "tls_verification"),
+    ('SSL error: decryption failed or bad record mac private-host', "tls_connection_error"),
+    ('could not translate host name "private-host" to address', "dns_resolution"),
+    ('connection timeout expired private-host', "connection_timeout"),
+    ('FATAL: Tenant or user not found private-user', "pooler_routing"),
+    ('FATAL: Circuit breaker open: Too many authentication errors private-user', "pooler_auth_throttled"),
+    ('connection refused private-host', "connection_refused"),
+    ('unexpected provider detail private-secret', "unclassified_connection_error"),
+])
+def test_cloud_connection_failure_has_safe_actionable_reason(
+    monkeypatch, capsys, private_message, expected,
+):
+    from types import SimpleNamespace
+
+    from psycopg import OperationalError as PsycopgOperationalError
+    from sqlalchemy.exc import OperationalError
+
+    from tools import migrate_cloud
+
+    def fail_connection():
+        raise OperationalError("private-statement", {}, PsycopgOperationalError(private_message))
+
+    monkeypatch.setattr("sys.argv", ["migrate_cloud", "--adopt-bootstrap", "--apply"])
+    monkeypatch.setattr(migrate_cloud.sys.stdin, "isatty", lambda: True)
+    monkeypatch.setattr(migrate_cloud.getpass, "getpass", lambda prompt: "private-password")
+    monkeypatch.setattr(migrate_cloud, "create_engine", lambda *args, **kwargs: SimpleNamespace(
+        begin=fail_connection, dispose=lambda: None,
+    ))
+    assert migrate_cloud.main() == 1
+    output = capsys.readouterr().out
+    assert "phase=connect" in output
+    assert f"reason={expected}" in output
+    assert "private-" not in output

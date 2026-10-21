@@ -61,6 +61,19 @@ Supabase migrations не змінюються. Помилка відкочує �
 При mismatch не обходити перевірку звичайним `stamp`; дослідити названу категорію.
 Історичні `0001–0006` не переписувати, bootstrap не запускати повторно.
 
+Якщо команда повертає `phase=connect; reason=authentication_rejected`, сервер
+відхилив пароль postgres до початку SQL. Це не пароль Dashboard, API key або
+пароль studio_app. Якщо пароль невідомий, скинути його через
+[Database → Settings](https://supabase.com/dashboard/project/dwckvtuhgelhsbjyhpks/database/settings),
+зберегти локально в менеджері паролів і ввести новий пароль у прихований prompt.
+Лапки та URL-кодування не потрібні; `.env.local` для цього не змінюється.
+Не повторювати невдалі спроби з тим самим відхиленим паролем.
+Якщо після скидання виникає помилка pooler, зберегти її безпечну категорію;
+не скидати пароль багаторазово й не послаблювати TLS.
+При `phase=commit` результат невідомий: спочатку перевірити стан БД.
+
+[Офіційна інструкція скидання пароля](https://supabase.com/docs/guides/troubleshooting/how-do-i-reset-my-supabase-database-password-oTs5sB).
+
 Після adoption наступні зміни робити новими Alembic revisions із перевірками
 на локальному стенді. Цей режим прив'язаний до `0006`, не є універсальним repair.
 

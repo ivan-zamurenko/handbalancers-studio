@@ -4,7 +4,7 @@
   "owner_request": "Try migration now after reviewing the direct SQL bootstrap; preserve existing data",
   "branch": "task/execution-v4",
   "base_commit": "6a408b7",
-  "status": "locally_verified_cloud_apply_pending_operator",
+  "status": "cloud_authentication_rejected_waiting_owner_password_reset",
   "red": {
     "command": "DOCKER_HOST=unix://$HOME/.colima/studio-s01/docker.sock .venv/bin/python -m tools.local_stack test .venv/bin/python -m pytest server/tests/integration/database/test_migration_baseline.py -k adopt_populated -q",
     "result": "1 failed: upgrade_verified lacks the adopt_bootstrap operation; actual populated PostgreSQL bootstrap fixture succeeded"
@@ -49,14 +49,25 @@
     "customer_data_read": "none; system catalogue only"
   },
   "cloud_apply": {
-    "status": "pending_operator_credentials",
+    "status": "connection_rejected_before_migration_sql",
     "command": ".venv/bin/python -m tools.migrate_cloud --adopt-bootstrap --ssl-root-cert .local-tools/supabase/prod-ca-2021.crt --apply",
-    "notes": "Owner asked to enter postgres password only in the hidden local terminal prompt. Do not claim applied until successful COMMIT."
+    "notes": "Owner asked to enter postgres password only in the hidden local terminal prompt. Do not claim applied until successful COMMIT.",
+    "owner_result": "phase=connect; reason=authentication_rejected",
+    "next_step": "Owner chose postgres password reset in Dashboard; rerun hidden terminal command with new password, never send secrets in chat."
   },
   "unverified": [
     "Cloud write/reconciliation/COMMIT and post-commit checks",
     "Full product regression and CI; only affected database suites run",
     "Two simultaneous successful adoption commits; tested repeated adoption and actual lock timeout separately",
     "Live refresh-token rotation remains outside this task"
-  ]
+  ],
+  "connection_diagnostics": {
+    "red": "9 safe diagnostic tests failed because old output omitted phase/reason; reviewer regression 1 failed for overly broad SSL classification",
+    "green": "20 migration connection unit tests passed; complete unit suite 60 passed; Ruff/format and mypy passed",
+    "probe": "Password-free connection using same host/CA reached password challenge; no SQL or administrator authentication performed",
+    "cloud_recheck": "Read-only product schema still matches 0006; Alembic ledger absent",
+    "review": "No secret-output blocker; separate generic TLS errors from certificate verification errors",
+    "ci": "955a773 run 39641166007: database job passed, baseline failed on pre-existing missing trailing newline in server/studio/migration_connection.py; newline fixed in follow-up",
+    "secrets": "Raw exception text is inspected only internally; only allowlisted reason strings are printed. No secrets persisted."
+  }
 }

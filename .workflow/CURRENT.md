@@ -11,10 +11,21 @@ reconcile двох default privileges із 0001, verified stamp 0006 і закр
 Дані та існуючі таблиці не відтворюються. За замовчуванням весь запуск rollback;
 застосування потребує `--apply` і прихованого локального вводу пароля postgres.
 
-**Cloud adoption ще НЕ застосовано:** доступне підключення лише studio_app;
-адміністративних credentials у доступному конфігу немає. Наступна дія — запуск
-власником конкретної команди з `.workflow/REGISTRATION_BASELINE.md`.
+**Cloud adoption ще НЕ застосовано:** власник запустив команду, але отримав
+`phase=connect; reason=authentication_rejected`. SQL міграції не починався.
+Password-free probe з тим самим CA/host пройшов TLS і дійшов до запиту пароля.
+Повторна read-only звірка хмари пройшла; журнал Alembic досі відсутній.
+Власник не має підтвердженого пароля postgres та обрав скидання через Dashboard.
+Наступна дія — скинути тільки postgres password і запустити ту саму команду
+з `.workflow/REGISTRATION_BASELINE.md`, ввівши новий пароль приховано в терміналі.
+Окремий пароль studio_app у `.env.local` не змінювати.
 Evidence поточної роботи: `.workflow/evidence/registration-baseline.json`.
+
+Baseline tooling: `955a773` запушено. CI39641166007: database job passed;
+baseline job зупинився на відсутньому кінцевому newline у migration_connection.py.
+Newline виправлено. Додано безпечні категорії connection failures та фазу помилки;
+помилка під час COMMIT більше не оголошується гарантованим rollback.
+Перевірки цього follow-up: 60 unit tests passed, Ruff/format/mypy passed.
 
 Нижче попередній checkpoint. Старі фрази про неперевірений runtime/signup/Google
 суперечать новішим live results: підключення, signup через лист-посилання,
