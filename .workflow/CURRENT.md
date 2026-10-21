@@ -1,5 +1,12 @@
 # Поточний checkpoint — перший етап DB для реєстрації виконано
 
+Закомічено й запушено в origin/task/execution-v4 (2026-10-21):
+- `775287c` feat(db): хмарна реєстраційна БД прямим SQL, без міграцій
+- `c7f3f65` feat(ui): іконкові кнопки входу, анімований перемикач теми, стабільна шапка
+Не включено у коміт навмисно: RED-тести S03-06 і його evidence; видалення старих
+`docs/*` (зміни власника); локальні tooling-файли `.claude/`, `.vscode/`,
+`copilot-instructions.md`, `docs/copilot/`, `skills-lock.json`, `.agents/skills/*`.
+
 2026-10-21: власник визначив пріоритетом налаштувати БД для реєстрації напряму,
 без запуску Alembic/Supabase migrations. `supabase/bootstrap-registration.sql`
 виконано через Supabase SQL API у наявному проєкті. Створено `studio.users`,
