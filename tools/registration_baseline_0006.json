@@ -1,0 +1,33 @@
+{
+  "schemas": [
+    "7078240a32ccdaa522405ff1a2fa967841e6cf2480dec0293afd197749993806"
+  ],
+  "relations": [
+    "ac17380aeca4f4459633b02810dec205b1df58c8c570385c534ead6e969d8980"
+  ],
+  "columns": [
+    "6275e24e40c9871d1a00e057ff962dbfd2d34b73940025843af33c33b8bc27b5"
+  ],
+  "constraints": [
+    "5df0249fe880eec984beae35cef7272213a8717b84864f8679ee21166f3b3fb3"
+  ],
+  "indexes": [
+    "4e9aafadfd0eb466b92707bc80d430c494a43bd21a5ad36fdde192fe29cf9248"
+  ],
+  "policies": [
+    "23404f8b5be85d5413b776a9dfb8ffeee36e9dc1829cc60ac0697c7b8b00417c"
+  ],
+  "functions": [
+    "80dfacffdc560db84d2d6b8f4937e1ba738b4c0b8bdc115b9d0a8e699b5e64ce",
+    "f829b1cb3323e2f72f18ebf13655358db73c4fbf0209f841bf6b837eabfd9d30"
+  ],
+  "triggers": [
+    "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  ],
+  "rules": [
+    "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  ],
+  "grants": [
+    "0f731e31b0e6a4ad40875ebef15b60cdbefe2e0902dbc9a3015994c919b974f6"
+  ]
+}

@@ -31,6 +31,7 @@ def test_cloud_command_requires_verified_tls(monkeypatch, root_certificate):
         raise RuntimeError("connection captured")
 
     monkeypatch.setattr("sys.argv", ["migrate_cloud", "--ssl-root-cert", root_certificate])
+    monkeypatch.setattr(migrate_cloud.sys.stdin, "isatty", lambda: True)
     monkeypatch.setattr(migrate_cloud.getpass, "getpass", lambda prompt: "test-only-password")
     monkeypatch.setattr(migrate_cloud, "create_engine", capture_connection)
     with pytest.raises(RuntimeError, match="connection captured"):
@@ -49,6 +50,7 @@ def test_cloud_failure_reports_sqlstate_without_private_details(monkeypatch, cap
         raise ProgrammingError("private-statement", {}, InsufficientPrivilege("private-detail"))
 
     monkeypatch.setattr("sys.argv", ["migrate_cloud"])
+    monkeypatch.setattr(migrate_cloud.sys.stdin, "isatty", lambda: True)
     monkeypatch.setattr(migrate_cloud.getpass, "getpass", lambda prompt: "test-only-password")
     monkeypatch.setattr(migrate_cloud, "create_engine", lambda *args, **kwargs: SimpleNamespace(
         begin=fail_transaction, dispose=lambda: None,
@@ -59,3 +61,14 @@ def test_cloud_failure_reports_sqlstate_without_private_details(monkeypatch, cap
     assert "private-statement" not in output
     assert "private-detail" not in output
     assert "test-only-password" not in output
+
+
+def test_cloud_command_refuses_noninteractive_password_entry(monkeypatch, capsys):
+    from tools import migrate_cloud
+
+    monkeypatch.setattr("sys.argv", ["migrate_cloud", "--adopt-bootstrap"])
+    monkeypatch.setattr(migrate_cloud.sys.stdin, "isatty", lambda: False)
+    with pytest.raises(SystemExit) as failure:
+        migrate_cloud.main()
+    assert failure.value.code == 2
+    assert "local interactive terminal" in capsys.readouterr().err

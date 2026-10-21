@@ -11,7 +11,7 @@ from alembic.config import Config
 from alembic.migration import MigrationContext
 from sqlalchemy import Column, Integer, MetaData, Table, create_engine, event, text
 from sqlalchemy.engine import URL
-from sqlalchemy.exc import IntegrityError, ProgrammingError
+from sqlalchemy.exc import IntegrityError, OperationalError, ProgrammingError
 from sqlalchemy.pool import NullPool
 
 from server.tests.support.database_guard import require_test_database
@@ -176,6 +176,184 @@ def test_verified_cloud_upgrade_preserves_managed_schemas(operator_engine):
         assert operator_membership(connection) == before
         assert connection.scalar(text("SELECT current_user")) == "postgres"
         transaction.rollback()
+
+
+def bootstrap_registration(connection):
+    sql = (ROOT / "supabase/bootstrap-registration.sql").read_text()
+    # Keep the real bootstrap DDL inside the test's rollback-only transaction.
+    connection.exec_driver_sql(sql.split("BEGIN;", 1)[1].rsplit("COMMIT;", 1)[0])
+
+
+def test_adopt_populated_registration_bootstrap(operator_engine):
+    from tools.migrate_cloud import upgrade_verified
+
+    identity_id = uuid4()
+    container = local_stack.verify_container("test")
+    local_stack.execute_local_sql(container, f"""
+\\connect {operator_engine.url.database}
+INSERT INTO auth.users (id) VALUES ('{identity_id}');
+""")
+    with operator_engine.connect() as connection, connection.begin():
+        bootstrap_registration(connection)
+        user_id = connection.scalar(text("""
+            INSERT INTO studio.users(auth_user_id,first_name,locale,timezone)
+            VALUES (:identity,'Migration test','uk','UTC') RETURNING id
+        """), {"identity": identity_id})
+        connection.execute(text("""
+            INSERT INTO studio_private.web_sessions
+              (id,session_key_hash,user_id,upstream_session_id,encrypted_tokens,
+               access_expires_at,expires_at)
+            VALUES (:id,:hash,:user,:upstream,'synthetic-ciphertext',now(),now()+interval '1 day')
+        """), {"id": uuid4(), "hash": "b" * 64, "user": user_id, "upstream": uuid4()})
+        connection.execute(text("""
+            INSERT INTO studio_private.auth_attempts
+              (id,state_hash,user_id,provider,encrypted_verifier,nonce_hash,
+               allowed_return_path,expires_at)
+            VALUES (:id,:hash,:user,'google','synthetic-verifier',:hash,'/plans',now())
+        """), {"id": uuid4(), "hash": "c" * 64, "user": user_id})
+        connection.execute(text("""
+            INSERT INTO studio_private.auth_rate_limits
+            VALUES (:bucket, now(), 2)
+        """), {"bucket": "a" * 64})
+        tables = ("studio.users", "studio_private.web_sessions",
+                  "studio_private.auth_attempts", "studio_private.auth_rate_limits")
+        before = {table: connection.execute(text(f"SELECT * FROM {table}")).all()
+                  for table in tables}
+        assert upgrade_verified(connection, adopt_bootstrap=True) == "0006"
+        assert upgrade_verified(connection, adopt_bootstrap=True) == "0006"
+        assert {table: connection.execute(text(f"SELECT * FROM {table}")).all()
+                for table in tables} == before
+        assert connection.scalar(text("SELECT version_num FROM studio.alembic_version")) == "0006"
+        connection.exec_driver_sql("CREATE FUNCTION studio_private.future_fn() RETURNS int "
+                                   "LANGUAGE sql AS 'SELECT 1'")
+        connection.exec_driver_sql("CREATE TYPE studio_private.future_type AS ENUM ('test')")
+        assert not connection.scalar(text(
+            "SELECT has_function_privilege('anon','studio_private.future_fn()','EXECUTE')"
+        ))
+        assert not connection.scalar(text(
+            "SELECT has_type_privilege('anon','studio_private.future_type','USAGE')"
+        ))
+        connection.rollback()
+
+
+def test_baseline_manifest_matches_real_migrations_and_bootstrap(operator_engine):
+    from tools.registration_baseline import verify_registration_baseline
+
+    with operator_engine.connect() as connection:
+        with connection.begin():
+            command.upgrade(configuration(connection), "0006")
+            verify_registration_baseline(connection)
+            connection.rollback()
+        with connection.begin():
+            bootstrap_registration(connection)
+            verify_registration_baseline(connection)
+            connection.rollback()
+
+
+@pytest.mark.parametrize("drift", [
+    "ALTER TABLE studio.users ADD COLUMN unexpected text",
+    "ALTER TABLE studio.users DISABLE ROW LEVEL SECURITY",
+    "ALTER TABLE studio.users DROP CONSTRAINT fk_users_auth_user_id",
+    "ALTER POLICY users_select_own ON studio.users USING (true)",
+    "GRANT SELECT ON studio_private.web_sessions TO anon",
+    "GRANT UPDATE(encrypted_tokens) ON studio_private.web_sessions TO studio_auth_runtime",
+    "ALTER FUNCTION studio_private.auth_profile(uuid) SECURITY INVOKER",
+    ("CREATE OR REPLACE FUNCTION studio_private.auth_profile(p_user_id uuid) "
+    "RETURNS TABLE(id uuid,auth_user_id uuid,first_name text,last_name text,role text,"
+    "locale text,timezone text,display_name text) LANGUAGE sql STABLE SECURITY DEFINER "
+    "SET search_path=pg_catalog,pg_temp AS 'SELECT id,auth_user_id,first_name,last_name,"
+    "role,locale,timezone,display_name FROM studio.users'"),
+])
+def test_adoption_rejects_drift_before_creating_history(operator_engine, drift):
+    from tools.check_migrations import MigrationCheckError
+    from tools.migrate_cloud import upgrade_verified
+
+    with operator_engine.connect() as connection, connection.begin():
+        bootstrap_registration(connection)
+        connection.exec_driver_sql(drift)
+        with pytest.raises(MigrationCheckError, match="baseline differs"):
+            upgrade_verified(connection, adopt_bootstrap=True)
+        assert connection.scalar(text("SELECT to_regclass('studio.alembic_version')")) is None
+        connection.rollback()
+
+
+def test_adoption_rollback_preserves_bootstrap(operator_engine, monkeypatch):
+    from tools.migrate_cloud import upgrade_verified
+    from tools.registration_baseline import catalogue_fingerprints
+
+    stamp = command.stamp
+
+    def fail_after_stamp(*args, **kwargs):
+        stamp(*args, **kwargs)
+        raise RuntimeError("injected failure after adoption")
+
+    with operator_engine.connect() as connection, connection.begin():
+        bootstrap_registration(connection)
+        before = catalogue_fingerprints(connection)
+        defaults = connection.execute(text("SELECT * FROM pg_default_acl ORDER BY oid")).all()
+        monkeypatch.setattr(command, "stamp", fail_after_stamp)
+        with pytest.raises(RuntimeError, match="injected failure"), connection.begin_nested():
+            upgrade_verified(connection, adopt_bootstrap=True)
+        assert catalogue_fingerprints(connection) == before
+        assert connection.scalar(text("SELECT to_regclass('studio.alembic_version')")) is None
+        assert connection.execute(text("SELECT * FROM pg_default_acl ORDER BY oid")).all() == defaults
+        connection.rollback()
+
+
+def test_adoption_rejects_unknown_revision(operator_engine):
+    from tools.check_migrations import MigrationCheckError
+    from tools.migrate_cloud import upgrade_verified
+
+    with operator_engine.connect() as connection, connection.begin():
+        command.upgrade(configuration(connection), "0006")
+        connection.exec_driver_sql("UPDATE studio.alembic_version SET version_num='9999'")
+        with pytest.raises(MigrationCheckError, match="Unexpected existing revision"):
+            upgrade_verified(connection, adopt_bootstrap=True)
+        assert connection.scalar(text("SELECT version_num FROM studio.alembic_version")) == "9999"
+        connection.rollback()
+
+
+def test_adoption_protects_history_from_inherited_default_grants(operator_engine):
+    from tools.migrate_cloud import upgrade_verified
+
+    with operator_engine.connect() as connection, connection.begin():
+        bootstrap_registration(connection)
+        connection.exec_driver_sql(
+            "ALTER DEFAULT PRIVILEGES GRANT ALL ON TABLES TO anon,authenticated,studio_auth_runtime"
+        )
+        upgrade_verified(connection, adopt_bootstrap=True)
+        for role in ("anon", "authenticated", "studio_auth_runtime"):
+            assert not connection.scalar(text(
+                "SELECT has_table_privilege(:role,'studio.alembic_version',"
+                "'SELECT,INSERT,UPDATE,DELETE,TRUNCATE')"
+            ), {"role": role})
+        assert connection.scalar(text(
+            "SELECT relrowsecurity FROM pg_class WHERE oid='studio.alembic_version'::regclass"
+        ))
+        connection.rollback()
+
+
+def test_adoption_waits_on_existing_migration_lock_with_timeout(operator_engine):
+    from tools.migrate_cloud import upgrade_verified
+
+    with operator_engine.connect() as holder, holder.begin():
+        holder.execute(text("SELECT pg_advisory_xact_lock(190103)"))
+        with operator_engine.connect() as waiter:
+            with pytest.raises(OperationalError) as blocked, waiter.begin():
+                upgrade_verified(waiter, adopt_bootstrap=True)
+            assert blocked.value.orig.sqlstate == "55P03"
+            assert waiter.scalar(text("SELECT to_regclass('studio.alembic_version')")) is None
+
+
+def test_runtime_cannot_adopt_bootstrap(connection):
+    from tools.check_migrations import MigrationCheckError
+    from tools.migrate_cloud import upgrade_verified
+
+    # The existing migration_owner fixture can SET ROLE; postgres deliberately cannot.
+    connection.exec_driver_sql("SET LOCAL ROLE studio_auth_runtime")
+    with pytest.raises(MigrationCheckError, match="requires the schema owner"):
+        upgrade_verified(connection, adopt_bootstrap=True)
+    assert connection.scalar(text("SELECT to_regnamespace('studio')")) is None
 
 
 def test_upgrade_empty_database(connection):

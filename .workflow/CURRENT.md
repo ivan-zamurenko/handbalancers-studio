@@ -1,4 +1,26 @@
-# Поточний checkpoint — перший етап DB для реєстрації виконано
+# Поточний checkpoint — підготовлено прийняття БД під керування Alembic
+
+2026-10-21, новий запит власника: спробувати міграцію після прямого SQL bootstrap.
+Цей запит замінює попередню заборону міграцій лише для перевіреного прийняття
+наявної registration schema; S03-06 і зміна refresh grants не поновлені.
+
+Хмарна read-only перевірка: owner postgres, чотири product tables із RLS,
+`studio.alembic_version` відсутня. Повна звірка категорій еталона `0006` пройшла.
+Додано явний `tools.migrate_cloud --adopt-bootstrap`: звірка структури/прав,
+reconcile двох default privileges із 0001, verified stamp 0006 і закритий журнал.
+Дані та існуючі таблиці не відтворюються. За замовчуванням весь запуск rollback;
+застосування потребує `--apply` і прихованого локального вводу пароля postgres.
+
+**Cloud adoption ще НЕ застосовано:** доступне підключення лише studio_app;
+адміністративних credentials у доступному конфігу немає. Наступна дія — запуск
+власником конкретної команди з `.workflow/REGISTRATION_BASELINE.md`.
+Evidence поточної роботи: `.workflow/evidence/registration-baseline.json`.
+
+Нижче попередній checkpoint. Старі фрази про неперевірений runtime/signup/Google
+суперечать новішим live results: підключення, signup через лист-посилання,
+password login та Google login уже перевірені 2026-10-21. Cloud OTP ще не перевірений.
+
+## Попередній checkpoint — реєстраційна БД та UI
 
 Закомічено й запушено в origin/task/execution-v4 (2026-10-21):
 - `775287c` feat(db): хмарна реєстраційна БД прямим SQL, без міграцій

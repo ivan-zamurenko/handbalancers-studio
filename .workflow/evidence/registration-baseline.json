@@ -1,0 +1,62 @@
+{
+  "scope": "Verified adoption of existing registration bootstrap as Alembic baseline 0006",
+  "date": "2026-10-21",
+  "owner_request": "Try migration now after reviewing the direct SQL bootstrap; preserve existing data",
+  "branch": "task/execution-v4",
+  "base_commit": "6a408b7",
+  "status": "locally_verified_cloud_apply_pending_operator",
+  "red": {
+    "command": "DOCKER_HOST=unix://$HOME/.colima/studio-s01/docker.sock .venv/bin/python -m tools.local_stack test .venv/bin/python -m pytest server/tests/integration/database/test_migration_baseline.py -k adopt_populated -q",
+    "result": "1 failed: upgrade_verified lacks the adopt_bootstrap operation; actual populated PostgreSQL bootstrap fixture succeeded"
+  },
+  "green": {
+    "command": "DOCKER_HOST=unix://$HOME/.colima/studio-s01/docker.sock .venv/bin/python -m tools.local_stack test .venv/bin/python -m pytest server/tests/integration/database server/tests/security/database server/tests/unit/database/test_migration_connection.py -q",
+    "result": "89 passed",
+    "coverage": [
+      "All values in synthetic profile, encrypted session, OAuth attempt and rate-limit rows preserved",
+      "Baseline accepted for both real historical migrations and direct bootstrap; repeated adoption",
+      "Policy, FK, RLS, column, function metadata/body and table/column grant drift rejected before stamp",
+      "Unknown existing revision rejected",
+      "Failure injected after stamp rolls back version table and default ACL changes",
+      "Future functions/types do not grant PUBLIC access after reconciliation",
+      "Ledger RLS and explicit revokes defeat inherited default table grants",
+      "Two real PostgreSQL connections: existing migration lock makes adoption time out with 55P03",
+      "Runtime cannot adopt baseline",
+      "TLS verification and sanitized errors retained; noninteractive password entry rejected"
+    ]
+  },
+  "test_harness_corrections": [
+    "One-off manifest generation needed PYTHONPATH=. for repository imports; not counted as RED",
+    "Runtime rejection fixture changed to existing migration_owner connection because the restricted postgres fixture cannot SET ROLE studio_auth_runtime; authorization expectation unchanged",
+    "Existing mocked CLI tests now simulate a TTY to satisfy the new hidden-input prerequisite; TLS and redaction expectations unchanged",
+    "Mypy invoked with --explicit-package-bases to avoid namespace duplicate discovery"
+  ],
+  "checks": [
+    "Scoped Ruff passed",
+    "Mypy passed for tools/registration_baseline.py and tools/migrate_cloud.py",
+    "git diff --check passed",
+    "Read-only independent review plus follow-up review: no blockers"
+  ],
+  "cloud_read_only": {
+    "project_ref": "dwckvtuhgelhsbjyhpks",
+    "identity": "studio_app",
+    "schema_owner": "postgres",
+    "product_tables": 4,
+    "all_product_tables_rls": true,
+    "alembic_version_present": false,
+    "catalogue_matches_verified_manifest": true,
+    "writes": "none",
+    "customer_data_read": "none; system catalogue only"
+  },
+  "cloud_apply": {
+    "status": "pending_operator_credentials",
+    "command": ".venv/bin/python -m tools.migrate_cloud --adopt-bootstrap --ssl-root-cert .local-tools/supabase/prod-ca-2021.crt --apply",
+    "notes": "Owner asked to enter postgres password only in the hidden local terminal prompt. Do not claim applied until successful COMMIT."
+  },
+  "unverified": [
+    "Cloud write/reconciliation/COMMIT and post-commit checks",
+    "Full product regression and CI; only affected database suites run",
+    "Two simultaneous successful adoption commits; tested repeated adoption and actual lock timeout separately",
+    "Live refresh-token rotation remains outside this task"
+  ]
+}
