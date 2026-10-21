@@ -4,7 +4,7 @@
   "owner_request": "Try migration now after reviewing the direct SQL bootstrap; preserve existing data",
   "branch": "task/execution-v4",
   "base_commit": "6a408b7",
-  "status": "cloud_authentication_rejected_waiting_owner_password_reset",
+  "status": "applied_and_post_commit_verified",
   "red": {
     "command": "DOCKER_HOST=unix://$HOME/.colima/studio-s01/docker.sock .venv/bin/python -m tools.local_stack test .venv/bin/python -m pytest server/tests/integration/database/test_migration_baseline.py -k adopt_populated -q",
     "result": "1 failed: upgrade_verified lacks the adopt_bootstrap operation; actual populated PostgreSQL bootstrap fixture succeeded"
@@ -37,27 +37,15 @@
     "git diff --check passed",
     "Read-only independent review plus follow-up review: no blockers"
   ],
-  "cloud_read_only": {
-    "project_ref": "dwckvtuhgelhsbjyhpks",
-    "identity": "studio_app",
-    "schema_owner": "postgres",
-    "product_tables": 4,
-    "all_product_tables_rls": true,
-    "alembic_version_present": false,
-    "catalogue_matches_verified_manifest": true,
-    "writes": "none",
-    "customer_data_read": "none; system catalogue only"
-  },
   "cloud_apply": {
-    "status": "connection_rejected_before_migration_sql",
+    "status": "committed_owner_reported",
     "command": ".venv/bin/python -m tools.migrate_cloud --adopt-bootstrap --ssl-root-cert .local-tools/supabase/prod-ca-2021.crt --apply",
-    "notes": "Owner asked to enter postgres password only in the hidden local terminal prompt. Do not claim applied until successful COMMIT.",
-    "owner_result": "phase=connect; reason=authentication_rejected",
-    "next_step": "Owner chose postgres password reset in Dashboard; rerun hidden terminal command with new password, never send secrets in chat."
+    "notes": "Operator tool verifies revision, FK, ownership/RLS and managed schema fingerprints before successful transaction exit; success is printed after COMMIT.",
+    "owner_result": "Applied baseline adoption to Alembic 0006; ownership and RLS verified.",
+    "next_step": "Baseline adoption complete. Resume S03-06 only within a new task scope."
   },
   "unverified": [
-    "Cloud write/reconciliation/COMMIT and post-commit checks",
-    "Full product regression and CI; only affected database suites run",
+    "Final database job result of CI run 39642149720 still pending at checkpoint",
     "Two simultaneous successful adoption commits; tested repeated adoption and actual lock timeout separately",
     "Live refresh-token rotation remains outside this task"
   ],
@@ -69,5 +57,48 @@
     "review": "No secret-output blocker; separate generic TLS errors from certificate verification errors",
     "ci": "955a773 run 39641166007: database job passed, baseline failed on pre-existing missing trailing newline in server/studio/migration_connection.py; newline fixed in follow-up",
     "secrets": "Raw exception text is inspected only internally; only allowlisted reason strings are printed. No secrets persisted."
+  },
+  "implementation_commits": [
+    "955a773",
+    "04b0373"
+  ],
+  "pre_apply_read_only": {
+    "project_ref": "dwckvtuhgelhsbjyhpks",
+    "identity": "studio_app",
+    "schema_owner": "postgres",
+    "product_tables": 4,
+    "all_product_tables_rls": true,
+    "alembic_version_present": false,
+    "catalogue_matches_verified_manifest": true,
+    "writes": "none",
+    "customer_data_read": "none; system catalogue only"
+  },
+  "post_commit_read_only": {
+    "identity": "studio_app",
+    "tls": true,
+    "catalogue_matches_verified_manifest": true,
+    "alembic_version_present": true,
+    "ledger_owner": "postgres",
+    "ledger_rls": true,
+    "ledger_dml_denied": [
+      "studio_app",
+      "studio_auth_runtime",
+      "anon",
+      "authenticated"
+    ],
+    "global_default_acl_records_present": [
+      "T",
+      "f"
+    ],
+    "global_default_acl_public_access": false,
+    "legacy_schema_present": true,
+    "customer_data_read": "none; system catalogue only",
+    "revision_value_source": "Operator success message; restricted runtime deliberately cannot read ledger rows"
+  },
+  "ci": {
+    "run_id": 39642149720,
+    "commit": "04b0373",
+    "baseline": "success",
+    "database": "in_progress"
   }
 }

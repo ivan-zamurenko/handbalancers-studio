@@ -9,8 +9,11 @@
 
 Хмарні `studio` і `studio_private` вже містять registration objects із
 `supabase/bootstrap-registration.sql`. Перевірка лише читанням підтвердила
-відповідність еталону `0006`; `studio.alembic_version` поки відсутня.
-Звичайний upgrade з base спробував би повторно створити наявні об'єкти.
+відповідність еталону `0006`. Власник успішно застосував adoption 2026-10-21;
+post-commit перевірка підтвердила захищений `studio.alembic_version`, RLS,
+збережену product schema та обидва виправлені default ACL.
+До adoption журнал був відсутній: звичайний upgrade з base спробував би
+повторно створити наявні об'єкти.
 
 ## Що робить новий режим
 

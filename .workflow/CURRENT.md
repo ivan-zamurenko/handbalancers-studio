@@ -1,35 +1,41 @@
-# Поточний checkpoint — підготовлено прийняття БД під керування Alembic
+# Поточний checkpoint — хмарну БД прийнято під керування Alembic 0006
 
-2026-10-21, новий запит власника: спробувати міграцію після прямого SQL bootstrap.
-Цей запит замінює попередню заборону міграцій лише для перевіреного прийняття
-наявної registration schema; S03-06 і зміна refresh grants не поновлені.
+2026-10-21: власник успішно виконав `tools.migrate_cloud --adopt-bootstrap --apply`.
+Результат після COMMIT: `Applied baseline adoption to Alembic 0006; ownership and RLS verified.`
+Це перевірене прийняття вже створеної SQL bootstrap схеми, а не повторний запуск
+історичних CREATE. Таблиці та дані не відтворювалися.
 
-Хмарна read-only перевірка: owner postgres, чотири product tables із RLS,
-`studio.alembic_version` відсутня. Повна звірка категорій еталона `0006` пройшла.
-Додано явний `tools.migrate_cloud --adopt-bootstrap`: звірка структури/прав,
-reconcile двох default privileges із 0001, verified stamp 0006 і закритий журнал.
-Дані та існуючі таблиці не відтворюються. За замовчуванням весь запуск rollback;
-застосування потребує `--apply` і прихованого локального вводу пароля postgres.
+Незалежна post-commit перевірка через обмежене studio_app підключення:
+- product schema відповідає еталону 0006;
+- журнал studio.alembic_version існує, owner postgres, RLS увімкнений;
+- studio_app, studio_auth_runtime, anon та authenticated не мають DML на журнал;
+- обидва глобальні defaults postgres для майбутніх функцій/типів існують без PUBLIC;
+- studio_app і TLS працюють, архівна схема studio_legacy_20261020 присутня.
+Revision 0006 підтверджена повідомленням операторського скрипта; runtime навмисно
+не читає рядки журналу. Managed-схеми перевірені самим скриптом до COMMIT.
 
-**Cloud adoption ще НЕ застосовано:** власник запустив команду, але отримав
-`phase=connect; reason=authentication_rejected`. SQL міграції не починався.
-Password-free probe з тим самим CA/host пройшов TLS і дійшов до запиту пароля.
-Повторна read-only звірка хмари пройшла; журнал Alembic досі відсутній.
-Власник не має підтвердженого пароля postgres та обрав скидання через Dashboard.
-Наступна дія — скинути тільки postgres password і запустити ту саму команду
-з `.workflow/REGISTRATION_BASELINE.md`, ввівши новий пароль приховано в терміналі.
-Окремий пароль studio_app у `.env.local` не змінювати.
-Evidence поточної роботи: `.workflow/evidence/registration-baseline.json`.
+Коміти запушено в origin/task/execution-v4:
+- 955a773 — verified baseline adoption;
+- 04b0373 — безпечна діагностика підключення та виправлення newline для CI.
+Перевірки: 89 DB checks, follow-up 60 unit + 39 contract/security tests;
+Ruff/format/mypy і read-only review пройшли. CI39642149720: baseline passed,
+database job ще виконувався на момент checkpoint.
 
-Baseline tooling: `955a773` запушено. CI39641166007: database job passed;
-baseline job зупинився на відсутньому кінцевому newline у migration_connection.py.
-Newline виправлено. Додано безпечні категорії connection failures та фазу помилки;
-помилка під час COMMIT більше не оголошується гарантованим rollback.
-Перевірки цього follow-up: 60 unit tests passed, Ruff/format/mypy passed.
+Попередня перешкода була `authentication_rejected` до початку SQL, а не помилка
+міграцій. Власник обрав скидання пароля postgres й потім повідомив успішний запуск.
+Пароль studio_app та .env.local агент не змінював, секретів не зберігав.
+Evidence: `.workflow/evidence/registration-baseline.json`.
+Інструкція: `.workflow/REGISTRATION_BASELINE.md`. Bootstrap повторно не запускати;
+наступні зміни БД оформлювати новими Alembic revisions.
 
-Нижче попередній checkpoint. Старі фрази про неперевірений runtime/signup/Google
-суперечать новішим live results: підключення, signup через лист-посилання,
-password login та Google login уже перевірені 2026-10-21. Cloud OTP ще не перевірений.
+Наступна roadmap-картка — S03-06 (refresh singleflight і atomic token swap).
+Ця робота завершила DB adoption; S03-06 та розширення refresh grants ще не поновлені.
+Її RED-тести/evidence лишаються локальними й поза комітами. Видалення docs та інші
+зміни власника збережені.
+
+Нижче історичний checkpoint. Старі твердження про неперевірені runtime/signup/Google
+не чинні: runtime, signup через лист-посилання, password і Google login перевірені.
+Cloud OTP ще не перевірений.
 
 ## Попередній checkpoint — реєстраційна БД та UI
 
