@@ -58,10 +58,6 @@ END
 $function$
 """)
     op.execute("""
-ALTER FUNCTION studio_private.provision_member(uuid,text,text,text,text)
-OWNER TO migration_owner
-""")
-    op.execute("""
 REVOKE ALL ON FUNCTION studio_private.provision_member(uuid,text,text,text,text)
 FROM PUBLIC, anon, authenticated, studio_web, studio_worker
 """)

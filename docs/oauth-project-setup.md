@@ -10,6 +10,16 @@
 
 ## 1. Google Cloud
 
+Стан на 2026-10-21: Google OAuth налаштований і перевірений живим входом.
+Project `handbalancers-studio`, client ID вже внесений у Supabase.
+
+Важлива пастка: якщо Google Auth Platform → Audience має User type **Internal**,
+вхід із звичайного `@gmail.com` падає з `Error 403: org_internal` ще до екрана згоди.
+Це не помилка коду або Supabase. Лікується кнопкою **Make external** на тій самій
+сторінці; у режимі Testing додати потрібні акаунти до Test users.
+
+Для створення нового client з нуля:
+
 Відкрити https://console.cloud.google.com/auth/overview у своєму Google account.
 Вибрати або створити Cloud project для Studio. Заповнити Branding (назва,
 контактний email), Audience (External; для testing додати свій email до test users),
@@ -47,11 +57,22 @@ Google повертається до Supabase callback, а Supabase — до л�
 Connect, а пароль належить саме цьому LOGIN. Не копіювати postgres/admin
 connection у runtime field. Пароль з URL не надсилати в чат або Git.
 
-Таблиці створюються Alembic migrations 0001–0006 у схемах `studio` і
-`studio_private`, а не вручну в Table Editor. На локальному стенді вони вже є.
-У хмарному проєкті ці міграції ще не виконано. Спочатку перевірити порожню нову
-БД та права migration owner, застосувати міграції, потім створити runtime LOGIN
-і заповнити AUTH_DATABASE_URL. Managed `auth` таблицями керує Supabase.
+У хмарі перший етап налаштований одноразовим прямим SQL з
+[`supabase/bootstrap-registration.sql`](../supabase/bootstrap-registration.sql).
+Це не migration: він не додає записів до `supabase_migrations.schema_migrations`.
+На локальному тестовому стенді Alembic усе ще використовується тестами.
+
+Bootstrap уже виконаний у підтвердженому проєкті `dwckvtuhgelhsbjyhpks`:
+створені `studio.users` та приватні `web_sessions`, `auth_attempts`,
+`auth_rate_limits`, необхідні registration/profile функції, FK до managed
+`auth.users`, RLS і вузькі grants. Усі нові таблиці були порожні; архівна схема
+`studio_legacy_20261020` не змінювалася. Не запускай bootstrap повторно: він
+призначений лише для порожніх `studio`/`studio_private`.
+
+Далі потрібен окремий restricted runtime LOGIN, успадкований від
+`studio_auth_runtime`, та `AUTH_DATABASE_URL` у локальному `.env.local`.
+Не використовувати `postgres` у застосунку й не передавати пароль у чат/Git.
+Managed `auth` таблицями керує Supabase.
 
 
 `.env.local` підготовлено і виключено з Git; права доступу0600.
@@ -62,10 +83,9 @@ SUPABASE_URL/PUBLIC_ORIGIN задані, TOKEN_ENCRYPTION_KEY згенерова
 - AUTH_DATABASE_URL — psycopg URL окремого DB login з правами studio_auth_runtime.
   Не postgres/migration_owner. Supabase auth і studio schema мають бути в тій самій БД.
 
-Перед запуском потрібні product migrations до0006 на цьому новому проєкті
-та окремий runtime login. Їх застосування до віддаленої БД ще не виконано:
-потрібен підключений Supabase або захищене локальне з’єднання. Не запускати
-міграції старого runtime. Без перевірки нової БД не позначати цей крок готовим.
+Перед реальним signup потрібні окремий runtime login, `AUTH_DATABASE_URL`,
+налаштування Supabase Auth email та end-to-end confirmation перевірка. Таблиці
+є, але реальна реєстрація ще не перевірена.
 
 Для email API після підключення DB/ключів та шаблону підтвердження:
 AUTH_EMAIL_ENABLED=true. Це незалежний прапорець від Google/Apple.

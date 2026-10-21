@@ -36,7 +36,6 @@ BEGIN
     RETURN v_user_id;
 END
 $function$;
-ALTER FUNCTION studio_private.provision_oauth_member(uuid,text,text,text) OWNER TO migration_owner;
 REVOKE ALL ON FUNCTION studio_private.provision_oauth_member(uuid,text,text,text)
 FROM PUBLIC, anon, authenticated, studio_web, studio_worker;
 GRANT EXECUTE ON FUNCTION studio_private.provision_oauth_member(uuid,text,text,text) TO studio_auth_runtime;
@@ -51,7 +50,6 @@ AS $function$
     SELECT u.id,u.auth_user_id,u.first_name,u.last_name,u.role,u.locale,u.timezone,u.display_name
     FROM studio.users u WHERE u.id=p_user_id AND u.is_active
 $function$;
-ALTER FUNCTION studio_private.auth_profile(uuid) OWNER TO migration_owner;
 REVOKE ALL ON FUNCTION studio_private.auth_profile(uuid)
 FROM PUBLIC, anon, authenticated, studio_web, studio_worker;
 GRANT EXECUTE ON FUNCTION studio_private.auth_profile(uuid) TO studio_auth_runtime;

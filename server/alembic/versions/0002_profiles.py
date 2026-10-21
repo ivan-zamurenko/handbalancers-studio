@@ -1,4 +1,4 @@
-"""Minimal profiles; operator requires REFERENCES(id) on managed auth.users."""
+"""Minimal profiles linked to managed Auth identities."""
 
 import sqlalchemy as sa
 from alembic import op

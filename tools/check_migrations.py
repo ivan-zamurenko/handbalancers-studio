@@ -88,7 +88,7 @@ def managed_fingerprint(connection: Connection) -> tuple:
     return tuple(tuple(tuple(row) for row in connection.execute(text(query))) for query in queries)
 
 
-def verify_isolation(connection: Connection) -> None:
+def verify_isolation(connection: Connection, *, owner: str = "migration_owner") -> None:
     for table in ("studio.users", "studio_private.web_sessions", "studio_private.auth_attempts"):
         require(
             connection.execute(
@@ -97,7 +97,7 @@ def verify_isolation(connection: Connection) -> None:
                 ),
                 {"table": table},
             ).one()
-            == ("migration_owner", True),
+            == (owner, True),
             "Product ownership/RLS mismatch",
         )
         for role in ("anon", "authenticated", "studio_worker"):

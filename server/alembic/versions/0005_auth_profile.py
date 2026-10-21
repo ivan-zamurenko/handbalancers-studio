@@ -19,7 +19,6 @@ AS $function$
     SELECT u.id,u.auth_user_id,u.first_name,u.last_name,u.role,u.locale,u.timezone
     FROM studio.users u WHERE u.id=p_user_id AND u.is_active
 $function$;
-ALTER FUNCTION studio_private.auth_profile(uuid) OWNER TO migration_owner;
 REVOKE ALL ON FUNCTION studio_private.auth_profile(uuid)
 FROM PUBLIC, anon, authenticated, studio_web, studio_worker;
 GRANT EXECUTE ON FUNCTION studio_private.auth_profile(uuid) TO studio_auth_runtime;
