@@ -3,7 +3,8 @@ for (const width of [390,1440]) for (const theme of ['light','dark']) {
   test(`login form ${width} ${theme}`, async ({page}) => {
     await page.setViewportSize({width,height:900});
     await page.goto('/?lang=uk');
-    await page.getByLabel('Тема').selectOption(theme);
+    await page.evaluate(preference => localStorage.setItem('studio:theme:guest', preference), theme);
+    await page.reload();
     await page.getByRole('link',{name:'Логін',exact:true}).click();
     await expect(page).toHaveURL(/\/login\?lang=uk$/);
     await expect(page.getByRole('heading',{level:1})).toHaveText('Раді бачити вас знову.');
@@ -60,7 +61,8 @@ test('leaving the preview clears password and resets visibility state',async({pa
 for (const width of [390, 1440]) for (const theme of ['light', 'dark']) test(`inline animated password eye ${width} ${theme}`, async ({page}) => {
   await page.setViewportSize({width, height: 900});
   await page.goto('/login');
-  await page.getByLabel('Тема').selectOption(theme);
+  await page.evaluate(preference => localStorage.setItem('studio:theme:guest', preference), theme);
+  await page.reload();
   const toggle = page.locator('[data-password-toggle]');
   await expect(toggle).toHaveAccessibleName('Показати пароль');
   const input = page.getByLabel('Пароль', {exact: true});

@@ -12,7 +12,8 @@ for (const width of [390,1440]) for (const theme of ['light','dark']) {
       await route.fulfill({status:503,contentType:'application/json',body:'{}'});
     });
     await page.goto('/login');
-    await page.getByLabel('Тема').selectOption(theme);
+    await page.evaluate(preference => localStorage.setItem('studio:theme:guest', preference), theme);
+    await page.reload();
     const google=page.getByRole('button',{name:'Продовжити з Google'});
     const apple=page.getByRole('button',{name:'Продовжити з Apple'});
     await expect(google).toBeEnabled(); await expect(apple).toBeEnabled();
@@ -35,7 +36,7 @@ test('guest does not see logout and signed-in visitor can log out', async ({page
     return route.fulfill({status:204});
   });
   await page.reload();
-  await expect(page.locator('[data-auth-status]')).toBeVisible();
+  await expect(page.locator('[data-logout]')).toBeVisible();
   await expect(page.locator('[data-login-link]')).toBeHidden();
   await page.locator('[data-logout]').click();
   await expect(page).toHaveURL(/\/login$/);

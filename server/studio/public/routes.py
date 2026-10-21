@@ -6,6 +6,7 @@ from fastapi import APIRouter, Request
 from fastapi.templating import Jinja2Templates
 from starlette.responses import HTMLResponse
 
+from studio.auth.oauth_routes import session_name
 from studio.shared.i18n import get_locale
 
 router = APIRouter()
@@ -89,6 +90,8 @@ def render(request: Request, template: str) -> HTMLResponse:
             "page_path": request.url.path,
             "oauth_providers": providers,
             "oauth_feedback": request.query_params.get("oauth", ""),
+            # Cookie presence only; the browser still confirms the session via /api/session.
+            "signed_in": bool(request.cookies.get(session_name(request))),
         },
         headers={
             "Cache-Control": "no-store",

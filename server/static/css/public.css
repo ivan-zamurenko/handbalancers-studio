@@ -13,11 +13,26 @@ a { color: inherit; }
 .primary-nav a { display: inline-flex; align-items: center; min-height: 44px; position: relative; font-size: 14px; text-decoration: none; }
 .primary-nav a::after { content: ''; position: absolute; left: 0; bottom: 3px; width: 100%; height: 1px; background: currentColor; transform: scaleX(0); transition: transform 420ms ease; }
 .primary-nav a:hover::after, .primary-nav a:focus-visible::after { transform: scaleX(1); }
-.header-controls { margin-left: auto; display: flex; align-items: center; gap: 20px; }
+.header-controls { margin-left: auto; display: flex; align-items: center; gap: 14px; }
 .locale-nav { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
 .locale-nav a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: none; }
 .locale-nav a[aria-current] { color: var(--text); font-weight: 600; }
-.theme-select select { font: inherit; font-size: 12px; color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-button); padding: 8px; min-height: 44px; max-width: 100px; }
+.theme-toggle { position: relative; display: grid; place-items: center; width: 40px; height: 40px; min-height: 40px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--muted); overflow: hidden; }
+.theme-toggle:hover { background: transparent; }
+.theme-toggle__icon { position: absolute; display: grid; place-items: center; }
+.theme-toggle__icon svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; }
+/* Resting state renders without animation, so a reload never replays the swap. */
+.theme-toggle__icon--moon, [data-theme='dark'] .theme-toggle__icon--sun { opacity: 0; transform: translateY(150%) rotate(28deg); }
+[data-theme='dark'] .theme-toggle__icon--moon { opacity: 1; transform: none; }
+[data-theme-animated][data-theme='light'] .theme-toggle__icon--sun,
+[data-theme-animated][data-theme='dark'] .theme-toggle__icon--moon { animation: theme-icon-drop-in 340ms cubic-bezier(.2,.8,.3,1) 210ms both; }
+[data-theme-animated][data-theme='light'] .theme-toggle__icon--moon,
+[data-theme-animated][data-theme='dark'] .theme-toggle__icon--sun { animation: theme-icon-drop-out 230ms cubic-bezier(.4,0,.9,.5) both; }
+@keyframes theme-icon-drop-in { from { transform: translateY(-150%) rotate(-28deg); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes theme-icon-drop-out { from { transform: none; opacity: 1; } to { transform: translateY(150%) rotate(28deg); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle__icon { animation-duration: 1ms !important; }
+}
 .login-link { border: 0; padding-inline: 8px; font-weight: 500; }
 .eyebrow { color: var(--muted); font-size: 12px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; }
 .hero { padding-top: 100px; padding-bottom: 0; }
@@ -106,7 +121,7 @@ html[data-theme='dark'] .tired { color: #d59494; }
   .primary-nav { order: 3; width: 100%; justify-content: center; gap: 40px; padding-top: 4px; }
   .primary-nav a { font-size: 12px; }
   .locale-nav { gap: 5px; }
-  .theme-select select { font-size: 11px; max-width: 78px; }
+  .theme-toggle { width: 36px; height: 36px; min-height: 36px; }
   .login-link { font-size: 12px; padding-inline: 4px; }
   .hero { padding-top: 64px; }
   .hero .eyebrow { font-size: 10px; letter-spacing: .075em; }

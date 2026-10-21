@@ -1,7 +1,6 @@
 // Keep credentials/CSRF only in memory; no tokens in browser storage.
 const logout = document.querySelector('[data-logout]');
 const login = document.querySelector('[data-login-link]');
-const status = document.querySelector('[data-auth-status]');
 let csrf = null;
 async function refresh() {
   try {
@@ -9,10 +8,10 @@ async function refresh() {
     const snapshot = response.ok ? await response.json() : {authenticated: false};
     csrf = snapshot.csrf_token || null;
     const authenticated = snapshot.authenticated === true && !!csrf;
-    logout.hidden = !authenticated; status.hidden = !authenticated; login.hidden = authenticated;
+    logout.hidden = !authenticated; login.hidden = authenticated;
     logout.disabled = false;
   } catch {
-    csrf = null; logout.hidden = true; status.hidden = true; login.hidden = false;
+    csrf = null; logout.hidden = true; login.hidden = false;
   }
 }
 logout?.addEventListener('click', async () => {

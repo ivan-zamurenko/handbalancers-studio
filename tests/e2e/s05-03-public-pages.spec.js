@@ -54,7 +54,9 @@ for (const width of [390, 1440]) for (const theme of ['light', 'dark']) {
   test(`public page ${width} ${theme}, language and theme persist`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/');
-    await page.getByLabel('Тема').selectOption(theme);
+    const themeToggle = page.getByRole('button', { name: 'Тема' });
+    await themeToggle.click();
+    if (await page.locator('html').getAttribute('data-theme') !== theme) await themeToggle.click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
     await page.reload();
     await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
