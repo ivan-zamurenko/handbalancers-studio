@@ -15,10 +15,10 @@ for (const width of [390,1440]) for (const theme of ['light','dark']) {
     await page.evaluate(preference => localStorage.setItem('studio:theme:guest', preference), theme);
     await page.reload();
     const google=page.getByRole('button',{name:'Продовжити з Google'});
-    const apple=page.getByRole('button',{name:'Продовжити з Apple'});
-    await expect(google).toBeEnabled(); await expect(apple).toBeEnabled();
+    await expect(page.getByRole('button',{name:/Apple/})).toHaveCount(0);
+    await expect(google).toBeEnabled();
     await google.click();
-    await expect(apple).toBeDisabled();
+    await expect(google).toBeDisabled();
     await expect(page.getByRole('status')).toContainText('Не вдалося почати вхід');
     await expect(google).toBeEnabled();
     expect(starts).toBe(1);

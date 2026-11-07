@@ -104,12 +104,11 @@ uv run --env-file .env.local uvicorn studio.main:create_app --factory --host 127
 
 ## 4. Apple
 
-Поки Apple Developer account відсутній, Apple лишається вимкненим.
-Після отримання доступу потрібні primary App ID із Sign in with Apple,
-Services ID для вебсайту, domain/return URL і signing key. Return URL:
-`https://dwckvtuhgelhsbjyhpks.supabase.co/auth/v1/callback`.
-Apple client secret зберігається в Supabase і поновлюється кожні6місяців.
-Код не створює Apple account і не купує членство.
+2026-11-07: власник відмовився від підключення Apple. Поточні способи входу —
+Google та email/password через Supabase Auth. OAUTH_APPLE_ENABLED=false;
+кнопка Apple видалена з форми входу. Членство, ключі та provider setup більше не є очікуваними
+кроками чи блокерами. До Apple повертатися лише за новим запитом власника.
+Існуюча підтримка Apple в коді лишається вимкненою.
 
 ## Які дані зберігаються
 

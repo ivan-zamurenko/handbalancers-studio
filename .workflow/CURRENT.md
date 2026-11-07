@@ -1,5 +1,22 @@
 # Поточний checkpoint — хмарну БД прийнято під керування Alembic 0006
 
+2026-11-07, остаточне рішення власника: Apple OAuth не підключаємо; залишаємо
+Google та email/password через Supabase Auth. Apple виключено з поточного обсягу,
+а не залишено в очікуванні платного членства. Backend-підтримка лишається вимкненою.
+Перевірено локальні прапорці: OAUTH_GOOGLE_ENABLED=true, AUTH_EMAIL_ENABLED=true,
+OAUTH_APPLE_ENABLED=false. Apple не є блокером для продовження поточного roadmap;
+історичні вимоги Apple застосовувати лише після нового рішення власника.
+
+За окремим запитом власника кнопку Apple видалено з форми входу. Google та
+email/password залишилися. Очікування наявного browser-тесту змінено відповідно
+до нового рішення: Apple відсутня навіть коли fixture оголошує обох провайдерів;
+перевірка блокування кнопки під час запиту тепер стосується Google.
+RED: `playwright test tests/e2e/oauth-ui.spec.js --max-failures=1` — тест отримав
+1 кнопку Apple замість 0. GREEN: `playwright test tests/e2e/login-form.spec.js
+tests/e2e/oauth-ui.spec.js` — 16 passed. Реальний OAuth повторно не перевіряли;
+браузерний тест перевіряє інтерфейс і відновлення після змодельованої помилки.
+Наступна roadmap-картка лишається S03-06; її реалізацію ця UI-зміна не починає.
+
 2026-10-21: власник успішно виконав `tools.migrate_cloud --adopt-bootstrap --apply`.
 Результат після COMMIT: `Applied baseline adoption to Alembic 0006; ownership and RLS verified.`
 Це перевірене прийняття вже створеної SQL bootstrap схеми, а не повторний запуск
