@@ -118,7 +118,7 @@ def test_operator_fk_upgrade_repeat_preserves_privileges(operator_engine):
         command.upgrade(configuration(connection), "head")
         assert connection.scalar(text("SELECT current_user")) == "postgres"
         assert operator_membership(connection) == before
-        assert connection.scalar(text("SELECT version_num FROM studio.alembic_version")) == "0006"
+        assert connection.scalar(text("SELECT version_num FROM studio.alembic_version")) == "0007"
         assert connection.execute(text(
             "SELECT DISTINCT pg_get_userbyid(relowner) FROM pg_class "
             "WHERE relnamespace IN ('studio'::regnamespace,'studio_private'::regnamespace)"
@@ -173,6 +173,11 @@ def test_verified_cloud_upgrade_preserves_managed_schemas(operator_engine):
     with operator_engine.connect() as connection, connection.begin() as transaction:
         before = operator_membership(connection)
         assert upgrade_verified(connection) == "0006"
+        # A later local head must never expand the approved cloud baseline target.
+        assert not connection.scalar(text(
+            "SELECT has_column_privilege('studio_auth_runtime', "
+            "'studio_private.web_sessions', 'encrypted_tokens', 'UPDATE')"
+        ))
         assert operator_membership(connection) == before
         assert connection.scalar(text("SELECT current_user")) == "postgres"
         transaction.rollback()

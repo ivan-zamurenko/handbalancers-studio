@@ -50,7 +50,9 @@ def safe_failure_reason(error: Exception, phase: str) -> str:
 
 def upgrade_verified(connection: Connection, *, adopt_bootstrap: bool = False) -> str:
     require(connection.in_transaction(), "An enclosing transaction is required")
-    require(single_head(ROOT / "server/alembic") == TARGET_REVISION, "Unapproved migration head")
+    # Validate the graph, but never replace the owner-approved target with its head.
+    # Later local migrations do not authorize applying them to the cloud project.
+    single_head(ROOT / "server/alembic")
     connection.exec_driver_sql("SET LOCAL lock_timeout = '5s'")
     connection.exec_driver_sql("SET LOCAL statement_timeout = '60s'")
     connection.execute(text("SELECT pg_advisory_xact_lock(190103)"))

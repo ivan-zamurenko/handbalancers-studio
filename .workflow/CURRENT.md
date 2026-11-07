@@ -1,4 +1,35 @@
-# Поточний checkpoint — хмарну БД прийнято під керування Alembic 0006
+# Поточний checkpoint — S03-06 завершено локально
+
+2026-11-07: S03-06 відновлено за запитом власника й реалізовано. Refresh має
+30-секундне резервування в БД, захист від запису застарілим запитом, атомарну
+заміну encrypted access/refresh та expiry, bounded timeout і recovery. Вихід
+під час refresh не відновлює сесію. Нові локальні сесії мають фіксований строк
+7 днів; access expiry окремий, refresh не продовжує local lifetime.
+
+Перевірено: 59 database + 20 RLS/security + 56 auth (включно з 21 refresh),
+99 unit/contracts/security, 8 migration-tooling tests; Ruff/Mypy GREEN.
+Реальний LOCAL Supabase refresh/JWT пройшов. Read-only review завершено;
+знайдений крайовий випадок oversized response виправлено через RED/GREEN.
+Докази: `.workflow/evidence/S03-06.json`; рішення: `docs/adr/S03-06-session-refresh.md`.
+
+Alembic head локального коду — 0007: тільки UPDATE grants на чотири існуючі
+колонки private sessions. Хмарна БД лишається на підтвердженому 0006.
+До використання нового runtime у хмарі потрібне окреме застосування/перевірка
+0007; хмарний refresh і deploy не виконувалися. `tools.migrate_cloud` досі
+навмисно застосовує лише 0006. Існуючі прострочені сесії потребують нового входу.
+
+Roadmap validator у робочому дереві бачить попередні видалення власником docs;
+їх не відновлювали й не включали в коміт. Окремий snapshot індексу пройшов
+roadmap validation: 142 картки, 0 помилок; next=S03-07.
+Google та email/password залишаються єдиними активними способами входу; Apple
+вимкнено, кнопку видалено попереднім комітом a8d9a29.
+
+Наступна картка: S03-07 — негайний локальний вихід. Зупинка на межі S03-06.
+Гілка task/execution-v4; commit/push status перевірити після коміту.
+
+## Історичний checkpoint до відновлення S03-06
+
+### Хмарну БД прийнято під керування Alembic 0006
 
 2026-11-07, остаточне рішення власника: Apple OAuth не підключаємо; залишаємо
 Google та email/password через Supabase Auth. Apple виключено з поточного обсягу,

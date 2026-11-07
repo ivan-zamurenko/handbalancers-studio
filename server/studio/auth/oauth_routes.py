@@ -11,6 +11,7 @@ from starlette.responses import JSONResponse, RedirectResponse
 from studio.auth.gateway import AuthFailure
 from studio.auth.jwt import InvalidIdentity
 from studio.auth.oauth import OAuthRateLimited, OAuthService
+from studio.auth.refresh import RefreshUnavailable
 from studio.auth.routes import same_origin
 from studio.auth.token_store import StoreError
 
@@ -128,6 +129,10 @@ async def session_snapshot(request: Request) -> JSONResponse:
         profile = await service_for(request).session_profile(cookie)
     except (StoreError, InvalidIdentity):
         return JSONResponse({"authenticated": False}, status_code=401, headers=HEADERS)
+    except RefreshUnavailable:
+        return JSONResponse(
+            {"detail": "Session temporarily unavailable"}, status_code=503, headers=HEADERS
+        )
     # No paid access is inferred from identity. Entitlement module is not ready.
     return JSONResponse(
         {

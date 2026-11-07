@@ -18,6 +18,7 @@ from studio.accounts.provisioning import current_profile, provision
 from studio.auth.gateway import AuthGateway
 from studio.auth.jwt import InvalidIdentity, JWTValidator
 from studio.auth.rate_limit import allow_start
+from studio.auth.refresh import refresh_identity
 from studio.auth.token_store import TokenStore
 
 
@@ -157,7 +158,7 @@ class OAuthService:
                 access_token=access,
                 refresh_token=refresh,
                 access_expires_at=datetime.fromtimestamp(identity.expires_at, UTC),
-                expires_at=datetime.fromtimestamp(identity.expires_at, UTC),
+                expires_at=datetime.now(UTC) + timedelta(days=7),
             )
             if old_cookie:
                 self.store.revoke_session(session, old_cookie)
@@ -169,9 +170,13 @@ class OAuthService:
         )
 
     async def session_profile(self, cookie: str) -> dict[str, object]:
-        with self.transaction() as session:
-            tokens = self.store.read_session(session, cookie)
-        identity = await self.validator.verify(tokens.access_token.get_secret_value())
+        identity = await refresh_identity(
+            cookie,
+            transaction=self.transaction,
+            store=self.store,
+            gateway=self.gateway,
+            validator=self.validator,
+        )
         # Recheck local revocation after network/JWKS wait; current active role from DB.
         with self.transaction() as session:
             current = self.store.read_session(session, cookie)

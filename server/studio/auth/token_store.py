@@ -12,13 +12,13 @@ import re
 import secrets
 from collections.abc import Mapping
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from uuid import UUID, uuid4
 
 from cryptography.exceptions import InvalidTag
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from pydantic import SecretStr
-from sqlalchemy import func, select, update
+from sqlalchemy import case, func, or_, select, update
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
@@ -140,7 +140,10 @@ class AttemptSecrets:
     verifier: SecretStr
 
 
-def _session_context(row: WebSession) -> tuple[str, ...]:
+REFRESH_LEASE_SECONDS = 30
+
+
+def _session_context(row: WebSession, access_expires_at: datetime | None = None) -> tuple[str, ...]:
     return (
         "web_sessions",
         str(row.id),
@@ -148,7 +151,7 @@ def _session_context(row: WebSession) -> tuple[str, ...]:
         str(row.upstream_session_id),
         row.session_key_hash,
         _time(row.expires_at),
-        _time(row.access_expires_at),
+        _time(access_expires_at or row.access_expires_at),
         "encrypted_tokens",
     )
 
@@ -252,6 +255,98 @@ class TokenStore:
                 WebSession.revoked_at.is_(None),
             )
             .values(revoked_at=now)
+        )
+
+    def claim_refresh(self, session: Session, cookie: str) -> int | None:
+        """Commit before network. Odd versions are idle; even versions own a lease."""
+        now = _now(session)
+        return session.execute(
+            update(WebSession)
+            .where(
+                WebSession.session_key_hash == _hash(cookie),
+                WebSession.revoked_at.is_(None),
+                WebSession.expires_at > now,
+                WebSession.access_expires_at <= now,
+                or_(
+                    WebSession.row_version % 2 == 1,
+                    WebSession.last_seen_at <= now - timedelta(seconds=REFRESH_LEASE_SECONDS),
+                ),
+            )
+            .values(
+                row_version=WebSession.row_version
+                + case((WebSession.row_version % 2 == 1, 1), else_=2),
+                last_seen_at=now,
+            )
+            .returning(WebSession.row_version)
+        ).scalar_one_or_none()
+
+    def complete_refresh(
+        self,
+        session: Session,
+        cookie: str,
+        version: int,
+        *,
+        access_token: str,
+        refresh_token: str,
+        access_expires_at: datetime,
+    ) -> bool:
+        """Fenced atomic encrypted pair/expiry swap; never extend local lifetime."""
+        now = _now(session)
+        _future(access_expires_at, now)
+        if not access_token or not refresh_token:
+            raise StoreError()
+        conditions = (
+            WebSession.session_key_hash == _hash(cookie),
+            WebSession.row_version == version,
+            WebSession.revoked_at.is_(None),
+            WebSession.expires_at > now,
+            WebSession.last_seen_at > now - timedelta(seconds=REFRESH_LEASE_SECONDS),
+        )
+        row = session.execute(select(WebSession).where(*conditions)).scalar_one_or_none()
+        if row is None:
+            return False
+        envelope = self._cipher.encrypt(
+            json.dumps({"access": access_token, "refresh": refresh_token}),
+            _session_context(row, access_expires_at),
+        )
+        return (
+            session.execute(
+                update(WebSession)
+                .where(*conditions)
+                .values(
+                    encrypted_tokens=envelope,
+                    access_expires_at=access_expires_at,
+                    row_version=version + 1,
+                )
+                .returning(WebSession.id)
+            ).scalar_one_or_none()
+            is not None
+        )
+
+    def release_refresh(
+        self,
+        session: Session,
+        cookie: str,
+        version: int,
+        *,
+        revoke: bool = False,
+    ) -> bool:
+        now = _now(session)
+        values: dict[str, object] = {"row_version": version + 1}
+        if revoke:
+            values["revoked_at"] = now
+        return (
+            session.execute(
+                update(WebSession)
+                .where(
+                    WebSession.session_key_hash == _hash(cookie),
+                    WebSession.row_version == version,
+                    WebSession.revoked_at.is_(None),
+                )
+                .values(**values)
+                .returning(WebSession.id)
+            ).scalar_one_or_none()
+            is not None
         )
 
     def create_attempt(

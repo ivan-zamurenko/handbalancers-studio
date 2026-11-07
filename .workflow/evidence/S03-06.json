@@ -1,0 +1,86 @@
+{
+  "task_id": "S03-06",
+  "status": "done",
+  "branch": "task/execution-v4",
+  "base_commit": "a8d9a29dad6764e7c9cddbf12e4fd67e0fe5e03d",
+  "scope_deviations": [
+    "Owner resumed paused card on 2026-11-07. Card says no schema change: new0007 grants UPDATE on four existing private columns; no new tables/columns. Applied only on guarded local test stack.",
+    "TokenStore owns atomic encrypted token replacement and database lease; OAuthService integrates refresh and separates fixed seven-day local lifetime from access expiry. Existing HTTP snapshot translates temporary failures; no unused dependencies.py placeholder.",
+    "Auth ADR records lease parity, last_seen_at claim semantics, failure recovery and lifetime default.",
+    "Cloud migration helper validates linear graph but remains pinned to owner-approved0006 even when local head is0007. Integration test proves refresh grants are not applied by this helper.",
+    "Existing head-upgrade test now expects0007; baseline/adoption checks remain0006. No assertions weakened."
+  ],
+  "environment": {
+    "database": "guarded local test Supabase on loopback55321/55322; temporary PostgreSQL databases for concurrency/grants and real local Auth for roundtrip",
+    "command_prefix": "PATH=\"$PWD/.local-tools/uv-env/bin:$PWD/.local-tools/supabase-cli/node_modules/.bin:$PATH\" UV_CACHE_DIR=\"$PWD/.local-tools/uv-cache\" DOCKER_HOST=\"unix://$HOME/.colima/studio-s01/docker.sock\"",
+    "excluded_setup_failures": [
+      "Initial direct pytest lacked test target environment; reran via tools/local_stack.py test.",
+      "Real Auth fixture initially lacked existing Supabase CLI in PATH; corrected PATH. Neither is behavior RED."
+    ]
+  },
+  "red": [
+    {
+      "command": "uv run --locked python tools/local_stack.py test uv run --locked pytest server/tests/integration/auth/test_refresh_session.py -q",
+      "result": "Original4 failed: expired access401 instead of coordinated refresh; upstream revoked did not revoke local. Expanded12 failed before implementation, including lifetime, identity and grants."
+    },
+    {
+      "command": "same harness: pytest server/tests/integration/database/test_migration_baseline.py -q -k verified_cloud_upgrade",
+      "result": "1failed: cloud baseline helper incorrectly refused later local migration head."
+    },
+    {
+      "command": "same harness: pytest server/tests/integration/auth/test_refresh_session.py -q -k unavailable_jwt",
+      "result": "1failed: ambiguous JWKS failure gave401/permanent revoke instead of retryable503."
+    },
+    {
+      "command": "same harness: pytest server/tests/integration/auth/test_refresh_session.py -q -k malformed",
+      "result": "1failed2passed: oversized valid-shape response gave401 instead of503; corrected before final gate."
+    }
+  ],
+  "green": [
+    {
+      "command": "uv run --locked python tools/local_stack.py test uv run --locked pytest server/tests/integration/auth/test_refresh_session.py -q",
+      "result": "18passed before malformed edge cases; includes real local Supabase token exchange."
+    },
+    {
+      "command": "same harness: pytest server/tests/integration/auth/test_refresh_session.py -q -k malformed",
+      "result": "3passed after review fix."
+    },
+    {
+      "command": "uv run --locked python -m tools.check_migrations",
+      "result": "Single head0007.59database+20RLS/security+56auth passed; all21 refresh cases included. No skip/xfail. Upgrade/repeat, role/isolation and baseline/adoption regression passed."
+    },
+    {
+      "command": ".venv/bin/pytest server/tests/unit server/tests/contracts server/tests/security/auth -q",
+      "result": "99passed"
+    },
+    {
+      "command": ".venv/bin/pytest tools/tests/test_s01_07_migration_ci.py -q",
+      "result": "8passed"
+    },
+    {
+      "command": "ruff check/format scoped runtime/test/migration; MYPYPATH=server mypy server/studio; mypy --explicit-package-bases tools/migrate_cloud.py; git diff --check",
+      "result": "passed"
+    },
+    {
+      "command": "python tools/roadmap.py validate",
+      "result": "Worktree reports pre-existing owner-deleted docs. Isolated staged snapshot validated142 tasks,0errors,next=S03-07; unrelated deletions excluded."
+    }
+  ],
+  "acceptance_evidence": [
+    "Two independent OAuthService instances share PostgreSQL lease; parallel expired sessions perform one upstream exchange.",
+    "Atomic encrypted token pair/expiry with matching AEAD; transaction rollback preserves previous pair; caller holds no DB lock during upstream I/O.",
+    "Definitive upstream rejection and signed user/session mismatch terminate local session; logout race cannot resurrect it.",
+    "Timeout/unavailable/rate limit/busy lease/malformed response fail closed503 and allow retry; cancellation releases owned claim.",
+    "Expired lease recovered; stale worker cannot save/revoke/release successor; bounded provider and waiter timeouts.",
+    "Real local Supabase refresh with real JWT verification and shortened local cache deadline; tokens absent from response/logs.",
+    "Only four added UPDATE columns; identity/cookie/local expiry privileges remain denied."
+  ],
+  "review": "Read-only reviewer found no blocking defects. Oversized response status issue fixed with observed RED/GREEN; follow-up review clean.",
+  "unverified": [
+    "Cloud0007 application and hosted refresh roundtrip; no production deploy performed.",
+    "No new Google OAuth roundtrip; previous Google login evidence remains separate."
+  ],
+  "rollout": "Cloud remains at confirmed0006. Apply/rehearse0007 before deploying refresh runtime; pinned migrate_cloud baseline command does not apply it. Existing expired sessions require login again.",
+  "next_task": "S03-07",
+  "push_status": "pending_at_commit"
+}
