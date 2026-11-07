@@ -92,7 +92,7 @@ class AuthGateway:
         return await self._call("/token?grant_type=refresh_token", {"refresh_token": refresh_token})
 
     async def logout(self, access_token: str) -> dict[str, object] | None:
-        return await self._call("/logout", {}, access_token=access_token)
+        return await self._call("/logout?scope=local", {}, access_token=access_token)
 
     async def recovery(self, email: str) -> dict[str, object] | None:
         return await self._call("/recover", {"email": email})

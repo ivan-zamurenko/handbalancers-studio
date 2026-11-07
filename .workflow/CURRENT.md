@@ -1,4 +1,32 @@
-# Поточний checkpoint — S03-06 завершено локально
+# Поточний checkpoint — S03-07 завершено локально
+
+2026-11-07: вихід відкликає local session до мережі, навіть якщо encrypted tokens
+пошкоджені або протерміновані. Upstream sign-out має 5-секундний загальний timeout
+і scope=local; інші пристрої лишаються активними. 204 підтверджує local logout,
+а результат upstream відокремлений. CSRF/Origin обов'язкові; повтор із тим самим
+cookie/CSRF безпечний, старий cookie відхиляється.
+
+Браузер очищає поточний account draft/cache namespace після підтвердженого виходу,
+зберігає guest preferences й не дозволяє застарілому snapshot відновити стан.
+Рішення/межі: `docs/adr/S03-07-logout.md`; докази: `.workflow/evidence/S03-07.json`.
+Перевірки: 64 auth integration, 104 unit/contracts/security, 24 browser GREEN;
+Ruff/Mypy GREEN, read-only review без блокувальних зауважень. Реальний LOCAL
+Supabase sign-out та збереження другої upstream session перевірені.
+
+Перший широкий auth run мав одиничний401 у незміненому тесті повторного password
+login (63passed/1failed); ізольований повтор і повний повтор64passed без правок.
+Причину не встановлено, очікування/перевірки не послаблювали. Це записано в evidence.
+Попередній fcfbd33 pushed, CI42425676793 baseline/database success.
+
+Хмарна БД досі на0006; застосування0007 із S03-06 та hosted smoke/deploy лишаються
+окремими кроками. S03-07 не змінює схему. Google/email увімкнені; Apple вимкнено.
+Видалення docs та інші сторонні файли не включати в коміт; roadmap validator
+пройшов на snapshot індексу: 142 картки, 0 помилок. Гілка task/execution-v4.
+Наступна картка: S03-08. Commit/push/CI цього checkpoint перевірити після коміту.
+
+## Історичний checkpoint S03-06
+
+### S03-06 завершено локально
 
 2026-11-07: S03-06 відновлено за запитом власника й реалізовано. Refresh має
 30-секундне резервування в БД, захист від запису застарілим запитом, атомарну

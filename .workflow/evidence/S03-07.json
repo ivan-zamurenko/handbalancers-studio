@@ -1,0 +1,89 @@
+{
+  "task_id": "S03-07",
+  "status": "done",
+  "scope_deviations": [
+    "Existing browser controller is features/auth/session.js; new state/session.js owns small account-storage cleanup helper.",
+    "Wire logout orchestrator through existing OAuthService/route; explicit local scope in AuthGateway.",
+    "Real DB acceptance and local Supabase tests live in integration/auth/test_logout.py because baseline security suite is intentionally DB-free. security/auth/test_logout.py tests pre-DB Origin/CSRF; JS/e2e prove cache cleanup.",
+    "Document cache namespace, bounded upstream result and limitations in docs/adr/S03-07-logout.md. No schema/migration changes; cloud0007 remains pending."
+  ],
+  "red": [
+    {
+      "command": ".venv/bin/pytest server/tests/security/auth/test_logout.py server/tests/unit/auth/test_auth_gateway.py -q",
+      "result": "1failed17passed: logout request did not specify local scope."
+    },
+    {
+      "command": "uv run --locked python tools/local_stack.py test uv run --locked pytest server/tests/integration/auth/test_logout.py -q",
+      "result": "4failed3passed: corrupt/expired rows not revoked, total logout deadline module absent, upstream result not separately reported."
+    },
+    {
+      "command": "npx playwright test tests/e2e/logout.spec.js --max-failures=1",
+      "result": "1failed: current-account private drafts/cache remained in localStorage/sessionStorage. Other cases not run after max-failures."
+    }
+  ],
+  "green": [
+    {
+      "command": "uv run --locked python tools/local_stack.py test uv run --locked pytest server/tests/integration/auth/test_logout.py -q",
+      "result": "7passed before adding other-account CSRF test; all8 included in final64."
+    },
+    {
+      "command": ".venv/bin/pytest server/tests/security/auth/test_logout.py server/tests/unit/auth/test_auth_gateway.py -q",
+      "result": "18passed"
+    },
+    {
+      "command": "uv run --locked python tools/local_stack.py test uv run --locked pytest server/tests/integration/auth -q",
+      "result": "Final unchanged rerun64passed, including real local Supabase logout/refresh rejection and separate second session survival."
+    },
+    {
+      "command": ".venv/bin/pytest server/tests/unit server/tests/contracts server/tests/security/auth -q",
+      "result": "104passed"
+    },
+    {
+      "command": "npx playwright test tests/e2e/logout.spec.js tests/e2e/oauth-ui.spec.js tests/e2e/login-form.spec.js",
+      "result": "24passed: logout390/1440 light/dark, cache cleanup, lost response, failed logout, overlapping snapshot, denied storage and login/OAuth regressions."
+    },
+    {
+      "command": "ruff check/format touched Python and server/studio; MYPYPATH=server mypy server/studio; git diff --check",
+      "result": "passed"
+    },
+    {
+      "command": "roadmap.validate_files on isolated staged snapshot",
+      "result": "142tasks,0errors,next=S03-08; owner-deleted docs untouched in worktree."
+    }
+  ],
+  "base_commit": "fcfbd33e5e41d0d95d37e40b9430991622f5c9d9",
+  "branch": "task/execution-v4",
+  "next_task": "S03-08",
+  "push_status": "pending_at_commit",
+  "regression_observation": {
+    "initial_auth_run": "63passed1failed: unchanged test_password_login.py::test_valid_login_rotates_cookie line48 returned401 on second login after initial confirmation/login/session200.",
+    "follow_up": "Unchanged isolated test1passed; unchanged full auth suite64passed. No assertion weakened/skipped or implementation changed to hide the failure.",
+    "diagnosis": "Root cause unknown. Read-only review found no direct path from password login to modified logout orchestration. Redacted local Auth logs inspected for status counts only. Clock/JWT timing is unproven and not claimed as cause."
+  },
+  "acceptance_evidence": {
+    "old_cookie_rejected": "Real DB local commit is visible while upstream coroutine is still running; replay yields401.",
+    "upstream_outage_local_revoke": "Provider failure/timeout returns local204 and clears cookie; corrupted/expired envelopes still get revoked.",
+    "clear_account_cache": "Real browser removes current profile namespace from both storage areas; guest prefs/other namespaces retained; confirmed guest reconciliation clears after response loss.",
+    "logout_idempotent": "Repeated cookie+CSRF returns204 without another upstream call; different account with old CSRF rejected403.",
+    "upstream_confirmed_separately": "Service return True/False/None tracks confirmed/unconfirmed/not-attempted; HTTP204 confirms local logout only. Actual local Supabase revokes old refresh and preserves second session."
+  },
+  "environment": {
+    "prefix": "PATH=\"$PWD/.local-tools/uv-env/bin:$PWD/.local-tools/supabase-cli/node_modules/.bin:$PATH\" UV_CACHE_DIR=\"$PWD/.local-tools/uv-cache\" DOCKER_HOST=\"unix://$HOME/.colima/studio-s01/docker.sock\"",
+    "browser": "Add .local-tools/node/bin to PATH; PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers. Isolated loopback test server; no cloud credentials.",
+    "database": "Guarded local test stack; existing migration head0007, no schema changes in this card."
+  },
+  "review": "Read-only reviewer: no blocking findings; local revoke before network, bounded current-session upstream, CSRF, cleanup and request-version guard verified.",
+  "unverified": [
+    "Hosted logout and cloud0007 apply/deployment not performed.",
+    "Intermittent401 in unchanged password-login test: cause unknown; two follow-up runs passed unchanged."
+  ],
+  "limitations": [
+    "No private cache writers exist yet; future ones must follow studio:account:<profile-id>:<key>. Current-tab sessionStorage and document memory only; no cross-tab messaging/IndexedDB/CacheStorage added.",
+    "Pre-existing deleted docs excluded; roadmap validated against staged snapshot to preserve owner changes."
+  ],
+  "previous_ci": {
+    "commit": "fcfbd33",
+    "run": 42425676793,
+    "result": "success: baseline and database"
+  }
+}

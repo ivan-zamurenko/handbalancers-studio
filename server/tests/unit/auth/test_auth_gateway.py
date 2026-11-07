@@ -86,6 +86,7 @@ def test_gateway_exposes_all_auth_flows():
     ] == [["password"], ["pkce"], ["refresh_token"]]
     logout_request = requests[5]
     assert logout_request.headers["authorization"] == "Bearer access-token"
+    assert parse_qs(logout_request.url.query.decode()) == {"scope": ["local"]}
 
 
 @pytest.mark.parametrize(

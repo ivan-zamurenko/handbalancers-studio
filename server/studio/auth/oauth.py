@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session
 from studio.accounts.provisioning import current_profile, provision
 from studio.auth.gateway import AuthGateway
 from studio.auth.jwt import InvalidIdentity, JWTValidator
+from studio.auth.logout import logout_session
 from studio.auth.rate_limit import allow_start
 from studio.auth.refresh import refresh_identity
 from studio.auth.token_store import TokenStore
@@ -196,21 +197,10 @@ class OAuthService:
             self.secret, ("session-csrf:" + cookie).encode(), hashlib.sha256
         ).hexdigest()
 
-    async def logout(self, cookie: str) -> None:
-        from studio.auth.gateway import AuthFailure
-        from studio.auth.token_store import StoreError
-
-        with self.transaction() as session:
-            try:
-                tokens = self.store.read_session(session, cookie)
-            except StoreError:
-                return
-            self.store.revoke_session(session, cookie)
-        # Local revocation is committed even if Supabase is unreachable.
-        try:
-            await self.gateway.logout(tokens.access_token.get_secret_value())
-        except AuthFailure:
-            pass
+    async def logout(self, cookie: str) -> bool | None:
+        return await logout_session(
+            cookie, transaction=self.transaction, store=self.store, gateway=self.gateway
+        )
 
 
 def handle_user_id(profile: dict[str, object]) -> UUID:
