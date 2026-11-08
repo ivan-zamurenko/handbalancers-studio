@@ -1,0 +1,168 @@
+{
+  "task": "workspace-residue-cleanup",
+  "status": "completed_local",
+  "authorization": "Owner explicitly authorized resolving all 70 dirty files and deleting unnecessary/outdated content. Commit and push authorization persists.",
+  "base_commit": "c359849",
+  "initial_status": {
+    "deleted_docs": 20,
+    "supabase_skill_files": 40,
+    "skills_lock": 1,
+    "local_aliases": 2,
+    "vscode_files": 2,
+    "copilot_package": 5,
+    "total": 70
+  },
+  "restored": [
+    "docs/SOURCES.md",
+    "docs/api-inventory.json",
+    "docs/architecture.md",
+    "docs/auth-contract.md",
+    "docs/contracts.md",
+    "docs/database-introduction.md",
+    "docs/database-invariants.md",
+    "docs/decisions.md",
+    "docs/engineering-defaults.md",
+    "docs/frontend.md",
+    "docs/owner-gates.md",
+    "docs/owner-workflow.md",
+    "docs/project-map.json",
+    "docs/project-structure.md",
+    "docs/schema_v4.json",
+    "docs/skills-policy.md",
+    "docs/sources.json",
+    "docs/testing-and-commits.md",
+    "docs/toolchain-lock.md",
+    "docs/toolchain.md"
+  ],
+  "removed": [
+    "COPILOT_SETUP_RU.md",
+    "copilot-instructions.md",
+    "docs/copilot/WORKFLOW_RU.md",
+    "docs/copilot/CURRENT.template.md",
+    "docs/copilot/settings.merge-example.json",
+    ".vscode/tasks.json"
+  ],
+  "removal_reason": "Duplicated Copilot kit with obsolete setup/current-state/model guidance, wrong Russian response preference and misplaced instructions; old S03-01 diagnostic/lock-retry VS Code tasks. Replace Copilot kit with a concise adapter pointing to current AGENTS and checkpoint.",
+  "local_backup": "private-evidence/workspace-residue-before-cleanup",
+  "retained_local_ignored": [
+    ".vscode/mcp.json",
+    ".claude/skills/supabase",
+    ".claude/skills/supabase-postgres-best-practices"
+  ],
+  "retained_versioned": [
+    ".agents/skills/supabase",
+    ".agents/skills/supabase-postgres-best-practices",
+    "skills-lock.json"
+  ],
+  "validation": [
+    {
+      "command": ".venv/bin/python tools/roadmap.py validate",
+      "result": "PASS: 142 tasks, zero errors in actual working tree"
+    },
+    {
+      "command": ".venv/bin/python -m pytest tools/tests/test_roadmap.py -q",
+      "result": "PASS: 16 tests"
+    },
+    {
+      "command": ".venv/bin/python tools/roadmap.py next",
+      "result": "S03-11 auth_local_e2e"
+    },
+    {
+      "check": "JSON parsing, skill frontmatter names/source, 40 file hashes, credential pattern scan, new local Markdown links",
+      "result": "PASS"
+    },
+    {
+      "check": "git check-ignore for editor MCP, two aliases, private social material; skill files not ignored",
+      "result": "PASS"
+    },
+    {
+      "command": "git diff --check",
+      "result": "PASS"
+    },
+    {
+      "check": "CLI help and implementation review for local_stack/check_migrations",
+      "result": "PASS; documented prepare and default rerunnable check; --fresh explained separately"
+    },
+    {
+      "command": "git diff --cached --check",
+      "result": "One existing trailing space in unchanged vendor snapshot: .agents/skills/supabase-postgres-best-practices/references/_contributing.md:30. Preserved original bytes and installer metadata; not a project-code defect."
+    },
+    {
+      "command": "git diff --cached --check -- . :(exclude).agents/skills/supabase/** :(exclude).agents/skills/supabase-postgres-best-practices/**",
+      "result": "PASS: all project-authored changes. Full staged scope and credential-pattern scan passed; staged skill bytes match recorded hashes."
+    }
+  ],
+  "skill_files_sha256": {
+    ".agents/skills/supabase/CHANGELOG.md": "4b9c9387871d7888f18e9c97a7d5691ea38e333401ccdcb0161d2140cb16b2d8",
+    ".agents/skills/supabase/SKILL.md": "697e0e949f97621c6fc1784169eb3ccbf673747d6bb8299a52962d3d84d93dc6",
+    ".agents/skills/supabase/assets/feedback-issue-template.md": "ea211aa174c5a096fe76461f25143b8bc23f3bde3adc9e727cda38218cc8c282",
+    ".agents/skills/supabase/references/skill-feedback.md": "09ad94c0291735dfc04c92557c8734fa259ec39e1d56bf2bd5c6a6529d838717",
+    ".agents/skills/supabase-postgres-best-practices/CHANGELOG.md": "751ad110037c85d400018c9894716a04fa46357ff55c22b1169b280752e19e88",
+    ".agents/skills/supabase-postgres-best-practices/SKILL.md": "ad65e776f45e761bafc609d3f506c77c1032225aa65e0c4c02f241b8071e5855",
+    ".agents/skills/supabase-postgres-best-practices/references/_contributing.md": "191e039e7d94764e6073410b513b559f9a594e0fdf0252a30c2a2986df2ab3bc",
+    ".agents/skills/supabase-postgres-best-practices/references/_sections.md": "c9e992612b422c7122de0b7542ebc2450db283edaab08cfe86c6d657fcccccd5",
+    ".agents/skills/supabase-postgres-best-practices/references/_template.md": "6299954250f212caabe339d752c3e5313a8e07d1a182a4e4b425baee91df1bd2",
+    ".agents/skills/supabase-postgres-best-practices/references/advanced-full-text-search.md": "40c2606bbb4c4dce31308f201b24cc7f58c7df05b1d9c6856fe2b888d3b7cf28",
+    ".agents/skills/supabase-postgres-best-practices/references/advanced-jsonb-indexing.md": "24cacf6a8bc35901dd566d24502ce8e57f810a5c196b897e61d52726e521d106",
+    ".agents/skills/supabase-postgres-best-practices/references/conn-idle-timeout.md": "630588902c00fcec59a5988cc5d042f76dcf2c923a535abfd8c47dca205eaed5",
+    ".agents/skills/supabase-postgres-best-practices/references/conn-limits.md": "11b2a67a7c7679cbbc5d807bbb17e69c98484a581d0c8b929c03408f412b81b2",
+    ".agents/skills/supabase-postgres-best-practices/references/conn-pooling.md": "88cf086bf98ba865d2e9d0579974e1366b14157619d6a93e7da77be91084e4a5",
+    ".agents/skills/supabase-postgres-best-practices/references/conn-prepared-statements.md": "174e9332fe3dda5c99b2b00159fb1915ae36c00bab3a7882c14e73e4344e946e",
+    ".agents/skills/supabase-postgres-best-practices/references/data-batch-inserts.md": "531933b82d6a622d0fae29e0ea80be6fe5d78655adf2804c271ea84a1930de37",
+    ".agents/skills/supabase-postgres-best-practices/references/data-n-plus-one.md": "21a44905e5b16a42741892ec34bb1bfef124d049b140a76934a9acd0f46f5fc2",
+    ".agents/skills/supabase-postgres-best-practices/references/data-pagination.md": "73c9fa10a3d439bedea0e11b640bd25bf30dd50f0d9006cf85baf7c3151543fa",
+    ".agents/skills/supabase-postgres-best-practices/references/data-upsert.md": "2612af83b20a2701dde30ef1f8d7efd26b7e9eef84717226b8f038a2d2150ff7",
+    ".agents/skills/supabase-postgres-best-practices/references/lock-advisory.md": "c88d259dbf81c3771438f59a165f7eab8acd09999dd370bdf807521c73f35aab",
+    ".agents/skills/supabase-postgres-best-practices/references/lock-deadlock-prevention.md": "09aee46f51d7178c8e55fe056cd5a94a64ba2c122fe418e6900cd99f297b2347",
+    ".agents/skills/supabase-postgres-best-practices/references/lock-short-transactions.md": "5aa7f61095916986d39644b446cdbcd2bacca7ef698a3bb50b3f82dd60207602",
+    ".agents/skills/supabase-postgres-best-practices/references/lock-skip-locked.md": "6c45077f430f29cd9cd8f448c94d578e827e7bd023fcdaf717a756acb116fa4b",
+    ".agents/skills/supabase-postgres-best-practices/references/monitor-explain-analyze.md": "4cb67ffbf8e57f2e5b380b0beb4242528b513723ce314a2c2ffcf083bd4203d7",
+    ".agents/skills/supabase-postgres-best-practices/references/monitor-pg-stat-statements.md": "89dca99d4e894fcbdcac136be7ad9fbc03d1342904f065c1b198dc9cf495f098",
+    ".agents/skills/supabase-postgres-best-practices/references/monitor-vacuum-analyze.md": "2892272011710eb49b3f185ec12f15ce9ce4c365792c672f6e2a9c90da426a1a",
+    ".agents/skills/supabase-postgres-best-practices/references/query-composite-indexes.md": "73e42424e671f0266e74fdb220db3196790f69fb43e2b19c7b9483eb4971b554",
+    ".agents/skills/supabase-postgres-best-practices/references/query-covering-indexes.md": "daf2a7f0477fb7357b62b5fb5b185b1995a77a186347e45cb780e25e7a7589b6",
+    ".agents/skills/supabase-postgres-best-practices/references/query-index-types.md": "472a74f22c2df203bd0154999b3a5a0187cca2ab3d9a3978e305bb7c32f1a282",
+    ".agents/skills/supabase-postgres-best-practices/references/query-missing-indexes.md": "91ad8b0ff4365704b4830a7f077c6f140f7140fd5d3ce5cd0b92b160cf9e25f1",
+    ".agents/skills/supabase-postgres-best-practices/references/query-partial-indexes.md": "6448982bc8558c6555284958edc331b29239c6a0130e6b4501dd6d4da607a6dd",
+    ".agents/skills/supabase-postgres-best-practices/references/schema-constraints.md": "90e8efda3e9e81095e642911ad4aae2809d160f29414338fa997253238f510f8",
+    ".agents/skills/supabase-postgres-best-practices/references/schema-data-types.md": "e01b58c14c7f3f65d8ead580b9a4fcf70b83baaab0f9a5f83c569c9fd113e8c8",
+    ".agents/skills/supabase-postgres-best-practices/references/schema-foreign-key-indexes.md": "7587713d12a65a212365459b3d39e4717d8a79e4073b10bd62f1054d8192c0dd",
+    ".agents/skills/supabase-postgres-best-practices/references/schema-lowercase-identifiers.md": "4bc80f70865f2390872591f326c8a6be6456a0aeb5a7e5a2475d7cd9d43059ab",
+    ".agents/skills/supabase-postgres-best-practices/references/schema-partitioning.md": "541e13fbeaf4bb1485c9059d4c9417dbdb766cf16f4237cd63a04ada7ec45b90",
+    ".agents/skills/supabase-postgres-best-practices/references/schema-primary-keys.md": "3c8beabef82066f9a0838b926da0885117fd2d9a263aaf84cb5ca9e5f0d400e9",
+    ".agents/skills/supabase-postgres-best-practices/references/security-privileges.md": "095909274a4fb43df785d7144cf674eeb40284d2d45628f14af4108737b93663",
+    ".agents/skills/supabase-postgres-best-practices/references/security-rls-basics.md": "e04dd1a3a382aafdaaa73fe9f7976352acdde6e90c2a2470d281b94d4f44b096",
+    ".agents/skills/supabase-postgres-best-practices/references/security-rls-performance.md": "2e1faeca7d5746e246b1c78f9492fe2a9cfa41c4d7fa1e23c402d58fa18ea014"
+  },
+  "skill_provenance": {
+    "source": "https://github.com/supabase/agent-skills",
+    "license_source": "https://raw.githubusercontent.com/supabase/agent-skills/main/LICENSE",
+    "scope": "Preserved installed local snapshot unchanged; lock hashes are installer metadata, not an independent verification against upstream HEAD."
+  },
+  "updated_documents": [
+    ".gitignore",
+    ".workflow/CURRENT.md",
+    "README.md",
+    "docs/auth-contract.md",
+    "docs/decisions.md",
+    "docs/frontend.md",
+    "docs/owner-gates.md",
+    "docs/owner-workflow.md",
+    "docs/project-map.json",
+    "docs/project-structure.md",
+    "docs/skills-policy.md",
+    "docs/testing-and-commits.md",
+    "docs/toolchain-lock.md",
+    "docs/toolchain.md"
+  ],
+  "review": {
+    "agent": "cleanup_audit",
+    "result": "CLEAR after follow-up: corrected README/toolchain commands confirmed; final checkpoint checked; no blockers."
+  },
+  "not_run": [
+    "No runtime, database, cloud or dependency changes; previous runtime/browser suites not repeated.",
+    "Database commands documented and checked against implementation/help, not executed during this cleanup."
+  ],
+  "next_task": "S03-11",
+  "delivery": "Commit and push follow this evidence; final SHA and remote verification reported to owner, not embedded in own commit."
+}

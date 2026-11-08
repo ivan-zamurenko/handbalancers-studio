@@ -1,42 +1,75 @@
-# Начало в чистой папке и локальные команды
+# Локальні інструменти та команди
 
-## Что уже лежит в kit
-Документы, task graph, workflow selector, тесты selector, агентская конфигурация и исторические reference-макеты. Ни FastAPI runtime, ни product SQL миграций пока нет. `references/design/preview/index.html` — макет, не сайт новой реализации. Содержимое `.codex` применять только после ручного обзора/trust; это не глобальный auto-install.
+## Робоче середовище
 
-## Первый сеанс S00
-Распаковать kit в новую отдельную папку, не поверх старого проекта. Сверить `git status`, существование `.git` и пользовательских файлов. Если там только kit, допустимо сделать его корнем нового репозитория. Не связывать старый origin автоматически. Запустить доступные уже сейчас команды:
+Працюємо в наявному корені цього репозиторію, гілка `task/execution-v4`.
+FastAPI runtime, міграції, локальний Supabase та public/auth UI вже є.
+Не створювати вкладений execution-v4 або новий робочий проєкт.
+Історичні матеріали kit у references не визначають поточну готовність.
+
 ```sh
-python tools/roadmap.py validate
-python tools/roadmap.py next
-python tools/roadmap.py show S00-01
-python -m unittest discover -s tools/tests -v
+.venv/bin/python tools/roadmap.py validate
+.venv/bin/python tools/roadmap.py next
 ```
-Затем выполнить S00-01; S00-02 создаёт pyproject/package manifests и lockfiles. Первую задачу нельзя объявлять сделанной только потому, что zip распакован: зафиксировать безопасное рабочее окружение, проверку исключений Git и baseline.
 
-## Фиксация версий
-Baseline: Python3.13, Node24 (только tooling), SQLAlchemy2, psycopg3 sync. Patch versions и SDK выбираются один раз по реальной совместимости в S00-02, записываются lockfiles; дальше только locked installs. FastAPI/Jinja/Uvicorn/Pydantic-settings/HTTPX и Supabase client по необходимости. Не копировать пакеты исторического React.
+Поточний стан — `.workflow/CURRENT.md`; структура й запуск — README.md.
 
-Supabase CLI локально управляет PostgreSQL/Auth. Версию PostgreSQL выбирать совместимую с фактическим local/staging Supabase, записать в toolchain-lock. Не создавать одновременно отдельный неподключённый postgres compose как «настоящую» DB для всех tests. Для unit DB не нужна; интеграции используют guarded local disposable project.
+## Версії та встановлення
 
-## Команды после их реализации
+Python/Node/uv та залежності зафіксовано в `.python-version`, `.node-version`,
+`pyproject.toml`, `package.json`, `uv.lock` і `package-lock.json`.
+`docs/toolchain-lock.md` зберігає докази початкового вибору й подальші доповнення.
+Не оновлювати залежності під час не пов’язаної з цим задачі.
+
 ```sh
 uv sync --locked
 npm ci
-uv run uvicorn studio.main:create_app --factory --host 127.0.0.1 --port 8000
-uv run alembic -c alembic.ini upgrade head
-uv run pytest server/tests/unit -q
-uv run pytest server/tests/contracts -q
-node --test tests/js/*.test.js
-npx playwright test --project=chromium
+export PLAYWRIGHT_BROWSERS_PATH="$PWD/.local-tools/playwright-browsers"
+npx playwright install chromium
+uv run --locked python tools/serve_preview.py
 ```
-До появления соответствующих tasks команда может закономерно не существовать. `alembic.ini` добавить в S01 migration-baseline и зарегистрировать в project map. Integration/security tests должны проверить loopback/project/port/test marker до любой записи. SQLite не substitute проверки PostgreSQL RLS/locks.
 
-## CI и окружения
-local-dev и local-test раздельны: ports, Supabase project_id, volumes, environment, cookie domains. Worktree writers также не делят один test database. staging — отдельный явно разрешённый target для внешних проверок. Production никогда не берётся из `.env` случайным fallback.
+Це credential-free preview на `127.0.0.1:8000`. Налаштований Auth runtime:
 
-Secrets: `APP_ENV`, `PUBLIC_ORIGIN`, `DATABASE_URL`, `AUTH_DATABASE_URL`, `WORKER_DATABASE_URL`, `SUPABASE_URL`, publishable public key, encrypted-token key IDs, Stripe/webhook keys — типизированы Settings. Пример env не содержит значений. Service-role если вообще нужен узкому owner/auth-tool остаётся серверным и не является обычной product DB ролью.
+```sh
+uv run --locked --env-file .env.local uvicorn studio.main:create_app --factory --host 127.0.0.1 --port 8000
+```
 
-Lock changes — отдельный review. Первое получение зависимостей/браузеров требует разрешённой сети; кэшировать installs в CI. Не включать danger-full-access ради установки пакета. Не ограничивать локальное чтение/редактирование/test suite лишним ручным подтверждением каждого файла.
+Файл середовища підключається явно; секрети не зберігати в Git чи логах.
+Наявний ключ шифрування не перегенеровувати для звичайного перезапуску.
 
-## Проверено здесь, не на твоём компьютере
-В подготовке kit проверяются workflow utility, JSON/TOML и HTML package. В данной среде Codex CLI и Docker не установлены: реальная загрузка конфигурации Codex, Supabase containers, OAuth/Stripe/product tests не выполнялись. Следующий агент обязан проверить версии и возможности своей среды, не повторять исторические «passed» как новые результаты.
+## Перевірки
+
+```sh
+uv run --locked python tools/checks.py
+uv run --locked pytest server/tests/unit server/tests/contracts server/tests/security/auth -q
+npm run test:js
+npx playwright test
+```
+
+Playwright використовує один неназваний Chromium project, власний порт 8765
+і явні local-test налаштування. `--project=chromium` у старих картках не відповідає
+поточному config; потрібен запуск без цього прапорця.
+
+DB/RLS/concurrency перевірки виконуються лише на ізольованому test stack:
+
+```sh
+uv run --locked python tools/local_stack.py prepare test
+uv run --locked python tools/local_stack.py start test
+uv run --locked python tools/local_stack.py provision-migrations test
+uv run --locked python -m tools.check_migrations
+```
+
+Для першої перевірки порожніх продуктових схем можна додати `--fresh`;
+на вже мігрованій тестовій БД цей прапорець навмисно відхиляє запуск.
+
+`local-dev` і `local-test` мають окремі порти, project IDs та volumes.
+Перед записами integration harness перевіряє loopback/project/port/test marker.
+SQLite не замінює PostgreSQL RLS/locks. Не запускати наведені test-команди
+проти хмарної БД; cloud tooling має окрему авторизацію й перевірки.
+
+## Межі доказів
+
+Local unit/browser/integration GREEN не підтверджує hosted OAuth, email,
+Stripe або production readiness. Невиконані зовнішні перевірки зберігаються
+в state/evidence. Наявність CLI чи ключа не є дозволом на deploy або витрати.

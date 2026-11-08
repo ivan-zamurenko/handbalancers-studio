@@ -24,11 +24,11 @@ Pure unit — rules, measurements, time boundaries, entitlements, payload valida
 Coverage не цель сама по себе. Все critical auth/owner/money/state/race ветки имеют явные сценарии; высокая line coverage не заменяет их. Mutation/property tests применять к рискованной policy, не ко всему ради процента.
 
 ## Git flow
-Новая папка, новая проверенная ветка. `main` содержит только зелёную reviewed историю. На задачу `task/S03-03-signup-request`; task commit subject из карточки. PR может содержать 1–3 тесно связанных green commits. Не squash весь этап в один гигантский commit. Зависимые ветки создаются после integration предыдущей, по умолчанию без сложного stacking.
+Працюємо в наявному корені та погодженій гілці `task/execution-v4`; вона є default branch цього репозиторію. Не створювати новий вкладений проєкт. Назви task-гілок у старих картках — приклади, не вимога змінювати поточну гілку. Кожна картка має окремий green commit із subject картки. Нову гілку або merge використовувати в межах окремого доручення, без force push і без втрати попередньої історії.
 
 Перед commit: `git status --short`, `git diff --check`, staged path review, targeted/affected tests. Добавлять явные пути (`git add path1 path2`), не слепое `git add .`. `git diff --cached` проверить на изменения вне задачи/секреты. Затем `git commit -m '<subject>'`.
 
-После local green push только на уже подтверждённый remote+feature branch: `git push -u origin HEAD`. При отказе auth/network — local commit сохранён, push_pending; не придумывать remote SHA. Не force push, не bypass hooks, не reset чужих изменений. Merge main делает интегратор/владелец по разрешённой политике.
+После local green push только на уже подтверждённый remote+feature branch: `git push -u origin HEAD`. При отказе auth/network — local commit сохранён, push_pending; не придумывать remote SHA. Не force push, не bypass hooks, не reset чужих изменений. Merge виконується в явно погоджену цільову гілку за дорученням власника.
 
 При каждом завершении: `git rev-parse HEAD`, status push/CI/review, список реально проверенных вещей, известный блокер, next task. SHA выводить после commit, а не вписывать в собственный создаваемый commit. Git global config пользователя не менять.
 

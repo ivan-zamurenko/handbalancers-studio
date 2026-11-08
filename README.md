@@ -94,10 +94,14 @@ npm run test:js
 DB/RLS/integration тести потребують окремого локального Supabase:
 
 ```sh
+uv run --locked python tools/local_stack.py prepare test
 uv run --locked python tools/local_stack.py start test
 uv run --locked python tools/local_stack.py provision-migrations test
-uv run --locked python -m tools.check_migrations --fresh
+uv run --locked python -m tools.check_migrations
 ```
+
+Для першої перевірки порожніх продуктових схем можна додати `--fresh`;
+на вже мігрованій тестовій БД цей прапорець навмисно відхиляє запуск.
 
 Ці команди призначені для ізольованого test stack, не для хмарної БД.
 CI використовує зафіксовані залежності й окремий DB job; автоматичного deploy немає.

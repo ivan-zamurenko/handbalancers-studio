@@ -20,6 +20,9 @@ test-results/
 coverage/
 .local-tools/
 supabase/.temp/
+# Machine-specific editor connections and local aliases to versioned skills.
+/.vscode/
+/.claude/skills/
 .private/
 private-evidence/
 *.har

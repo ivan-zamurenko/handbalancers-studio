@@ -1,5 +1,14 @@
 # Frontend: компоненты и страницы
 
+## Реалізовано на 2026-11-08
+
+Публічні `/`, `/plans` та Auth `/register`, `/verify-email`, `/login`, `/recovery`.
+Усі Auth templates — у `server/templates/auth/`, спільний стиль — `auth.css`,
+реєстрація/код/вхід використовують `registration.js`, recovery — `recovery.js`.
+Google доступний за конфігурацією; Apple відсутній. UI-тести не підтверджують
+доставку hosted email. Подальші розділи описують також заплановані компоненти;
+фактичні статуси — у `.workflow/CURRENT.md` і `.workflow/state.json`.
+
 ## Общий слой
 Jinja base shell + macros, ES modules и CSS variables. Семантические компоненты: FormField, ErrorSummary, PrimaryButton, Dialog, SaveStatus, ThemeSwitch, LanguageSwitch, Pagination, EmptyState. Это шаблоны/контроллеры, не новый React/framework runtime. Каждый компонент имеет loading/empty/error/disabled/focus/success при наличии соответствующего действия.
 

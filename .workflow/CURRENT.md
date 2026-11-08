@@ -1,29 +1,34 @@
-# Поточний checkpoint — очищення проєкту, 2026-11-08
+# Поточний checkpoint — порядок у Git, 2026-11-08
 
-За прямим дорученням власника завершено maintenance cleanup перед S03-11.
-Видалено підтверджені зайві CSS-правила, старий JS enable loop і два import-only
-wrappers. Login template тепер у `server/templates/auth/`; спільний стиль Auth —
-`server/static/css/auth.css`. Модулі авторизації/БД/міграції не змінювались.
+За прямим дорученням власника розібрано всі 70 залишкових змін робочого дерева.
+Відновлено 20 потрібних документів: їх видалення ламало посилання roadmap.
+Оновлено застарілі вказівки про Apple, нову папку/гілку, структуру та команди.
+Видалено старий пакет Copilot (5 файлів) і тимчасові задачі VS Code;
+замість дубльованих інструкцій — короткий `.github/copilot-instructions.md`.
+Локальна резервна копія видаленого — у виключеному `private-evidence/`.
 
-Демонстрації анімації перенесено з production static у `tools/previews/handstand/`.
-Тільки explicit локальний `tools/serve_preview.py` та Playwright harness монтують
-`/_previews`; звичайний app повертає 404. Фінальний loading rig збережено.
-README та LOCAL_PREVIEW оновлено. Попередні 617 рядків checkpoint без змін
-збережено в [архіві](history/2026-11-08-through-S03-10.md); шляхи у ньому від кореня.
+40 файлів раніше встановлених Supabase skills та `skills-lock.json` збережено
+у version control; походження, MIT license та межі застосування описано в
+`docs/skills-policy.md`. Персональні `.vscode/`, skill aliases `.claude/skills/`
+та матеріали дописів `private-evidence/` залишаються локальними й ignored.
 
-Перевірки й review — у `.workflow/evidence/maintenance-cleanup.json`.
-GREEN: 85 browser, 41 JS, 231 Python runtime, 68 tooling (+25 subtests);
-Ruff/format/Mypy. Reviewer clear. Staged tree roadmap validator пройшов.
-Коміт і push виконуються після цього checkpoint; SHA буде у звіті власнику.
+Перевірено в реальному робочому дереві: roadmap valid (142 картки, 0 помилок),
+16 тестів roadmap, JSON/skill metadata, нові локальні посилання, ignore scope,
+контрольні суми 40 skill-файлів і перевірка credential patterns.
+Незалежний review виявив неточність DB-команд; виправлено README/toolchain:
+prepare перед start; `--fresh` лише для порожніх продуктових схем.
+Runtime, БД і залежності не змінено; їхні тести повторно не запускалися.
+Докази — `.workflow/evidence/workspace-residue-cleanup.json`.
+Commit/push — після фінальної перевірки; фактичний SHA у звіті власнику.
 
-## Авторизація та наступний крок
+## Попередній результат та наступний крок
 
-S03-10 завершено: `f3d4e03`, pushed. Форми реєстрації/коду/password login
-підключені; Google лишається, Apple відсутній. Докладні докази:
-`.workflow/evidence/S03-10.json`. Наступна картка — S03-11, повний локальний Auth E2E.
-Hosted OTP/recovery, key rotation, cloud 0007 та provider gates не закривалися
-UI-тестами або поточним cleanup; див. попередній checkpoint і evidence.
+Попереднє очищення runtime завершено й pushed: `c359849`.
+Його перевірки (85 browser, 41 JS, 231 Python, 68 tooling +25 subtests)
+записані в `.workflow/evidence/maintenance-cleanup.json`; це попередній запуск.
+Історичний checkpoint — [архів](history/2026-11-08-through-S03-10.md).
 
-У робочому дереві залишаються сторонні видалення docs та локальні editor/skill
-файли. Вони не включаються в cleanup. Повний file validator у цьому дереві
-має попередні missing_document; graph і staged tree перевіряються окремо.
+S03-10 завершено: `f3d4e03`, pushed. Google та email/password лишаються,
+Apple виключено власником. Наступна картка — S03-11, повний локальний Auth E2E.
+Hosted OTP/recovery, key rotation, cloud 0007 та provider gates не закриті
+поточним cleanup; див. архів checkpoint та evidence відповідних перевірок.

@@ -1,6 +1,6 @@
 # Полная целевая структура: создавать по карточкам, не все файлы сразу
 
-Это карта будущего приложения. В выдаваемом kit **нет реализованного server/studio**. Есть спецификации, референсы, настройка агента и read-only workflow utility. `project-map.json` перечисляет целевые пути и задачи, которые их вводят. Каталоги добавляются в задаче первого использования, не сотнями пустых TODO.
+Це цільова карта roadmap, а не перелік уже готових можливостей. `server/studio`, міграції та public/auth UI вже реалізовані; актуальний стан — у `.workflow/CURRENT.md`, коротка фактична структура — у README.md. `project-map.json` перечисляет целевые пути и задачи, которые их вводят. Каталоги добавляются в задаче первого использования, не сотнями пустых TODO.
 
 ```text
 handbalancers-studio/
@@ -53,12 +53,12 @@ handbalancers-studio/
     templates/
       layouts/{public,member,coach}.html
       shared/{navigation,forms,errors}.html
-      auth/{register,verify_email,login,recovery,complete_profile}.html
+      auth/{register,verify,login,recovery,complete_profile}.html
       public/{index,plans,onboarding,checkout_pending}.html
       member/{dashboard,programs,program_detail,calendar,workout,result,history,profile}.html
       coach/{desk,clients,client,exercises,exercise_editor,programs,program_editor,
              assignment,review,assessments,planning_rules,permissions}.html
-    static/
+    static/                        runtime assets; css/auth.css для Auth
       css/{tokens,base,components,member,coach}.css
       js/
         api/{client,errors}.js
@@ -85,6 +85,7 @@ handbalancers-studio/
   tools/                            local stack, checks, roadmap, evidence, benchmarks
   .github/workflows/ci.yml
   Dockerfile / compose.yaml
+  tools/previews/handstand/         локальні дизайн-демонстрації, поза runtime static
   docs/runbooks/                    auth setup, restore, deployment, incident handling
 ```
 

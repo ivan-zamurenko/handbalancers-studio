@@ -1,9 +1,30 @@
-# Skills: минимум, который действительно нужен
+# Skills проєкту
 
-В kit включён один **проектный**, а не официальный OpenAI-certified skill: `studio-task-delivery`. Он реализует твой конкретный процесс task → test-first → bounded change → evidence. Создан через skill-creator; структура проверяется его валидатором. Это не гарантия качества произвольного будущего кода.
+У репозиторії зберігаються три перевірені за призначенням набори:
 
-Для Codex repository path `.agents/skills/studio-task-delivery`. Для отдельной установки выдан `skill.zip` с одним skill. Не устанавливать обе копии в несколько scopes под одним именем без необходимости. Инструкции и scripts сторонних skills сначала прочитать; не устанавливать случайный «ultimate best practices pack».
+| Skill | Призначення |
+|---|---|
+| `.agents/skills/studio-task-delivery/` | Проєктний процес: картка, test-first, review та evidence |
+| `.agents/skills/supabase/` | Документація й правила роботи з Supabase Auth/DB/CLI |
+| `.agents/skills/supabase-postgres-best-practices/` | SQL, schema, RLS та PostgreSQL performance |
 
-Дополнительный skill подключать по реальной задаче: Figma design-to-code при переносе конкретного Figma frame; migration workflow при изменении DDL; Playwright/browser workflow при взаимодействии с UI; security review при auth/RLS/payment. Проверить, что он действительно доступен и его trigger узкий. Если нет — использовать первичные docs и project tests, а не утверждать, что skill применён.
+Два Supabase skills — раніше встановлений snapshot з
+[supabase/agent-skills](https://github.com/supabase/agent-skills), не нова установка
+чи оновлення. Файли збережено без зміни upstream інструкцій. Походження й hashes
+інсталятора — `skills-lock.json`; SHA-256 збережених локальних файлів — у
+`.workflow/evidence/workspace-residue-cleanup.json`.
+[MIT license](vendor/supabase-agent-skills-LICENSE.txt) збережена поруч із документами.
 
-Не загружать все skills на каждый task. Не добавлять архитектурные предписания, конфликтующие с согласованным monolith/vanilla stack. Root AGENTS остаётся коротким; подробные контракты в docs читаются по необходимости. Это согласуется с официальной рекомендацией OpenAI о узких triggers и progressive disclosure [S-SKILLBLOG][S-SKILLS].
+Ці skills не є runtime-залежностями й не запускають команди самостійно.
+Читати лише релевантний skill і потрібні references. Інструкції власника,
+AGENTS.md та погоджений стек мають пріоритет над рекомендаціями сторонніх skills;
+наприклад, продукт використовує Alembic для власних схем, а не паралельну
+історію Supabase CLI migrations. Snapshot не оновлювати без окремого review.
+
+`.claude/skills/` містить лише локальні symlink aliases на `.agents/skills/`
+і виключений із Git. `.vscode/` — персональні налаштування та MCP-підключення,
+також поза Git. Короткий Copilot adapter — `.github/copilot-instructions.md`;
+він посилається на спільний контракт замість дублювання правил.
+
+Стан і дозволи визначаються поточним дорученням та checkpoint, не прикладами
+у сторонніх довідниках. Skills і зелені тести самі по собі не гарантують безпеку.

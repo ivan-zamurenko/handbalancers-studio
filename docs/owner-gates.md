@@ -4,7 +4,7 @@
 
 | Gate | Что нужно от владельца / среды | Что блокируется | Что продолжать без этого |
 |---|---|---|---|
-| G_AUTH_PROVIDERS | Google/Apple app, staging redirects, разрешённый тестовый аккаунт; secrets только dashboard/env | реальный OAuth допуск | gateway, callback tests, UI, каталог |
+| G_AUTH_PROVIDERS | Google app (Apple виключено поточним рішенням власника), staging redirects, разрешённый тестовый аккаунт; secrets только dashboard/env | реальный OAuth допуск | gateway, callback tests, UI, каталог |
 | G_SMTP | sender domain/provider и реальная доставка; секреты вне чата | production signup/commerce допуск | local Supabase mail test |
 | G_STRIPE_TEST | Stripe test project/price IDs/webhook и разрешение test calls | S13-09 внешний roundtrip | projection/inbox/checkout fake tests |
 | G_RULES | правила нагрузки, совместимости, допустимые замены | реальное автоматическое планирование без unknown warning | owner CRUD, synthetic deterministic tests |

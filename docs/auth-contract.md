@@ -3,7 +3,7 @@
 ## UI
 `/register`: имя, фамилия, email, password, показать/скрыть пароль, доступная ошибка, submit pending, ссылка на login. Social кнопки только для действительно сконфигурированных провайдеров. Нет кнопки «Supabase».
 `/verify-email`: email, 6-значный code, resend с cooldown, исправить email, ошибки expiry/invalid/generic. Не сохранять password в storage.
-`/login`: email/password, recovery, доступные Google/Apple. OAuth возвращается в тот же onboarding/plan path.
+`/login`: email/password, recovery, налаштований Google; Apple у поточному UI відсутній. OAuth возвращается в тот же onboarding/plan path.
 `/complete-profile`: для verified OAuth без имени; завершение до Checkout, не выдумывать identity.
 `/recovery`: запрос и подтверждение по upstream flow, не обычная paid session.
 
@@ -17,7 +17,7 @@ Identity authenticated не означает paid. Profile incomplete не оз�
 `POST /api/auth/login`: {email,password}. Verified identity, profile UUID, rotation cookie.
 `GET /api/session`: {authenticated,user:{id,first_name,last_name,role,locale,timezone,profile_complete},entitlements,csrf_token}. Нет access/refresh/provider secrets. Для guest возвращается ограниченное состояние по API контракту; protected API всё равно 401.
 `POST /api/auth/logout`: CSRF, revoke local, clear cookie; upstream failure не оставляет local active.
-`POST /api/auth/oauth/{provider}/start`: only google/apple, trusted callback allowlist и browser-bound attempt. PKCE verifier изолирован, Supabase owns upstream OAuth state. App correlation token не подменяет state Supabase.
+`POST /api/auth/oauth/{provider}/start`: реалізований allowlist google/apple; Apple вимкнений і не є активною вимогою, trusted callback allowlist и browser-bound attempt. PKCE verifier изолирован, Supabase owns upstream OAuth state. App correlation token не подменяет state Supabase.
 `GET /auth/callback`: code+app attempt, browser binding/expiry/consumption проверены до code exchange. Auth code не сохраняется в logs.
 
 ## Сессии
@@ -29,7 +29,7 @@ Request-scoped SDK client или stateless HTTP gateway. Глобальный mu
 users, user_preferences, onboarding_profiles; private web_sessions/auth_attempts/auth_rate_limits. Никаких собственных passwords/identities в product tables. Managed auth.users не дропать/не пересоздавать Alembic.
 
 ## Доказательства готовности
-Unit fake Gateway проверяет поведение приложения. Local Supabase roundtrip проверяет email/managed auth/provision. Google и Apple требуют отдельных реальных staging результатов. Наличие кнопки, SDK вызова или зелёного mock теста не делает provider подключённым. Apple relay/нет имени/secret expiry — обязательные cases [S-APPLE].
+Unit fake Gateway проверяет поведение приложения. Local Supabase roundtrip проверяет email/managed auth/provision. Google потребує окремої реальної перевірки. Наявність кнопки, SDK виклику або зеленого mock тесту не підтверджує provider readiness. Apple виключено поточним рішенням власника; relay/відсутнє ім’я/secret expiry [S-APPLE] застосовуються лише після окремого рішення повернути інтеграцію.
 
 ## Scope auth commits
 S03-01..11 + S04-01..06. Каждый с отдельным тестом/коммитом. Не объединять всё в «implement authentication». Root DB/CI/UI подготовлены раньше, потому что без них нельзя честно получить и проверить RED/GREEN.

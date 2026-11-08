@@ -1,5 +1,6 @@
 {
-  "kind": "target_paths_not_implemented",
+  "kind": "roadmap_target_paths",
+  "note": "Target-path index for roadmap cards; not an inventory of implemented runtime. Current paths and status: README.md and .workflow/state.json.",
   "files": [
     {
       "path": ".dockerignore",
