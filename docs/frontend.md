@@ -9,6 +9,15 @@ Google доступний за конфігурацією; Apple відсутн�
 доставку hosted email. Подальші розділи описують також заплановані компоненти;
 фактичні статуси — у `.workflow/CURRENT.md` і `.workflow/state.json`.
 
+## Мобільна навігація
+
+До 780 px логотип і вхід/вихід розташовані зверху; посилання розділів,
+UA/EN та тема — в одному рядку нижче, з підтримкою ширини від 320 px.
+Висота зон натискання — 44 px; мови мають ширину щонайменше 24 px.
+За збільшення тексту рядок може переноситися, а відступ переходів до секцій
+масштабується, щоб sticky header не закривав вміст. Вхід лишається доступним
+без JavaScript, зокрема зі старою session cookie.
+
 ## Общий слой
 Jinja base shell + macros, ES modules и CSS variables. Семантические компоненты: FormField, ErrorSummary, PrimaryButton, Dialog, SaveStatus, ThemeSwitch, LanguageSwitch, Pagination, EmptyState. Это шаблоны/контроллеры, не новый React/framework runtime. Каждый компонент имеет loading/empty/error/disabled/focus/success при наличии соответствующего действия.
 

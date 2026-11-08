@@ -9,7 +9,7 @@
 .login-card input { min-height: 48px; font-size: 16px; }
 .password-control { position: relative; }
 .password-control input { padding-right: 54px; }
-.login-help a { border: 0; padding: 0; font-size: 12px; font-weight: 400; text-decoration: underline; text-underline-offset: 4px; }
+.login-help a { display: inline-flex; align-items: center; min-height: 44px; border: 0; padding: 0; font-size: 13px; font-weight: 400; text-decoration: underline; text-underline-offset: 4px; }
 .recovery-again { width: 100%; margin-top: 16px; }
 #recovery-status:not(:empty) { margin-block: 24px; font-size: 14px; color: var(--muted); }
 .password-toggle { position: absolute; right: 2px; top: 50%; transform: translateY(-50%); display: grid; place-items: center; width: 44px; height: 44px; min-height: 44px; padding: 0; border: 0; border-radius: 4px; background: transparent; color: var(--muted); }
@@ -25,7 +25,7 @@
   .eye-open, .eye-closed { transition: none; }
 }
 .login-card button:disabled { cursor: not-allowed; }
-.login-help { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-top: -12px; margin-bottom: 20px; }
+.login-help { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 0 12px; margin-top: -12px; margin-bottom: 20px; }
 .login-submit { width: 100%; min-height: 50px; justify-content: center; padding-inline: 20px; }
 .login-submit:disabled { opacity: .5; }
 .login-signup { margin-top: 24px; text-align: center; font-size: 13px; color: var(--muted); }

@@ -1,0 +1,107 @@
+{
+  "task": "mobile-navigation-polish",
+  "status": "completed_local",
+  "date": "2026-11-08",
+  "base_commit": "18d1e57",
+  "authorization": "Owner requested mobile navigation alignment, mobile page audit, and concise social posts with 2–3 real screenshots. Existing commit/push permission applies; social material remains ignored.",
+  "scope": [
+    "server/static/css/public.css",
+    "server/static/css/auth.css",
+    "server/templates/public/base.html",
+    "tests/e2e/mobile-navigation.spec.js",
+    "docs/frontend.md"
+  ],
+  "decisions": [
+    "At normal text size on mobile, brand/account row above one row containing Directions/Method/Plans, UA/EN and theme.",
+    "Keep 44px target heights; locale links at least24px wide.",
+    "Allow enlarged text to wrap instead of clipping and scale anchor scroll padding.",
+    "Conditional no-JS login fallback for signed_in; hide inert logout only when noscript anchor is parsed.",
+    "Social: three direct browser screenshots, no generated graphics; short separate English posts for Ireland remote Full-stack/Product Engineer opportunities."
+  ],
+  "red": [
+    {
+      "command": "PLAYWRIGHT_BROWSERS_PATH=\"$PWD/.local-tools/playwright-browsers\" npx playwright test tests/e2e/mobile-navigation.spec.js --grep \"320 uk light\"",
+      "result": "FAIL expected: header target centers differ48px; required<2px."
+    },
+    {
+      "command": "npx playwright test tests/e2e/mobile-navigation.spec.js --grep \"touch targets|enlarged|cookie: true\"",
+      "result": "Expected failures: help target15px vs44px; stale-cookie no-JS login missing after removing redundant fallback. Enlarged-text case initially failed due CSP-blocked style tag, not layout."
+    },
+    {
+      "command": "npx playwright test tests/e2e/mobile-navigation.spec.js --grep enlarged",
+      "result": "After correcting fixture to style.fontSize=200% and asserting32px root font, observed actual horizontal overflow. Expectations unchanged; CSP unchanged."
+    },
+    {
+      "command": "npx playwright test tests/e2e/mobile-navigation.spec.js --grep enlarged",
+      "result": "With reducedMotion to measure final scroll position, anchor top123.546875px was behind197px header. Fixed with scalable scroll padding."
+    }
+  ],
+  "green": [
+    {
+      "command": "PATH=\"$PWD/.local-tools/uv-env/bin:$PATH\" PLAYWRIGHT_BROWSERS_PATH=\"$PWD/.local-tools/playwright-browsers\" npx playwright test",
+      "result": "96 passed (54.2s), including11 new navigation cases. Initial collection without local uv PATH failed ENOENT; resolved environment only."
+    },
+    {
+      "command": ".venv/bin/python -m pytest server/tests/contracts/auth/test_oauth_public.py server/tests/contracts/auth/test_registration_ui.py server/tests/unit/ui/test_localization.py -q",
+      "result": "11 passed; existing Starlette/httpx deprecation warning."
+    },
+    {
+      "command": ".venv/bin/python tools/roadmap.py validate",
+      "result": "142 tasks, valid=true, no errors."
+    },
+    {
+      "command": "git diff --check",
+      "result": "PASS"
+    }
+  ],
+  "coverage": {
+    "widths": [
+      320,
+      360,
+      390,
+      430,
+      768,
+      1440
+    ],
+    "routes": [
+      "/",
+      "/plans",
+      "/login",
+      "/register",
+      "/verify-email",
+      "/recovery"
+    ],
+    "languages": [
+      "uk",
+      "en"
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "note": "Representative width/language/theme combinations, not full Cartesian matrix. Real Chromium layout and interactions; signed-in tests use synthetic session responses, no live provider proof."
+  },
+  "review": {
+    "agent": "cleanup_audit",
+    "result": "CLEAR after no-JS and enlarged-text anchor fixes; independently verified197px header bottom vs247.55px section start."
+  },
+  "sources": [
+    "https://www.w3.org/WAI/WCAG21/Understanding/reflow",
+    "https://www.w3.org/TR/WCAG22/#target-size-minimum"
+  ],
+  "skills": "No installed skill specifically covers repository-native mobile design; followed project contracts, W3C primary guidance and real browser checks. No unrelated Figma/Sites/Supabase workflow invoked.",
+  "private_artifacts": [
+    "private-evidence/mobile-navigation-2026-11-08/",
+    "private-evidence/social-2026-11-08/LinkedIn.pdf",
+    "private-evidence/social-2026-11-08/Instagram.pdf",
+    "private-evidence/social-2026-11-08/screenshots/",
+    "private-evidence/handbalancers-studio-social-pack.zip"
+  ],
+  "not_verified": [
+    "Physical iOS/Android devices and Safari/WebKit not tested.",
+    "Not a complete WCAG conformance or cloud auth security audit.",
+    "No publication to social networks; no changes to backend auth, database or dependencies."
+  ],
+  "next_task": "S03-11",
+  "delivery": "Commit and push follow final staged review; report actual SHA and remote verification to owner."
+}

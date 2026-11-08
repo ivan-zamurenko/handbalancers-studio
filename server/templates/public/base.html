@@ -25,7 +25,7 @@
       </button>
       <button type="button" data-logout data-pending-label="{{ copy('Виходимо…', 'Signing out…') }}"{% if not signed_in %} hidden{% endif %}>{{ copy("Вийти", "Log out") }}</button>
       <a data-login-link class="login-link btn" href="/login?lang={{ language }}"{% if signed_in %} hidden{% endif %}{% if page_path == '/login' %} aria-current="page"{% endif %}>{{ copy('Логін', 'Log in') }}</a>
-      <noscript><a class="login-link btn" href="/login?lang={{ language }}">{{ copy('Логін', 'Log in') }}</a></noscript>
+      {% if signed_in %}<noscript><a class="login-link btn" href="/login?lang={{ language }}">{{ copy('Логін', 'Log in') }}</a></noscript>{% endif %}
     </div>
   </div>
 </header>

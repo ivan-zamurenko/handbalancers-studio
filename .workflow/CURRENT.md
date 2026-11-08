@@ -1,34 +1,28 @@
-# Поточний checkpoint — порядок у Git, 2026-11-08
+# Поточний checkpoint — мобільна навігація, 2026-11-08
 
-За прямим дорученням власника розібрано всі 70 залишкових змін робочого дерева.
-Відновлено 20 потрібних документів: їх видалення ламало посилання roadmap.
-Оновлено застарілі вказівки про Apple, нову папку/гілку, структуру та команди.
-Видалено старий пакет Copilot (5 файлів) і тимчасові задачі VS Code;
-замість дубльованих інструкцій — короткий `.github/copilot-instructions.md`.
-Локальна резервна копія видаленого — у виключеному `private-evidence/`.
+За прямим дорученням власника виправлено мобільну шапку: логотип/вхід зверху,
+Directions/Method/Plans, UA/EN і тема разом у наступному рядку. Перевірено
+ширини 320/360/390/430/768/1440, обидві мови й теми на шести поточних сторінках.
+Збільшено зони натискання, виправлено перенесення при тексті 200% та відступ
+від sticky header. No-JS вхід працює також зі старою session cookie.
 
-40 файлів раніше встановлених Supabase skills та `skills-lock.json` збережено
-у version control; походження, MIT license та межі застосування описано в
-`docs/skills-policy.md`. Персональні `.vscode/`, skill aliases `.claude/skills/`
-та матеріали дописів `private-evidence/` залишаються локальними й ignored.
+GREEN: 96 браузерних тестів (11 нових), 11 Python UI/contract тестів,
+roadmap valid (142 задачі), diff check. Незалежний review — clear.
+Докази RED/GREEN, поправки test fixture й межі перевірок:
+`.workflow/evidence/mobile-navigation-polish.json`.
+На фізичних телефонах/Safari не перевірялося; backend/БД не змінено.
 
-Перевірено в реальному робочому дереві: roadmap valid (142 картки, 0 помилок),
-16 тестів roadmap, JSON/skill metadata, нові локальні посилання, ignore scope,
-контрольні суми 40 skill-файлів і перевірка credential patterns.
-Незалежний review виявив неточність DB-команд; виправлено README/toolchain:
-prepare перед start; `--fresh` лише для порожніх продуктових схем.
-Runtime, БД і залежності не змінено; їхні тести повторно не запускалися.
-Докази — `.workflow/evidence/workspace-residue-cleanup.json`.
-Commit/push — після фінальної перевірки; фактичний SHA у звіті власнику.
+Два короткі дописи англійською та три прямі скриншоти застосунку:
+`private-evidence/social-2026-11-08/LinkedIn.pdf`, `Instagram.pdf` і `screenshots/`.
+Тексти — поруч у .txt; загальний ZIP — `private-evidence/handbalancers-studio-social-pack.zip`.
+Матеріали ignored, у Git не входять; нічого не опубліковано в соцмережах.
+Коміт/push — після фінального staged review; SHA у звіті власнику.
 
-## Попередній результат та наступний крок
+## Попередній стан і наступний крок
 
-Попереднє очищення runtime завершено й pushed: `c359849`.
-Його перевірки (85 browser, 41 JS, 231 Python, 68 tooling +25 subtests)
-записані в `.workflow/evidence/maintenance-cleanup.json`; це попередній запуск.
-Історичний checkpoint — [архів](history/2026-11-08-through-S03-10.md).
-
-S03-10 завершено: `f3d4e03`, pushed. Google та email/password лишаються,
-Apple виключено власником. Наступна картка — S03-11, повний локальний Auth E2E.
+Очищення 70 залишкових файлів завершено та pushed: `18d1e57`.
+Попереднє runtime cleanup: `c359849`; S03-10: `f3d4e03`.
+Google та email/password лишаються; Apple виключено власником.
+Наступна roadmap-картка — S03-11, повний локальний Auth E2E.
 Hosted OTP/recovery, key rotation, cloud 0007 та provider gates не закриті
-поточним cleanup; див. архів checkpoint та evidence відповідних перевірок.
+цим UI-виправленням; див. evidence і [архів](history/2026-11-08-through-S03-10.md).
