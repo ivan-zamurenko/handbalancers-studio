@@ -5,7 +5,7 @@ import os
 from typing import Literal, Self
 from urllib.parse import urlsplit
 
-from pydantic import BaseModel, ConfigDict, SecretStr, ValidationError, model_validator
+from pydantic import BaseModel, ConfigDict, Field, SecretStr, ValidationError, model_validator
 
 
 class Settings(BaseModel):
@@ -23,6 +23,8 @@ class Settings(BaseModel):
     supabase_url: str | None = None
     supabase_publishable_key: SecretStr | None = None
     auth_email_enabled: bool = False
+    auth_client_attempts_per_minute: int = Field(default=10, ge=1, le=10)
+    auth_account_attempts_per_minute: int = Field(default=10, ge=1, le=10)
     oauth_google_enabled: bool = False
     oauth_apple_enabled: bool = False
     stripe_secret_key: SecretStr | None = None

@@ -14,7 +14,7 @@ from server.tests.integration.database.test_auth_storage import (  # noqa: F401
 flow = flow_support.flow
 
 
-@pytest.mark.parametrize("action", ["password-login", "verify", "resend"])
+@pytest.mark.parametrize("action", ["password-login", "verify", "resend", "register"])
 def test_denied_client_cannot_grow_account_buckets(flow, action):
     service, _, engine, _ = flow
 
@@ -32,6 +32,6 @@ def test_denied_client_cannot_grow_account_buckets(flow, action):
     assert count() == before + 11
 
     # The exhausted account budget remains effective from a different client.
-    if action == "resend":
+    if action in {"resend", "register"}:
         with pytest.raises(OAuthRateLimited):
             quota(service, action, "allowed-0@example.test", "other-client")

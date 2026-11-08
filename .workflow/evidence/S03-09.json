@@ -1,0 +1,86 @@
+{
+  "task": "S03-09",
+  "status": "done_local",
+  "base_commit": "3b5fd8d",
+  "scope_extension": {
+    "reason": "Existing guards/quotas are spread across auth modules; register has no app quota. Reuse rate_limit.py and the table from0005_auth_profile instead of duplicate0005_auth_limits. No schema migration needed: expiry is window_start +60s. Keep DB concurrency tests in integration/auth so baseline CI remains DB-free. HTTP contract fixtures will isolate quota only; real integration tests prove enforcement.",
+    "files": [
+      "server/studio/auth/csrf.py",
+      "server/studio/auth/routes.py",
+      "server/studio/auth/service.py",
+      "server/studio/auth/oauth_routes.py",
+      "server/studio/auth/verification.py",
+      "server/tests/security/auth/test_csrf_rate_limits.py",
+      "server/tests/integration/auth/test_csrf_rate_limits.py",
+      "server/tests/contracts/auth/test_signup_request.py",
+      "server/tests/integration/auth/test_rate_limit_bounds.py",
+      "server/studio/auth/rate_limit.py",
+      "server/studio/auth/oauth.py",
+      "server/studio/auth/runtime.py",
+      "server/studio/settings.py",
+      ".env.example"
+    ]
+  },
+  "red": [
+    {
+      "command": "pytest server/tests/security/auth/test_csrf_rate_limits.py -q",
+      "result": "12failed/32passed: malformed/duplicateCSRF, duplicateOrigin, missingquota runtime, configdefaults"
+    },
+    {
+      "command": "local_stack.py test pytest server/tests/integration/auth/test_csrf_rate_limits.py -q",
+      "result": "2failed/2passed:20registrations reachprovider; repeatedsignupnotblockedafter503"
+    },
+    {
+      "command": "local_stack.py test pytest server/tests/integration/auth/test_csrf_rate_limits.py -q -k stricter_worker",
+      "result": "1failed/5deselected:lower-limitworker loweredcounter and reopened exhaustedbudget"
+    }
+  ],
+  "green": [
+    {
+      "command": "pytest server/tests/unit server/tests/contracts server/tests/security/auth tools/tests/test_roadmap.py -q",
+      "result": "237 passed (221 application +16 roadmap tests)"
+    },
+    {
+      "command": "DOCKER_HOST=dedicated-Colima-socket local_stack.py test pytest server/tests/integration/auth -q --tb=short",
+      "result": "96 passed in67.64s; real-local Supabase/PostgreSQL; provider synthetic only where explicitly isolated"
+    },
+    {
+      "command": "ruff check server/studio; ruff format --check server/studio; mypy server/studio; git diff --check",
+      "result": "passed;41 source files"
+    }
+  ],
+  "external_gates": [
+    "Previous hosted key rotation/cloud0007/recovery provider gates unchanged"
+  ],
+  "environment_recovery": "Initial default Docker socket unavailable; used existing dedicated Colima studio-s01 Unix socket. No cloud or global Docker config changed.",
+  "regression_history": [
+    "213unit/contracts/security passed",
+    "First auth run94passed/1failed OTP422",
+    "Second auth run93passed/3failed JWT-driven401/422",
+    "Targeted6quota+4password tests passed before diagnosis",
+    "Temporary safe instrumentation proved ImmatureSignatureError with issuer10ms ahead. Separate DEFECT-auth-clock-skew card/commit fixes iat-only1s tolerance; no expiration leeway."
+  ],
+  "branch": "task/execution-v4",
+  "related_defect_commit": "4cecb25",
+  "acceptance": {
+    "csrf_missing_rejected": "Missing/wrong/non-ASCII/duplicate/cross-session CSRF denied403 before DB/provider; existing authenticated logout integration also passes",
+    "login_csrf_rejected": "Missing/foreign/null/duplicate Origin rejected for all8 auth mutations before provider",
+    "rate_limit_atomic": "20 independent HTTP app instances share DB/secret:10accepted10denied429, only10provider calls;20clients sameaccount also10accepted; saturation11 survives mixed limits; failure commits budget; expiry/rollback/RLS/private hashes verified",
+    "oauth_callback_exception_narrow": "GET callback uses existing bound-attempt checks; invalidcallback303, POSTcallback405; unsafe auth routes still requireOrigin; existing realDB binding/replay/exchange/session suite passes"
+  },
+  "review": {
+    "reviewer": "security_auth_review",
+    "result": "clear after finding/fixing mixed-limit counter decrease; reviewer independently55security/contract tests passed"
+  },
+  "schema": "No migration: reuse0005_auth_profile.auth_rate_limits; window_start+60s defines expiry; admission limits1..10 and persisted ceiling11 match existing constraint",
+  "validation_limitation": "roadmap validate fails only on pre-existing missing docs in working tree; graph/next checked separately. Unrelated deleted docs untouched.",
+  "docs_consulted": [
+    "https://supabase.com/changelog.md",
+    "https://supabase.com/docs/guides/auth/rate-limits",
+    "https://supabase.com/changelog/supabase-cli-v3",
+    "https://supabase.com/changelog/cbc-tls-ciphers-deprecated",
+    "https://supabase.com/docs/guides/observability"
+  ],
+  "push_status": "pending_at_commit",
+  "next": "S03-10"
+}

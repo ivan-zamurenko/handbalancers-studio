@@ -1,3 +1,29 @@
+# Поточний checkpoint — S03-09 завершено локально, 2026-11-08
+
+Захист авторизації доповнено й перевірено:
+- Реєстрація витрачає спільну DB-квоту до звернення до Supabase; помилка провайдера
+  не повертає витрачену спробу. Повторна реєстрація з іншого IP не обходить email-квоту.
+- Origin має бути єдиним і точним; CSRF — єдиний 64-символьний hex-токен цієї сесії.
+  Некоректні, дубльовані й не-ASCII заголовки відхиляються з 403 до DB/provider.
+- Налаштування AUTH_CLIENT_ATTEMPTS_PER_MINUTE / AUTH_ACCOUNT_ATTEMPTS_PER_MINUTE:
+  default 10, дозволено 1..10; вікно 60s. Register/resend/recovery — максимум 1/email/min.
+- Лічильник насичується на 11 незалежно від налаштувань процесу; суворіший процес
+  не зменшує лічильник і не відкриває повторно вичерпаний бюджет.
+
+Нова міграція не потрібна: таблиця вже є в 0005_auth_profile. Хмару не змінювали.
+GREEN: 237 unit/contract/security/roadmap tests; 96 real-local Auth integration;
+Ruff/format/Mypy. Reviewer clear. Початкові RED та всі регресійні збої збережено
+у .workflow/evidence/S03-09.json. Окремо усунуто підтверджений JWT clock-skew defect
+комітом 4cecb25: допуск лише iat до 1s, exp/nbf лишаються суворими.
+
+Повний roadmap file validator має попередні missing_document через сторонні
+видалення docs; вони не входять у ці коміти. Graph/next валідні.
+Попередні hosted recovery/key rotation/cloud0007/provider gates залишаються.
+Наступна картка — S03-10: повний UI реєстрації, підтвердження email та password login.
+Google лишається; Apple не повертаємо. Поточний email login UI ще preview.
+
+## Попередній checkpoint
+
 # Поточний checkpoint — окремий JWT clock-skew defect, 2026-11-08
 
 Під час S03-09 виявлено нестабільний valid login/verify-email. Safe diagnostic

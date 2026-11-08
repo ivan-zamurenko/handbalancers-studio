@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from studio.auth.gateway import AuthGateway
 from studio.auth.jwt import JWTValidator
 from studio.auth.oauth import OAuthService
+from studio.auth.rate_limit import AuthLimits
 from studio.auth.supabase_adapter import SupabaseAuthAdapter
 from studio.auth.token_store import TokenCipher, TokenStore
 from studio.settings import Settings
@@ -69,6 +70,10 @@ def build_oauth(settings: Settings) -> OAuthService | None:
         supabase_url=settings.supabase_url,
         public_origin=settings.public_origin,
         providers=providers,
+        limits=AuthLimits(
+            client=settings.auth_client_attempts_per_minute,
+            account=settings.auth_account_attempts_per_minute,
+        ),
         secret=base64.b64decode(settings.token_encryption_key.get_secret_value(), validate=True),
     )
 

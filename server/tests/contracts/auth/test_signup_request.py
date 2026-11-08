@@ -5,7 +5,10 @@ import httpx
 import pytest
 from fastapi.testclient import TestClient
 from studio.auth.gateway import AuthGateway
+from studio.auth.jwt import JWTValidator
+from studio.auth.oauth import OAuthService
 from studio.auth.supabase_adapter import SupabaseAuthAdapter
+from studio.auth.token_store import TokenCipher, TokenStore
 from studio.main import create_app
 
 ORIGIN = "http://127.0.0.1:8765"
@@ -17,6 +20,13 @@ VALID = {
 }
 
 
+@pytest.fixture(autouse=True)
+def isolate_quota_for_http_contract(monkeypatch):
+    # These existing tests exercise HTTP/provider translation, not DB enforcement.
+    # Real quota commits/concurrency/failure are covered in integration/auth/test_csrf_rate_limits.py.
+    monkeypatch.setattr("studio.auth.service.quota", lambda *_args: None)
+
+
 def client_for(status=200, body=None):
     calls = []
 
@@ -25,7 +35,7 @@ def client_for(status=200, body=None):
         return httpx.Response(status, json=body or {"id": "pending-auth-user"})
 
     app = create_app({"app_env": "local-test", "public_origin": ORIGIN})
-    app.state.auth_gateway = AuthGateway(
+    gateway = AuthGateway(
         SupabaseAuthAdapter(
             "https://auth.example.test",
             "key",
@@ -33,6 +43,21 @@ def client_for(status=200, body=None):
                 **kw, transport=httpx.MockTransport(respond)
             ),
         )
+    )
+
+    def forbidden_transaction():
+        raise AssertionError("HTTP contract suite must not open a database")
+
+    app.state.verification_service = OAuthService(
+        auth_transaction=forbidden_transaction,
+        store=TokenStore(
+            TokenCipher("test", {"test": b"a" * 32}), allowed_return_paths=frozenset({"/plans"})
+        ),
+        gateway=gateway,
+        validator=JWTValidator(issuer="https://auth.example.test/auth/v1"),
+        supabase_url="https://auth.example.test",
+        public_origin=ORIGIN,
+        providers=frozenset(),
     )
     return TestClient(app, base_url=ORIGIN, headers={"origin": ORIGIN}), calls
 
@@ -80,6 +105,8 @@ def test_provider_unavailable(status, expected):
     client, _ = client_for(status, {"msg": VALID["password"]})
     response = client.post("/api/auth/register", json=VALID)
     assert response.status_code == expected
+    if expected == 429:
+        assert response.headers["retry-after"] == "60"
     assert "set-cookie" not in response.headers
     assert VALID["password"] not in response.text
 

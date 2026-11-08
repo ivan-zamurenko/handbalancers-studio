@@ -3,34 +3,36 @@
 from fastapi import APIRouter, HTTPException, Request
 from starlette.responses import JSONResponse
 
-from studio.auth.gateway import AuthFailure, AuthFailureKind, AuthGateway
+from studio.auth.csrf import same_origin
+from studio.auth.gateway import AuthFailure, AuthFailureKind
+from studio.auth.oauth import OAuthRateLimited, OAuthService
 from studio.auth.schemas import SignupInput
 from studio.auth.service import register
 
 router = APIRouter(prefix="/api/auth")
 
 
-def same_origin(request: Request) -> None:
-    expected = request.app.state.settings.public_origin
-    if not expected or request.headers.get("origin") != expected.rstrip("/"):
-        raise HTTPException(403)
-
-
-def gateway_for(request: Request) -> AuthGateway:
-    gateway = getattr(request.app.state, "auth_gateway", None)
-    if not isinstance(gateway, AuthGateway):
+def service_for(request: Request) -> OAuthService:
+    service = getattr(request.app.state, "verification_service", None)
+    if not isinstance(service, OAuthService):
         raise HTTPException(503)
-    return gateway
+    return service
 
 
 @router.post("/register")
 async def signup(request: Request, data: SignupInput) -> JSONResponse:
     same_origin(request)
     try:
-        await register(gateway_for(request), data)
+        await register(
+            service_for(request),
+            data,
+            client_key=request.client.host if request.client else "unknown",
+        )
+    except OAuthRateLimited:
+        raise HTTPException(429, headers={"Retry-After": "60"}) from None
     except AuthFailure as error:
         if error.kind == AuthFailureKind.RATE_LIMIT:
-            raise HTTPException(429) from None
+            raise HTTPException(429, headers={"Retry-After": "60"}) from None
         if error.kind in {AuthFailureKind.TIMEOUT, AuthFailureKind.UNAVAILABLE}:
             raise HTTPException(503, headers={"Retry-After": "5"}) from None
         raise HTTPException(422) from None

@@ -20,7 +20,7 @@ from studio.auth.db_work import run_db
 from studio.auth.gateway import AuthFailure, AuthGateway
 from studio.auth.jwt import InvalidIdentity, JWTValidator
 from studio.auth.logout import logout_session
-from studio.auth.rate_limit import allow_start
+from studio.auth.rate_limit import AuthLimits, allow_start
 from studio.auth.refresh import refresh_identity
 from studio.auth.token_store import AttemptSecrets, TokenStore
 
@@ -56,6 +56,7 @@ class OAuthService:
         public_origin: str,
         providers: frozenset[str],
         secret: bytes | None = None,
+        limits: AuthLimits | None = None,
     ):
         self.transaction = auth_transaction
         self.store = store
@@ -65,6 +66,7 @@ class OAuthService:
         self.public_origin = public_origin.rstrip("/")
         self.providers = providers
         self.secret = secret or secrets.token_bytes(32)
+        self.limits = limits or AuthLimits()
 
     def start(self, provider: str, return_path: str, *, client_key: str = "direct") -> OAuthStart:
         if provider not in {"google", "apple"} or provider not in self.providers:
@@ -73,7 +75,7 @@ class OAuthService:
             self.secret, ("oauth-start:" + client_key).encode(), hashlib.sha256
         ).hexdigest()
         with self.transaction() as session:
-            allowed = allow_start(session, bucket)
+            allowed = allow_start(session, bucket, limit=self.limits.client)
         if not allowed:
             raise OAuthRateLimited()
         verifier = secrets.token_urlsafe(48)

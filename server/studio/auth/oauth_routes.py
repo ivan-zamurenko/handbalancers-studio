@@ -2,12 +2,12 @@
 
 import hashlib
 import re
-import secrets
 
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, ConfigDict
 from starlette.responses import JSONResponse, RedirectResponse
 
+from studio.auth.csrf import require_csrf
 from studio.auth.db_work import run_db
 from studio.auth.gateway import AuthFailure
 from studio.auth.jwt import InvalidIdentity
@@ -153,10 +153,9 @@ async def logout(request: Request):
     same_origin(request)
     service = service_for(request)
     cookie = request.cookies.get(session_name(request), "")
-    if not cookie or not secrets.compare_digest(
-        service.csrf_token(cookie), request.headers.get("x-csrf-token", "")
-    ):
+    if not cookie:
         raise HTTPException(403)
+    require_csrf(request, service.csrf_token(cookie))
     await service.logout(cookie)
     response = Response(status_code=204, headers=HEADERS)
     response.delete_cookie(

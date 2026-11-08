@@ -15,13 +15,17 @@ def quota(service: OAuthService, action: str, email: str, client_key: str) -> No
         return hmac.new(service.secret, value.encode(), hashlib.sha256).hexdigest()
 
     with service.transaction() as session:
-        client_allowed = allow_start(session, bucket(f"{action}:ip:{client_key}"))
+        client_allowed = allow_start(
+            session, bucket(f"{action}:ip:{client_key}"), limit=service.limits.client
+        )
         # Commit the IP budget, but do not insert attacker-chosen email buckets
         # after it is exhausted. Raising inside the transaction would roll it back.
         email_allowed = client_allowed and allow_start(
             session,
             bucket(f"{action}:email:{email.casefold()}"),
-            limit=1 if action in {"resend", "recovery-request", "recovery-confirm"} else 10,
+            limit=1
+            if action in {"register", "resend", "recovery-request", "recovery-confirm"}
+            else service.limits.account,
         )
     if not client_allowed or not email_allowed:
         raise OAuthRateLimited()

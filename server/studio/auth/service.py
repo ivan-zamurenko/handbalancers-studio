@@ -1,12 +1,16 @@
-"""Auth orchestration; signup deliberately has no product database dependency."""
+"""Signup orchestration: commit private abuse budgets before provider I/O."""
 
-from studio.auth.gateway import AuthFailure, AuthFailureKind, AuthGateway
+from studio.auth.db_work import run_db
+from studio.auth.gateway import AuthFailure, AuthFailureKind
+from studio.auth.oauth import OAuthService
 from studio.auth.schemas import SignupInput
+from studio.auth.verification import quota
 
 
-async def register(gateway: AuthGateway, data: SignupInput) -> None:
+async def register(service: OAuthService, data: SignupInput, *, client_key: str) -> None:
+    await run_db(quota, service, "register", data.email, client_key)
     try:
-        await gateway.signup(
+        await service.gateway.signup(
             data.email, data.password.get_secret_value(), data.first_name, data.last_name
         )
     except AuthFailure as error:
