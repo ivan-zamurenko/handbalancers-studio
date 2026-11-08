@@ -57,3 +57,4 @@ logout?.addEventListener('click', async () => {
   await refresh();
 });
 window.addEventListener('pageshow', refresh);
+window.addEventListener('studio:session-changed', refresh);

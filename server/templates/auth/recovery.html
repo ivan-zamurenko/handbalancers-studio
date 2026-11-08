@@ -1,0 +1,44 @@
+{% extends "public/base.html" %}
+{% block title %}{{ copy('Відновлення пароля', 'Reset password') }} — Handbalancer’s Studio{% endblock %}
+{% block head %}{{ super() }}<link rel="stylesheet" href="/static/css/login.css">{% endblock %}
+{% block public_content %}
+<section class="login-section wrap" aria-labelledby="recovery-heading">
+  <div class="login-heading"><p class="eyebrow">Handbalancer’s Studio</p>
+    <h1 id="recovery-heading">{{ copy('Повернімо доступ.', 'Find your way back.') }}</h1>
+    <p>{{ copy('Код із листа. Новий пароль. Новий початок.', 'An email code. A new password. A fresh start.') }}</p>
+  </div>
+  <div class="login-card">
+    <form id="recovery-form" method="post" action="/recovery" aria-describedby="recovery-status">
+      <div class="form-field">
+        <label class="form-field__label" for="recovery-email">Email</label>
+        <input class="form-field__control" id="recovery-email" type="email" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false" maxlength="254" required>
+      </div>
+      <button class="primary login-submit" type="submit" data-request-code disabled>{{ copy('Надіслати код', 'Send a code') }}</button>
+    </form>
+    <p id="recovery-status" role="status" tabindex="-1"
+       data-pending="{{ copy('Зачекайте…', 'Please wait…') }}"
+       data-sent="{{ copy('Якщо для цієї пошти доступне відновлення, ми надіслали код. Перевірте вхідні та спам.', 'If recovery is available for this email, we sent a code. Check your inbox and spam folder.') }}"
+       data-error="{{ copy('Не вдалося завершити запит. Спробуйте пізніше. Якщо пароль уже змінився, увійдіть із новим або запросіть новий код.', 'We could not complete the request. Try again later. If your password changed, sign in with the new one or request a new code.') }}"
+       data-invalid="{{ copy('Перевірте код і пароль. Код може бути прострочений або вже використаний — тоді запросіть новий.', 'Check the code and password. The code may have expired or already been used; request a new one.') }}"
+       data-limited="{{ copy('Забагато спроб. Зачекайте хвилину перед повтором.', 'Too many attempts. Wait a minute before trying again.') }}"
+       data-done="{{ copy('Пароль змінено. Тепер увійдіть із новим паролем.', 'Your password has changed. Sign in with your new password.') }}"></p>
+    <form id="recovery-confirm" method="post" action="/recovery" aria-describedby="recovery-status" hidden>
+      <div class="form-field">
+        <label class="form-field__label" for="recovery-code">{{ copy('Код із листа', 'Email code') }}</label>
+        <input class="form-field__control" id="recovery-code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" minlength="6" maxlength="6" required>
+        <p class="form-field__hint">{{ copy('Перевірте код уважно: одна спроба на хвилину.', 'Check the code carefully: one attempt per minute.') }}</p>
+      </div>
+      <div class="form-field">
+        <label class="form-field__label" for="recovery-password">{{ copy('Новий пароль', 'New password') }}</label>
+        <input class="form-field__control" id="recovery-password" type="password" autocomplete="new-password" minlength="8" maxlength="256" aria-describedby="recovery-password-hint" required>
+        <p class="form-field__hint" id="recovery-password-hint">{{ copy('Щонайменше 8 символів. Використайте унікальний пароль.', 'At least 8 characters. Use a unique password.') }}</p>
+      </div>
+      <button class="primary login-submit" type="submit" disabled>{{ copy('Зберегти новий пароль', 'Save new password') }}</button>
+      <button class="recovery-again" type="button" data-recovery-again disabled>{{ copy('Інша пошта або новий код', 'Different email or a new code') }}</button>
+    </form>
+    <noscript><p>{{ copy('Увімкніть JavaScript для безпечного відновлення пароля.', 'Enable JavaScript to reset your password securely.') }}</p></noscript>
+  </div>
+  <a class="login-back" href="/login?lang={{ language }}">← {{ copy('Повернутися до входу', 'Back to sign-in') }}</a>
+</section>
+{% endblock %}
+{% block scripts %}<script type="module" src="/static/js/features/auth/recovery.js"></script>{% endblock %}

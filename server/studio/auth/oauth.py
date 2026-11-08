@@ -1,5 +1,6 @@
 """Server PKCE orchestration: consume/commit before network, then provision/session."""
 
+import asyncio
 import base64
 import hashlib
 import hmac
@@ -16,7 +17,7 @@ from sqlalchemy.orm import Session
 
 from studio.accounts.provisioning import current_profile, provision
 from studio.auth.db_work import run_db
-from studio.auth.gateway import AuthGateway
+from studio.auth.gateway import AuthFailure, AuthGateway
 from studio.auth.jwt import InvalidIdentity, JWTValidator
 from studio.auth.logout import logout_session
 from studio.auth.rate_limit import allow_start
@@ -177,7 +178,24 @@ class OAuthService:
                 bool(profile["first_name"] and profile["last_name"]),
             )
 
-        return await run_db(persist)
+        result = await run_db(persist)
+
+        def discard() -> None:
+            with self.transaction() as session:
+                self.store.revoke_session(session, result.cookie.get_secret_value())
+
+        try:
+            # Commit-before-check is intentional: password recovery globally revokes
+            # upstream sessions before its last local sweep. Either this check sees
+            # revocation, or that sweep sees our committed row. Never issue the cookie
+            # from a delayed pre-recovery token exchange without this live check.
+            active = await self.gateway.current_user(access)
+            if not isinstance(active, dict) or active.get("id") != str(identity.user_id):
+                raise InvalidIdentity()
+        except (AuthFailure, InvalidIdentity, asyncio.CancelledError):
+            await run_db(discard)
+            raise
+        return result
 
     async def session_profile(self, cookie: str) -> dict[str, object]:
         identity = await refresh_identity(

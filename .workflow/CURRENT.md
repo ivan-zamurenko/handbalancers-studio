@@ -1,3 +1,27 @@
+# Поточний checkpoint — S03-08, 2026-11-08
+
+Відновлення пароля готове локально: email → код → новий пароль, UK/EN,
+нейтральна відповідь, no-JS fail-closed, очищення секретів, відкликання сесій.
+Recovery не створює звичайну web_session. Late pre-reset payload перевіряється
+живим GET /user після local commit і до cookie. Схема БД не змінювалась.
+
+GREEN: 89 real-local auth integration; 168 unit/contracts/security;
+17 browser recovery/login і 14 recovery/logout після session-event;
+21 tooling +16 subtests; Ruff/format/Mypy. Read-only review без блокерів.
+Докази: .workflow/evidence/S03-08.json; рішення: docs/adr/S03-08-password-recovery.md.
+
+**Не готовність до публікації:** cloud email template/SMTP не перевірено;
+local gotrue:v2.197.0 має concurrent OTP race (app захищений quota1/min)
+і source-confirmed old-password grant race (потрібен patched provider і повторна
+перевірка). Попередні key rotation/cloud0007/hosted smoke gates залишаються.
+Email login UI ще preview до S03-10. Хмарних змін/deploy не було.
+
+Попередній security commit: 8537b8ffc157acdfcd444cdd47858b48e2db1b98; CI42429744181 success.
+Далі: окремий запит власника — компактна handstand loading animation; потім S03-09.
+Сторонні видалення docs/файли збережені. SHA цього delivery звіряти з Git.
+
+## Попередній checkpoint
+
 # Поточний checkpoint — security best practices, 2026-11-08
 
 Власник підтвердив: сайт лише локальний із хмарною Supabase, реальних користувачів

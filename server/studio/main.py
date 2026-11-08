@@ -11,6 +11,7 @@ from starlette.exceptions import HTTPException
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from studio.auth.oauth_routes import router as oauth_router
+from studio.auth.recovery_routes import router as recovery_router
 from studio.auth.routes import router as auth_router
 from studio.auth.runtime import build_oauth
 from studio.auth.verification_routes import router as verification_router
@@ -60,6 +61,7 @@ def create_app(settings: Settings | Mapping[str, object] | None = None) -> FastA
     app.add_api_route("/health/live", liveness, methods=["GET"])
     app.include_router(auth_router)
     app.include_router(verification_router)
+    app.include_router(recovery_router)
     app.include_router(oauth_router)
     app.include_router(public_router)
     app.mount(

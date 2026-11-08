@@ -1,0 +1,70 @@
+{
+  "task": "S03-08",
+  "status": "done_local",
+  "base_commit": "8537b8ffc157acdfcd444cdd47858b48e2db1b98",
+  "scope_extension": {
+    "reason": "Complete the specified OTP recovery HTTP/UI flow using existing auth infrastructure and prove it against isolated local Supabase. No schema change.",
+    "files": [
+      "server/studio/auth/recovery.py",
+      "server/studio/auth/recovery_routes.py",
+      "server/studio/auth/gateway.py",
+      "server/studio/auth/supabase_adapter.py",
+      "server/studio/auth/verification.py",
+      "server/studio/main.py",
+      "server/studio/public/routes.py",
+      "server/templates/auth/recovery.html",
+      "server/templates/public/login.html",
+      "server/static/js/features/auth/recovery.js",
+      "server/static/css/login.css",
+      "supabase/config.toml",
+      "supabase/templates/recovery.html",
+      "tools/local_stack.py",
+      "server/tests/contracts/auth/test_password_recovery.py",
+      "server/tests/integration/auth/test_password_recovery.py",
+      "tests/e2e/password-recovery.spec.js",
+      "docs/adr/S03-08-password-recovery.md",
+      "server/studio/auth/oauth.py",
+      "server/tests/integration/auth/test_oauth_flow.py",
+      "tests/e2e/login-form.spec.js",
+      "server/tests/integration/auth/test_recovery_failures.py",
+      "server/static/js/features/auth/session.js"
+    ],
+    "issuance_guard": "Live GET/user after local session commit closes late pre-reset payload race without a schema change; fail-closed revoke on rejected check."
+  },
+  "separate_followup": "Owner-requested handstand loading animation will be a separate bounded commit",
+  "external_gates": [
+    "Hosted recovery email template and real mailbox delivery not yet verified",
+    "Prior encryption-key rotation/cloud0007 gates unchanged",
+    "Local gotrue v2.197.0 lacks old-password hash recheck before issuing upstream session; source-confirmed upstream race, runtime reproduction outstanding. Require patched provider version/revalidation before public launch."
+  ],
+  "red": [
+    {
+      "command": "pytest server/tests/contracts/auth/test_password_recovery.py -q",
+      "result": "10 failed: routes/page absent (404)"
+    },
+    {
+      "command": "tools/local_stack.py test uv run --locked pytest server/tests/integration/auth/test_password_recovery.py -q",
+      "result": "4 failed: recovery request route absent (404), local fixtures healthy"
+    },
+    {
+      "command": "pytest test_password_recovery.py -k late (issuance guard temporarily removed)",
+      "result": "1 failed, 5 deselected: late payload incorrectly accepted; guard restored"
+    },
+    {
+      "command": "local_stack test pytest server/tests/integration/auth -q",
+      "result": "80 passed, 1 failed: concurrent provider OTP accepted twice; corrected app confirm quota without weakening assertion"
+    }
+  ],
+  "green": {
+    "auth_integration": "89 passed against isolated real Supabase/Postgres",
+    "unit_contract_security": "168 passed",
+    "browser_recovery_login": "17 passed",
+    "browser_recovery_logout_after_session_event": "14 passed",
+    "tooling": "21 passed, 16 subtests",
+    "static": "Ruff, format, Mypy (41 source files), git diff --check"
+  },
+  "review": {
+    "reviewer": "security_auth_review",
+    "result": "No blocking findings for local scope; provider and hosted gates explicitly retained"
+  }
+}

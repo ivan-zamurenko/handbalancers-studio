@@ -51,6 +51,10 @@ otp_length = 6
 subject = "Handbalancer’s Studio — код підтвердження"
 content_path = "./supabase/templates/confirmation.html"
 
+[auth.email.template.recovery]
+subject = "Handbalancer’s Studio — відновлення пароля"
+content_path = "./supabase/templates/recovery.html"
+
 [realtime]
 enabled = false
 

@@ -66,9 +66,10 @@ def prepare(profile: str, *, root: Path = ROOT) -> Path:
             config["auth"]["signing_keys_path"] = "./signing_keys.json"
         template_dir = directory / "templates"
         template_dir.mkdir(exist_ok=True)
-        (template_dir / "confirmation.html").write_text(
-            (ROOT / "supabase/templates/confirmation.html").read_text()
-        )
+        for template in ("confirmation.html", "recovery.html"):
+            (template_dir / template).write_text(
+                (ROOT / "supabase/templates" / template).read_text()
+            )
         (directory / "config.toml").write_text(config_text(config))
     return workdir
 
@@ -327,7 +328,9 @@ def provision_migration_roles(profile: str, *, root: Path = ROOT) -> None:
             with os.fdopen(descriptor, "w") as output:
                 json.dump({"password": secrets.token_hex(32)}, output)
         password = read_migration_password(workdir)
-        statements = ["BEGIN; SET LOCAL lock_timeout = '5s'; SET LOCAL statement_timeout = '10s'; SELECT pg_advisory_xact_lock(190102);"]
+        statements = [
+            "BEGIN; SET LOCAL lock_timeout = '5s'; SET LOCAL statement_timeout = '10s'; SELECT pg_advisory_xact_lock(190102);"
+        ]
         for role in ("migration_owner", "studio_web", "studio_auth_runtime", "studio_worker"):
             login = "LOGIN" if role == "migration_owner" else "NOLOGIN"
             statements.append(f"""
@@ -341,14 +344,16 @@ $role$;
 ALTER ROLE {role} {login} NOSUPERUSER NOCREATEDB NOCREATEROLE
     NOINHERIT NOREPLICATION NOBYPASSRLS;
 """)
-        statements.extend([
-            f"ALTER ROLE migration_owner PASSWORD '{password}';",
-            "GRANT CONNECT, CREATE ON DATABASE postgres TO migration_owner;",
-            "GRANT USAGE ON SCHEMA auth TO migration_owner;",
-            "GRANT REFERENCES (id) ON auth.users TO migration_owner;",
-            "GRANT studio_web, studio_auth_runtime, studio_worker TO migration_owner WITH INHERIT FALSE;",
-            "COMMIT;",
-        ])
+        statements.extend(
+            [
+                f"ALTER ROLE migration_owner PASSWORD '{password}';",
+                "GRANT CONNECT, CREATE ON DATABASE postgres TO migration_owner;",
+                "GRANT USAGE ON SCHEMA auth TO migration_owner;",
+                "GRANT REFERENCES (id) ON auth.users TO migration_owner;",
+                "GRANT studio_web, studio_auth_runtime, studio_worker TO migration_owner WITH INHERIT FALSE;",
+                "COMMIT;",
+            ]
+        )
         execute_local_sql(container, "\n".join(statements))
 
 
@@ -363,7 +368,12 @@ def run_migrations(profile: str, *, root: Path = ROOT) -> None:
     try:
         subprocess.run(
             [sys.executable, "-m", "alembic", "-c", str(root / "alembic.ini"), "upgrade", "head"],
-            cwd=root, env=environment, capture_output=True, text=True, check=True, timeout=120,
+            cwd=root,
+            env=environment,
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=120,
         )
     except (OSError, subprocess.SubprocessError):
         raise UnsafeDatabaseTarget("Local migration failed; output withheld") from None

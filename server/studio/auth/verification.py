@@ -21,7 +21,7 @@ def quota(service: OAuthService, action: str, email: str, client_key: str) -> No
         email_allowed = client_allowed and allow_start(
             session,
             bucket(f"{action}:email:{email.casefold()}"),
-            limit=1 if action == "resend" else 10,
+            limit=1 if action in {"resend", "recovery-request", "recovery-confirm"} else 10,
         )
     if not client_allowed or not email_allowed:
         raise OAuthRateLimited()

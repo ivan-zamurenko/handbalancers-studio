@@ -61,6 +61,7 @@ class SupabaseAuthAdapter:
         payload: Mapping[str, object],
         *,
         access_token: str | None = None,
+        method: str = "POST",
     ) -> dict[str, object] | None:
         if not path.startswith("/") or path.startswith("//"):
             raise ValueError("Auth endpoint path must be relative to the provider")
@@ -84,7 +85,7 @@ class SupabaseAuthAdapter:
                         trust_env=False,
                     ) as client,
                     client.stream(
-                        "POST", f"{self._base_url}{path}", json=dict(payload), headers=headers
+                        method, f"{self._base_url}{path}", json=dict(payload), headers=headers
                     ) as response,
                 ):
                     body = await read_provider_body(response)

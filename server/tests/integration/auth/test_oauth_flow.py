@@ -54,6 +54,10 @@ def flow(storage_db):
     )
 
     def exchange(request):
+        if request.method == "GET" and request.url.path == "/auth/v1/user":
+            assert request.headers["authorization"] == f"Bearer {token}"
+            return httpx.Response(200, json={"id": str(auth_id)})
+        # Keep this list scoped to token exchanges (PKCE assertions below).
         calls.append(request)
         return httpx.Response(
             200,

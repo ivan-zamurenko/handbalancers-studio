@@ -49,10 +49,17 @@ class AuthGateway:
         self._adapter = adapter
 
     async def _call(
-        self, path: str, payload: dict[str, object], *, access_token: str | None = None
+        self,
+        path: str,
+        payload: dict[str, object],
+        *,
+        access_token: str | None = None,
+        method: str = "POST",
     ) -> dict[str, object] | None:
         try:
-            return await self._adapter.request(path, payload, access_token=access_token)
+            return await self._adapter.request(
+                path, payload, access_token=access_token, method=method
+            )
         except SupabaseAuthError as error:
             raise AuthFailure(_classify(error)) from None
 
@@ -96,3 +103,17 @@ class AuthGateway:
 
     async def recovery(self, email: str) -> dict[str, object] | None:
         return await self._call("/recover", {"email": email})
+
+    async def verify_recovery(self, email: str, token: str) -> dict[str, object] | None:
+        return await self._call("/verify", {"email": email, "token": token, "type": "recovery"})
+
+    async def update_password(self, access_token: str, password: str) -> dict[str, object] | None:
+        return await self._call(
+            "/user", {"password": password}, access_token=access_token, method="PUT"
+        )
+
+    async def logout_all(self, access_token: str) -> dict[str, object] | None:
+        return await self._call("/logout?scope=global", {}, access_token=access_token)
+
+    async def current_user(self, access_token: str) -> dict[str, object] | None:
+        return await self._call("/user", {}, access_token=access_token, method="GET")

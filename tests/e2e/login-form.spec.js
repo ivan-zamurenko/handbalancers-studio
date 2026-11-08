@@ -31,12 +31,11 @@ for (const width of [390,1440]) for (const theme of ['light','dark']) {
     await expect(page.locator('html')).toHaveAttribute('data-theme',theme);
   });
 }
-test('login safe without JavaScript and unavailable recovery is explicit',async({browser,page})=>{
+test('login safe without JavaScript and recovery has its own page',async({browser,page})=>{
   await page.goto('/login');
-  await page.getByRole('button',{name:'Забули пароль?',exact:true}).click();
-  await expect(page.getByRole('dialog',{name:'Відновлення доступу'})).toBeVisible();
-  await page.keyboard.press('Escape');
-  await expect(page.getByRole('button',{name:'Забули пароль?',exact:true})).toBeFocused();
+  await page.getByRole('link',{name:'Забули пароль?',exact:true}).click();
+  await expect(page).toHaveURL(/\/recovery\?lang=uk$/);
+  await expect(page.locator('#recovery-form')).toBeVisible();
   const context=await browser.newContext({javaScriptEnabled:false});
   const bare=await context.newPage();
   await bare.goto('http://127.0.0.1:8765/login');
