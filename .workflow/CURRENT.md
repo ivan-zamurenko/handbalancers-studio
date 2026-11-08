@@ -1,3 +1,17 @@
+# Поточний checkpoint — грайлива людинка, 2026-11-08
+
+Уточнення власника: анімація може бути менш строгою. Preview01/cycle.html:
+вагання перед махом, розведені ноги й м’яке коліно при ловінні балансу,
+маленькі очі, кліпання та кивок після приземлення. Оновлено GIF/overview.
+8.2s цикл; localhost8000 доступний. Runtime loader не змінено.
+
+GREEN:4 geometry tests (попередні3 збережені),38 JS,4 browser.
+Evidence: .workflow/evidence/handstand-cycle.json; ADR: docs/adr/handstand-cycle.md.
+Next: власник оцінює характер руху. Roadmap/cloud/security gates без змін.
+Попередній commit:f3768ad93016e5c9ca4e9103bc93e583fa1e262b.
+
+## Попередній checkpoint
+
 # Поточний checkpoint — виразніший гімнастичний цикл, 2026-11-08
 
 Власник уточнив характер і надіслав Instagram Reel DfViPqtSRxY.

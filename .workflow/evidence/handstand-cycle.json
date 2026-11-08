@@ -1,22 +1,21 @@
 {
   "task": "owner-handstand-cycle",
   "status": "preview_ready",
-  "request": "Style01 thin line; standing→forward step→plant hands→handstand→controlled return to standing",
+  "request": "Less strict: hesitation, splayed balance with soft trailing knee, small eyes, blink and landing nod",
   "red": {
     "command": "node --test tests/js/handstand-cycle.test.js",
-    "result": "3 failures against previous rig: missing Toe/side Shoulder points and obsolete wrist anchors; interim continuity tests also caught knee snap and rapid return arm swing"
+    "result": "new playful scenario failed because prior feet separation was <=30px; previous three tests passed"
   },
   "green": {
-    "geometry": "3 passed; 10,001 continuity/floor/length samples; fixed straight support arms and leading leg",
-    "browser": "4 passed (9.9s); pause, reduced motion card/clone, mobile, live inversion, dialogs/focus, no API",
-    "javascript_suite": "37 passed with PLAYWRIGHT_BROWSERS_PATH configured",
+    "geometry": "4 passed; previous three tests retained, including 10,001 samples; playful correction and landing nod added",
+    "browser": "4 passed (9.6s); actual motion, pause, reduced motion, mobile, dialogs and focus",
+    "javascript_suite": "38 passed",
     "diff_check": "passed"
   },
-  "review": "security_auth_review: no blockers; independently verified geometry and head radius bounds; aesthetics require owner review",
-  "visual": "11-pose contact sheet + central mobile light / desktop dark; cycle.gif205frames/25fps/8.2s; overview refreshed",
+  "review": "security_auth_review: no blockers; independently checked 4 tests, eye paths at phase boundaries and identical rendered loop endpoints",
+  "visual": "Preparation, three balance-catch poses and landing blink/nod inspected; cycle.gif205frames/25fps; overview updated",
   "scope": "Preview01 and dedicated cycle page; no runtime loader placement/auth/cloud changes",
   "next": "Owner reviews exact full-body cycle; final placement/integration remains separate",
-  "revision": "2026-11-08 expressive gymnastics refinement",
-  "reference": "https://www.instagram.com/reel/DfViPqtSRxY/; public page and decoded frames visually inspected",
-  "environment_note": "Initial full JS run lacked PLAYWRIGHT_BROWSERS_PATH; rerun with installed browser passed."
+  "revision": "2026-11-08 playful character refinement",
+  "reference": "https://www.instagram.com/reel/DfViPqtSRxY/; public page and decoded frames visually inspected"
 }

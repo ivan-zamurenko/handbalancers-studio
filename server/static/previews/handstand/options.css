@@ -153,3 +153,5 @@ dialog[data-placement="corner"] .escape-hint { bottom: 128px; }
 .cycle-sequence { margin: 24px 0 0; text-align: center; font-size: 11px; line-height: 2; color: var(--muted); }
 .cycle-sequence span { padding: 0 8px; color: var(--accent); }
 .cycle-main footer a { color: var(--muted); text-decoration: none; }
+
+.cycle-figure .cycle-eye { stroke-width: 1.35; }

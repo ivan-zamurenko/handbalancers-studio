@@ -41,3 +41,12 @@ test('limb lengths, floor contact and frame continuity survive the entire cycle'
     previous=p;
   }
 });
+
+test('playful balance opens the legs, softens the trailing knee and settles before a nod',()=>{
+  const wobble=poseAt(.55),settle=poseAt(.94),nod=poseAt(.967);
+  assert.ok(Math.abs(wobble.frontFoot[0]-wobble.backFoot[0])>30);
+  assert.ok(distance(wobble.frontHip,wobble.frontFoot)<57);
+  assert.deepEqual(settle.frontFoot,[66,164]);
+  assert.deepEqual(nod.frontFoot,settle.frontFoot);
+  assert.ok(nod.head[1]>settle.head[1]+1);
+});

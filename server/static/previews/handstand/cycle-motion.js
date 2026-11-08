@@ -40,25 +40,28 @@ const releaseLength=Math.hypot(118-releaseHip[0],164-releaseHip[1]);
 const releaseLegAngle=Math.atan2(164-releaseHip[1],118-releaseHip[0])/rad;
 
 export function poseAt(progress) {
-  const t=clamp(progress);
+  const time=clamp(progress);
+  // Leave a short beat after landing for the character's pleased little nod.
+  const t=time<=.78?time:mix(.78,1,smooth((time-.78)/.16));
   // Return is deliberately slower than the kick, with a different step rhythm.
   let phase=t;
   if(t>.78) phase=track(t,[[.78,.36],[.88,.24],[.96,.10],[1,0]]);
   let hip,angle,armAngle,armLength=46,backFoot,frontFoot;
   if(t>=.36 && t<=.78) {
-    angle=track(t,[[.36,30],[.405,51],[.46,83],[.51,91.4],
-      [.55,89.4],[.59,90.3],[.64,90],[.69,77],[.75,45],[.78,30]]);
+    angle=track(t,[[.36,30],[.405,51],[.46,83],[.51,95],
+      [.55,87],[.59,92],[.64,90],[.69,77],[.75,45],[.78,30]]);
     hip=polar([180,164],-86,angle);
     armAngle=angle;
-    backFoot=polar([hip[0]-2,hip[1]],60,angle+180);
+    const catchBalance=track(t,[[.47,0],[.53,1],[.56,.8],[.60,.25],[.625,.4],[.66,0]]);
+    backFoot=polar([hip[0]-2,hip[1]],60,angle+180-20*catchBalance);
     if(angle<=releaseAngle) frontFoot=[118,164];
     else {
       const q=clamp((angle-releaseAngle)/(90-releaseAngle));
       // The trailing leg follows a long, clean arc; it joins after the first.
       const legAngle=mix(releaseLegAngle,270,smooth(q));
       const extension=clamp((angle-releaseAngle)/30);
-      const length=60-(60-releaseLength)*(1-extension)**2;
-      frontFoot=polar([hip[0]+2,hip[1]],length,legAngle+(angle>90?angle-90:0));
+      const length=60-(60-releaseLength)*(1-extension)**2-10*catchBalance**2;
+      frontFoot=polar([hip[0]+2,hip[1]],length,legAngle+(angle>90?angle-90:0)+27*catchBalance);
     }
   } else if(phase>=.24) {
     const q=(phase-.24)/.12;
@@ -72,7 +75,7 @@ export function poseAt(progress) {
     hip=[track(phase,[[0,64],[.07,62],[.12,67],[.24,98]]),
       track(phase,[[0,104],[.07,106],[.12,105],[.24,118.64]])];
     angle=track(phase,[[0,-90],[.07,-97],[.14,-87],[.24,-60]]);
-    armAngle=track(phase,[[0,78],[.055,104],[.12,-112],[.20,-78],[.24,-60]]);
+    armAngle=track(phase,[[0,78],[.035,90],[.065,72],[.085,105],[.14,-112],[.20,-78],[.24,-60]]);
     armLength=track(phase,[[0,44],[.08,42],[.18,46],[.24,46]]);
     const stride=smooth((phase-.10)/.14);
     backFoot=[62,164];
@@ -87,6 +90,9 @@ export function poseAt(progress) {
   // nod and a relaxed settling pose provide character without extra effects.
   const head=polar(shoulder,14,angle);
   head[0]+=9;
+  const nod=track(time,[[0,0],[.035,1],[.075,0],[.94,0],[.967,1],[1,0]]);
+  head[0]+=3*nod;
+  head[1]+=2.5*nod;
   const pose={hip,shoulder,head};
   for(const [side,offset,foot] of [['back',-2,backFoot],['front',2,frontFoot]]) {
     const origin=[hip[0]+offset,hip[1]], top=[shoulder[0]+offset,shoulder[1]];
@@ -119,6 +125,14 @@ export function drawPose(svg,progress) {
   const head=svg.querySelector('[data-head]');
   head.setAttribute('cx',pose.head[0].toFixed(2));
   head.setAttribute('cy',pose.head[1].toFixed(2));
+  // Two tiny eyes follow the floor during support, then soften on landing.
+  const t=clamp(progress), lookingDown=smooth((t-.25)/.1)*(1-smooth((t-.80)/.1));
+  const blink=track(t,[[0,0],[.04,0],[.047,1],[.058,0],[.95,0],[.968,1],[.985,0],[1,0]]);
+  const eyeY=pose.head[1]-1+4*lookingDown;
+  for(const [side,offset] of [['left',2],['right',5.5]]) {
+    const x=pose.head[0]+offset;
+    path('eye-'+side,[[x-.7*blink,eyeY],[x+.2+.7*blink,eyeY+.4*(1-blink)]]);
+  }
 }
 
 export function mountHandstandCycle(svg) {
