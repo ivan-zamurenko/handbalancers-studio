@@ -31,6 +31,11 @@ jobs:
         run: |
           uv sync --locked
           npm ci
+      - name: Audit locked dependencies
+        run: |
+          uv export --locked --no-emit-project --format requirements-txt --output-file "$RUNNER_TEMP/studio-requirements.txt"
+          uvx pip-audit==2.10.1 --strict --no-deps --disable-pip --progress-spinner off -r "$RUNNER_TEMP/studio-requirements.txt"
+          npm audit --audit-level=low
       - name: Install locked Playwright browser
         run: ./node_modules/.bin/playwright install --with-deps chromium
       - name: Run baseline checks

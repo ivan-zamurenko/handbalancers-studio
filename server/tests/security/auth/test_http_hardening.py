@@ -134,3 +134,33 @@ def test_verified_database_tls_and_local_development_remain_usable():
     production["auth_database_url"] += "?sslmode=verify-full&sslrootcert=/trusted/ca.crt"
     assert Settings.model_validate(production).app_env == "production"
     assert Settings.model_validate(auth_config("local-dev")).app_env == "local-dev"
+
+
+@pytest.mark.parametrize("environment", ["staging", "production"])
+def test_deployment_rejects_untrusted_host_and_hides_schema(environment):
+    app = create_app(
+        {
+            "app_env": environment,
+            "public_origin": "https://studio.example.test",
+            "token_encryption_key": base64.b64encode(b"t" * 32).decode(),
+        }
+    )
+    with TestClient(app, base_url="https://studio.example.test") as client:
+        assert client.get("/login").status_code == 200
+        for host in (
+            "attacker.test",
+            "studio.example.test.attacker.test",
+            "www.studio.example.test",
+        ):
+            response = client.get(
+                "/login/",
+                headers={
+                    "Host": host,
+                    "X-Forwarded-Host": "studio.example.test",
+                },
+                follow_redirects=False,
+            )
+            assert response.status_code == 400
+            assert "location" not in response.headers
+            assert response.headers["x-content-type-options"] == "nosniff"
+        assert client.get("/openapi.json").status_code == 404

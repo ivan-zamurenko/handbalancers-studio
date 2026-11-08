@@ -2,11 +2,13 @@
 
 from collections.abc import Mapping
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from studio.auth.oauth_routes import router as oauth_router
 from studio.auth.routes import router as auth_router
@@ -22,9 +24,15 @@ from studio.shared.security import RequestBodyLimitMiddleware
 
 def create_app(settings: Settings | Mapping[str, object] | None = None) -> FastAPI:
     validated = load_settings() if settings is None else Settings.model_validate(settings)
+    deployed = validated.app_env in {"production", "staging"}
     # CDN/inline Swagger and ReDoc conflict with the product's strict CSP.
-    # Keep /openapi.json for API tools without serving those extra HTML pages.
-    app = FastAPI(title="Handbalancer's Studio", docs_url=None, redoc_url=None)
+    # Keep /openapi.json for local API tools only.
+    app = FastAPI(
+        title="Handbalancer's Studio",
+        docs_url=None,
+        redoc_url=None,
+        openapi_url=None if deployed else "/openapi.json",
+    )
     app.state.settings = validated
     app.state.oauth_service = build_oauth(validated)
     app.state.verification_service = (
@@ -33,10 +41,19 @@ def create_app(settings: Settings | Mapping[str, object] | None = None) -> FastA
     if validated.auth_email_enabled and app.state.oauth_service is not None:
         app.state.auth_gateway = app.state.oauth_service.gateway
     configure_access_logging()
+    if deployed:
+        assert validated.public_origin
+        hostname = urlsplit(validated.public_origin).hostname
+        assert hostname
+        app.add_middleware(
+            TrustedHostMiddleware,
+            allowed_hosts=[hostname],
+            www_redirect=False,
+        )
     app.add_middleware(RequestBodyLimitMiddleware)
     app.add_middleware(
         RequestContextMiddleware,
-        hsts=validated.app_env in {"production", "staging"},
+        hsts=deployed,
     )
     app.add_exception_handler(RequestValidationError, validation_error)
     app.add_exception_handler(HTTPException, http_error)

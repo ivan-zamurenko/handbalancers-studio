@@ -1,0 +1,108 @@
+{
+  "date": "2026-11-08",
+  "scope": "Owner-requested security-best-practices audit and hardening of implemented functionality through S03-07; no roadmap transition",
+  "base_commit": "a38ca1c1ef6d1fe66e0d799e8b9c97010e560a7b",
+  "report": "security_best_practices_report.md",
+  "status": "local_fixes_verified_operator_gates_open",
+  "owner_context": "Only local site with cloud Supabase; no real users",
+  "skills": [
+    "OpenAI security-best-practices: official upstream SKILL.md plus Python FastAPI and vanilla JavaScript references",
+    "supabase",
+    "supabase-postgres-best-practices"
+  ],
+  "red": [
+    {
+      "command": "pytest server/tests/integration/auth/test_auth_resilience.py -q",
+      "result": "6 failed, 1 passed before offload/JWKS fix: real DB delays block health; fresh valid session returns401 on JWKS outage"
+    },
+    {
+      "command": "pytest server/tests/unit/auth/test_provider_limits.py -q",
+      "result": "Initial14 failed/5 passed; additional malformed-success cases6 failed/21 passed before corresponding fixes"
+    },
+    {
+      "result": "2 failed,24 deselected before Host/schema guards",
+      "test": "server/tests/security/auth/test_http_hardening.py::test_deployment_rejects_untrusted_host_and_hides_schema"
+    },
+    {
+      "command": "pytest server/tests/integration/auth/test_auth_resilience.py -k cancel -q",
+      "result": "1 failed,7 deselected: plain run_in_threadpool cancellation releases lease before DB worker finishes"
+    },
+    {
+      "result": "1 failed,14 deselected: warm cache missing kid becomes401 during failed-fetch cooldown",
+      "test": "server/tests/security/auth/test_jwt_validation.py::test_key_rotation_outage_stays_retryable_through_cooldown"
+    }
+  ],
+  "green": [
+    {
+      "command": ".venv/bin/pytest server/tests/unit server/tests/contracts server/tests/security/auth -q",
+      "result": "158 passed;1 upstream Starlette/httpx deprecation warning"
+    },
+    {
+      "command": "uv run --locked python tools/local_stack.py test uv run --locked pytest server/tests/integration/auth -q",
+      "environment": "isolated local Supabase/PostgreSQL test stack",
+      "result": "75 passed;1 upstream Starlette/httpx deprecation warning"
+    },
+    {
+      "command": "npx playwright test",
+      "result": "45 passed"
+    },
+    {
+      "command": ".venv/bin/pytest tools/tests/test_s00_07_ci_baseline.py tools/tests/test_s01_07_migration_ci.py -q",
+      "result": "14 passed,6 subtests passed"
+    },
+    {
+      "command": "ruff check/format; MYPYPATH=server mypy server/studio",
+      "result": "passed;38 source modules"
+    },
+    {
+      "command": "uv export --locked --no-emit-project --format requirements-txt; uvx pip-audit==2.10.1 --strict --no-deps --disable-pip --progress-spinner off -r exported-requirements.txt",
+      "result": "No known vulnerabilities"
+    },
+    {
+      "command": "npm audit --audit-level=low",
+      "result": "0 vulnerabilities"
+    }
+  ],
+  "earlier_evidence_not_rerun": {
+    "database": 59,
+    "rls": 20,
+    "javascript": 34,
+    "ci_url": "https://github.com/ivan-zamurenko/handbalancers-studio/actions/runs/42427836011",
+    "ci_status": "success for base commit; not evidence for new commit"
+  },
+  "cloud_preflight": {
+    "mode": "read-only; aggregates only; no secrets logged",
+    "session_rows": 3,
+    "live_local_sessions": 0,
+    "not_revoked_session_rows": 2,
+    "oauth_attempt_rows": 4,
+    "live_attempts": 0,
+    "connection_ssl": true,
+    "role_has_no_superuser_bypassrls_createrole": true,
+    "env_local_mode": "0600",
+    "caveat": "Point-in-time local expiry counts do not prove upstream session revocation"
+  },
+  "review": {
+    "agent": "security_auth_review",
+    "mode": "read-only",
+    "result": "No blocking findings in final core and CI diff; cancellation and warm-cache findings reproduced/fixed"
+  },
+  "unverified": [
+    "Historically exposed TOKEN_ENCRYPTION_KEY rotation and dependent upstream revocations",
+    "Cloud0007 migration and hosted login/refresh/logout smoke",
+    "Dashboard settings, production edge controls and external pentest"
+  ],
+  "unchanged": [
+    "Cloud schema/data/secrets",
+    "Existing runtime process",
+    "User-owned docs deletions and unrelated files",
+    "Roadmap task statuses"
+  ],
+  "next_step": "Complete coordinated key/session rotation and cloud0007 verification before public launch; roadmap next remains S03-08",
+  "auth_fix_commit": "b656d5cc1ba252d6601420d13f9eaaa874ef16b0",
+  "roadmap_validation": {
+    "source": "isolated staged index snapshot preserving owner worktree deletions",
+    "tasks": 142,
+    "errors": 0
+  }
+}

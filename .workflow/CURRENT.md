@@ -1,3 +1,35 @@
+# Поточний checkpoint — security best practices, 2026-11-08
+
+Власник підтвердив: сайт лише локальний із хмарною Supabase, реальних користувачів
+немає. Застосовано офіційний OpenAI security-best-practices (FastAPI/vanilla JS)
+та Supabase/Postgres skills; реалізовану функціональність до S03-07 перевірено.
+
+Виправлено блокування ASGI loop синхронною БД, provider I/O без загального deadline
+і streaming-ліміту, помилковий401 при тимчасовому збої JWKS. DB worker завершує
+транзакцію до cancellation cleanup; failed-fetch cooldown не відкликає сесію.
+Production/staging перевіряють Host і не публікують openapi.json. У CI додано
+аудит зафіксованих Python/JS-залежностей; зараз0 відомих вразливостей.
+
+GREEN:158 unit/contracts/auth-security,75 auth integration,45 browser,
+14 CI/tooling +6 subtests, Ruff/format/Mypy. Незалежний read-only review пройдено.
+Попередній security commit a38ca1c1ef6d1fe66e0d799e8b9c97010e560a7b pushed;
+CI42427836011 success. Auth-виправлення зафіксовано в b656d5cc1ba252d6601420d13f9eaaa874ef16b0.
+Host/CI/report commit та його CI звіряти за Git після запису checkpoint.
+
+**Відкрито:** ротація історично засвіченого TOKEN_ENCRYPTION_KEY; cloud0007;
+hosted smoke і deployment security settings. Read-only preflight:3 local sessions,
+0 чинних,2 без revoked_at;4 OAuth attempts,0 чинних. Це не доказ upstream revoke.
+SSL активний, runtime role без superuser/BYPASSRLS/CREATEROLE; .env.local0600.
+Ключ, хмарні дані та працюючий локальний сервер не змінювали. Новий runtime-код
+потребує перезапуску сервера. Конкретний план ротації є у звіті; не позначати
+інцидент закритим після простої заміни .env.local.
+
+Звіт: security_best_practices_report.md.
+Докази: .workflow/evidence/security-best-practices-2026-11-08.json.
+Roadmap не пересували; next=S03-08. Сторонні видалення docs/файли збережено.
+
+## Попередній security checkpoint
+
 # Поточний checkpoint — security review, 2026-11-07
 
 За запитом власника виконано аудит реалізованого сайту до S03-07.
