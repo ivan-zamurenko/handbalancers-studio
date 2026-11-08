@@ -1,21 +1,21 @@
 {
   "task": "owner-handstand-cycle",
   "status": "preview_ready",
-  "request": "Less strict: hesitation, splayed balance with soft trailing knee, small eyes, blink and landing nod",
-  "red": {
+  "request": "Slightly smoother and faster; 8.2s→6.6s, fewer reversals and gentler balance correction",
+  "green": {
+    "geometry": "4 passed unchanged; 10,001 samples and playful correction/landing constraints retained",
+    "browser": "4 passed (10.0s); pause, reduced motion, mobile, actual motion and dialogs",
+    "diff_check": "passed"
+  },
+  "review": "security_auth_review: no regressions; independently ran4 geometry tests and reviewed return phase continuity",
+  "visual": "cycle.gif198frames/30fps/6.6s; overview66frames/10fps; artifacts regenerated from browser",
+  "scope": "Preview01 and dedicated cycle page; no runtime loader placement/auth/cloud changes",
+  "next": "Owner reviews exact full-body cycle; final placement/integration remains separate",
+  "revision": "2026-11-08 smoother and faster timing",
+  "reference": "https://www.instagram.com/reel/DfViPqtSRxY/; public page and decoded frames visually inspected",
+  "prior_red": {
     "command": "node --test tests/js/handstand-cycle.test.js",
     "result": "new playful scenario failed because prior feet separation was <=30px; previous three tests passed"
   },
-  "green": {
-    "geometry": "4 passed; previous three tests retained, including 10,001 samples; playful correction and landing nod added",
-    "browser": "4 passed (9.6s); actual motion, pause, reduced motion, mobile, dialogs and focus",
-    "javascript_suite": "38 passed",
-    "diff_check": "passed"
-  },
-  "review": "security_auth_review: no blockers; independently checked 4 tests, eye paths at phase boundaries and identical rendered loop endpoints",
-  "visual": "Preparation, three balance-catch poses and landing blink/nod inspected; cycle.gif205frames/25fps; overview updated",
-  "scope": "Preview01 and dedicated cycle page; no runtime loader placement/auth/cloud changes",
-  "next": "Owner reviews exact full-body cycle; final placement/integration remains separate",
-  "revision": "2026-11-08 playful character refinement",
-  "reference": "https://www.instagram.com/reel/DfViPqtSRxY/; public page and decoded frames visually inspected"
+  "validation_approach": "Visual timing refinement; existing four geometry tests unchanged; no new behavior contract"
 }

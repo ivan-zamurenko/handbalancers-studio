@@ -42,17 +42,17 @@ const releaseLegAngle=Math.atan2(164-releaseHip[1],118-releaseHip[0])/rad;
 export function poseAt(progress) {
   const time=clamp(progress);
   // Leave a short beat after landing for the character's pleased little nod.
-  const t=time<=.78?time:mix(.78,1,smooth((time-.78)/.16));
+  const t=time<=.78?time:mix(.78,1,clamp((time-.78)/.16));
   // Return is deliberately slower than the kick, with a different step rhythm.
   let phase=t;
   if(t>.78) phase=track(t,[[.78,.36],[.88,.24],[.96,.10],[1,0]]);
   let hip,angle,armAngle,armLength=46,backFoot,frontFoot;
   if(t>=.36 && t<=.78) {
-    angle=track(t,[[.36,30],[.405,51],[.46,83],[.51,95],
-      [.55,87],[.59,92],[.64,90],[.69,77],[.75,45],[.78,30]]);
+    angle=track(t,[[.36,30],[.405,51],[.46,83],[.51,93],
+      [.56,89],[.61,90],[.64,90],[.69,77],[.75,45],[.78,30]]);
     hip=polar([180,164],-86,angle);
     armAngle=angle;
-    const catchBalance=track(t,[[.47,0],[.53,1],[.56,.8],[.60,.25],[.625,.4],[.66,0]]);
+    const catchBalance=track(t,[[.47,0],[.54,1],[.60,.35],[.66,0]]);
     backFoot=polar([hip[0]-2,hip[1]],60,angle+180-20*catchBalance);
     if(angle<=releaseAngle) frontFoot=[118,164];
     else {
@@ -75,14 +75,14 @@ export function poseAt(progress) {
     hip=[track(phase,[[0,64],[.07,62],[.12,67],[.24,98]]),
       track(phase,[[0,104],[.07,106],[.12,105],[.24,118.64]])];
     angle=track(phase,[[0,-90],[.07,-97],[.14,-87],[.24,-60]]);
-    armAngle=track(phase,[[0,78],[.035,90],[.065,72],[.085,105],[.14,-112],[.20,-78],[.24,-60]]);
+    armAngle=track(phase,[[0,78],[.075,96],[.145,-105],[.20,-78],[.24,-60]]);
     armLength=track(phase,[[0,44],[.08,42],[.18,46],[.24,46]]);
     const stride=smooth((phase-.10)/.14);
     backFoot=[62,164];
     frontFoot=[mix(66,118,stride),164-16*Math.sin(Math.PI*stride)];
   }
   if(t>.88) {
-    armAngle=track(t,[[.88,-60],[.95,70],[.98,86],[1,78]]);
+    armAngle=track(t,[[.88,-60],[.95,70],[.98,82],[1,78]]);
     armLength=track(t,[[.88,46],[.96,44],[1,44]]);
   }
   const shoulder=polar(hip,40,angle);
@@ -143,7 +143,7 @@ export function mountHandstandCycle(svg) {
     if (!svg.isConnected) {dispose();return;}
     if (previous!==null) elapsed+=now-previous;
     previous=now;
-    drawPose(svg,(elapsed%8200)/8200);
+    drawPose(svg,(elapsed%6600)/6600);
     frame=requestAnimationFrame(tick);
   }
   function sync() {
