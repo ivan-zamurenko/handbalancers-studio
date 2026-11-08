@@ -1,3 +1,5 @@
+import {mountHandstandCycle} from './cycle-motion.js';
+
 const root = document.documentElement;
 const pause = document.querySelector('[data-pause]');
 const theme = document.querySelector('[data-theme-toggle]');
@@ -11,6 +13,8 @@ function setPaused(value) {
   pause.textContent = value ? 'Відтворити' : 'Пауза';
 }
 setPaused(motion.matches);
+for (const svg of document.querySelectorAll('[data-handstand-cycle]')) mountHandstandCycle(svg);
+let disposeCycle;
 motion.addEventListener('change', event => setPaused(event.matches));
 pause.addEventListener('click', () => setPaused(root.dataset.paused !== 'true'));
 theme.addEventListener('click', () => {
@@ -28,6 +32,9 @@ for (const button of document.querySelectorAll('[data-open]')) {
   button.addEventListener('click', () => {
     const card = button.closest('[data-option]');
     stage.replaceChildren(card.querySelector('svg').cloneNode(true));
+    disposeCycle?.();
+    const cycle=stage.querySelector('[data-handstand-cycle]');
+    disposeCycle=cycle ? mountHandstandCycle(cycle) : null;
     dialog.querySelector('#preview-title').textContent = `0${card.dataset.option} / ${card.querySelector('h2').textContent}`;
     setPlacement('center');
     dialog.showModal();
@@ -36,6 +43,7 @@ for (const button of document.querySelectorAll('[data-open]')) {
 }
 dialog.querySelector('[data-close]').addEventListener('click', () => dialog.close());
 dialog.addEventListener('close', () => {
+  disposeCycle?.(); disposeCycle=null;
   stage.replaceChildren();
   document.body.classList.remove('preview-open');
 });

@@ -1,3 +1,20 @@
+# Поточний checkpoint — повний цикл «з ніг на руки», 2026-11-08
+
+Власник обрав thin-line стиль01 і уточнив рух: стоїть → крок → ставить руки →
+виходить у стійку → сходить назад → стоїть. Реалізовано8.2s цикл, SVG+малий JS
+без бібліотек. Варіант01 у gallery оновлено; окремо /static/previews/handstand/cycle.html.
+cycle.gif показує повний рух; galleryoverview оновлено. Local8000 доступний.
+
+2 geometry tests/1001sample,4 browser scenarios,36 JS passed. Read-only review
+без блокерів; RAF reduced-motion на картці/clone іdedicatedpage перевірені.
+Докази: .workflow/evidence/handstand-cycle.json; рішення: docs/adr/handstand-cycle.md.
+
+Це уточнення preview. Основний runtime loader/placement ще не замінено.
+Next: перегляд власником повного руху, потім інтеграція обраного розташування.
+Roadmap/auth/cloud/security gates не змінені. Попередній previewcommit:f9f55d1.
+
+## Попередній checkpoint
+
 # Поточний checkpoint — 5 варіантів анімації для вибору, 2026-11-08
 
 За запитом власника створено5 рухомих SVG/CSS-варіантів: Перша спроба,

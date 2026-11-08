@@ -10,7 +10,7 @@
 04 Орбіта — геометрична фігура, коло, перехресний баланс.
 05 Тихий баланс — плавний straddle press, пауза, дихаюче тло.
 
-Усі рухи — локальні SVG/CSS; жодних бібліотек, API, зовнішніх ресурсів чи
+Рухи — локальні SVG/CSS; уточнений01 використовує SVG+JS (handstand-cycle.md); жодних бібліотек, API, зовнішніх ресурсів чи
 зміни поточного runtime loader. Native dialog показує centre/corner placement;
 навіть corner у цій примірці modal — це порівняння вигляду, не інтеграція
 фонового завантаження. Escape/close повертають focus. Пауза, light/dark,
@@ -20,7 +20,7 @@ mobile, prefers-reduced-motion (з ручним opt-in playback).
 Після вибору власника окремо підключити конкретний варіант і визначити blocking
 операції. Не перехоплювати всі фонoві session refresh повноекранним loader.
 
-overview.gif:6s/10fps browser-rendered motion contact sheet, scaled924px;
+overview.gif:8.2s/10fps browser-rendered motion contact sheet, scaled924px;
 overview.png:статичний огляд. Це preview artifacts, не runtime assets loader.
 
 RED:3 browser scenarios failed (preview404, no cards/buttons).

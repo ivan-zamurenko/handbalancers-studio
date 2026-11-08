@@ -1,0 +1,19 @@
+{
+  "task": "owner-handstand-cycle",
+  "status": "preview_ready",
+  "request": "Style01 thin line; standing→forward step→plant hands→handstand→controlled return to standing",
+  "red": {
+    "command": "node --test tests/js/handstand-cycle.test.js",
+    "result": "failed: cycle-motion.js not implemented"
+  },
+  "green": {
+    "geometry": "2 passed; 1001 samples, fixed limb lengths and hands during support",
+    "browser": "4 passed (11.1s); gallery regression, RAF reduced-motion card/clone, dedicated cycle actual motion/pause/mobile/dialog",
+    "javascript_suite": "36 passed",
+    "diff_check": "passed"
+  },
+  "review": "security_auth_review: no blockers; requested reduced-motion RAF and standalone smoke coverage added",
+  "visual": "6 keyframes inspected + dedicated mobile/light central preview; GIF8.2s/123frames",
+  "scope": "Preview01 and dedicated cycle page; no runtime loader placement/auth/cloud changes",
+  "next": "Owner reviews exact full-body cycle; final placement/integration remains separate"
+}
