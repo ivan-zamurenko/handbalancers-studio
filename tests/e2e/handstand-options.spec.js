@@ -88,3 +88,27 @@ test('dedicated cycle moves from standing feet to a handstand and pauses', async
   await page.keyboard.press('Escape');
   await expect(page.getByRole('button',{name:'На весь екран — Повний цикл'})).toBeFocused();
 });
+
+test('studio composition uses product tokens and fits both themes on mobile and desktop', async ({page})=>{
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.goto('/static/previews/handstand/cycle.html');
+  for(const width of [390,1440]){
+    await page.setViewportSize({width,height:1000});
+    for(const theme of ['light','dark']){
+      await page.getByRole('button',{name:'Змінити тему'}).click();
+      await expect(page.locator('html')).toHaveAttribute('data-theme',theme);
+      const styles=await page.locator('.single-stage').evaluate(el=>{
+        const root=getComputedStyle(document.documentElement),card=getComputedStyle(el);
+        return {radius:card.borderRadius,token:root.getPropertyValue('--radius-panel').trim(),fits:document.documentElement.scrollWidth<=innerWidth};
+      });
+      expect(styles.radius).toBe(styles.token);
+      expect(styles.fits).toBe(true);
+      await expect(page.locator('[data-contact-shadow]')).toHaveCount(1);
+    }
+  }
+  await page.getByRole('button',{name:'На весь екран — Повний цикл'}).click();
+  const dialog=page.getByRole('dialog');
+  await expect(dialog.locator('[data-stage] svg')).toBeVisible();
+  expect(await dialog.locator('.loading-stage').evaluate(el=>el.getBoundingClientRect().width)).toBeLessThan(300);
+  await page.keyboard.press('Escape');
+});

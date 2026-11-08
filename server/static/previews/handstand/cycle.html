@@ -3,33 +3,37 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>З ніг — на руки · Handbalancer’s Studio</title>
-  <link rel="stylesheet" href="../../css/tokens.css"><link rel="stylesheet" href="./options.css">
+  <link rel="stylesheet" href="../../css/tokens.css"><link rel="stylesheet" href="./options.css"><link rel="stylesheet" href="./cycle.css">
   <script type="module" src="./options.js"></script>
 </head>
-<body>
+<body class="studio-motion-page">
   <header class="topbar">
     <a class="wordmark" href="./index.html" aria-label="Усі варіанти">h<span>.</span></a>
-    <span class="studio-label">HANDBALANCER’S STUDIO <span>/ MOTION LAB</span></span>
+    <span class="studio-label">HANDBALANCER’S STUDIO <span>/ ПРАКТИКА БАЛАНСУ</span></span>
     <div class="tools"><button type="button" data-pause aria-pressed="false">Пауза</button><button type="button" data-theme-toggle aria-label="Змінити тему">Світла тема</button></div>
   </header>
   <main class="cycle-main">
-    <section class="intro"><p class="eyebrow">ПЕРША СПРОБА / ПОВНИЙ РУХ</p>
-      <h1>З ніг — на руки<span>.</span></h1>
-      <p class="lead">Крок уперед. Вихід у стійку. Плавне повернення назад.</p>
+    <section class="intro"><p class="eyebrow">HANDBALANCER’S STUDIO</p>
+      <h1>У своєму ритмі<span>.</span></h1>
+      <p class="lead">Маленька пауза. Трохи руху. І знову в балансі.</p>
     </section>
     <article class="option single-stage" data-option="1">
+      <div class="motion-caption"><span><i aria-hidden="true"></i> ПРАКТИКА БАЛАНСУ</span><span>01 / HANDSTAND</span></div>
       <div class="artboard"><svg class="figure cycle-figure" data-handstand-cycle viewBox="0 0 240 184" fill="none" aria-hidden="true">
-            <path class="cycle-ground" d="M40 166H202" />
+            <ellipse class="cycle-contact-shadow" data-contact-shadow cx="64" cy="167" rx="16" ry="2.2"/>
+            <path class="cycle-mat" d="M32 168H211"/>
+            <path class="cycle-ground" d="M32 166H211" />
+            <path class="cycle-marks" d="M32 163V169M211 163V169"/>
             <g class="cycle-rear"><path data-bone="back-leg" d="M68 105L62 135L62 164"/><path data-bone="back-foot" d="M62 164H68"/><path data-bone="back-arm" d="M68 65L57 86L57 108"/><path data-bone="back-hand" d="M57 108H62"/></g>
             <path data-bone="torso" d="M68 105V65"/>
             <path data-bone="front-leg" d="M68 105L74 135L74 164"/><path data-bone="front-foot" d="M74 164H80"/>
             <path data-bone="front-arm" d="M68 65L82 86L82 108"/><path data-bone="front-hand" d="M82 108H87"/>
-            <path data-bone="neck" d="M64 64L73 50"/><circle data-head cx="73" cy="50" r="9"/><path class="cycle-eye" data-bone="eye-left" d="M75 49h.2"/><path class="cycle-eye" data-bone="eye-right" d="M78.5 49h.2"/>
+            <path data-bone="neck" d="M64 64L73 50"/><circle data-head cx="73" cy="50" r="7.2"/><path class="cycle-eye" data-bone="eye-left" d="M75 49h.2"/><path class="cycle-eye" data-bone="eye-right" d="M78.5 49h.2"/>
           </svg></div>
-      <div class="card-copy"><h2>Крок. Стійка. Назад.</h2><p>Один простий рух, який хочеться повторити.</p></div>
+      <div class="card-copy"><p class="eyebrow">ЗНАХОДИМО БАЛАНС</p><h2>Рух, у якому є спокій.</h2><p>Впевнений крок, легкий мах і м’яке повернення.</p></div>
       <button class="preview-button" type="button" data-open aria-label="На весь екран — Повний цикл">Подивитися по центру <span aria-hidden="true">↗</span></button>
     </article>
-    <p class="cycle-sequence">Стоїть <span>→</span> Крок <span>→</span> Стійка на руках <span>→</span> Назад на ноги</p>
+    <div class="cycle-sequence" aria-label="Послідовність руху"><span><b>01</b> Крок</span><span><b>02</b> Баланс</span><span><b>03</b> Повернення</span></div>
     <footer><a href="./index.html">← Усі п’ять варіантів</a><span>Handbalancer’s Studio</span></footer>
   </main>
   <dialog data-preview data-placement="center" aria-labelledby="preview-title">

@@ -42,11 +42,42 @@ test('limb lengths, floor contact and frame continuity survive the entire cycle'
   }
 });
 
-test('playful balance opens the legs, softens the trailing knee and settles before a nod',()=>{
-  const wobble=poseAt(.55),settle=poseAt(.94),nod=poseAt(.967);
-  assert.ok(Math.abs(wobble.frontFoot[0]-wobble.backFoot[0])>30);
-  assert.ok(distance(wobble.frontHip,wobble.frontFoot)<57);
-  assert.deepEqual(settle.frontFoot,[66,164]);
-  assert.deepEqual(nod.frontFoot,settle.frontFoot);
-  assert.ok(nod.head[1]>settle.head[1]+1);
+// Latest owner request replaces the exaggerated split/nod with a natural hold.
+test('natural handstand joins straight legs and returns to a grounded stance',()=>{
+  for(const t of [.53,.57,.61]){
+    const p=poseAt(t);
+    assert.ok(Math.abs(p.frontFoot[0]-p.backFoot[0])<8);
+    close(distance(p.frontHip,p.frontFoot),60);
+    close(distance(p.backHip,p.backFoot),60);
+  }
+  assert.deepEqual(poseAt(.96).frontFoot,[66,164]);
+  assert.deepEqual(poseAt(.96).backFoot,[62,164]);
+});
+
+test('weight transfer keeps moving through the hand contact transition',()=>{
+  const dt=.0001;
+  const before=poseAt(.36-dt),contact=poseAt(.36),after=poseAt(.36+dt);
+  const speedBefore=distance(before.hip,contact.hip)/dt;
+  const speedAfter=distance(after.hip,contact.hip)/dt;
+  assert.ok(speedBefore>40 && speedAfter>40,'hips must not stop at hand contact');
+  assert.ok(Math.abs(speedBefore-speedAfter)<10,'contact must not abruptly change hip speed');
+});
+
+test('hand contact and release preserve joint velocities; push-off starts from rest',()=>{
+  const dt=.00001;
+  const velocity=(a,b)=>a.map((v,i)=>(b[i]-v)/dt);
+  for(const t of [.36,.78]){
+    for(const key of ['hip','backKnee','backFoot','frontHand']){
+      const a=poseAt(t-dt)[key],p=poseAt(t)[key],b=poseAt(t+dt)[key];
+      assert.ok(distance(velocity(a,p),velocity(p,b))<1, `velocity jump: ${key} at ${t}`);
+    }
+  }
+  // Locate the instant the previously planted foot begins lifting.
+  let low=.36,high=.41;
+  for(let i=0;i<40;i++){
+    const mid=(low+high)/2;
+    if(poseAt(mid).frontFoot[1]>=164-1e-9)low=mid;else high=mid;
+  }
+  const foot=poseAt(low).frontFoot,next=poseAt(low+dt).frontFoot;
+  assert.ok(distance(foot,next)/dt<1,'push-off must accelerate from rest');
 });

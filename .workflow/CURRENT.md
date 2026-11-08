@@ -1,3 +1,20 @@
+# Поточний checkpoint — природний рух у стилі сайту, 2026-11-08
+
+Останній запит: плавні рухи «як в житті» та оформлення за стилем продукту.
+Preview01/cycle.html: узгоджена швидкість при постановці/знятті рук,
+плавний відрив стопи, м’яке розгинання коліна, ноги разом угорі.6.6s цикл.
+Оновлено оформлення: product tokens, зелений торс, нейтральні кінцівки,
+лінія опори/контактна тінь, compact central preview. Sites skill local-only.
+
+GREEN:6 geometry (включно з похідними),40 JS,5 browser; read-only review
+без блокерів. Візуально перевірено10поз іdesktop dark/mobile light/central.
+Нові артефакти studio.gif/png показують оформлення; cycle/overview оновлено.
+Evidence: .workflow/evidence/handstand-cycle.json; ADR: docs/adr/handstand-cycle.md.
+Попередній commit0a749da. Runtime loader/roadmap/cloud gates не змінено.
+Next: оцінка природності руху й оформлення власником.
+
+## Попередній checkpoint
+
 # Поточний checkpoint — плавніше й швидше, 2026-11-08
 
 Уточнення власника: «Трохи більш плавно і швидше».

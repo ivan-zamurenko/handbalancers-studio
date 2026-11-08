@@ -1,21 +1,28 @@
 {
   "task": "owner-handstand-cycle",
   "status": "preview_ready",
-  "request": "Slightly smoother and faster; 8.2s→6.6s, fewer reversals and gentler balance correction",
+  "request": "Life-like smooth movement; adapt presentation to existing website with best practices",
   "green": {
-    "geometry": "4 passed unchanged; 10,001 samples and playful correction/landing constraints retained",
-    "browser": "4 passed (10.0s); pause, reduced motion, mobile, actual motion and dialogs",
+    "geometry": "6 passed; 10,001 samples, matched contact/release velocities, stationary foot accelerates smoothly, straight joined legs",
+    "javascript_suite": "40 passed",
+    "browser": "5 passed (10.2s), product tokens and dark/light390/1440, pause/reduced motion, clone/focus",
     "diff_check": "passed"
   },
-  "review": "security_auth_review: no regressions; independently ran4 geometry tests and reviewed return phase continuity",
-  "visual": "cycle.gif198frames/30fps/6.6s; overview66frames/10fps; artifacts regenerated from browser",
-  "scope": "Preview01 and dedicated cycle page; no runtime loader placement/auth/cloud changes",
+  "review": "security_auth_review: no blockers; independently verified6 tests, head bounds, identical loop rendering including shadow/eyes",
+  "visual": "10 poses, desktop dark/mobile light/central; cycle.gif198frames30fps6.6s; styled studio.gif/png and refreshed overview",
+  "scope": "Preview motion and presentation only; no runtime placement/auth/cloud changes",
   "next": "Owner reviews exact full-body cycle; final placement/integration remains separate",
-  "revision": "2026-11-08 smoother and faster timing",
+  "revision": "2026-11-08 natural contact dynamics and product styling",
   "reference": "https://www.instagram.com/reel/DfViPqtSRxY/; public page and decoded frames visually inspected",
   "prior_red": {
     "command": "node --test tests/js/handstand-cycle.test.js",
     "result": "new playful scenario failed because prior feet separation was <=30px; previous three tests passed"
   },
-  "validation_approach": "Visual timing refinement; existing four geometry tests unchanged; no new behavior contract"
+  "validation_approach": "Replaced exaggerated playful expectation per latest owner request; retained original length/floor/continuity constraints and added velocity checks",
+  "red": {
+    "command": "node --test tests/js/handstand-cycle.test.js",
+    "result": "2 new scenarios failed against old rig: legs not joined, hips stopped at hand contact"
+  },
+  "skill": "Sites SKILL.md and local-preview reference, existing local checkout; no hosting or publication",
+  "technique_reference": "https://static.usagym.org/PDFs/Women/development/compulsory/2021/replacement_061721.pdf"
 }
