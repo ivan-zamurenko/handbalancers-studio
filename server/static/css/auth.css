@@ -9,7 +9,7 @@
 .login-card input { min-height: 48px; font-size: 16px; }
 .password-control { position: relative; }
 .password-control input { padding-right: 54px; }
-.login-help a, .login-signup button { border: 0; padding: 0; font-size: 12px; font-weight: 400; text-decoration: underline; text-underline-offset: 4px; }
+.login-help a { border: 0; padding: 0; font-size: 12px; font-weight: 400; text-decoration: underline; text-underline-offset: 4px; }
 .recovery-again { width: 100%; margin-top: 16px; }
 #recovery-status:not(:empty) { margin-block: 24px; font-size: 14px; color: var(--muted); }
 .password-toggle { position: absolute; right: 2px; top: 50%; transform: translateY(-50%); display: grid; place-items: center; width: 44px; height: 44px; min-height: 44px; padding: 0; border: 0; border-radius: 4px; background: transparent; color: var(--muted); }
@@ -26,12 +26,9 @@
 }
 .login-card button:disabled { cursor: not-allowed; }
 .login-help { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-top: -12px; margin-bottom: 20px; }
-.login-help button { min-height: 44px; text-decoration: none; font-size: 12px; }
-.login-help button:hover { text-decoration: underline; }
 .login-submit { width: 100%; min-height: 50px; justify-content: center; padding-inline: 20px; }
 .login-submit:disabled { opacity: .5; }
 .login-signup { margin-top: 24px; text-align: center; font-size: 13px; color: var(--muted); }
-.login-signup button { margin-left: 4px; color: var(--text); font-size: 13px; }
 .login-back { display: block; width: fit-content; margin: 28px auto 0; padding: 12px; font-size: 13px; color: var(--muted); text-decoration: none; }
 @media(max-width: 780px) {
   .login-section { padding-top: 40px; padding-bottom: 40px; }
@@ -44,9 +41,6 @@
 .oauth-button svg { width: 22px; height: 22px; flex-shrink: 0; }
 .oauth-button:hover { background: var(--soft); }
 .oauth-button:disabled { opacity: .55; }
-/* :disabled lasts only until the script runs; this state stays until the provider is configured. */
-.oauth-button--unavailable:disabled { opacity: .4; }
-.oauth-button--unavailable:hover { background: var(--surface); }
 .login-divider { display: flex; align-items: center; gap: 16px; margin: 24px 0; font-size: 12px; color: var(--muted); }
 .login-divider::before, .login-divider::after { content: ''; flex: 1; height: 1px; background: var(--line); }
 #oauth-message:empty { display: none; }

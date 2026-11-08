@@ -1,4 +1,4 @@
-import {mountHandstandCycle} from './cycle-motion.js';
+import {mountHandstandCycle} from '/static/js/components/handstand-motion.js';
 
 const root = document.documentElement;
 const pause = document.querySelector('[data-pause]');

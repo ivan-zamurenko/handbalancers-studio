@@ -1,6 +1,6 @@
 {% extends "public/base.html" %}
 {% block title %}{{ copy('Підтвердження пошти', 'Confirm email') }} — Handbalancer’s Studio{% endblock %}
-{% block head %}{{ super() }}<link rel="stylesheet" href="/static/css/login.css">{% endblock %}
+{% block head %}{{ super() }}<link rel="stylesheet" href="/static/css/auth.css">{% endblock %}
 {% block public_content %}
 <section class="login-section wrap" aria-labelledby="verify-title">
   <div class="login-heading"><p class="eyebrow">Handbalancer’s Studio</p><h1 id="verify-title">{{ copy('Перевірте вашу пошту.', 'Check your inbox.') }}</h1><p>{{ copy('Введіть шестизначний код із листа. Якщо листа немає — перевірте спам або запросіть новий код.', 'Enter the six-digit code from your email. If it has not arrived, check spam or request a new code.') }}</p></div>

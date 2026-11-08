@@ -1,0 +1,93 @@
+{
+  "task": "maintenance-cleanup",
+  "status": "done_local",
+  "base_commit": "f3d4e03",
+  "authorization": "User requested unused-code cleanup, repository organization, commit and push. This maintenance task precedes S03-11.",
+  "scope": [
+    "Remove confirmed dead frontend selectors and stale enable loop.",
+    "Remove import-only login and preview rig wrappers; keep direct imports.",
+    "Group login template with other auth templates; rename shared auth stylesheet.",
+    "Move motion studies outside production static into tools/previews; retain all gallery tests via explicit credential-free preview factory.",
+    "Refresh README and local-preview guide; archive prior CURRENT entries without losing history.",
+    "Add HTTP boundary tests: production app cannot serve design studies; explicit local preview still can.",
+    "Ignore generated Supabase CLI .temp files; preserve unrelated editor and skill files."
+  ],
+  "preserved": [
+    "Existing unrelated docs deletions and editor/skill files.",
+    "DB/auth backend, migrations, completed and tested foundation components.",
+    "Animation variants and generated preview artifacts."
+  ],
+  "red": [
+    {
+      "command": ".venv/bin/python -m pytest server/tests/contracts/foundation/test_static_boundaries.py -q",
+      "result": "2 failed, 2 passed: regular app served design study HTML and GIF with 200 instead of 404 before relocation. /tmp/studio-cleanup-red.log"
+    }
+  ],
+  "green": [
+    {
+      "command": ".venv/bin/python -m pytest server/tests/contracts/foundation/test_static_boundaries.py tools/tests/test_preview.py -q",
+      "result": "9 passed"
+    },
+    {
+      "command": "npx playwright test tests/e2e/handstand-options.spec.js tests/e2e/login-form.spec.js tests/e2e/s03-10-registration-ui.spec.js tests/e2e/s05-03-public-pages.spec.js",
+      "result": "38 passed"
+    },
+    {
+      "command": "npx playwright test",
+      "result": "85 passed, including gallery, loader and all auth regressions; /tmp/studio-cleanup-browser.log"
+    },
+    {
+      "command": "node --test tests/js/*.test.js",
+      "result": "41 passed; /tmp/studio-cleanup-js.log"
+    },
+    {
+      "command": ".venv/bin/python -m pytest server/tests/unit server/tests/contracts server/tests/security/auth -q",
+      "result": "231 passed; /tmp/studio-cleanup-python.log"
+    },
+    {
+      "command": "ruff check server/studio and changed tooling/tests; ruff format --check changed Python; mypy server/studio tools/serve_preview.py",
+      "result": "passed (42 source files for mypy)"
+    },
+    {
+      "command": "Byte comparison against HEAD + local Markdown link validation",
+      "result": "All 617 prior CURRENT lines and all five GIF/PNG files preserved exactly; links in updated current guides resolve."
+    },
+    {
+      "command": ".venv/bin/python -m pytest tools/tests -q",
+      "result": "68 passed, 25 subtests passed; /tmp/studio-cleanup-tooling.log"
+    },
+    {
+      "command": "validate_files against temporary git checkout-index snapshot; validate_graph on working tree",
+      "result": "Staged tree fully valid; working-tree graph valid, 260 pre-existing missing_document errors from unrelated deletions. Next S03-11."
+    },
+    {
+      "command": "git diff --cached --check; compare staged content with private config values without printing values",
+      "result": "passed; no local credentials/private key blocks or unrelated files staged"
+    }
+  ],
+  "audit": {
+    "frontend": "Independent read-only audit confirmed obsolete login-help/signup button rules, unavailable-provider rules and data-public-interactive loop have no consumers.",
+    "backend": "Ruff clean and AST/reference scan. AuthRateLimit ORM model retained because it contributes table metadata; migrations and security code are not dead merely because there is no direct call.",
+    "retained_foundations": [
+      "forms.js and shared/forms.html",
+      "state/save-status.js",
+      "i18n catalogs and formatters"
+    ],
+    "removed_wrappers": [
+      "server/static/js/features/auth/login.js",
+      "server/static/previews/handstand/cycle-motion.js"
+    ]
+  },
+  "review": {
+    "agent": "cleanup_audit",
+    "result": "clear; independently ran 9 boundary/preview tests; checked imports and exact image preservation"
+  },
+  "runtime_check": {
+    "origin": "http://127.0.0.1:8000",
+    "result": "Restarted existing local app with unchanged private config; login/register/verify-email/recovery, auth.css and production motion JS return 200. Both old static previews and /_previews return 404. No cloud/provider operations."
+  },
+  "external_gates": "Unchanged hosted OTP/recovery, cloud 0007, key rotation and provider gates. No DB/schema changes; no repeat of DB integration suite.",
+  "branch": "task/execution-v4",
+  "push_status": "pending_at_commit",
+  "next": "S03-11"
+}

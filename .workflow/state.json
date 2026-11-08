@@ -147,7 +147,7 @@
     "S03-10": {
       "status": "done",
       "evidence": ".workflow/evidence/S03-10.json",
-      "push_status": "pending_at_commit"
+      "push_status": "pushed"
     },
     "S03-11": {
       "status": "todo",

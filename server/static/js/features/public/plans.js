@@ -12,7 +12,6 @@ try {
   if (Object.hasOwn(names, saved)) selected = saved;
 } catch { canStore = false; }
 
-for (const control of document.querySelectorAll('[data-public-interactive]')) control.disabled = false;
 if (button) button.disabled = false;
 
 function render() {

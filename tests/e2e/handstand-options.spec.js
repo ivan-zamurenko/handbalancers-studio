@@ -1,6 +1,6 @@
 import {test, expect} from '@playwright/test';
 
-const preview = '/static/previews/handstand/index.html';
+const preview = '/_previews/handstand/index.html';
 
 test('five animated options, both themes, mobile layout and pause', async ({page}) => {
   await page.goto(preview);
@@ -71,7 +71,7 @@ test('reduced motion defaults to still poses; preview makes no API calls', async
 
 test('dedicated cycle moves from standing feet to a handstand and pauses', async ({page}) => {
   await page.setViewportSize({width:390,height:844});
-  await page.goto('/static/previews/handstand/cycle.html');
+  await page.goto('/_previews/handstand/cycle.html');
   const figure=page.locator('[data-handstand-cycle]');
   expect(Number(await figure.locator('[data-head]').getAttribute('cy'))).toBeLessThan(60);
   await expect.poll(async()=>{
@@ -91,7 +91,7 @@ test('dedicated cycle moves from standing feet to a handstand and pauses', async
 
 test('studio composition uses product tokens and fits both themes on mobile and desktop', async ({page})=>{
   await page.emulateMedia({reducedMotion:'reduce'});
-  await page.goto('/static/previews/handstand/cycle.html');
+  await page.goto('/_previews/handstand/cycle.html');
   for(const width of [390,1440]){
     await page.setViewportSize({width,height:1000});
     for(const theme of ['light','dark']){

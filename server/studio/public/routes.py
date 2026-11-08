@@ -112,7 +112,7 @@ async def plans_page(request: Request) -> HTMLResponse:
 
 @router.get("/login", response_class=HTMLResponse, include_in_schema=False)
 async def login_page(request: Request) -> HTMLResponse:
-    return render(request, "public/login.html")
+    return render(request, "auth/login.html")
 
 
 @router.get("/recovery", response_class=HTMLResponse, include_in_schema=False)

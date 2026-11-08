@@ -1,6 +1,6 @@
 {% extends "public/base.html" %}
 {% block title %}{{ copy('Вхід', 'Log in') }} — Handbalancer’s Studio{% endblock %}
-{% block head %}{{ super() }}<link rel="stylesheet" href="/static/css/login.css">{% endblock %}
+{% block head %}{{ super() }}<link rel="stylesheet" href="/static/css/auth.css">{% endblock %}
 {% block public_content %}
 <section class="login-section wrap" aria-labelledby="login-title">
   <div class="login-heading"><p class="eyebrow">Handbalancer’s Studio</p><h1 id="login-title">{{ copy('Раді бачити вас знову.', 'Good to see you again.') }}</h1><p>{{ copy('Ваш простір для практики.', 'Your space to practise.') }}</p></div>
@@ -31,4 +31,4 @@
   <a class="login-back" href="/?lang={{ language }}">← {{ copy('На головну', 'Back to home') }}</a>
 </section>
 {% endblock %}
-{% block scripts %}<script type="module" src="/static/js/features/auth/login.js"></script>{% endblock %}
+{% block scripts %}<script type="module" src="/static/js/features/auth/registration.js"></script>{% endblock %}

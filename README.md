@@ -1,129 +1,110 @@
-# Handbalancer’s Studio — Execution V4
+# Handbalancer’s Studio
 
-Нова реалізація за комплектом Execution V4 від 2026-10-06 у корені цього проєкту.
-Попередня Git-історія збережена; старий runtime, акаунти та дані не використовуються.
-Реалізовано безпечне створення репозиторію (S00-01) та відтворюване
-встановлення Python/JS toolchain (S00-02), фабрику HTTP-застосунку та liveness (S00-03), безпечні типізовані налаштування (S00-04), Node/Playwright перевірки (S00-05), єдиний контракт HTTP-помилок (S00-06), автоматичні перевірки CI (S00-07).
-`references/` — матеріали наданого комплекту, не код застосунку й не джерело
-нових вимог. Пріоритет мають актуальне доручення користувача та специфікація V4.
+Застосунок для практики балансу на руках. Стек: FastAPI, SQLAlchemy 2,
+PostgreSQL / Supabase Auth, Jinja, CSS і vanilla JavaScript.
 
-## Перевірки
+Працюють публічні сторінки, тарифи, UK/EN, світла/темна тема та форми авторизації:
+реєстрація, підтвердження email, вхід із паролем, Google, відновлення і вихід.
+Доступність email/Google залежить від налаштувань сервера. Apple вимкнено.
+Оплата, кабінет і тренувальні сценарії ще розробляються.
 
-Запускати з кореня з Python 3.13.3, Node 24.21.0, npm 11.19.0 та uv 0.12.23
-у PATH (локальні налаштування: [toolchain-lock](docs/toolchain-lock.md)):
+Поточний стан і невиконані перевірки — у [checkpoint](.workflow/CURRENT.md).
+Загальний план — [ROADMAP](roadmap/ROADMAP.md), наступна картка:
+
+```sh
+.venv/bin/python tools/roadmap.py next
+```
+
+## Структура
+
+| Шлях | Призначення |
+|---|---|
+| `server/studio/` | HTTP-застосунок; модулі auth, accounts, public та shared |
+| `server/templates/auth/` | Усі сторінки й частини форм авторизації |
+| `server/templates/public/` | Лендінг, тарифи та публічний layout |
+| `server/templates/shared/` | Спільні елементи інтерфейсу |
+| `server/static/` | Лише ресурси продукту; `css/auth.css` — спільні стилі Auth |
+| `server/alembic/` | Версійні міграції БД |
+| `server/tests/` | Python unit, HTTP, security та integration тести |
+| `tests/` | JavaScript, браузерні тести й їхні fixtures |
+| `tools/` | Локальні інструменти розробки, міграцій і перевірок |
+| `tools/previews/handstand/` | Збережені варіанти анімації; не публікуються застосунком |
+| `.workflow/` | Поточний стан, evidence та архів checkpoint у `history/` |
+| `roadmap/`, `docs/` | Картки, специфікації, рішення й інструкції |
+| `references/`, `checks/`, `prompts/`, `agent-config/` | Матеріали вихідного комплекту, не runtime |
+
+`00_READ_FIRST.md`, `AGENT_START_RU.txt`, `START_HERE.html`, `MANIFEST.json`
+та `SHA256SUMS.txt` збережені як історичні матеріали комплекту Execution V4.
+Manifest і контрольні суми описують вихідний ZIP, а не поточний код.
+Робота ведеться в корені, у гілці `task/execution-v4`.
+
+## Локальний запуск
+
+Версії зафіксовані у `.python-version`, `.node-version`, `pyproject.toml` і
+`package.json`; Python та JS залежності — в `uv.lock` і `package-lock.json`.
 
 ```sh
 uv sync --locked
 npm ci
 export PLAYWRIGHT_BROWSERS_PATH="$PWD/.local-tools/playwright-browsers"
-./node_modules/.bin/playwright install chromium
-python3 tools/checks.py
-python3 tools/roadmap.py validate
-python3 tools/roadmap.py next
-```
-
-Пакет `studio` встановлюється з `server/studio`; залежності для перевірок
-зафіксовані lock-файлами. Запуск сервера:
-
-```sh
-APP_ENV=local-dev PUBLIC_ORIGIN=http://127.0.0.1:8000 uv run --locked uvicorn studio.main:create_app --factory --host 127.0.0.1 --port 8000
-```
-
-`GET http://127.0.0.1:8000/health/live` повертає `200 {"status":"ok"}` без БД
-або зовнішніх сервісів. Це лише ознака роботи процесу, не перевірка готовності
-БД, авторизації чи оплати. Інтерфейс сайту ще не реалізовано.
-
-`APP_ENV` обов’язковий: `local-dev`, `local-test`, `test`, `staging` або `production`.
-Для staging/production потрібні HTTPS `PUBLIC_ORIGIN` та непорожній
-`TOKEN_ENCRYPTION_KEY`. Тут перевіряється наявність ключа; алгоритм шифрування
-та формат ключа ще не реалізовані. Це не перевірка готовності production.
-`.env.example` містить лише безпечні приклади й порожні секрети; `.env`
-автоматично не читається. Налаштування передавайте через середовище процесу.
-Тести передають власну конфігурацію, незалежну від середовища машини.
-
-Тести застосунку: `uv run --locked pytest server/tests -q`.
-Усі поточні тести разом: `uv run --locked pytest -q`.
-
-## Автоматичні перевірки CI
-
-GitHub Actions запускає той самий `python3 tools/checks.py` на кожний push
-і pull request. Перевіряються Ruff, форматування та mypy для `server/studio`
-і `tools/checks.py`, потім Python unit/HTTP/tooling тести, реальний Chromium,
-Node-тести та граф задач. Відсутній обов’язковий набір тестів або помилка
-команди зупиняють pipeline з помилкою.
-
-CI встановлює залежності через `uv sync --locked` та `npm ci`, перевіряє
-незмінність lock-файлів і працює з правами `contents: read` без production
-секретів. Версії Actions зафіксовано повними перевіреними commit SHA.
-Автоматичного deploy немає; успіх CI підтверджує лише реалізовані перевірки.
-
-## HTTP-помилки та журнал
-
-Помилки повертаються як `{"error":{"code":"…","message_key":"…","field_errors":[],"request_id":"…"}}`.
-Статус HTTP зберігає значення: наприклад, 422 — неправильний запит,
-404 — маршрут не знайдено, 500 — внутрішня помилка. SQL, exception detail
-та traceback клієнту не повертаються. Помилки мають `Cache-Control: no-store`.
-
-`field_errors` зараз вказують лише розділ запиту (`body`, `query`, `path`,
-`header`, `cookie`), без введених значень або динамічних назв полів.
-`message_key` призначений для майбутніх локалізованих повідомлень інтерфейсу.
-
-Кожен HTTP-запит отримує новий серверний `X-Request-ID`; такий самий ID
-є в помилці та журналі `studio.access`. Переданий клієнтом ID не використовується.
-Access-log містить лише ID та статус. Стандартний Uvicorn access-log із сирими
-URL відфільтровано; body, query, cookies і Authorization не журналюються.
-Після вже відправлених HTTP-заголовків замінити відповідь новим 500 неможливо;
-для такого збою початковий текст exception також не передається серверному logger.
-
-## JS і браузерні тести
-
-Після `uv sync --locked` і `npm ci` встановіть Chromium один раз:
-
-```sh
-export PLAYWRIGHT_BROWSERS_PATH="$PWD/.local-tools/playwright-browsers"
 npx playwright install chromium
-npm run test:js
+```
+
+Перегляд дизайну без ключів, БД й зовнішньої авторизації:
+
+```sh
+uv run --locked python tools/serve_preview.py
+```
+
+Відкрити http://127.0.0.1:8000. Галерея руху в цьому режимі:
+http://127.0.0.1:8000/_previews/handstand/index.html.
+Цей сервер явно ігнорує налаштування провайдерів із середовища.
+
+Для роботи з уже налаштованою авторизацією:
+
+```sh
+uv run --locked --env-file .env.local uvicorn studio.main:create_app --factory --host 127.0.0.1 --port 8000
+```
+
+`.env.local` приватний і виключений із Git. Не перегенеровуйте ключ шифрування
+під час перезапуску. Налаштування описані в `.env.example` та
+[інструкції Auth](docs/oauth-project-setup.md). Фабрика застосунку сама `.env`
+не читає; команда вище підключає його явно. Вибирайте один сервер для порту 8000.
+Зупинка — Ctrl+C. `GET /health/live` перевіряє лише роботу процесу.
+
+## Перевірки
+
+```sh
+uv run --locked python tools/checks.py
 npm run test:e2e
 ```
 
-`test:e2e` сам запускає та зупиняє тестовий застосунок на
-`http://127.0.0.1:8765`. Порт має бути вільний: наявний сервер не використовується.
-Налаштування app передаються явно як local-test; production env не зчитується.
-`TEST_BASE_URL` дозволяє лише цю адресу (також із завершальним `/`); інші адреси,
-навіть звичайний dev-порт 8000, відхиляються до запуску сервера/браузера.
-Не використовуйте цей harness для staging або production.
+`checks.py` запускає lint/type checks, Python unit/contract/security/tooling,
+JS і roadmap validator. `test:e2e` перевіряє весь браузерний набір.
+Він сам запускає ізольований сервер на `127.0.0.1:8765`; порт має бути вільним.
+Інші origin, зокрема dev-порт 8000, відхиляються до запуску тестів.
 
-Кожний тест отримує чистий браузерний контекст. Перевірки демонструють, що
-cookies, localStorage і sessionStorage попереднього тесту не переходять у наступний.
-Це перевірки liveness та ізоляції; інтерфейс продукту ще не реалізовано.
-
-Повний `uv run --locked pytest -q` тепер також запускає браузерні перевірки;
-він потребує Chromium, змінної `PLAYWRIGHT_BROWSERS_PATH` і дозволу на loopback.
-Для вузьких backend-перевірок: `uv run --locked pytest server/tests -q`.
-
-## Створення окремого репозиторію
+Вузькі перевірки без БД:
 
 ```sh
-python3 tools/workspace.py /path/to/new-directory
+uv run --locked pytest server/tests/unit server/tests/contracts server/tests/security/auth -q
+npm run test:js
 ```
 
-Батьківська папка має існувати, цільова — ні. Ініціалізатор відмовляє для будь-якої
-наявної цілі, включно із симлінком, і не змінює її. Новий репозиторій починається
-на `main`; origin не додається. Фактична наявність origin записується до
-`.workflow/origin.json`, без адрес чи облікових даних.
+DB/RLS/integration тести потребують окремого локального Supabase:
 
-Початковий baseline S00-01 створено цим ініціалізатором і збережено як
-`1f4f757` (гілка `baseline/s00-01`). За наступним дорученням власника файли
-перенесено з `execution-v4/` у корінь наявного проєкту, у гілку `task/execution-v4`. Початкові SHA256SUMS/MANIFEST описують вихідний ZIP,
-а не робочі файли після реалізації карток. Логи `checks/` належать автору
-комплекту; нові результати записуються до `.workflow/evidence/`.
+```sh
+uv run --locked python tools/local_stack.py start test
+uv run --locked python tools/local_stack.py provision-migrations test
+uv run --locked python -m tools.check_migrations --fresh
+```
 
-`.gitignore` виключає локальні секрети, exports сесій, дампи та відео за шляхами
-і розширеннями. Він не виявляє секрети всередині довільного коду: перед кожним
-коммітом потрібен перегляд staged diff. Не використовуйте `git add -f` для цих даних.
+Ці команди призначені для ізольованого test stack, не для хмарної БД.
+CI використовує зафіксовані залежності й окремий DB job; автоматичного deploy немає.
+Зелені локальні тести не підтверджують hosted OAuth, доставку листів або оплату.
 
-Використовується origin цього проєкту: `ivan-zamurenko/handbalancers-studio`.
-За дорученням власника основна гілка — `task/execution-v4`; стару `main`
-видалено локально й на GitHub. Її вершину збережено під тегом
-`archive/pre-execution-v4`.
-Стан і наступний крок: `.workflow/CURRENT.md`.
+## Робочі правила
+
+[AGENTS.md](AGENTS.md) описує межі змін, перевірки й handoff.
+Секрети, сесії, дампи та приватні відео не додаються в Git. `.gitignore`
+не перевіряє вміст довільного файлу: перед комітом потрібен перегляд staged diff.

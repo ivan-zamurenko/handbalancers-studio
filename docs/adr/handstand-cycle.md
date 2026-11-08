@@ -1,5 +1,11 @@
 # Підключено до сайту — 2026-11-08
 
+
+Оновлення 2026-11-08: демонстрації перенесено в `tools/previews/handstand/`;
+локальний `tools/serve_preview.py` публікує їх на `/_previews/handstand/`.
+Робоча анімація лишається у `server/static/js/components/handstand-motion.js`.
+Нижче збережено історію початкової реалізації.
+
 За прямим уточненням власника цей рух тепер працює як справжній runtime
 loader. Preview залишається тільки галереєю. Рішення й докази інтеграції:
 [handstand-loading.md](handstand-loading.md),

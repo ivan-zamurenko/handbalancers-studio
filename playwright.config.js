@@ -21,7 +21,7 @@ export default defineConfig({
   },
   webServer: {
     // Explicit settings ensure inherited production environment is not consumed.
-    command: `.venv/bin/python -c "from studio.main import create_app; import uvicorn; uvicorn.run(create_app({'app_env': 'local-test', 'public_origin': '${baseURL}'}), host='127.0.0.1', port=8765)"`,
+    command: `.venv/bin/python -c "from tools.serve_preview import create_preview_app; import uvicorn; uvicorn.run(create_preview_app('${baseURL}'), host='127.0.0.1', port=8765)"`,
     url: `${baseURL}/health/live`,
     reuseExistingServer: false,
     timeout: 15_000,
