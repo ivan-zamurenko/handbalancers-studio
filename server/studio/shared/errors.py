@@ -10,6 +10,7 @@ HTTP_CODES = {
     404: "not_found",
     405: "method_not_allowed",
     409: "conflict",
+    413: "content_too_large",
     422: "validation_error",
     429: "rate_limited",
     500: "internal_error",

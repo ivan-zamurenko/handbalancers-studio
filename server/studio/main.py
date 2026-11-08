@@ -17,11 +17,14 @@ from studio.public.routes import router as public_router
 from studio.settings import Settings, load_settings
 from studio.shared.http import RequestContextMiddleware, http_error, validation_error
 from studio.shared.logging import configure_access_logging
+from studio.shared.security import RequestBodyLimitMiddleware
 
 
 def create_app(settings: Settings | Mapping[str, object] | None = None) -> FastAPI:
     validated = load_settings() if settings is None else Settings.model_validate(settings)
-    app = FastAPI(title="Handbalancer's Studio")
+    # CDN/inline Swagger and ReDoc conflict with the product's strict CSP.
+    # Keep /openapi.json for API tools without serving those extra HTML pages.
+    app = FastAPI(title="Handbalancer's Studio", docs_url=None, redoc_url=None)
     app.state.settings = validated
     app.state.oauth_service = build_oauth(validated)
     app.state.verification_service = (
@@ -30,7 +33,11 @@ def create_app(settings: Settings | Mapping[str, object] | None = None) -> FastA
     if validated.auth_email_enabled and app.state.oauth_service is not None:
         app.state.auth_gateway = app.state.oauth_service.gateway
     configure_access_logging()
-    app.add_middleware(RequestContextMiddleware)
+    app.add_middleware(RequestBodyLimitMiddleware)
+    app.add_middleware(
+        RequestContextMiddleware,
+        hsts=validated.app_env in {"production", "staging"},
+    )
     app.add_exception_handler(RequestValidationError, validation_error)
     app.add_exception_handler(HTTPException, http_error)
     app.add_api_route("/health/live", liveness, methods=["GET"])

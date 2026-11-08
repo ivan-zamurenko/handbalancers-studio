@@ -1,18 +1,9 @@
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
 
 const root = resolve(fileURLToPath(new URL('../..', import.meta.url)));
-const componentCss = [
-  'server/static/css/tokens.css',
-  'server/static/css/base.css',
-  'server/static/css/components.css',
-].map(path => readFileSync(resolve(root, path), 'utf8')).join('\n');
-const componentScripts = ['forms.js', 'dialog.js'].map(name => readFileSync(
-  resolve(root, `server/static/js/components/${name}`), 'utf8',
-));
 
 function renderFixture() {
   const source = String.raw`
@@ -47,9 +38,12 @@ print(template.render())
 test.beforeEach(async ({ page }) => {
   await page.goto('/health/live');
   await page.setContent(renderFixture());
-  await page.addStyleTag({ content: componentCss });
-  for (const content of componentScripts) {
-    await page.addScriptTag({ content, type: 'module' });
+  // Use the same external assets as product pages under the real strict CSP.
+  for (const name of ['tokens.css', 'base.css', 'components.css']) {
+    await page.addStyleTag({ url: `/static/css/${name}` });
+  }
+  for (const name of ['forms.js', 'dialog.js']) {
+    await page.addScriptTag({ url: `/static/js/components/${name}`, type: 'module' });
   }
 });
 

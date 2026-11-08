@@ -10,6 +10,7 @@ from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 from studio.shared.errors import error_response
 from studio.shared.logging import record_access
+from studio.shared.security import SECURITY_HEADERS
 
 
 async def validation_error(request: Request, exc: Exception) -> JSONResponse:
@@ -40,8 +41,11 @@ async def http_error(request: Request, exc: Exception) -> JSONResponse:
 
 
 class RequestContextMiddleware:
-    def __init__(self, app: ASGIApp):
+    def __init__(self, app: ASGIApp, *, hsts: bool = False):
         self.app = app
+        self.security_headers = dict(SECURITY_HEADERS)
+        if hsts:
+            self.security_headers[b"strict-transport-security"] = b"max-age=31536000"
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         if scope["type"] != "http":
@@ -60,8 +64,9 @@ class RequestContextMiddleware:
                 headers = [
                     (key, value)
                     for key, value in message.get("headers", [])
-                    if key.lower() != b"x-request-id"
+                    if key.lower() != b"x-request-id" and key.lower() not in self.security_headers
                 ]
+                headers.extend(self.security_headers.items())
                 if scope.get("path", "").startswith("/api/auth/") or scope.get("path") in {
                     "/api/session",
                     "/auth/callback",

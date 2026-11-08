@@ -15,7 +15,9 @@ def quota(service: OAuthService, action: str, email: str, client_key: str) -> No
 
     with service.transaction() as session:
         client_allowed = allow_start(session, bucket(f"{action}:ip:{client_key}"))
-        email_allowed = allow_start(
+        # Commit the IP budget, but do not insert attacker-chosen email buckets
+        # after it is exhausted. Raising inside the transaction would roll it back.
+        email_allowed = client_allowed and allow_start(
             session,
             bucket(f"{action}:email:{email.casefold()}"),
             limit=1 if action == "resend" else 10,

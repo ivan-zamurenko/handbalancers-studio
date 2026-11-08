@@ -95,6 +95,11 @@ class Settings(BaseModel):
                     database = make_url(settings.auth_database_url.get_secret_value())
                     if database.drivername != "postgresql+psycopg" or not database.database:
                         raise ValueError("Invalid auth database")
+                    if (
+                        settings.app_env in {"staging", "production"}
+                        and database.query.get("sslmode") != "verify-full"
+                    ):
+                        raise ValueError("Deployment requires verified database TLS")
                 except ArgumentError:
                     raise ValueError("Invalid auth database") from None
                 key = base64.b64decode(

@@ -1,3 +1,29 @@
+# Поточний checkpoint — security review, 2026-11-07
+
+За запитом власника виконано аудит реалізованого сайту до S03-07.
+Виправлено: дві залежності з відомими advisory (certifi/OpenTelemetry), зайві
+email-buckets після IP rate limit, відсутність обов’язкового verify-full у
+production/staging та необмежений body parsing. Додано ліміт64KiB, глобальні
+CSP/no-referrer/nosniff і HSTS для deployment; CDN Swagger/ReDoc HTML вимкнено,
+openapi.json збережено. Схема БД й хмарні секрети не змінені.
+
+GREEN:128 unit/contracts/auth-security;59 database;20 RLS/security;67 auth;
+45 browser;34 JS;Ruff/format/Mypy. Dependency audits:0 відомих вразливостей.
+Незалежний read-only review пройдено. У вузькій перевірці983 Git blobs немає
+збігів із поточними секретами; це не скасовує історичне розкриття ключа в tool-output.
+
+**До публічного запуску:** контрольована ротація TOKEN_ENCRYPTION_KEY з перевіркою
+залежних ciphertext та впливу на сесії; cloud0007/hosted smoke; dashboard/edge
+security checks. Не стверджуємо, що сайт неможливо зламати. Deploy не виконувався.
+Поточна локальна auth DB конфігурація вже використовує verify-full і CA.
+Звіт і межі: docs/security-review-2026-11-07.md.
+Докази: .workflow/evidence/security-review-2026-11-07.json.
+Попередній commit:24102fd (S03-07). Новий SHA/CI перевірити після commit.
+Roadmap не пересували: наступна картка S03-08. Видалення docs та сторонні файли
+власника збережені й не включаються у security commit.
+
+## Попередній checkpoint S03-07
+
 # Поточний checkpoint — S03-07 завершено локально
 
 2026-11-07: вихід відкликає local session до мережі, навіть якщо encrypted tokens

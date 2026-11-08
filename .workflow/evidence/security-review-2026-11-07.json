@@ -1,0 +1,77 @@
+{
+  "scope": "User-requested security audit and local hardening through S03-07; no roadmap transition",
+  "date": "2026-11-07",
+  "base_commit": "24102fd8a1167274139cb8ef001d2c6261e3dde0",
+  "report": "docs/security-review-2026-11-07.md",
+  "status": "local_fixes_verified_cloud_release_gates_open",
+  "red": [
+    {
+      "command": ".venv/bin/pytest server/tests/security/auth/test_http_hardening.py -q",
+      "result": "21 failed, 2 passed before implementation: missing body/config/header guards"
+    },
+    {
+      "command": "tools/local_stack.py test uv run --locked pytest server/tests/integration/auth/test_rate_limit_bounds.py -q",
+      "result": "3 failed: rejected new emails still add DB buckets"
+    },
+    {
+      "command": ".venv/bin/pytest server/tests/security/auth/test_http_hardening.py -k api_schema -q",
+      "result": "1 failed before disabling CDN docs"
+    }
+  ],
+  "green": [
+    {
+      "command": ".venv/bin/pytest server/tests/unit server/tests/contracts server/tests/security/auth -q",
+      "result": "128 passed"
+    },
+    {
+      "command": "uv run --locked python -m tools.check_migrations",
+      "environment": "isolated local test stack",
+      "result": "head 0007; 59 database + 20 RLS/security + 67 auth passed"
+    },
+    {
+      "command": "npx playwright test",
+      "result": "45 passed"
+    },
+    {
+      "command": "npm run test:js",
+      "result": "34 passed"
+    },
+    {
+      "command": "ruff check/format; MYPYPATH=server mypy server/studio",
+      "result": "passed; 36 modules"
+    },
+    {
+      "command": "uvx pip-audit --path .venv/lib/python3.13/site-packages --format json",
+      "result": "41 packages; zero known vulnerabilities after certifi2026.10.19/opentelemetry-api1.45.1 updates"
+    },
+    {
+      "command": "npm audit --json",
+      "result": "zero vulnerabilities"
+    }
+  ],
+  "test_adjustment": {
+    "reason": "Global CSP now blocks inline assets injected by s02-02 form fixture. Switched fixture to same-origin external product assets; behavioral assertions unchanged.",
+    "initial_browser_result": "41 passed, 4 failed",
+    "final_browser_result": "45 passed"
+  },
+  "secret_review": {
+    "git_blobs": 983,
+    "current_secret_values": 3,
+    "exact_matches": 0,
+    "narrow_pattern_candidates": 0,
+    "limitation": "Not a general secret scanner; tool-output and unknown formats not certified clean."
+  },
+  "review": {
+    "agent": "security_auth_review",
+    "mode": "read-only",
+    "result": "No blocking findings; noted Swagger/ReDoc CSP incompatibility addressed by explicit disabling."
+  },
+  "unverified": [
+    "Hosted security settings and external penetration test",
+    "Rotation of historically tool-output-exposed encryption key",
+    "Cloud migration0007 and deployment",
+    "Infrastructure TLS/proxy/header/time/concurrency controls and abuse protection"
+  ],
+  "next_step": "Prepare controlled encryption-key rotation and hosted release checks; roadmap next remains S03-08.",
+  "completed_date": "2026-11-08"
+}
