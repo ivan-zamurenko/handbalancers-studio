@@ -1,0 +1,38 @@
+{
+  "task": "DEFECT-auth-clock-skew",
+  "status": "done_local",
+  "base_commit": "3b5fd8d",
+  "trigger": "S03-09 real-local auth regression",
+  "diagnosis": {
+    "tool": "temporary pytest instrumentation outside repository; no credentials or payloads logged",
+    "kind": "ImmatureSignatureError",
+    "iat_minus_host_seconds": 0.01
+  },
+  "scope": [
+    "server/studio/auth/jwt.py",
+    "server/tests/security/auth/test_jwt_clock_skew.py"
+  ],
+  "decision": "At most1s iat-only skew; strict exp/nbf/signature/issuer/audience; no global JWT leeway",
+  "red": {
+    "command": "pytest server/tests/security/auth/test_jwt_clock_skew.py -q",
+    "result": "1failed/7passed: signed token10ms ahead rejected"
+  },
+  "green": [
+    {
+      "command": "pytest server/tests/security/auth/test_jwt_clock_skew.py server/tests/security/auth/test_jwt_validation.py -q",
+      "result": "23passed"
+    },
+    {
+      "command": "DOCKER_HOST=dedicated-Colima-socket local_stack.py test pytest server/tests/integration/auth -q --tb=short",
+      "result": "96passed (67.64s), real-local Auth/Postgres"
+    }
+  ],
+  "review": {
+    "reviewer": "security_auth_review",
+    "result": "No blockers; independently23JWTtests passed; installed PyJWT confirmed strict exp/nbf/signature with custom iat-only check"
+  },
+  "limitations": [
+    "Clock synchronization still required; larger skew is rejected",
+    "No hosted changes"
+  ]
+}

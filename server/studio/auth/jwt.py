@@ -136,9 +136,16 @@ class JWTValidator:
                 algorithms=[algorithm],
                 issuer=self.issuer,
                 audience="authenticated",
-                options={"require": ["exp", "iat", "sub", "iss", "aud", "session_id"]},
+                options={
+                    "require": ["exp", "iat", "sub", "iss", "aud", "session_id"],
+                    # Validate iat below with a one-second clock-skew bound only.
+                    # Global leeway would also extend expired/not-yet-valid tokens.
+                    "verify_iat": False,
+                },
             )
             if type(claims["exp"]) is not int or type(claims["iat"]) is not int:
+                raise InvalidIdentity()
+            if claims["iat"] > time.time() + 1:
                 raise InvalidIdentity()
             return VerifiedIdentity(UUID(claims["sub"]), UUID(claims["session_id"]), claims["exp"])
         except (jwt.PyJWTError, ValueError, TypeError, AttributeError):

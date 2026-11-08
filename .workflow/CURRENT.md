@@ -1,3 +1,16 @@
+# Поточний checkpoint — окремий JWT clock-skew defect, 2026-11-08
+
+Під час S03-09 виявлено нестабільний valid login/verify-email. Safe diagnostic
+підтвердив ImmatureSignatureError: iat лише0.01s попереду host. Окрема defect
+картка й commit: допускаємо максимум1s лише для iat; exp/nbf/signature/issuer/
+audience лишаються суворими. Не додаємо глобальний leeway чи runtime retry.
+RED1/7passed; GREEN23JWTtests та96real-local Auth integration. Reviewer clear.
+Evidence: .workflow/evidence/DEFECT-auth-clock-skew.json.
+S03-09 ще in_progress у робочому дереві: code/review/tests готові, лишилось
+оформити state/evidence та її окремий commit. Попередній commit3b5fd8d.
+
+## Попередній checkpoint
+
 # Поточний checkpoint — вибіркові індикатори завантаження, 2026-11-08
 
 Власник погодив рекомендацію: індикатор залежить від дії, дизайн у стилі сайту.
