@@ -165,3 +165,34 @@ def test_failed_fetch_singleflight_and_cooldown():
 
     asyncio.run(run())
     assert len(calls) == 1
+
+
+def test_key_rotation_outage_stays_retryable_through_cooldown(monkeypatch):
+    from studio.auth import jwt as module
+
+    clock = [100.0]
+    monkeypatch.setattr(module.time, "monotonic", lambda: clock[0])
+    verifier, calls = make_validator()
+    new_token = jwt.encode(
+        {"sub": USER},
+        KEY,
+        algorithm="ES256",
+        headers={"kid": "new-key"},
+    )
+
+    async def failed_refresh():
+        calls.append(True)
+        raise TimeoutError()
+
+    async def run():
+        await verifier.verify(signed())
+        clock[0] += 31
+        verifier._fetch = failed_refresh
+        for _ in range(2):
+            with pytest.raises(module.IdentityVerificationUnavailable):
+                await verifier.verify(new_token)
+        # A previously verified cached key still works during its valid TTL.
+        assert str((await verifier.verify(signed())).user_id) == USER
+
+    asyncio.run(run())
+    assert len(calls) == 2

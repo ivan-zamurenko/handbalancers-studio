@@ -6,8 +6,9 @@ from contextlib import AbstractContextManager
 
 from sqlalchemy.orm import Session
 
+from studio.auth.db_work import run_db
 from studio.auth.gateway import AuthFailure, AuthGateway
-from studio.auth.token_store import StoreError, TokenStore
+from studio.auth.token_store import SessionSecrets, StoreError, TokenStore
 
 UPSTREAM_TIMEOUT_SECONDS = 5.0
 
@@ -20,13 +21,19 @@ async def logout_session(
     gateway: AuthGateway,
 ) -> bool | None:
     """Return upstream confirmed/unconfirmed/not-attempted; never undo local revoke."""
-    with transaction() as session:
-        try:
-            tokens = store.read_session(session, cookie)
-        except StoreError:
-            tokens = None
-        # Expiry or unreadable ciphertext must not prevent local revocation.
-        store.revoke_session(session, cookie)
+
+    def revoke() -> SessionSecrets | None:
+        # A whole transaction belongs to one worker; no Session crosses an await.
+        with transaction() as session:
+            try:
+                tokens = store.read_session(session, cookie)
+            except StoreError:
+                tokens = None
+            # Expiry or unreadable ciphertext must not prevent local revocation.
+            store.revoke_session(session, cookie)
+        return tokens
+
+    tokens = await run_db(revoke)
     if tokens is None:
         return None
     try:

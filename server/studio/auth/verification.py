@@ -3,6 +3,7 @@
 import hashlib
 import hmac
 
+from studio.auth.db_work import run_db
 from studio.auth.gateway import AuthFailure, AuthFailureKind
 from studio.auth.oauth import OAuthRateLimited, OAuthResult, OAuthService
 from studio.auth.rate_limit import allow_start
@@ -34,13 +35,13 @@ async def verify_email(
     client_key: str,
     old_cookie: str | None = None,
 ) -> OAuthResult:
-    quota(service, "verify", email, client_key)
+    await run_db(quota, service, "verify", email, client_key)
     payload = await service.gateway.verify_email(email, token)
     return await service.accept_identity(payload, old_cookie=old_cookie)
 
 
 async def resend(service: OAuthService, email: str, *, client_key: str) -> None:
-    quota(service, "resend", email, client_key)
+    await run_db(quota, service, "resend", email, client_key)
     try:
         await service.gateway.resend_verification(email)
     except AuthFailure as error:

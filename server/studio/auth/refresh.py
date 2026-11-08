@@ -11,9 +11,15 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from studio.accounts.provisioning import current_profile
+from studio.auth.db_work import run_db
 from studio.auth.gateway import AuthFailure, AuthFailureKind, AuthGateway
-from studio.auth.jwt import InvalidIdentity, JWTValidator, VerifiedIdentity
-from studio.auth.token_store import TokenStore
+from studio.auth.jwt import (
+    IdentityVerificationUnavailable,
+    InvalidIdentity,
+    JWTValidator,
+    VerifiedIdentity,
+)
+from studio.auth.token_store import SessionSecrets, TokenStore
 
 WAIT_SECONDS = 6.0
 EXCHANGE_SECONDS = 5.0
@@ -49,22 +55,31 @@ async def _refresh_identity(
     gateway: AuthGateway,
     validator: JWTValidator,
 ) -> VerifiedIdentity:
-    deadline = time.monotonic() + WAIT_SECONDS
-    while True:
+    def read_or_claim() -> tuple[SessionSecrets, bool, int | None, dict[str, object]]:
+        # Offload complete short transactions, not individual calls on a shared Session.
         with transaction() as session:
             tokens = store.read_session(session, cookie)
             if tokens.access_expires_at > datetime.now(UTC):
-                version = None
-                fresh = True
-            else:
-                fresh = False
-                version = store.claim_refresh(session, cookie)
-                if version is not None:
-                    # Re-read after winning the CAS, including current active identity.
-                    tokens = store.read_session(session, cookie)
-                    profile = current_profile(session, tokens.user_id)
+                return tokens, True, None, {}
+            version = store.claim_refresh(session, cookie)
+            profile = {}
+            if version is not None:
+                tokens = store.read_session(session, cookie)
+                profile = current_profile(session, tokens.user_id)
+            return tokens, False, version, profile
+
+    def release(version: int, *, revoke: bool = False) -> None:
+        with transaction() as session:
+            store.release_refresh(session, cookie, version, revoke=revoke)
+
+    deadline = time.monotonic() + WAIT_SECONDS
+    while True:
+        tokens, fresh, version, profile = await run_db(read_or_claim)
         if fresh:
-            return await validator.verify(tokens.access_token.get_secret_value())
+            try:
+                return await validator.verify(tokens.access_token.get_secret_value())
+            except IdentityVerificationUnavailable:
+                raise RefreshUnavailable() from None
         if version is not None:
             break
         if time.monotonic() >= deadline:
@@ -104,26 +119,28 @@ async def _refresh_identity(
             }:
                 raise RefreshUnavailable() from None
             raise InvalidIdentity() from None
-        with transaction() as session:
-            saved = store.complete_refresh(
-                session,
-                cookie,
-                version,
-                access_token=access,
-                refresh_token=refresh,
-                access_expires_at=datetime.fromtimestamp(identity.expires_at, UTC),
-            )
-            if not saved:
-                # Local logout/expiry is terminal; loss of lease is temporary.
-                store.read_session(session, cookie)
-                raise RefreshUnavailable()
+
+        def complete() -> None:
+            with transaction() as session:
+                saved = store.complete_refresh(
+                    session,
+                    cookie,
+                    version,
+                    access_token=access,
+                    refresh_token=refresh,
+                    access_expires_at=datetime.fromtimestamp(identity.expires_at, UTC),
+                )
+                if not saved:
+                    # Local logout/expiry is terminal; loss of lease is temporary.
+                    store.read_session(session, cookie)
+                    raise RefreshUnavailable()
+
+        await run_db(complete)
         return identity
     except InvalidIdentity:
-        with transaction() as session:
-            store.release_refresh(session, cookie, version, revoke=True)
+        await run_db(release, version, revoke=True)
         raise
     finally:
         # Cancellation and transient failure leave the session retryable. If the DB
         # itself is down the committed lease expires; only this version may release it.
-        with transaction() as session:
-            store.release_refresh(session, cookie, version)
+        await run_db(release, version)

@@ -8,6 +8,7 @@ from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, ConfigDict
 from starlette.responses import JSONResponse, RedirectResponse
 
+from studio.auth.db_work import run_db
 from studio.auth.gateway import AuthFailure
 from studio.auth.jwt import InvalidIdentity
 from studio.auth.oauth import OAuthRateLimited, OAuthService
@@ -91,7 +92,7 @@ async def callback(request: Request) -> RedirectResponse:
         binding = request.cookies.get(cookie_name, "")
         provider = query.get("provider", "")
         if query.get("error"):
-            service.cancel(provider, attempt, binding)
+            await run_db(service.cancel, provider, attempt, binding)
             response = RedirectResponse("/login?oauth=cancelled", status_code=303, headers=HEADERS)
         else:
             if len(query.getlist("code")) != 1:

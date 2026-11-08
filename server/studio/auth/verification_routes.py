@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field, SecretStr, field_validator
 from starlette.responses import JSONResponse
 
 from studio.auth.gateway import AuthFailure, AuthFailureKind
-from studio.auth.jwt import InvalidIdentity
+from studio.auth.jwt import IdentityVerificationUnavailable, InvalidIdentity
 from studio.auth.oauth import OAuthRateLimited, OAuthService
 from studio.auth.oauth_routes import HEADERS, secure, session_name
 from studio.auth.routes import same_origin
@@ -47,6 +47,8 @@ def client_key(request: Request) -> str:
 
 
 def translate(error: Exception) -> HTTPException:
+    if isinstance(error, IdentityVerificationUnavailable):
+        return HTTPException(503, headers={"Retry-After": "5"})
     if isinstance(error, OAuthRateLimited) or (
         isinstance(error, AuthFailure) and error.kind == AuthFailureKind.RATE_LIMIT
     ):

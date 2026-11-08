@@ -1,6 +1,7 @@
 """Verify identity only; product role/active/session revocation remain DB checks."""
 
 import asyncio
+import json
 import time
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
@@ -9,10 +10,16 @@ from uuid import UUID
 import httpx
 import jwt
 
+from studio.auth.provider_http import read_provider_body
+
 
 class InvalidIdentity(Exception):
     def __init__(self) -> None:
         super().__init__("Authentication identity could not be verified")
+
+
+class IdentityVerificationUnavailable(InvalidIdentity):
+    """Missing trusted keys are not evidence that an existing session is invalid."""
 
 
 @dataclass(frozen=True)
@@ -53,15 +60,22 @@ class JWTValidator:
         self._keys: dict[str, jwt.PyJWK] = {}
         self._updated = float("-inf")
         self._attempted = float("-inf")
+        self._last_fetch_failed = False
         self._lock = asyncio.Lock()
 
     async def _fetch_http(self) -> dict[str, object]:
-        async with httpx.AsyncClient(timeout=5, follow_redirects=False, trust_env=False) as client:
-            response = await client.get(self.issuer + "/.well-known/jwks.json")
+        async with (
+            httpx.AsyncClient(timeout=5, follow_redirects=False, trust_env=False) as client,
+            client.stream(
+                "GET",
+                self.issuer + "/.well-known/jwks.json",
+                headers={"Accept-Encoding": "identity"},
+            ) as response,
+        ):
             response.raise_for_status()
-            value = response.json()
+            value = json.loads(await read_provider_body(response))
             if not isinstance(value, dict):
-                raise InvalidIdentity()
+                raise IdentityVerificationUnavailable()
             return value
 
     async def _key(self, kid: str) -> jwt.PyJWK:
@@ -71,12 +85,13 @@ class JWTValidator:
                 kid not in self._keys or now - self._updated >= 300
             ) and now - self._attempted >= 30:
                 self._attempted = now
+                self._last_fetch_failed = True
                 try:
                     async with asyncio.timeout(5):
                         payload = await self._fetch()
                     raw_keys = payload.get("keys")
                     if not isinstance(raw_keys, list) or len(raw_keys) > 100:
-                        raise InvalidIdentity()
+                        raise IdentityVerificationUnavailable()
                     keys = {}
                     for raw in raw_keys:
                         if not isinstance(raw, dict) or not isinstance(raw.get("kid"), str):
@@ -87,13 +102,20 @@ class JWTValidator:
                         ):
                             continue
                         if raw["kid"] in keys:
-                            raise InvalidIdentity()
+                            raise IdentityVerificationUnavailable()
                         keys[raw["kid"]] = jwt.PyJWK.from_dict(raw)
+                    if not keys:
+                        raise IdentityVerificationUnavailable()
                     self._keys = keys
                     self._updated = now
-                except (httpx.HTTPError, TimeoutError, ValueError, jwt.PyJWTError):
-                    raise InvalidIdentity() from None
-            if now - self._updated >= 300 or kid not in self._keys:
+                    self._last_fetch_failed = False
+                except (httpx.HTTPError, TimeoutError, ValueError, RecursionError, jwt.PyJWTError):
+                    raise IdentityVerificationUnavailable() from None
+            if now - self._updated >= 300:
+                raise IdentityVerificationUnavailable()
+            if kid not in self._keys:
+                if self._last_fetch_failed:
+                    raise IdentityVerificationUnavailable()
                 raise InvalidIdentity()
             return self._keys[kid]
 
