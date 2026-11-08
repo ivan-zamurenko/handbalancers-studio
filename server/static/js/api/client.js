@@ -1,3 +1,5 @@
+import {beginLoading} from '../components/loading.js';
+
 const safeMethods = new Set(['GET', 'HEAD', 'OPTIONS']);
 const jsonBodyTypes = new Set(['[object Object]', '[object Array]']);
 
@@ -61,26 +63,31 @@ export async function requestApi(input, {
   }
   options.credentials = sameOrigin ? 'same-origin' : 'omit';
 
-  let response;
+  const finishLoading = beginLoading();
   try {
-    response = await fetchImpl(url, options);
-  } catch (cause) {
-    throw new NetworkError(cause);
-  }
-
-  if (!response.ok) {
-    let payload;
+    let response;
     try {
-      payload = await response.json();
-    } catch {
-      payload = null;
+      response = await fetchImpl(url, options);
+    } catch (cause) {
+      throw new NetworkError(cause);
     }
-    throw new ApiError(response.status, payload?.error);
-  }
 
-  if (response.status === 204) return null;
-  if (response.headers.get('content-type')?.includes('application/json')) {
-    return response.json();
+    if (!response.ok) {
+      let payload;
+      try {
+        payload = await response.json();
+      } catch {
+        payload = null;
+      }
+      throw new ApiError(response.status, payload?.error);
+    }
+
+    if (response.status === 204) return null;
+    if (response.headers.get('content-type')?.includes('application/json')) {
+      return await response.json();
+    }
+    return await response.text();
+  } finally {
+    finishLoading();
   }
-  return response.text();
 }

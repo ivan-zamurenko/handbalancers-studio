@@ -1,0 +1,15 @@
+<div class="loading-handstand" data-loading-indicator role="status" aria-live="polite" aria-atomic="true" hidden>
+  <svg viewBox="0 0 96 88" width="72" height="66" fill="none" aria-hidden="true" focusable="false">
+    <path class="loading-floor" d="M16 78H81" />
+    <g class="loading-person" stroke-linecap="round" stroke-linejoin="round">
+      <path class="loading-arms" d="M29 75L31 60L38 51L47 60L49 75M26 76H33M46 76H53" />
+      <circle cx="39" cy="60" r="5" />
+      <g class="loading-balance">
+        <path d="M38 51L38 33" />
+        <path class="loading-leg loading-leg-back" d="M38 33L35 20L33 8L38 7" />
+        <path class="loading-leg loading-leg-front" d="M38 33L43 20L45 8L50 9" />
+      </g>
+    </g>
+  </svg>
+  <span>{{ 'Loading…' if language == 'en' else 'Завантажуємо…' }}</span>
+</div>

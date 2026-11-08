@@ -1,3 +1,5 @@
+import {beginLoading} from './loading.js';
+
 const pendingForms = new WeakSet();
 
 document.addEventListener('submit', async event => {
@@ -24,6 +26,7 @@ document.addEventListener('submit', async event => {
     feedback.hidden = true;
   }
 
+  const finishLoading = beginLoading();
   try {
     const method = form.method.toUpperCase();
     const destination = new URL(form.action, document.baseURI);
@@ -49,6 +52,7 @@ document.addEventListener('submit', async event => {
       feedback.hidden = false;
     }
   } finally {
+    finishLoading();
     pendingForms.delete(form);
     form.removeAttribute('aria-busy');
     submitter.disabled = wasDisabled;

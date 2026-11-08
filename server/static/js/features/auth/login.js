@@ -1,3 +1,5 @@
+import {beginLoading, beginNavigation} from '../../components/loading.js';
+
 // UI preview only. Real submission requires the server session and CSRF flow.
 const form = document.getElementById('login-form');
 form?.addEventListener('submit', event => event.preventDefault());
@@ -30,6 +32,7 @@ for (const button of providers) {
     starting = true;
     for (const control of providers) control.disabled = true;
     message.textContent = message.dataset.pending;
+    const finishLoading = beginLoading();
     try {
       const response = await fetch(`/api/auth/oauth/${button.dataset.oauthProvider}/start`, {
         method: 'POST', credentials: 'same-origin', headers: {'Content-Type': 'application/json'},
@@ -39,11 +42,14 @@ for (const button of providers) {
       const result = await response.json();
       const target = new URL(result.authorization_url);
       if (!['https:', 'http:'].includes(target.protocol)) throw new Error('Invalid destination');
+      beginNavigation();
       window.location.assign(target.href);
     } catch {
       starting = false;
       message.textContent = message.dataset.error;
       for (const control of providers) control.disabled = false;
+    } finally {
+      finishLoading();
     }
   });
 }

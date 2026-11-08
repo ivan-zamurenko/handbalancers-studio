@@ -8,10 +8,13 @@
   <link rel="stylesheet" href="/static/css/tokens.css">
   <link rel="stylesheet" href="/static/css/base.css">
   <link rel="stylesheet" href="/static/css/components.css">
+  <link rel="stylesheet" href="/static/css/loading.css">
   {% block head %}{% endblock %}
 </head>
 <body>
   {% block content %}{% endblock %}
+  {% include 'shared/loading.html' %}
+  <script type="module" src="/static/js/components/loading.js"></script>
   <script type="module" src="/static/js/components/forms.js"></script>
   <script type="module" src="/static/js/components/dialog.js"></script>
   <script type="module" src="/static/js/state/theme.js"></script>

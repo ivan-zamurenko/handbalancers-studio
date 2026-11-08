@@ -1,0 +1,30 @@
+{
+  "task": "owner-handstand-loading",
+  "status": "done_local",
+  "base_commit": "d6e2c81a13cf10b0529a4041b0b347450da3fc25",
+  "scope": "Owner-requested compact handstand loading animation after S03-08; no new dependencies or cloud changes",
+  "red": {
+    "command": "playwright test tests/e2e/loading.spec.js",
+    "result": "7 failed: indicator absent"
+  },
+  "green": {
+    "loader": "10 passed",
+    "full_browser": "61 passed",
+    "javascript": "34 passed",
+    "server_contracts": "35 passed",
+    "diff_check": "passed"
+  },
+  "test_correction": "Pending navigation makes Playwright DOM queries wait for commit. Pre-navigation MutationObserver/exposeFunction now checks actual indicator visibility and reduced-motion animation count while route held; requirement unchanged.",
+  "review": {
+    "reviewer": "security_auth_review",
+    "result": "No blocking findings; native cancellation and raw hash filtering corrected"
+  },
+  "visual": "390 dark and 1440 light screenshots inspected; 390/1440 x light/dark exercised",
+  "runtime": "Local port8000 restarted; health/login/recovery HTTP200, indicator markup present. Cloud settings/data/secrets untouched.",
+  "limits": [
+    "Loader requires HTML/JS arrival",
+    "Navigation watchdog10s; API completion follows real work",
+    "No new hosted recovery/security readiness claim; S03-08 external gates remain"
+  ],
+  "next": "S03-09 CSRF/rate-limit card; email login/register UI S03-10"
+}

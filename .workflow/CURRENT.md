@@ -1,3 +1,25 @@
+# Поточний checkpoint — handstand loading готовий, 2026-11-08
+
+Погоджений custom loader: маленька SVG-людинка робить спроби стійки на руках.
+Показ тільки під час реального очікування після180ms; API/body parsing, auth,
+форми, page assets і навігація. Паралельні запити, помилки, скасування/історія;
+UK/EN, light/dark, reduced-motion, без блокування кнопок і нових залежностей.
+
+GREEN:10 loader scenarios;61 повний browser;34 JS;35 contracts;diff-check.
+Read-only review без блокерів; mobile dark/desktop light візуально переглянуто.
+Докази: .workflow/evidence/handstand-loading.json; рішення: docs/adr/handstand-loading.md.
+Local preview127.0.0.1:8000 перезапущено, health/login/recovery200; новий markup присутній.
+Cloud/deploy/секрети/сторонні видалення не змінені.
+
+S03-08 commit d6e2c81a13cf10b0529a4041b0b347450da3fc25 pushed;
+CI42432001862 success. Відновлення пароля пройшло89 real-local auth integration.
+**Залишаються зовнішні gates:** cloud recovery email/SMTP; patched provider/retest
+для source-confirmed old-password grant race; key rotation/cloud0007/hosted smoke.
+Email login UI ще preview. Наступна картка S03-09, потім S03-10 повний auth UI.
+Loader SHA/CI звіряти з Git після цього checkpoint.
+
+## Попередній checkpoint
+
 # Поточний checkpoint — S03-08, 2026-11-08
 
 Відновлення пароля готове локально: email → код → новий пароль, UK/EN,
