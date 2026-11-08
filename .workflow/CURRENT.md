@@ -1,3 +1,22 @@
+# Поточний checkpoint — 5 варіантів анімації для вибору, 2026-11-08
+
+За запитом власника створено5 рухомих SVG/CSS-варіантів: Перша спроба,
+Пружинка,8-bit баланс,Орбіта,Тихий баланс. Окрема сторінка
+/static/previews/handstand/index.html; center+scrim або corner, пауза, обидві теми.
+GIF/PNG огляди поруч. Працює на поточному127.0.0.1:8000 без перезапуску.
+
+Тести:3 RED404 →3 GREEN browser scenarios;390/1440,5 dialogs,Escape/focus,
+reduced motion/no API. Візуальний перегляд desktop dark/mobile light/central;
+read-only review без блокерів. Докази: .workflow/evidence/handstand-options.json.
+
+**Вибір ще не зроблено.** Основний loader і roadmap не змінювали. Next: власник
+обирає варіант; центр рекомендується для очікування дії, corner для background.
+Corner у preview теж native modal: це примірка розташування, не runtime behavior.
+Попередній runtime loader commit4cced3a607033104a6b0ea4b3fed119eb741220a pushed;
+CI42432476758 success. Усі попередні auth/cloud/security gates залишаються.
+
+## Попередній checkpoint
+
 # Поточний checkpoint — handstand loading готовий, 2026-11-08
 
 Погоджений custom loader: маленька SVG-людинка робить спроби стійки на руках.

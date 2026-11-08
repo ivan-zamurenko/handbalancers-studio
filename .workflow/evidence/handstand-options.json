@@ -1,0 +1,31 @@
+{
+  "task": "owner-handstand-options",
+  "status": "preview_ready_awaiting_selection",
+  "scope": "Five separate animated SVG/CSS options and central dim/corner comparison; existing runtime loader unchanged",
+  "red": {
+    "command": "playwright test tests/e2e/handstand-options.spec.js",
+    "result": "3 failed: preview404; missing cards/buttons"
+  },
+  "green": {
+    "command": "playwright test tests/e2e/handstand-options.spec.js",
+    "result": "3 passed (3.4s)",
+    "cases": [
+      "five animated options; both themes 390/1440; pause",
+      "all five modal previews; backdrop; corner; Escape and focus restoration",
+      "reduced-motion paused by default; no API requests"
+    ]
+  },
+  "visual": [
+    "desktop dark gallery",
+    "central scrim with small spring character",
+    "mobile light gallery"
+  ],
+  "review": "security_auth_review: no blockers; corner preview remains modal intentionally",
+  "artifacts": [
+    "server/static/previews/handstand/index.html",
+    "server/static/previews/handstand/overview.gif",
+    "server/static/previews/handstand/overview.png"
+  ],
+  "runtime_change": false,
+  "next": "Owner chooses one of five characters; then separately integrate requested placement for suitable loading actions"
+}
