@@ -1,0 +1,21 @@
+{% extends "public/base.html" %}
+{% block title %}{{ copy('Підтвердження пошти', 'Confirm email') }} — Handbalancer’s Studio{% endblock %}
+{% block head %}{{ super() }}<link rel="stylesheet" href="/static/css/login.css">{% endblock %}
+{% block public_content %}
+<section class="login-section wrap" aria-labelledby="verify-title">
+  <div class="login-heading"><p class="eyebrow">Handbalancer’s Studio</p><h1 id="verify-title">{{ copy('Перевірте вашу пошту.', 'Check your inbox.') }}</h1><p>{{ copy('Введіть шестизначний код із листа. Якщо листа немає — перевірте спам або запросіть новий код.', 'Enter the six-digit code from your email. If it has not arrived, check spam or request a new code.') }}</p></div>
+  <div class="login-card">
+    {% if not email_auth_enabled %}<p class="login-status">{{ copy('Підтвердження пошти тимчасово недоступне.', 'Email confirmation is currently unavailable.') }}</p>{% endif %}
+    <form id="verify-form" data-auth-form="verify" data-auth-enabled="{{ 'true' if email_auth_enabled else 'false' }}" method="post" action="/verify-email" aria-describedby="auth-status">
+      <div class="form-field"><label class="form-field__label" for="verify-email">Email</label><input class="form-field__control" id="verify-email" data-auth-field="email" type="email" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false" maxlength="254" required></div>
+      <div class="form-field"><label class="form-field__label" for="verify-code">{{ copy('Код із листа', 'Email code') }}</label><input class="form-field__control auth-code" id="verify-code" data-auth-field="token" type="text" autocomplete="one-time-code" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" required></div>
+      <button class="primary login-submit" type="submit" data-auth-submit data-pending-label="{{ copy('Підтверджуємо…', 'Confirming…') }}" disabled>{{ copy('Підтвердити пошту', 'Confirm email') }}</button>
+      <button class="auth-resend" type="button" data-auth-resend data-label="{{ copy('Надіслати новий код', 'Send a new code') }}" data-wait="{{ copy('Новий код через', 'New code in') }}" data-pending-label="{{ copy('Надсилаємо…', 'Sending…') }}" disabled>{{ copy('Надіслати новий код', 'Send a new code') }}</button>
+    </form>
+    {% with auth_action='verify' %}{% include 'auth/form_status.html' %}{% endwith %}
+    <p class="login-signup"><a href="/register?lang={{ language }}">{{ copy('Повернутися до реєстрації', 'Back to registration') }}</a></p>
+    <noscript><p class="small">{{ copy('Увімкніть JavaScript для підтвердження пошти.', 'Enable JavaScript to confirm your email.') }}</p></noscript>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}<script type="module" src="/static/js/features/auth/registration.js"></script>{% endblock %}

@@ -1,0 +1,116 @@
+{
+  "task": "S03-10",
+  "status": "done_local",
+  "base_commit": "c3bc3ba",
+  "scope_extension": {
+    "reason": "Wire existing public login template/routes and preserve configured Google. Shared controller owns email/OAuth single-flight, draft whitelist and history fences. Tests use synthetic configured presentation and intercepted HTTP; they do not establish live provider readiness.",
+    "files": [
+      "server/studio/public/routes.py",
+      "server/templates/public/login.html",
+      "server/templates/auth/register.html",
+      "server/templates/auth/verify.html",
+      "server/templates/auth/password_toggle.html",
+      "server/templates/auth/oauth.html",
+      "server/templates/auth/form_status.html",
+      "server/static/js/features/auth/registration.js",
+      "server/static/js/features/auth/login.js",
+      "server/static/css/login.css",
+      "tests/fixtures/render_auth_page.py",
+      "tests/e2e/s03-10-registration-ui.spec.js",
+      "server/tests/contracts/auth/test_registration_ui.py",
+      "tests/e2e/oauth-ui.spec.js",
+      "server/templates/public/base.html"
+    ],
+    "decisions": [
+      "Retain public/login.html as canonical login template instead of duplicating auth/login.html.",
+      "No React, database migration or Apple button. Existing configured Google remains available.",
+      "Fixed 60-second resend and HTTP 429 cooldown matches current server contract; server enforcement remains authoritative.",
+      "Email controls enabled only when server email auth is configured; UI tests use explicit synthetic configured Jinja.",
+      "Only first_name, last_name and email draft plus expiry/cooldown metadata in sessionStorage, with 30-minute expiry. Never store password or OTP.",
+      "Configured availability dialog now describes only payments as unavailable; retain preview copy for unconfigured runtime."
+    ],
+    "test_adjustment": "OAuth assertion targets its status element explicitly because email forms now have their own live status; disabled-runtime preview expectations remain valid."
+  },
+  "red": [
+    {
+      "command": "npx playwright test tests/e2e/s03-10-registration-ui.spec.js",
+      "result": "Initial five tests failed: missing register/verify pages and absent email login behavior. /tmp/studio-s0310-red.log"
+    },
+    {
+      "command": "npx playwright test tests/e2e/s03-10-registration-ui.spec.js --grep full_signup_keyboard",
+      "result": "Additional assertion failed on stale registration-unavailable copy in configured runtime before conditional template fix. /tmp/studio-s0310-copy-red.log"
+    }
+  ],
+  "green": [
+    {
+      "command": "npx playwright test tests/e2e/s03-10-registration-ui.spec.js tests/e2e/login-form.spec.js tests/e2e/oauth-ui.spec.js tests/e2e/loading.spec.js",
+      "result": "45 passed before final accessibility/copy polish"
+    },
+    {
+      "command": "npx playwright test tests/e2e/s03-10-registration-ui.spec.js --grep error_focus",
+      "result": "1 passed; held 503 response, mobile viewport, unchanged scrollY and focused aria-live status"
+    },
+    {
+      "command": "npx playwright test",
+      "result": "85 passed after final changes (53.9s); /tmp/studio-s0310-full-browser.log"
+    },
+    {
+      "command": "node --test tests/js/*.test.js",
+      "result": "41 passed; /tmp/studio-s0310-js.log"
+    },
+    {
+      "command": ".venv/bin/python -m pytest server/tests/contracts/auth server/tests/security/auth server/tests/unit/auth -q",
+      "result": "172 passed; /tmp/studio-s0310-python.log"
+    },
+    {
+      "command": "ruff check / ruff format --check on changed Python; mypy server/studio/public/routes.py; git diff --check",
+      "result": "passed"
+    }
+  ],
+  "external_gates": [
+    "Hosted OTP template and mail delivery not tested by intercepted UI tests.",
+    "Previous key rotation, cloud 0007, recovery and provider gates unchanged."
+  ],
+  "branch": "task/execution-v4",
+  "command_adaptation": "Use existing unnamed Chromium project; --project=chromium in card does not match repository configuration. Browser remains Chromium.",
+  "visual_review": {
+    "viewports": [
+      390,
+      1440
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "pages": [
+      "register",
+      "verify-email",
+      "login"
+    ],
+    "result": "No horizontal overflow; reviewed coherent typography, controls, wrapping and spacing. Screenshots from real Jinja with synthetic configured settings.",
+    "artifacts": [
+      ".workflow/evidence/S03-10-login-390-light.png",
+      ".workflow/evidence/S03-10-register-390-dark.png",
+      ".workflow/evidence/S03-10-verify-email-1440-light.png",
+      ".workflow/evidence/S03-10-register-1440-dark.png"
+    ]
+  },
+  "runtime_check": {
+    "origin": "http://127.0.0.1:8000",
+    "result": "Restarted existing local-dev runtime using private .env.local without logging values. GET health/login/register/verify-email all 200; email auth enabled; Google present on login/register; Apple absent. No provider operation issued."
+  },
+  "review": {
+    "agent": "security_auth_review",
+    "result": "clear, including final follow-up. Nonblocking scroll assertion gap fixed and verified."
+  },
+  "not_run": [
+    "No DB/schema/auth backend behavior changed; no repeat of real-local integration suite for this UI card. S03-11 will verify full local flow."
+  ],
+  "push_status": "pending_at_commit",
+  "next": "S03-11",
+  "roadmap_validation": {
+    "graph": "passed",
+    "next": "S03-11",
+    "file_validation": "260 pre-existing missing_document errors from unrelated deleted docs; untouched"
+  }
+}

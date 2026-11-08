@@ -89,6 +89,7 @@ def render(request: Request, template: str) -> HTMLResponse:
             "plans": PLANS,
             "page_path": request.url.path,
             "oauth_providers": providers,
+            "email_auth_enabled": request.app.state.settings.auth_email_enabled,
             "oauth_feedback": request.query_params.get("oauth", ""),
             # Cookie presence only; the browser still confirms the session via /api/session.
             "signed_in": bool(request.cookies.get(session_name(request))),
@@ -117,3 +118,13 @@ async def login_page(request: Request) -> HTMLResponse:
 @router.get("/recovery", response_class=HTMLResponse, include_in_schema=False)
 async def recovery_page(request: Request) -> HTMLResponse:
     return render(request, "auth/recovery.html")
+
+
+@router.get("/register", response_class=HTMLResponse, include_in_schema=False)
+async def register_page(request: Request) -> HTMLResponse:
+    return render(request, "auth/register.html")
+
+
+@router.get("/verify-email", response_class=HTMLResponse, include_in_schema=False)
+async def verify_page(request: Request) -> HTMLResponse:
+    return render(request, "auth/verify.html")

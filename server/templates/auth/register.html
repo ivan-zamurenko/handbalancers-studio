@@ -1,0 +1,31 @@
+{% extends "public/base.html" %}
+{% block title %}{{ copy('Реєстрація', 'Register') }} — Handbalancer’s Studio{% endblock %}
+{% block head %}{{ super() }}<link rel="stylesheet" href="/static/css/login.css">{% endblock %}
+{% block public_content %}
+<section class="login-section wrap" aria-labelledby="register-title">
+  <div class="login-heading"><p class="eyebrow">Handbalancer’s Studio</p><h1 id="register-title">{{ copy('Почнімо вашу практику.', 'Make room for your practice.') }}</h1><p>{{ copy('Ваш акаунт. Перший крок до нових можливостей.', 'Your account. A first step towards new possibilities.') }}</p></div>
+  <div class="login-card">
+    {% if not email_auth_enabled %}<p class="login-status">{{ copy('Реєстрація через email тимчасово недоступна.', 'Email registration is currently unavailable.') }}</p>{% endif %}
+    <form id="register-form" data-auth-form="register" data-auth-enabled="{{ 'true' if email_auth_enabled else 'false' }}" method="post" action="/register" aria-describedby="auth-status">
+      <div class="auth-name-row">
+        <div class="form-field"><label class="form-field__label" for="register-first">{{ copy('Ім’я', 'First name') }}</label><input class="form-field__control" id="register-first" data-auth-field="first_name" autocomplete="given-name" maxlength="100" required></div>
+        <div class="form-field"><label class="form-field__label" for="register-last">{{ copy('Прізвище', 'Last name') }}</label><input class="form-field__control" id="register-last" data-auth-field="last_name" autocomplete="family-name" maxlength="100" required></div>
+      </div>
+      <div class="form-field"><label class="form-field__label" for="register-email">Email</label><input class="form-field__control" id="register-email" data-auth-field="email" type="email" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false" maxlength="254" required></div>
+      <div class="form-field"><label class="form-field__label" for="register-password">{{ copy('Пароль', 'Password') }}</label>
+        <div class="password-control"><input class="form-field__control" id="register-password" data-auth-field="password" type="password" autocomplete="new-password" minlength="8" maxlength="256" aria-describedby="password-hint" required>
+          {% with password_id='register-password' %}{% include 'auth/password_toggle.html' %}{% endwith %}
+        </div>
+        <p id="password-hint" class="form-field__hint">{{ copy('Щонайменше 8 символів. Оберіть унікальний пароль.', 'At least 8 characters. Choose a unique password.') }}</p>
+      </div>
+      <button class="primary login-submit" type="submit" data-auth-submit data-pending-label="{{ copy('Створюємо…', 'Creating…') }}" disabled>{{ copy('Створити акаунт', 'Create account') }}</button>
+    </form>
+    {% with auth_action='register' %}{% include 'auth/form_status.html' %}{% endwith %}
+    {% include 'auth/oauth.html' %}
+    <p class="login-signup">{{ copy('Вже маєте акаунт?', 'Already have an account?') }} <a href="/login?lang={{ language }}">{{ copy('Увійти', 'Log in') }}</a></p>
+    <noscript><p class="small">{{ copy('Увімкніть JavaScript для безпечної реєстрації.', 'Enable JavaScript to register securely.') }}</p></noscript>
+  </div>
+  <a class="login-back" href="/?lang={{ language }}">← {{ copy('На головну', 'Back to home') }}</a>
+</section>
+{% endblock %}
+{% block scripts %}<script type="module" src="/static/js/features/auth/registration.js"></script>{% endblock %}

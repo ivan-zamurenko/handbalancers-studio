@@ -52,3 +52,12 @@
 #oauth-message:empty { display: none; }
 #oauth-message { margin-top: 12px; text-align: center; }
 .oauth-feedback { margin-bottom: 24px; padding: 12px; border: 1px solid var(--line); border-radius: 6px; }
+
+.auth-name-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.auth-name-row > * { min-width: 0; }
+.auth-status { min-height: 1.4em; margin-top: 16px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.auth-status:focus { outline: 1px solid var(--accent); outline-offset: 6px; border-radius: 2px; }
+.auth-resend { width: 100%; margin-top: 12px; font-size: 13px; }
+.auth-code { letter-spacing: .28em; font-variant-numeric: tabular-nums; }
+.login-signup a { color: var(--text); text-underline-offset: 4px; }
+@media(max-width: 420px) { .auth-name-row { grid-template-columns: 1fr; gap: 0; } }

@@ -19,7 +19,7 @@ for (const width of [390,1440]) for (const theme of ['light','dark']) {
     await expect(google).toBeEnabled();
     await google.click();
     await expect(google).toBeDisabled();
-    await expect(page.getByRole('status')).toContainText('Не вдалося почати вхід');
+    await expect(page.locator('#oauth-message')).toContainText('Не вдалося почати вхід');
     await expect(google).toBeEnabled();
     expect(starts).toBe(1);
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);

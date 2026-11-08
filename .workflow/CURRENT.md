@@ -1,3 +1,29 @@
+# Поточний checkpoint — S03-10 завершено локально, 2026-11-08
+
+Готові форми /register, /verify-email та /login: реєстрація, шестизначний код,
+повторний лист і вхід із паролем використовують наявні API. Google збережено,
+Apple відсутній. Спільний pending guard запобігає одночасним email/Google
+запитам; повернення назад відсікає застарілі відповіді й очищає секрети.
+У sessionStorage лише ім’я/email та TTL/cooldown; пароль/код не зберігаються.
+Є 60s resend/429 cooldown, доступні локалізовані помилки без прокрутки,
+keyboard flow, disabled/noJS fallback, мобільна й широка верстка в обох темах.
+
+GREEN: 85 browser, 41 JS, 172 Auth unit/contract/security tests; Ruff/format/Mypy.
+Read-only reviewer clear; його зауваження щодо scrollY assertion усунуто.
+Докази й screenshots: .workflow/evidence/S03-10.json.
+UI перевірено зі справжніми Jinja templates і synthetic/intercepted API;
+це не доказ доставки hosted OTP чи нового реального Google входу.
+
+Локальний сервер http://127.0.0.1:8000 перезапущено з приватним .env.local;
+GET health/login/register/verify-email = 200. Нові екрани доступні власнику.
+Міграцій/хмарних змін не було. Попередні security/provider gates залишаються.
+Сторонні видалення docs не чіпали; повний roadmap file validator через них
+не проходить, graph/next перевіряються окремо.
+Попередній завершений commit: c3bc3ba (S03-09, pushed); JWT fix: 4cecb25.
+Наступна картка — S03-11: наскрізні сценарії Auth із локальним Supabase.
+
+## Попередній checkpoint
+
 # Поточний checkpoint — S03-09 завершено локально, 2026-11-08
 
 Захист авторизації доповнено й перевірено:

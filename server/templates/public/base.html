@@ -42,7 +42,11 @@
     <div class="dialog__header"><h2 id="availability-title">{{ copy('Студія готується до відкриття', 'The studio is getting ready') }}</h2>
       <button type="button" data-dialog-close aria-label="{{ copy('Закрити', 'Close') }}">×</button></div>
     <div class="dialog__content">
+      {% if email_auth_enabled %}
+      <p>{{ copy('Оплата ще не відкрита. Зараз можна переглянути напрями, тарифи та обрати пакет.', 'Payments are not open yet. You can explore directions, plans and choose a package.') }}</p>
+      {% else %}
       <p>{{ copy('Реєстрація й оплата ще не відкриті. Зараз можна переглянути напрями, тарифи та обрати пакет.', 'Registration and payments are not open yet. You can explore directions, plans and choose a package.') }}</p>
+      {% endif %}
       <p class="muted" data-selection-message></p>
     </div>
   </div>
