@@ -9,14 +9,14 @@ async function ready(page, language = 'uk') {
 }
 
 for (const width of [390, 1440]) for (const theme of ['light', 'dark']) {
-  test(`real loading uses centered handstand and dimming ${width} ${theme}`, async ({page}) => {
+  test(`explicit screen loading uses centered handstand after 500ms ${width} ${theme}`, async ({page}) => {
     await page.setViewportSize({width, height:800});
     await page.addInitScript(value => localStorage.setItem('studio:theme:guest', value), theme);
     await ready(page);
     let release;
     const held = new Promise(resolve => {release = resolve;});
     await page.route('**/api/loading-example', async route => {await held; await route.fulfill({json:{ok:true}});});
-    await page.evaluate(() => {window.work = import('/static/js/api/client.js').then(({requestApi})=>requestApi('/api/loading-example'));});
+    await page.evaluate(() => {window.work = import('/static/js/api/client.js').then(({requestApi})=>requestApi('/api/loading-example',{loading:'screen'}));});
     const indicator = page.locator('[data-loading-indicator]');
     await expect(indicator).toBeVisible();
     await expect(indicator).toHaveAttribute('role','status');
@@ -46,8 +46,8 @@ test('concurrent API work stays visible until all settle, including network fail
   });
   await page.evaluate(async () => {
     const {requestApi} = await import('/static/js/api/client.js');
-    window.first = requestApi('/api/held/success');
-    window.second = requestApi('/api/held/failure').catch(()=>null);
+    window.first = requestApi('/api/held/success',{loading:'screen'});
+    window.second = requestApi('/api/held/failure',{loading:'screen'}).catch(()=>null);
   });
   await expect.poll(()=>Object.keys(releases).length).toBe(2);
   const indicator = page.locator('[data-loading-indicator]');
@@ -67,9 +67,9 @@ test('fast work does not flash; abort and history restore clear loading', async 
     const el = document.querySelector('[data-loading-indicator]');
     new MutationObserver(records=>{if(records.some(r=>r.attributeName==='hidden') && !el.hidden) window.shown = true;}).observe(el,{attributes:true});
     const {requestApi} = await import('/static/js/api/client.js');
-    await requestApi('/api/fast');
+    await requestApi('/api/fast',{loading:'screen'});
   });
-  await page.waitForTimeout(250);
+  await page.waitForTimeout(650);
   expect(await page.evaluate(()=>window.shown)).toBe(false);
   await page.route('**/api/hang', route=>route.abort('timedout'));
   await page.evaluate(async () => {
@@ -77,7 +77,7 @@ test('fast work does not flash; abort and history restore clear loading', async 
     const controller = new AbortController(); controller.abort();
     await requestApi('/api/hang',{signal:controller.signal}).catch(()=>{});
     const {beginLoading} = await import('/static/js/components/loading.js');
-    window.finish = beginLoading();
+    window.finish = beginLoading({mode:'screen'});
   });
   await expect(page.locator('[data-loading-indicator]')).toBeVisible();
   await page.evaluate(()=>window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true})));
@@ -85,7 +85,7 @@ test('fast work does not flash; abort and history restore clear loading', async 
   await page.evaluate(()=>{window.finish(); window.finish();});
 });
 
-test('reduced motion uses a still handstand; real page navigation shows loading', async ({page}) => {
+test('navigation uses only the top bar and respects reduced motion', async ({page}) => {
   await page.emulateMedia({reducedMotion:'reduce'});
   await ready(page);
   let release;
@@ -95,20 +95,22 @@ test('reduced motion uses a still handstand; real page navigation shows loading'
   let snapshot;
   await page.exposeFunction('reportLoading',value=>{snapshot=value;});
   await page.evaluate(()=>{
-    const element=document.querySelector('[data-loading-indicator]');
+    const element=document.querySelector('[data-loading-navigation]');
     new MutationObserver(()=>window.reportLoading({visible:!element.hidden,
+      screenVisible:!document.querySelector('[data-loading-indicator]').hidden,
       animations:element.getAnimations({subtree:true}).length})).observe(element,{attributes:true});
   });
   await page.getByRole('link',{name:'Забули пароль?'}).click({noWaitAfter:true});
   const indicator = page.locator('[data-loading-indicator]');
   await expect.poll(()=>snapshot?.visible).toBe(true);
   expect(snapshot.animations).toBe(0);
+  expect(snapshot.screenVisible).toBe(false);
   release();
   await expect(page).toHaveURL(/\/recovery\?lang=uk$/);
   await expect(indicator).toBeHidden();
 });
 
-test('initial page assets show loading until the load event', async ({page}) => {
+test('public page assets use only the top bar until the load event', async ({page}) => {
   let release;
   const held = new Promise(resolve=>{release=resolve;});
   await page.route('**/api/session', route=>route.fulfill({json:{authenticated:false}}));
@@ -121,9 +123,11 @@ test('initial page assets show loading until the load event', async ({page}) => 
     await route.fulfill({response,body:(await response.text()).replace('</body>','<img src="/held-image.svg" alt=""></body>')});
   });
   await page.goto('/login',{waitUntil:'domcontentloaded'});
-  await expect(page.locator('[data-loading-indicator]')).toBeVisible();
+  await expect(page.locator('[data-loading-navigation]')).toBeVisible();
+  await expect(page.locator('[data-loading-indicator]')).toBeHidden();
   release();
   await page.waitForLoadState('load');
+  await expect(page.locator('[data-loading-navigation]')).toBeHidden();
   await expect(page.locator('[data-loading-indicator]')).toBeHidden();
 });
 
@@ -131,7 +135,7 @@ test('body parsing and HTTP errors finish correctly', async ({page}) => {
   await ready(page);
   await page.evaluate(async () => {
     const {requestApi} = await import('/static/js/api/client.js');
-    window.bodyWork = requestApi('/test', {fetchImpl:async()=>({
+    window.bodyWork = requestApi('/test', {loading:'screen',fetchImpl:async()=>({
       ok:true, status:200, headers:new Headers({'Content-Type':'application/json'}),
       json:()=>new Promise(resolve=>{window.releaseBody=resolve;}),
     })});
@@ -163,17 +167,19 @@ test('anchors, downloads, other tabs and cancelled navigation do not start loadi
     }
   });
   await page.waitForTimeout(250);
+  await expect(page.locator('[data-loading-navigation]')).toBeHidden();
   await expect(page.locator('[data-loading-indicator]')).toBeHidden();
   await page.evaluate(()=>document.addEventListener('click',event=>event.preventDefault(),{once:true}));
   await page.getByRole('link',{name:'Забули пароль?'}).click();
   await page.waitForTimeout(250);
+  await expect(page.locator('[data-loading-navigation]')).toBeHidden();
   await expect(page.locator('[data-loading-indicator]')).toBeHidden();
 });
 
 
 test('production motion animates only while visible and responds to reduced motion',async({page})=>{
   await ready(page);
-  await page.evaluate(async()=>{window.finish=(await import('/static/js/components/loading.js')).beginLoading();});
+  await page.evaluate(async()=>{window.finish=(await import('/static/js/components/loading.js')).beginLoading({mode:'screen'});});
   const indicator=page.locator('[data-loading-indicator]');
   const figure=indicator.locator('[data-handstand-cycle]');
   await expect(indicator).toBeVisible();
@@ -195,7 +201,7 @@ test('production motion animates only while visible and responds to reduced moti
   expect(await figure.innerHTML()).toBe(hidden);
 });
 
-test('Google sign-in starts the real loader and a failed response clears it',async({page})=>{
+test('Google sign-in shows a button spinner without covering the page',async({page})=>{
   // The isolated test server intentionally has no configured OAuth provider.
   // Reuse the real Jinja fixture with synthetic availability, as oauth-ui does.
   const html=execFileSync('uv',['run','--locked','python','tests/fixtures/render_oauth_login.py'],{encoding:'utf8'});
@@ -206,10 +212,103 @@ test('Google sign-in starts the real loader and a failed response clears it',asy
   await page.route('**/api/auth/oauth/google/start',async route=>{
     await held;await route.fulfill({status:503,json:{}});
   });
-  await page.locator('[data-oauth-provider="google"]').click();
-  await expect(page.locator('[data-loading-indicator]')).toBeVisible();
+  const google=page.locator('[data-oauth-provider="google"]');
+  await google.click();
+  await expect(google.locator('.button-spinner')).toBeVisible();
+  await expect(google).toHaveAttribute('aria-busy','true');
+  await page.waitForTimeout(550);
+  await expect(page.locator('[data-loading-indicator]')).toBeHidden();
+  await expect(page.locator('[data-loading-navigation]')).toBeHidden();
   release();
   await expect(page.locator('[data-loading-indicator]')).toBeHidden();
-  await expect(page.locator('[data-oauth-provider="google"]')).toBeEnabled();
+  await expect(google).toBeEnabled();
+  await expect(google.locator('.button-spinner')).toHaveCount(0);
+  await expect(google).not.toHaveAttribute('aria-busy','true');
   await expect(page.locator('#oauth-message')).not.toBeEmpty();
+});
+
+
+test('background API work is silent and does not keep a screen indicator alive',async({page})=>{
+  await ready(page);
+  let release;const held=new Promise(resolve=>release=resolve);
+  await page.route('**/api/background',async route=>{await held;await route.fulfill({json:{ok:true}});});
+  await page.evaluate(()=>{window.background=import('/static/js/api/client.js').then(({requestApi})=>requestApi('/api/background'));});
+  await page.waitForTimeout(650);
+  await expect(page.locator('[data-loading-indicator]')).toBeHidden();
+  await expect(page.locator('[data-loading-navigation]')).toBeHidden();
+  await page.evaluate(async()=>{window.finish=(await import('/static/js/components/loading.js')).beginLoading({mode:'screen'});});
+  await expect(page.locator('[data-loading-indicator]')).toBeVisible();
+  await page.evaluate(()=>window.finish());
+  await expect(page.locator('[data-loading-indicator]')).toBeHidden();
+  release();await page.evaluate(()=>window.background);
+});
+
+test('whole-screen delay is 500ms and a finished task does not play out the cycle',async({page})=>{
+  await ready(page);
+  await page.clock.install();
+  await page.evaluate(async()=>{window.finish=(await import('/static/js/components/loading.js')).beginLoading({mode:'screen'});});
+  await page.clock.runFor(499);
+  await expect(page.locator('[data-loading-indicator]')).toBeHidden();
+  await page.clock.runFor(1);
+  await expect(page.locator('[data-loading-indicator]')).toBeVisible();
+  await page.evaluate(()=>window.finish());
+  await expect(page.locator('[data-loading-indicator]')).toBeHidden();
+});
+
+test('recovery uses a local busy button and restores it after the response',async({page})=>{
+  let release;const held=new Promise(resolve=>release=resolve);
+  await page.route('**/api/session',route=>route.fulfill({json:{authenticated:false}}));
+  await page.route('**/api/auth/recovery/request',async route=>{await held;await route.fulfill({status:503,json:{}});});
+  await page.goto('/recovery?lang=uk');
+  await page.getByLabel('Email',{exact:true}).fill('synthetic@example.test');
+  const submit=page.getByRole('button',{name:'Надіслати код'});
+  await submit.click();
+  await expect(page.getByRole('button',{name:'Надсилаємо…'})).toBeDisabled();
+  await expect(page.locator('[data-request-code] .button-spinner')).toBeVisible();
+  await page.waitForTimeout(550);
+  await expect(page.locator('[data-loading-indicator]')).toBeHidden();
+  await expect(page.locator('[data-loading-navigation]')).toBeHidden();
+  release();
+  await expect(page.getByRole('button',{name:'Надіслати код'})).toBeEnabled();
+  await expect(page.locator('[data-request-code] .button-spinner')).toHaveCount(0);
+});
+
+
+test('session refresh stays quiet while pending',async({page})=>{
+  let release;const held=new Promise(resolve=>release=resolve);
+  await page.route('**/api/session',async route=>{await held;await route.fulfill({json:{authenticated:false}});});
+  await page.goto('/login');
+  await page.waitForTimeout(650);
+  await expect(page.locator('[data-loading-indicator]')).toBeHidden();
+  await expect(page.locator('[data-loading-navigation]')).toBeHidden();
+  release();
+});
+
+test('button feedback restores original nodes and ignores stale completion after history restore',async({page})=>{
+  await ready(page);
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.evaluate(async()=>{
+    const button=document.createElement('button');button.id='loading-fixture';
+    const icon=document.createElement('span');icon.textContent='Save';
+    button.append(icon);document.body.append(button);window.originalIcon=icon;
+    const {beginLoading}=await import('/static/js/components/loading.js');
+    window.oldFinish=beginLoading({mode:'button',target:button,label:'Saving…'});
+  });
+  const button=page.locator('#loading-fixture');
+  await expect(button).toHaveText('Saving…');
+  expect(await button.evaluate(el=>el.getAnimations({subtree:true}).length)).toBe(0);
+  await page.evaluate(()=>window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true})));
+  await expect(button).toHaveText('Save');
+  expect(await button.evaluate(el=>el.firstChild===window.originalIcon)).toBe(true);
+  await page.evaluate(async()=>{
+    const {beginLoading}=await import('/static/js/components/loading.js');
+    window.newFinish=beginLoading({mode:'button',target:document.querySelector('#loading-fixture'),label:'Saving again…'});
+    window.oldFinish();
+  });
+  await expect(button).toHaveText('Saving again…');
+  await expect(button).toHaveAttribute('aria-busy','true');
+  await page.evaluate(()=>{window.newFinish();window.newFinish();});
+  await expect(button).toHaveText('Save');
+  await expect(button).not.toHaveAttribute('aria-busy','true');
+  expect(await button.evaluate(el=>el.firstChild===window.originalIcon)).toBe(true);
 });

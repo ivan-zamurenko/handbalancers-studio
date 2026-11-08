@@ -1,0 +1,58 @@
+{
+  "task": "owner-selective-loading",
+  "date": "2026-11-08",
+  "previous_commit": "f51d10a",
+  "scope": [
+    "quiet background and session",
+    "button feedback for existing actions",
+    "navigation topbar",
+    "explicit 500ms centered mascot"
+  ],
+  "red": {
+    "command": "npx playwright test tests/e2e/loading.spec.js -g \"whole-screen delay|background API\"",
+    "result": "2 failed against former 180ms global overlay: background displayed screen; screen displayed before 500ms"
+  },
+  "green": [
+    {
+      "command": "PLAYWRIGHT_BROWSERS_PATH=\"$PWD/.local-tools/playwright-browsers\" .local-tools/node/bin/node --test tests/js/*.test.js",
+      "result": "41 passed"
+    },
+    {
+      "command": "npx playwright test tests/e2e/loading.spec.js",
+      "result": "15 passed before 2 additional lifecycle/session tests"
+    },
+    {
+      "command": "npx playwright test",
+      "result": "73 passed, 44.1s"
+    },
+    {
+      "command": "npx playwright test tests/e2e/loading.spec.js -g \"fast work does not flash\"",
+      "result": "1 passed (3.7s); no-flash wait strengthened from250ms to650ms following review"
+    }
+  ],
+  "review": {
+    "agent": "security_auth_review",
+    "result": "no blocking findings; reviewer independently ran6 HTTP-client JS tests"
+  },
+  "visual": {
+    "origin": "http://127.0.0.1:8000",
+    "route": "/recovery?lang=uk",
+    "cases": [
+      "dark1440x900",
+      "light390x900"
+    ],
+    "result": "spinner visible; overlay hidden; no horizontal overflow; original button restored after503",
+    "fixtures": "synthetic email and intercepted held503; no real email sent",
+    "screenshots": [
+      "selective-loading-dark.png",
+      "selective-loading-light.png"
+    ]
+  },
+  "limitations": [
+    "No real OAuth/email flow executed in this UI task",
+    "No current public/auth page automatically invokes screen mode; reserved for whole-screen unavailable work",
+    "No new calendar/skeleton/upload product feature",
+    "Existing unrelated deleted docs/untracked skills untouched"
+  ],
+  "next": "S03-09 remains next roadmap card; cloud/security gates unchanged"
+}

@@ -18,7 +18,6 @@ function forgetAccount() {
 async function refresh() {
   if (logoutPending || !logout || !login) return;
   const requestRevision = ++revision;
-  const finishLoading = beginLoading();
   try {
     const response = await fetch('/api/session', {credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(8000)});
     if (!response.ok && response.status !== 401) throw new Error('Session unavailable');
@@ -35,8 +34,6 @@ async function refresh() {
     // An outage is not proof of logout. Keep the existing session/CSRF retryable.
     logout.disabled = false;
     if (!csrf) { logout.hidden = true; login.hidden = false; }
-  } finally {
-    finishLoading();
   }
 }
 
@@ -45,7 +42,7 @@ logout?.addEventListener('click', async () => {
   logoutPending = true;
   ++revision; // A snapshot started before logout must not restore old account state.
   logout.disabled = true;
-  const finishLoading = beginLoading();
+  const finishLoading = beginLoading({mode:'button', target:logout});
   try {
     const response = await fetch('/api/auth/logout', {method: 'POST', credentials: 'same-origin', headers: {'X-CSRF-Token': csrf}, signal: AbortSignal.timeout(8000)});
     if (response.status === 204) {

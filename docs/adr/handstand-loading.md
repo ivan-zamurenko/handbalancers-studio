@@ -1,3 +1,35 @@
+# Вибірковий feedback — 2026-11-08
+
+Власник погодив рекомендацію не перекривати готову сторінку під час кожної дії.
+Це рішення замінює універсальний centered loader з попередньої версії нижче.
+
+- requestApi за замовчуванням background; session refresh також quiet.
+- beginLoading({mode:'button',target}) / requestApi(...,{loading:{mode:'button',target}})
+  дає spinner після180ms, data-pending-label за наявності; зберігає DOM nodes і
+  початковий aria-busy. Disabled/repeated-submit guards лишаються у контролерах.
+- navigation/assets: accent topbar3px, delay180ms, без вигаданого відсотка.
+- requestApi(...,{loading:'screen'}) / beginLoading({mode:'screen'}) — лише явно
+  блокувальне завантаження цілого екрана; delay500ms, card224px, dim12%/blur1px.
+  На поточних SSR public/auth сторінках немає такого caller; режим готовий для
+  майбутнього кабінету. Сам loader не є authorization/interaction guard.
+- Контент з календаря/карток згодом отримує skeleton, uploads — реальний progress.
+  Не додаємо неіснуючі функції лише заради показу індикатора.
+
+Незалежні token sets; screen тимчасово ховає navigation bar. Button state identity
+захищає нову операцію від stale completion після pagehide/bfcache. Page reset
+скасовує також deferred click timers. API finally чекає body parsing; loading
+options не йдуть у fetch. Після завершення немає штучної мінімальної тривалості.
+Reduced-motion вимикає CSS spinner/bar animation і дає static handstand pose;
+звичайний RAF працює тільки коли mascot видимий. Нових dependencies немає.
+
+RED:2 тести на старій реалізації показали overlay для background і появу раніше500ms.
+GREEN:41 JS,73 browser, незалежний read-only review без блокерів. За review посилено
+no-flash wait250→650ms і перевірено окремо. Візуально оглянуто local8000 recovery
+у dark desktop та light mobile, без overflow, на synthetic затриманій503.
+Auth/security бізнес-правила не змінено; це не підтвердження live provider flows.
+
+## Попередня версія
+
 # Центральний runtime loader — 2026-11-08
 
 Пряма вказівка власника: анімація повинна працювати при завантаженні сайту.

@@ -13,7 +13,7 @@
         <label class="form-field__label" for="recovery-email">Email</label>
         <input class="form-field__control" id="recovery-email" type="email" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false" maxlength="254" required>
       </div>
-      <button class="primary login-submit" type="submit" data-request-code disabled>{{ copy('Надіслати код', 'Send a code') }}</button>
+      <button class="primary login-submit" type="submit" data-request-code data-pending-label="{{ copy('Надсилаємо…', 'Sending…') }}" disabled>{{ copy('Надіслати код', 'Send a code') }}</button>
     </form>
     <p id="recovery-status" role="status" tabindex="-1"
        data-pending="{{ copy('Зачекайте…', 'Please wait…') }}"
@@ -33,7 +33,7 @@
         <input class="form-field__control" id="recovery-password" type="password" autocomplete="new-password" minlength="8" maxlength="256" aria-describedby="recovery-password-hint" required>
         <p class="form-field__hint" id="recovery-password-hint">{{ copy('Щонайменше 8 символів. Використайте унікальний пароль.', 'At least 8 characters. Use a unique password.') }}</p>
       </div>
-      <button class="primary login-submit" type="submit" disabled>{{ copy('Зберегти новий пароль', 'Save new password') }}</button>
+      <button class="primary login-submit" type="submit" data-pending-label="{{ copy('Зберігаємо…', 'Saving…') }}" disabled>{{ copy('Зберегти новий пароль', 'Save new password') }}</button>
       <button class="recovery-again" type="button" data-recovery-again disabled>{{ copy('Інша пошта або новий код', 'Different email or a new code') }}</button>
     </form>
     <noscript><p>{{ copy('Увімкніть JavaScript для безпечного відновлення пароля.', 'Enable JavaScript to reset your password securely.') }}</p></noscript>

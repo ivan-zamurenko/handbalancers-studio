@@ -1,3 +1,24 @@
+# Поточний checkpoint — вибіркові індикатори завантаження, 2026-11-08
+
+Власник погодив рекомендацію: індикатор залежить від дії, дизайн у стилі сайту.
+Google start, recovery, logout і generic forms показують spinner у кнопці;
+перехід/початкове очікування assets — тонку accent-смугу зверху. Затримка180ms.
+Background API та /api/session працюють без глобального індикатора.
+Людинка доступна через explicit screen mode після500ms: центр224px,
+затемнення12%, blur1px. Поточні SSR public/auth сторінки цього режиму не
+потребують; підключати до майбутнього справді недоступного екрана, не всіх fetch.
+Skeletons/calendar/video progress не реалізовувались: таких робочих UI ще немає.
+Рух6.6s збережений, без примусового програвання до кінця; reduced-motion static.
+
+GREEN:41 JS,73 full browser; посилений fast no-flash тест перевірено окремо.
+Read-only reviewer: блокерів немає. Local8000 recovery: dark1440/light390,
+контрольовано затримана synthetic503, spinner та відновлення кнопки перевірені;
+реальних email/OAuth операцій ця UI перевірка не виконує.
+Evidence: .workflow/evidence/selective-loading.json; ADR: docs/adr/handstand-loading.md.
+Попередній commit:f51d10a. Cloud/auth/security gates не змінено; S03-09 наступна.
+
+## Попередній checkpoint
+
 # Поточний checkpoint — анімація підключена до завантаження сайту, 2026-11-08
 
 Власник уточнив: потрібен реальний loader, не окрема сторінка.

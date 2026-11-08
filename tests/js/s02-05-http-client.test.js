@@ -117,3 +117,13 @@ test('network failure remains distinct from a business response', async () => {
     error => error instanceof NetworkError && error.kind === 'network',
   );
 });
+
+test('local loading options are not forwarded to fetch', async () => {
+  await requestApi('/api/example', {
+    loading: {mode: 'button', target: {localOnly: true}},
+    fetchImpl: async (_url, options) => {
+      assert.equal(Object.hasOwn(options, 'loading'), false);
+      return new Response(null, {status: 204});
+    },
+  });
+});

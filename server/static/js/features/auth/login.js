@@ -32,7 +32,7 @@ for (const button of providers) {
     starting = true;
     for (const control of providers) control.disabled = true;
     message.textContent = message.dataset.pending;
-    const finishLoading = beginLoading();
+    const finishLoading = beginLoading({mode:'button', target:button});
     try {
       const response = await fetch(`/api/auth/oauth/${button.dataset.oauthProvider}/start`, {
         method: 'POST', credentials: 'same-origin', headers: {'Content-Type': 'application/json'},

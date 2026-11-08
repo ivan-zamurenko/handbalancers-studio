@@ -23,7 +23,7 @@
         <span class="theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="4.1"/><path d="M12 2.7v2.4M12 18.9v2.4M2.7 12h2.4M18.9 12h2.4M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/></svg></span>
         <span class="theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M20.1 14.3A8.3 8.3 0 0 1 9.7 3.9a8.4 8.4 0 1 0 10.4 10.4Z"/></svg></span>
       </button>
-      <button type="button" data-logout{% if not signed_in %} hidden{% endif %}>{{ copy("Вийти", "Log out") }}</button>
+      <button type="button" data-logout data-pending-label="{{ copy('Виходимо…', 'Signing out…') }}"{% if not signed_in %} hidden{% endif %}>{{ copy("Вийти", "Log out") }}</button>
       <a data-login-link class="login-link btn" href="/login?lang={{ language }}"{% if signed_in %} hidden{% endif %}{% if page_path == '/login' %} aria-current="page"{% endif %}>{{ copy('Логін', 'Log in') }}</a>
       <noscript><a class="login-link btn" href="/login?lang={{ language }}">{{ copy('Логін', 'Log in') }}</a></noscript>
     </div>

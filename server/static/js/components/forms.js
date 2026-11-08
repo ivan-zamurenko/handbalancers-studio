@@ -15,18 +15,16 @@ document.addEventListener('submit', async event => {
   if (!(submitter instanceof HTMLButtonElement)) return;
 
   pendingForms.add(form);
-  const initialLabel = submitter.textContent;
   const wasDisabled = submitter.disabled;
   const feedback = form.querySelector('[data-form-feedback]');
   submitter.disabled = true;
-  if (submitter.dataset.pendingLabel) submitter.textContent = submitter.dataset.pendingLabel;
   form.setAttribute('aria-busy', 'true');
   if (feedback instanceof HTMLElement) {
     feedback.textContent = '';
     feedback.hidden = true;
   }
 
-  const finishLoading = beginLoading();
+  const finishLoading = beginLoading({mode:'button', target:submitter});
   try {
     const method = form.method.toUpperCase();
     const destination = new URL(form.action, document.baseURI);
@@ -56,6 +54,5 @@ document.addEventListener('submit', async event => {
     pendingForms.delete(form);
     form.removeAttribute('aria-busy');
     submitter.disabled = wasDisabled;
-    submitter.textContent = initialLabel;
   }
 });

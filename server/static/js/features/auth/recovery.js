@@ -28,6 +28,7 @@ async function submit(event, confirming) {
   try {
     await requestApi(`/api/auth/recovery/${confirming ? 'confirm' : 'request'}`, {
       method: 'POST', signal: AbortSignal.timeout(30000),
+      loading: {mode:'button', target:event.target.querySelector('button[type="submit"]')},
       body: confirming ? {email: address, token: code.value, password: password.value} : {email: address},
     });
     if (current !== revision) return;

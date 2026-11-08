@@ -39,6 +39,7 @@ function isJsonBody(body) {
 export async function requestApi(input, {
   baseUrl = globalThis.location?.origin || 'http://localhost',
   csrfToken,
+  loading = 'background',
   fetchImpl = globalThis.fetch,
   documentObject = globalThis.document,
   ...requestOptions
@@ -63,7 +64,7 @@ export async function requestApi(input, {
   }
   options.credentials = sameOrigin ? 'same-origin' : 'omit';
 
-  const finishLoading = beginLoading();
+  const finishLoading = beginLoading(typeof loading === 'string' ? {mode:loading} : loading);
   try {
     let response;
     try {

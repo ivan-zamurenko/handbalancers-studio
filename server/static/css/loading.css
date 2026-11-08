@@ -1,4 +1,47 @@
-/* A status overlay for real pending work; callers retain their own form guards. */
+/* Navigation stays at the edge; local actions keep feedback inside their button. */
+.loading-navigation {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 90;
+  height: 3px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  pointer-events: none;
+}
+.loading-navigation[hidden] { display: none; }
+.loading-navigation > span {
+  display: block;
+  width: 35%;
+  height: 100%;
+  border-radius: 0 2px 2px 0;
+  background: var(--accent);
+  animation: loading-travel 1.4s ease-in-out infinite;
+}
+.button-spinner {
+  display: inline-block;
+  flex: 0 0 14px;
+  width: 14px;
+  height: 14px;
+  box-sizing: border-box;
+  border: 1.5px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: loading-turn .8s linear infinite;
+}
+.oauth-button.is-loading { position: relative; }
+.oauth-button.is-loading > svg { opacity: 0; }
+.oauth-button.is-loading .button-spinner { position: absolute; }
+@keyframes loading-travel {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(386%); }
+}
+@keyframes loading-turn { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .loading-navigation > span, .button-spinner { animation: none; }
+  .loading-navigation > span { width: 100%; opacity: .65; }
+}
+
+/* Explicit whole-screen work only; callers retain their own interaction guards. */
 .loading-handstand {
   position: fixed;
   inset: 0;
@@ -6,8 +49,8 @@
   display: grid;
   place-items: center;
   padding: 16px;
-  background: rgb(0 0 0 / .22);
-  backdrop-filter: blur(2px);
+  background: rgb(0 0 0 / .12);
+  backdrop-filter: blur(1px);
   pointer-events: none;
 }
 .loading-handstand[hidden] { display: none; }
