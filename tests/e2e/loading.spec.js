@@ -1,4 +1,5 @@
 import {test, expect} from '@playwright/test';
+import {execFileSync} from 'node:child_process';
 
 async function ready(page, language = 'uk') {
   await page.route('**/api/session', route => route.fulfill({json:{authenticated:false}}));
@@ -8,7 +9,7 @@ async function ready(page, language = 'uk') {
 }
 
 for (const width of [390, 1440]) for (const theme of ['light', 'dark']) {
-  test(`handstand loading is compact and accessible ${width} ${theme}`, async ({page}) => {
+  test(`real loading uses centered handstand and dimming ${width} ${theme}`, async ({page}) => {
     await page.setViewportSize({width, height:800});
     await page.addInitScript(value => localStorage.setItem('studio:theme:guest', value), theme);
     await ready(page);
@@ -23,8 +24,12 @@ for (const width of [390, 1440]) for (const theme of ['light', 'dark']) {
     await expect(indicator.locator('svg')).toHaveAttribute('aria-hidden','true');
     expect(await indicator.evaluate(el=>getComputedStyle(el).pointerEvents)).toBe('none');
     expect(await page.evaluate(()=>document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    const box = await indicator.boundingBox();
-    expect(box.width).toBeLessThan(260); expect(box.height).toBeLessThan(110);
+    const box = await indicator.locator('.loading-card').boundingBox();
+    expect(box.width).toBeLessThan(260); expect(box.height).toBeLessThan(240);
+    expect(Math.abs(box.x+box.width/2-width/2)).toBeLessThan(2);
+    expect(Math.abs(box.y+box.height/2-400)).toBeLessThan(2);
+    expect(await indicator.evaluate(el=>getComputedStyle(el).backgroundColor)).not.toBe('rgba(0, 0, 0, 0)');
+    await expect(indicator.locator('[data-handstand-cycle]')).toHaveCount(1);
     await page.screenshot({path:test.info().outputPath('handstand.png')});
     release(); await page.evaluate(()=>window.work);
     await expect(indicator).toBeHidden();
@@ -163,4 +168,48 @@ test('anchors, downloads, other tabs and cancelled navigation do not start loadi
   await page.getByRole('link',{name:'Забули пароль?'}).click();
   await page.waitForTimeout(250);
   await expect(page.locator('[data-loading-indicator]')).toBeHidden();
+});
+
+
+test('production motion animates only while visible and responds to reduced motion',async({page})=>{
+  await ready(page);
+  await page.evaluate(async()=>{window.finish=(await import('/static/js/components/loading.js')).beginLoading();});
+  const indicator=page.locator('[data-loading-indicator]');
+  const figure=indicator.locator('[data-handstand-cycle]');
+  await expect(indicator).toBeVisible();
+  const first=await figure.innerHTML();
+  await page.waitForTimeout(300);
+  expect(await figure.innerHTML()).not.toBe(first);
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.waitForTimeout(60);
+  const still=await figure.innerHTML();
+  await page.waitForTimeout(300);
+  expect(await figure.innerHTML()).toBe(still);
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await page.waitForTimeout(200);
+  expect(await figure.innerHTML()).not.toBe(still);
+  await page.evaluate(()=>window.finish());
+  await expect(indicator).toBeHidden();
+  const hidden=await figure.innerHTML();
+  await page.waitForTimeout(300);
+  expect(await figure.innerHTML()).toBe(hidden);
+});
+
+test('Google sign-in starts the real loader and a failed response clears it',async({page})=>{
+  // The isolated test server intentionally has no configured OAuth provider.
+  // Reuse the real Jinja fixture with synthetic availability, as oauth-ui does.
+  const html=execFileSync('uv',['run','--locked','python','tests/fixtures/render_oauth_login.py'],{encoding:'utf8'});
+  await page.route('**/login?lang=uk',route=>route.fulfill({contentType:'text/html',body:html}));
+  await ready(page);
+  let release;
+  const held=new Promise(resolve=>{release=resolve;});
+  await page.route('**/api/auth/oauth/google/start',async route=>{
+    await held;await route.fulfill({status:503,json:{}});
+  });
+  await page.locator('[data-oauth-provider="google"]').click();
+  await expect(page.locator('[data-loading-indicator]')).toBeVisible();
+  release();
+  await expect(page.locator('[data-loading-indicator]')).toBeHidden();
+  await expect(page.locator('[data-oauth-provider="google"]')).toBeEnabled();
+  await expect(page.locator('#oauth-message')).not.toBeEmpty();
 });

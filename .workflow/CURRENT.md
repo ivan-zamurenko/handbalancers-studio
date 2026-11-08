@@ -1,3 +1,23 @@
+# Поточний checkpoint — анімація підключена до завантаження сайту, 2026-11-08
+
+Власник уточнив: потрібен реальний loader, не окрема сторінка.
+Природний цикл перенесено до production handstand-motion.js; preview тепер
+імпортує його. Спільний base включає новий SVG та shared figure CSS.
+Реальні API/forms/Google-start/navigation/assets використовують centered
+224px loading-card, затемнення22% іblur2px. Затримка180ms збережена.
+PendingSet, errors/abort/body parsing, bfcache та navigation guards збережені.
+RAF існує лише під час показу; reduced-motion дає статичну стійку.
+
+GREEN:40 JS,68 browser,6 motion tests напряму з production module.
+Read-only review без блокерів. Local8000 /login віддає новий loader без restart;
+перевірено реальний local HTTP GET/health/live visible→hidden, dark desktop/
+light mobile. Google failure test — UI fixture, не доказ live OAuth.
+Evidence: .workflow/evidence/handstand-runtime.json; ADR: docs/adr/handstand-loading.md.
+Попередній commitcd2b54c. Cloud/auth/security gates не змінені.
+Next: власник користується звичайним сайтом; спеціальна preview-сторінка не потрібна.
+
+## Попередній checkpoint
+
 # Поточний checkpoint — природний рух у стилі сайту, 2026-11-08
 
 Останній запит: плавні рухи «як в житті» та оформлення за стилем продукту.

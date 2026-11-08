@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {poseAt} from '../../server/static/previews/handstand/cycle-motion.js';
+import {poseAt} from '../../server/static/js/components/handstand-motion.js';
 const distance=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
 const close=(a,b)=>assert.ok(Math.abs(a-b)<.001, `${a} != ${b}`);
 

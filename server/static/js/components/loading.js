@@ -1,21 +1,40 @@
+import {drawPose, mountHandstandCycle} from './handstand-motion.js';
+
 // A shared indicator for real work. Each caller owns one idempotent completion.
 const indicator = globalThis.document?.querySelector('[data-loading-indicator]');
 const pending = new Set();
 let reveal;
 let navigationTimer;
 let finishNavigation;
+let disposeMotion;
+const figure = indicator?.querySelector('[data-handstand-cycle]');
+const motionPreference = indicator ? matchMedia('(prefers-reduced-motion: reduce)') : null;
+
+function syncMotion() {
+  disposeMotion?.();
+  disposeMotion = undefined;
+  if (!figure || indicator.hidden) return;
+  if (motionPreference.matches) drawPose(figure, .58);
+  else disposeMotion = mountHandstandCycle(figure);
+}
+
+function hide() {
+  indicator.hidden = true;
+  disposeMotion?.();
+  disposeMotion = undefined;
+}
 
 export function beginLoading() {
   if (!indicator) return () => {};
   const token = {};
   pending.add(token);
   if (pending.size === 1) {
-    reveal = setTimeout(() => { indicator.hidden = false; }, 180);
+    reveal = setTimeout(() => { indicator.hidden = false; syncMotion(); }, 180);
   }
   return () => {
     if (!pending.delete(token) || pending.size) return;
     clearTimeout(reveal);
-    indicator.hidden = true;
+    hide();
   };
 }
 
@@ -31,10 +50,11 @@ function reset() {
   clearTimeout(reveal);
   clearTimeout(navigationTimer);
   pending.clear();
-  indicator.hidden = true;
+  hide();
 }
 
 if (indicator) {
+  motionPreference.addEventListener('change', syncMotion);
   if (document.readyState !== 'complete') {
     const finish = beginLoading();
     window.addEventListener('load', finish, {once:true});

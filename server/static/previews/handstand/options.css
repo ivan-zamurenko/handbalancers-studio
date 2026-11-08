@@ -1,3 +1,4 @@
+@import url('../../css/handstand.css');
 * { box-sizing: border-box; }
 body { margin: 0; font-family: var(--font-family); background: var(--bg); color: var(--text); }
 button, a { -webkit-tap-highlight-color: transparent; }
@@ -37,10 +38,6 @@ h2 { margin: 0 0 9px; font-weight: 550; font-size: 20px; letter-spacing: -.035em
 footer { display: flex; justify-content: space-between; gap: 20px; padding: 25px 0 0; font-size: 10px; color: var(--muted); }
 .ground-shadow { fill: var(--text); opacity: .08; }
 .cycle-figure { width: 190px; height: 146px; }
-.cycle-figure path, .cycle-figure circle { stroke: var(--text); stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round; }
-.cycle-figure .cycle-ground { stroke: var(--line); stroke-width: 1.4; }
-.cycle-rear { opacity: .40; }
-.cycle-figure [data-head] { fill: var(--surface); stroke-width: 2.2; }
 .ink { stroke: var(--accent); stroke-linecap: round; stroke-linejoin: round; }
 .thin { stroke-width: 3; }
 
@@ -154,13 +151,8 @@ dialog[data-placement="corner"] .escape-hint { bottom: 128px; }
 .cycle-sequence span { padding: 0 8px; color: var(--accent); }
 .cycle-main footer a { color: var(--muted); text-decoration: none; }
 
-.cycle-figure .cycle-eye { stroke-width: 1.35; }
 
 /* Studio signature: neutral silhouette, green singlet, quiet floor contact. */
-.cycle-figure [data-bone="torso"] { stroke: var(--accent); stroke-width: 4.8; }
-.cycle-figure .cycle-mat { stroke: var(--accent); stroke-width: 3; opacity: .13; }
-.cycle-figure .cycle-marks { stroke: var(--line); stroke-width: 1; }
-.cycle-contact-shadow { fill: var(--text); opacity: .09; }
 .loading-stage { min-width: 224px; padding: 20px 24px 24px; border: 1px solid var(--line); border-radius: var(--radius-panel); }
 .loading-stage .cycle-figure { width: 148px; height: 114px; }
 .loading-stage p { margin-top: 16px; font-size: 12px; }

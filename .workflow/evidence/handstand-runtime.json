@@ -1,0 +1,23 @@
+{
+  "task": "owner-handstand-runtime",
+  "status": "implemented_local",
+  "request": "Use the refined handstand as the actual website loading animation, centered with dimming",
+  "red": {
+    "command": "playwright test tests/e2e/loading.spec.js -g \"real loading uses centered.*390 light\"",
+    "result": "failed: runtime .loading-card absent"
+  },
+  "green": {
+    "javascript": "40 passed",
+    "production_motion": "6 passed via canonical production module",
+    "browser": "68 full suite passed (35.0s)",
+    "diff_check": "passed",
+    "foundation_contracts": "8 passed"
+  },
+  "test_fixture_correction": "First focused run16passed/1failed: isolated app intentionally lacks OAuth config. Google UI scenario now reuses existing real-Jinja/synthetic-availability fixture; no runtime auth changes.",
+  "review": "security_auth_review: no blockers; moved rig identical, pending work guards/lifecycle/CSP reviewed",
+  "local_smoke": "http://127.0.0.1:8000/login; real held /health/live GET showed centered motion then hid on completion; desktop dark and mobile light visually checked",
+  "scope": "Shared runtime loading component and shared motion/style; auth logic/cloud/deploy unchanged",
+  "not_verified": "No new live OAuth/provider or cloud security evidence claimed",
+  "previous_commit": "cd2b54c",
+  "next": "Use the ordinary site; no separate preview page required"
+}

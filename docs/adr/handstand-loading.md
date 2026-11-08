@@ -1,3 +1,30 @@
+# Центральний runtime loader — 2026-11-08
+
+Пряма вказівка власника: анімація повинна працювати при завантаженні сайту.
+Новий SVG та6.6s rig підключено через shared/base.html іloading.js.
+Єдине джерело руху — static/js/components/handstand-motion.js; preview re-export.
+Спільний handstand.css задає фігуру; loading.css — center card224px, легке
+затемнення22%/blur2px, product tokens. Це status overlay, не dialog: фокус
+не викрадається, pointer-events:none; блокування повторної форми лишається
+обов’язком існуючих form guards.
+
+PendingSet/idempotent done,180ms anti-flash, API body parsing іfinally,
+помилки/abort/navigation/assets/bfcache збережені. При reveal створюється
+controller; при hide/reset він dispose; reduced-motion static pose іlive
+preference changes підтримані. Немає додаткового штучного очікування анімації.
+Auth/provider logic не змінено; нових зовнішніх запитів іdependencies немає.
+
+RED: новий runtime center test не знайшов .loading-card у старому corner loader.
+Перший combined run16passed/1failed: ізольований сервер не має налаштованого
+Google, тому кнопка відсутня. Тест виправлено через існуючий real-Jinja OAuth
+UI fixture із синтетичною availability; не вмикали provider в runtime.
+GREEN:68 full browser,40 JS,6 production motion tests; review без блокерів.
+Перевірено local8000 /login під час реального, контрольовано затриманого
+GET/health/live: показ по центру, рух, приховування після відповіді;
+dark desktop/light mobile переглянуті. Cloud/OAuth реальні gates незмінні.
+
+## Попередня версія
+
 # Компактний handstand loading — 2026-11-08
 
 Окремий явно погоджений запит власника після S03-08: маленька абстрактна людина,
