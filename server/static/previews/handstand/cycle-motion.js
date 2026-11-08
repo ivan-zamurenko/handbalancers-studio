@@ -1,63 +1,124 @@
-// One small, side-view skeleton. Hands stay at fixed floor anchors during support.
-// Frames: time, hip, torso angle, rear/front feet, rear/front hands.
-const stand = [[68,105],-90,[62,164],[74,164],[57,108],[82,108]];
-const step = [[88,111],-78,[62,164],[112,164],[125,42],[133,47]];
-const stride = [[75,108],-86,[62,164],[90,149],[98,105],[108,93]];
-const lunge = [[100,116],-42,[64,164],[118,164],[153,124],[161,123]];
-const plant = [[108,106],41,[62,133],[118,164],[166,164],[176,164]];
-const split = [[161,76],81,[174,18],[113,109],[166,164],[176,164]];
-const balance = [[171,75],90,[176,16],[166,16],[166,164],[176,164]];
-const frames = [
-  [0,...stand],[.06,...stand],[.14,...stride],[.22,...step],[.28,...lunge],
-  [.34,...plant],
-  [.43,[130,88],51,[90,45],[117,145],[166,164],[176,164]],
-  [.50,...split],[.56,...balance],[.66,...balance],
-  [.72,...split],[.80,...plant],[.87,...lunge],[.92,...step],
-  [.96,...stride],[.98,...stand],[1,...stand],
-];
-const lerp = (a,b,t) => a+(b-a)*t;
-const point = (a,b,t) => [lerp(a[0],b[0],t),lerp(a[1],b[1],t)];
+// Side-view rig. The support chain is solved from the wrists, not interpolated
+// between bent poses: wrist → shoulder → hip stays straight throughout the kick.
+const rad = Math.PI/180;
+const clamp = t => Math.max(0,Math.min(1,t));
+const mix = (a,b,t) => a+(b-a)*t;
+const smooth = t => {t=clamp(t);return t*t*(3-2*t);};
+const polar = (p,length,angle) => [p[0]+length*Math.cos(angle*rad),p[1]+length*Math.sin(angle*rad)];
+const blend = (a,b,t) => a.map((v,i)=>mix(v,b[i],t));
 
-function joint(start,end,length,bend) {
-  const dx=end[0]-start[0], dy=end[1]-start[1];
-  const distance=Math.max(.001,Math.hypot(dx,dy));
-  const offset=Math.sqrt(Math.max(0,length*length-distance*distance/4));
-  return [(start[0]+end[0])/2-bend*dy/distance*offset,
-    (start[1]+end[1])/2+bend*dx/distance*offset];
+// Shape-preserving cubic interpolation: passing poses retain velocity, while
+// anticipation, the apex and the finish can settle without overshooting.
+function track(t,keys) {
+  if(t<=keys[0][0]) return keys[0][1];
+  if(t>=keys.at(-1)[0]) return keys.at(-1)[1];
+  const i=keys.findIndex(k=>k[0]>t)-1;
+  const slope=j=>(keys[j+1][1]-keys[j][1])/(keys[j+1][0]-keys[j][0]);
+  const tangent=j=>{
+    if(j===0 || j===keys.length-1) return 0;
+    const a=slope(j-1),b=slope(j);
+    return a*b<=0?0:2*a*b/(a+b);
+  };
+  const h=keys[i+1][0]-keys[i][0], u=(t-keys[i][0])/h;
+  return (2*u**3-3*u*u+1)*keys[i][1]+(u**3-2*u*u+u)*h*tangent(i)
+    +(-2*u**3+3*u*u)*keys[i+1][1]+(u**3-u*u)*h*tangent(i+1);
 }
 
+function joint(a,b,length,bend=-1) {
+  const dx=b[0]-a[0],dy=b[1]-a[1],d=Math.max(.00001,Math.hypot(dx,dy));
+  const height=Math.sqrt(Math.max(0,length*length-d*d/4));
+  return [(a[0]+b[0])/2-bend*dy/d*height,(a[1]+b[1])/2+bend*dx/d*height];
+}
+
+const plantHip=polar([180,164],-86,30);
+const lungeHip=[98,118.64];
+const rearStartAngle=Math.atan2(164-lungeHip[1],62-(lungeHip[0]-2))/rad;
+const rearStartLength=Math.hypot(62-(lungeHip[0]-2),164-lungeHip[1]);
+const releaseAngle=35; // Push off before the knee locks, then extend in flight.
+const releaseHip=polar([182,164],-86,releaseAngle);
+const releaseLength=Math.hypot(118-releaseHip[0],164-releaseHip[1]);
+const releaseLegAngle=Math.atan2(164-releaseHip[1],118-releaseHip[0])/rad;
+
 export function poseAt(progress) {
-  const t=Math.min(1,Math.max(0,progress));
-  const index=Math.max(1,frames.findIndex(frame=>frame[0]>=t));
-  const a=frames[index-1], b=frames[index];
-  const fraction=(t-a[0])/(b[0]-a[0]);
-  const ease=fraction*fraction*(3-2*fraction);
-  const hip=point(a[1],b[1],ease);
-  const angle=lerp(a[2],b[2],ease)*Math.PI/180;
-  const shoulder=[hip[0]+40*Math.cos(angle),hip[1]+40*Math.sin(angle)];
-  const head=[shoulder[0]+14*Math.cos(angle),shoulder[1]+14*Math.sin(angle)];
-  const backFoot=point(a[3],b[3],ease), frontFoot=point(a[4],b[4],ease);
-  const backHand=point(a[5],b[5],ease), frontHand=point(a[6],b[6],ease);
-  return {hip,shoulder,head,backFoot,frontFoot,backHand,frontHand,
-    backKnee:joint(hip,backFoot,30,-1),frontKnee:joint(hip,frontFoot,30,-1),
-    backElbow:joint(shoulder,backHand,25,-1),frontElbow:joint(shoulder,frontHand,25,-1)};
+  const t=clamp(progress);
+  // Return is deliberately slower than the kick, with a different step rhythm.
+  let phase=t;
+  if(t>.78) phase=track(t,[[.78,.36],[.88,.24],[.96,.10],[1,0]]);
+  let hip,angle,armAngle,armLength=46,backFoot,frontFoot;
+  if(t>=.36 && t<=.78) {
+    angle=track(t,[[.36,30],[.405,51],[.46,83],[.51,91.4],
+      [.55,89.4],[.59,90.3],[.64,90],[.69,77],[.75,45],[.78,30]]);
+    hip=polar([180,164],-86,angle);
+    armAngle=angle;
+    backFoot=polar([hip[0]-2,hip[1]],60,angle+180);
+    if(angle<=releaseAngle) frontFoot=[118,164];
+    else {
+      const q=clamp((angle-releaseAngle)/(90-releaseAngle));
+      // The trailing leg follows a long, clean arc; it joins after the first.
+      const legAngle=mix(releaseLegAngle,270,smooth(q));
+      const extension=clamp((angle-releaseAngle)/30);
+      const length=60-(60-releaseLength)*(1-extension)**2;
+      frontFoot=polar([hip[0]+2,hip[1]],length,legAngle+(angle>90?angle-90:0));
+    }
+  } else if(phase>=.24) {
+    const q=(phase-.24)/.12;
+    hip=blend(lungeHip,plantHip,smooth(q));
+    angle=mix(-60,30,smooth(q));
+    armAngle=angle;
+    const rearAngle=mix(rearStartAngle,210,smooth(q));
+    backFoot=polar([hip[0]-2,hip[1]],mix(rearStartLength,60,smooth(q)),rearAngle);
+    frontFoot=[118,164];
+  } else {
+    hip=[track(phase,[[0,64],[.07,62],[.12,67],[.24,98]]),
+      track(phase,[[0,104],[.07,106],[.12,105],[.24,118.64]])];
+    angle=track(phase,[[0,-90],[.07,-97],[.14,-87],[.24,-60]]);
+    armAngle=track(phase,[[0,78],[.055,104],[.12,-112],[.20,-78],[.24,-60]]);
+    armLength=track(phase,[[0,44],[.08,42],[.18,46],[.24,46]]);
+    const stride=smooth((phase-.10)/.14);
+    backFoot=[62,164];
+    frontFoot=[mix(66,118,stride),164-16*Math.sin(Math.PI*stride)];
+  }
+  if(t>.88) {
+    armAngle=track(t,[[.88,-60],[.95,70],[.98,86],[1,78]]);
+    armLength=track(t,[[.88,46],[.96,44],[1,44]]);
+  }
+  const shoulder=polar(hip,40,angle);
+  // Keep the head outside the supporting arm silhouette; a small preparatory
+  // nod and a relaxed settling pose provide character without extra effects.
+  const head=polar(shoulder,14,angle);
+  head[0]+=9;
+  const pose={hip,shoulder,head};
+  for(const [side,offset,foot] of [['back',-2,backFoot],['front',2,frontFoot]]) {
+    const origin=[hip[0]+offset,hip[1]], top=[shoulder[0]+offset,shoulder[1]];
+    const hand=t>=.36 && t<=.78?[180+offset,164]:polar(top,armLength,armAngle);
+    const knee=joint(origin,foot,30);
+    const elbow=joint(top,hand,23,1);
+    const air=smooth((164-foot[1])/12);
+    const pointed=polar(foot,6,Math.atan2(foot[1]-knee[1],foot[0]-knee[0])/rad);
+    const toe=blend([foot[0]+6,foot[1]],pointed,air);
+    Object.assign(pose,{[side+'Hip']:origin,[side+'Shoulder']:top,[side+'Foot']:foot,
+      [side+'Knee']:knee,[side+'Hand']:hand,[side+'Elbow']:elbow,[side+'Toe']:toe});
+  }
+  return pose;
 }
 
 export function drawPose(svg,progress) {
   const pose=poseAt(progress);
-  const coordinates = p => p.map(value=>value.toFixed(2)).join(' ');
-  const path = (name,points) => svg.querySelector(`[data-bone="${name}"]`)
+  const coordinates=p=>p.map(value=>value.toFixed(2)).join(' ');
+  const path=(name,points)=>svg.querySelector('[data-bone="'+name+'"]')
     .setAttribute('d',points.map((p,i)=>(i?'L':'M')+coordinates(p)).join(' '));
   path('torso',[pose.hip,pose.shoulder]);
-  for (const side of ['back','front']) {
-    path(`${side}-leg`,[pose.hip,pose[`${side}Knee`],pose[`${side}Foot`]]);
-    path(`${side}-arm`,[pose.shoulder,pose[`${side}Elbow`],pose[`${side}Hand`]]);
-    const foot=pose[`${side}Foot`], hand=pose[`${side}Hand`];
-    path(`${side}-foot`,[foot,[foot[0]+6,foot[1]]]);
-    path(`${side}-hand`,[hand,[hand[0]+5,hand[1]]]);
+  path('neck',[pose.shoulder,pose.head]);
+  for(const side of ['back','front']) {
+    path(side+'-leg',[pose[side+'Hip'],pose[side+'Knee'],pose[side+'Foot']]);
+    path(side+'-arm',[pose[side+'Shoulder'],pose[side+'Elbow'],pose[side+'Hand']]);
+    path(side+'-foot',[pose[side+'Foot'],pose[side+'Toe']]);
+    const hand=pose[side+'Hand'];
+    path(side+'-hand',[hand,[hand[0]+4,hand[1]]]);
   }
-  svg.querySelector('[data-head]').setAttribute('cx',pose.head[0].toFixed(2));
-  svg.querySelector('[data-head]').setAttribute('cy',pose.head[1].toFixed(2));
+  const head=svg.querySelector('[data-head]');
+  head.setAttribute('cx',pose.head[0].toFixed(2));
+  head.setAttribute('cy',pose.head[1].toFixed(2));
 }
 
 export function mountHandstandCycle(svg) {

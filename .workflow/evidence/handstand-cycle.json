@@ -4,16 +4,19 @@
   "request": "Style01 thin line; standing→forward step→plant hands→handstand→controlled return to standing",
   "red": {
     "command": "node --test tests/js/handstand-cycle.test.js",
-    "result": "failed: cycle-motion.js not implemented"
+    "result": "3 failures against previous rig: missing Toe/side Shoulder points and obsolete wrist anchors; interim continuity tests also caught knee snap and rapid return arm swing"
   },
   "green": {
-    "geometry": "2 passed; 1001 samples, fixed limb lengths and hands during support",
-    "browser": "4 passed (11.1s); gallery regression, RAF reduced-motion card/clone, dedicated cycle actual motion/pause/mobile/dialog",
-    "javascript_suite": "36 passed",
+    "geometry": "3 passed; 10,001 continuity/floor/length samples; fixed straight support arms and leading leg",
+    "browser": "4 passed (9.9s); pause, reduced motion card/clone, mobile, live inversion, dialogs/focus, no API",
+    "javascript_suite": "37 passed with PLAYWRIGHT_BROWSERS_PATH configured",
     "diff_check": "passed"
   },
-  "review": "security_auth_review: no blockers; requested reduced-motion RAF and standalone smoke coverage added",
-  "visual": "6 keyframes inspected + dedicated mobile/light central preview; GIF8.2s/123frames",
+  "review": "security_auth_review: no blockers; independently verified geometry and head radius bounds; aesthetics require owner review",
+  "visual": "11-pose contact sheet + central mobile light / desktop dark; cycle.gif205frames/25fps/8.2s; overview refreshed",
   "scope": "Preview01 and dedicated cycle page; no runtime loader placement/auth/cloud changes",
-  "next": "Owner reviews exact full-body cycle; final placement/integration remains separate"
+  "next": "Owner reviews exact full-body cycle; final placement/integration remains separate",
+  "revision": "2026-11-08 expressive gymnastics refinement",
+  "reference": "https://www.instagram.com/reel/DfViPqtSRxY/; public page and decoded frames visually inspected",
+  "environment_note": "Initial full JS run lacked PLAYWRIGHT_BROWSERS_PATH; rerun with installed browser passed."
 }

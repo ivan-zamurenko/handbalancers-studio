@@ -1,3 +1,19 @@
+# Поточний checkpoint — виразніший гімнастичний цикл, 2026-11-08
+
+Власник уточнив характер і надіслав Instagram Reel DfViPqtSRxY.
+Переглянуто публічні кадри: контурна людинка, велика кругла голова, виразні пози.
+Preview01/cycle.html перероблено: прямі опорні руки, контрольований мах,
+витягнуті носки, підготовка, невелика поправка балансу, окремий ритм повернення.
+8.2s loop; cycle.gif25fps і gallery overview оновлено. Local8000 доступний.
+
+GREEN:3 geometry/10,001samples,37 JS,4 browser. Read-only review без блокерів.
+Візуально перевірено11поз і central light/mobile, dark/desktop.
+Докази: .workflow/evidence/handstand-cycle.json; docs/adr/handstand-cycle.md.
+Це preview; потрібна естетична оцінка власника. Runtime loader/placement,
+roadmap і зовнішні security/auth gates не змінені. Попередній commit5d71e63.
+
+## Попередній checkpoint
+
 # Поточний checkpoint — повний цикл «з ніг на руки», 2026-11-08
 
 Власник обрав thin-line стиль01 і уточнив рух: стоїть → крок → ставить руки →
