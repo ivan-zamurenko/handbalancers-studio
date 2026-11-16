@@ -3,6 +3,7 @@
 import base64
 import hashlib
 from concurrent.futures import ThreadPoolExecutor
+from datetime import UTC, datetime, timedelta
 from urllib.parse import parse_qs, urlsplit
 
 import pytest
@@ -122,4 +123,22 @@ def test_no_shared_mutable_client(flow):
         params = query(start)
         assert f"attempt={start.attempt}" in params["redirect_to"][0]
         assert params["code_challenge"] == [challenge_of(consumed_verifier(service, start))]
+    assert not calls
+
+
+def test_apple_removed_even_if_configured(flow):
+    """Owner decision 2026-11-16: no Apple sign-in; config cannot re-enable it."""
+    service, calls, _, _ = flow
+    with_apple = type(service).__new__(type(service))
+    with_apple.__dict__.update(service.__dict__, providers=frozenset({"google", "apple"}))
+    with pytest.raises(ValueError):
+        with_apple.start("apple", "/plans")
+    with service.transaction() as session, pytest.raises(ValueError):
+        service.store.create_attempt(
+            session,
+            provider="apple",
+            verifier="v" * 64,
+            allowed_return_path="/plans",
+            expires_at=datetime.now(UTC) + timedelta(minutes=5),
+        )
     assert not calls

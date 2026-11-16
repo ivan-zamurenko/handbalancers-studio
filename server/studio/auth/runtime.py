@@ -16,14 +16,7 @@ from studio.settings import Settings
 
 
 def build_oauth(settings: Settings) -> OAuthService | None:
-    providers = frozenset(
-        name
-        for name, enabled in (
-            ("google", settings.oauth_google_enabled),
-            ("apple", settings.oauth_apple_enabled),
-        )
-        if enabled
-    )
+    providers = frozenset({"google"}) if settings.oauth_google_enabled else frozenset()
     if not providers and not settings.auth_email_enabled:
         return None
     assert settings.auth_database_url and settings.token_encryption_key

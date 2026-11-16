@@ -79,14 +79,14 @@ def test_explicit_names_imported_and_manual_edits_preserved(flow):
     ) == ("Моє ім’я", "Коваль", "Мій профіль", "member")
 
 
-def test_missing_apple_names_can_fill_later_without_duplicate(flow):
+def test_missing_names_can_fill_later_without_duplicate(flow):
     service, _, db, auth_id = flow
     metadata = {}
     with_metadata(service, metadata)
-    first = login(service, "apple")
+    first = login(service, "google")
     assert not first.profile_complete
     metadata.update(first_name="Іван", last_name="Петренко", full_name="Іван Петренко")
-    second = login(service, "apple")
+    second = login(service, "google")
     profile = asyncio.run(service.session_profile(second.cookie.get_secret_value()))
     assert profile.get("display_name") == "Іван Петренко"
     assert second.profile_complete

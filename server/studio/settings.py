@@ -26,7 +26,6 @@ class Settings(BaseModel):
     auth_client_attempts_per_minute: int = Field(default=10, ge=1, le=10)
     auth_account_attempts_per_minute: int = Field(default=10, ge=1, le=10)
     oauth_google_enabled: bool = False
-    oauth_apple_enabled: bool = False
     stripe_secret_key: SecretStr | None = None
     stripe_webhook_secret: SecretStr | None = None
 
@@ -57,11 +56,7 @@ class Settings(BaseModel):
                 or not settings.token_encryption_key.get_secret_value().strip()
             ):
                 raise ValueError("Deployment requires HTTPS origin and encryption key")
-            if (
-                settings.auth_email_enabled
-                or settings.oauth_google_enabled
-                or settings.oauth_apple_enabled
-            ):
+            if settings.auth_email_enabled or settings.oauth_google_enabled:
                 if not all(
                     (
                         settings.public_origin,

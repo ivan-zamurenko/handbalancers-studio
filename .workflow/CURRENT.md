@@ -1,4 +1,11 @@
-# Поточний checkpoint — S04-02 oauth callback, 2026-11-16
+# Поточний checkpoint — Apple видалено, S04-03 skipped, 2026-11-16
+
+За рішенням власника Apple-вхід видалено з коду (allowlist лише google, налаштування
+oauth_apple_enabled прибрано, docs оновлено); S04-03 — skipped, S04-04 тепер залежить
+від S04-02. CHECK у БД (0004) ще допускає 'apple' — застосунок не записує.
+RED→GREEN; checks.py exit 0; DB suites 202. Докази: `.workflow/evidence/S04-03.json`.
+
+## Попередньо — S04-02 oauth callback
 
 S04-02 виконано локально (IMPLEMENTED_LOCAL). Поведінка callback уже була з S04-01a;
 додано HTTP-тести `server/tests/security/accounts/test_oauth_callback.py`
@@ -60,4 +67,4 @@ SMTP Supabase, але hosted-шаблон надсилає посилання, �
 
 ## Наступний крок
 
-S04-03 `apple_adapter` за roadmap, але Apple виключено власником — потрібне рішення: позначити blocked/skip чи працювати далі (`tools/roadmap.py next`).
+S04-04 `identity_linking` — linking і конфлікти identities (`tools/roadmap.py next`).

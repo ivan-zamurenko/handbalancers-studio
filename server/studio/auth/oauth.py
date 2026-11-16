@@ -69,7 +69,7 @@ class OAuthService:
         self.limits = limits or AuthLimits()
 
     def start(self, provider: str, return_path: str, *, client_key: str = "direct") -> OAuthStart:
-        if provider not in {"google", "apple"} or provider not in self.providers:
+        if provider != "google" or provider not in self.providers:
             raise ValueError("Provider unavailable")
         bucket = hmac.new(
             self.secret, ("oauth-start:" + client_key).encode(), hashlib.sha256

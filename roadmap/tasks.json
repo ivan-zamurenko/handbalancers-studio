@@ -1642,7 +1642,7 @@
       "module": "accounts",
       "kind": "security",
       "depends_on": [
-        "S04-03"
+        "S04-02"
       ],
       "gates": [],
       "files": [

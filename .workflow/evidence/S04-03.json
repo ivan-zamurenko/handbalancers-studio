@@ -1,0 +1,42 @@
+{
+  "task_id": "S04-03",
+  "status": "skipped",
+  "reason": "Owner decision 2026-11-16 (confirming 2026-11-07): no Apple sign-in; owner will not pay for Apple Developer Program. Apple removed from code instead of adapted.",
+  "branch": "task/execution-v4",
+  "base_sha": "b25df72",
+  "changed_paths": [
+    "server/studio/auth/oauth.py",
+    "server/studio/auth/token_store.py",
+    "server/studio/auth/runtime.py",
+    "server/studio/settings.py",
+    ".env.example",
+    "docs/auth-contract.md",
+    "docs/decisions.md",
+    "roadmap/tasks.json",
+    "roadmap/tasks/S04-04_identity_linking.md",
+    "server/tests/security/accounts/test_oauth_attempt.py",
+    "server/tests/contracts/auth/test_oauth_http.py",
+    "server/tests/integration/auth/test_oauth_flow.py",
+    "server/tests/integration/auth/test_oauth_profile.py",
+    "tests/fixtures/render_oauth_login.py"
+  ],
+  "red": {
+    "commands": [
+      ".venv/bin/python -m pytest server/tests/contracts/auth/test_oauth_http.py -q",
+      "local_stack test pytest server/tests/security/accounts/test_oauth_attempt.py -k apple_removed -q"
+    ],
+    "observed_failure": "test_apple_setting_removed failed (Settings still had oauth_apple_enabled); test_apple_removed_even_if_configured failed: DID NOT RAISE ValueError (service accepted 'apple' when configured).",
+    "not_an_environment_failure": true
+  },
+  "green": {
+    "summary": "Provider allowlist is google-only in OAuthService.start and TokenStore.create_attempt; runtime builds providers from OAUTH_GOOGLE_ENABLED only; Settings has no oauth_apple_enabled (extra=forbid rejects it; unknown env names are not read, so an old OAUTH_APPLE_ENABLED line is ignored)."
+  },
+  "test_adjustments": "Tests that used 'apple' as a second provider (independent PKCE, missing-name no-duplicate, cancel, logout start, profile fill-later) now use 'google'; the asserted guarantees are unchanged. Storage test keeps 'apple' as a mismatched-provider negative case.",
+  "regression_commands": [
+    {"command": "uv run --locked python tools/checks.py", "result": "exit 0 (ruff, mypy, unit 87, contracts 54, security/auth 99, tools 68, JS)"},
+    {"command": "local_stack test pytest integration/database security/database security/accounts integration/auth -q", "result": "202 passed"}
+  ],
+  "not_changed": "DB CHECK ck_attempts_provider (migration 0004) still allows 'apple'; tightening needs a new migration and is not required because the app cannot write it.",
+  "roadmap": "S04-04 depends_on changed S04-03 -> S04-02.",
+  "push_status": "not_started"
+}

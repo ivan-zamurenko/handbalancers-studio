@@ -361,7 +361,7 @@ class TokenStore:
     ) -> AttemptHandle:
         now = _now(session)
         _future(expires_at, now)
-        if provider not in {"google", "apple"} or allowed_return_path not in self._return_paths:
+        if provider != "google" or allowed_return_path not in self._return_paths:
             raise StoreError()
         state, binding = secrets.token_urlsafe(32), secrets.token_urlsafe(32)
         row = AuthAttempt(

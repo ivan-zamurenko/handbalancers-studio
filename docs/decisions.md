@@ -15,7 +15,7 @@ C1/A1 — общий фундамент; C3 — активная трениро�
 
 YouTube приоритет, Vimeo/Drive возможны. Просмотр человеком и AI доступ — разные capabilities. Один текущий контрольный ролик на выполненное упражнение, immutable evidence versions. Можно завершить без видео, техника unreviewed.
 
-Модульный монолит FastAPI/PostgreSQL/Supabase Auth/SQLAlchemy 2/Alembic/Jinja/CSS/vanilla JS. Google та email/password через Supabase Auth. За рішенням власника від 2026-11-07 Apple виключено з поточного продукту; повертатися до нього лише за новим дорученням. «Вход через Supabase» не означает третью социальную кнопку.
+Модульный монолит FastAPI/PostgreSQL/Supabase Auth/SQLAlchemy 2/Alembic/Jinja/CSS/vanilla JS. Google та email/password через Supabase Auth. За рішенням власника від 2026-11-07 Apple виключено з поточного продукту; повертатися до нього лише за новим дорученням. 2026-11-16 власник підтвердив: Apple-вхід видалено з коду (без оплати Apple Developer), S04-03 — skipped. «Вход через Supabase» не означает третью социальную кнопку.
 
 TDD, небольшие логичные commits, код корректируется под согласованное поведение. Это поручение разработки, не deployment/live payment/private-data processing authorization.
 

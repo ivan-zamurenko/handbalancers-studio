@@ -33,3 +33,13 @@ def test_config_requires_all_oauth_dependencies():
 
     with pytest.raises(ValidationError):
         Settings(app_env="test", oauth_google_enabled=True)
+
+
+def test_apple_setting_removed():
+    import pytest
+    from pydantic import ValidationError
+    from studio.settings import Settings
+
+    assert "oauth_apple_enabled" not in Settings.model_fields
+    with pytest.raises(ValidationError):
+        Settings(app_env="test", oauth_apple_enabled=True)

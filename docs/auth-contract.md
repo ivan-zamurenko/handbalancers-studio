@@ -3,7 +3,7 @@
 ## UI
 `/register`: имя, фамилия, email, password, показать/скрыть пароль, доступная ошибка, submit pending, ссылка на login. Social кнопки только для действительно сконфигурированных провайдеров. Нет кнопки «Supabase».
 `/verify-email`: email, 6-значный code, resend с cooldown, исправить email, ошибки expiry/invalid/generic. Не сохранять password в storage.
-`/login`: email/password, recovery, налаштований Google; Apple у поточному UI відсутній. OAuth возвращается в тот же onboarding/plan path.
+`/login`: email/password, recovery, налаштований Google. Apple видалено з продукту (рішення власника 2026-11-16). OAuth возвращается в тот же onboarding/plan path.
 `/complete-profile`: для verified OAuth без имени; завершение до Checkout, не выдумывать identity.
 `/recovery`: запрос и подтверждение по upstream flow, не обычная paid session.
 
@@ -17,7 +17,7 @@ Identity authenticated не означает paid. Profile incomplete не оз�
 `POST /api/auth/login`: {email,password}. Verified identity, profile UUID, rotation cookie.
 `GET /api/session`: {authenticated,user:{id,first_name,last_name,role,locale,timezone,profile_complete},entitlements,csrf_token}. Нет access/refresh/provider secrets. Для guest возвращается ограниченное состояние по API контракту; protected API всё равно 401.
 `POST /api/auth/logout`: CSRF, revoke local, clear cookie; upstream failure не оставляет local active.
-`POST /api/auth/oauth/{provider}/start`: реалізований allowlist google/apple; Apple вимкнений і не є активною вимогою, trusted callback allowlist и browser-bound attempt. PKCE verifier изолирован, Supabase owns upstream OAuth state. App correlation token не подменяет state Supabase.
+`POST /api/auth/oauth/{provider}/start`: allowlist лише google (Apple видалено 2026-11-16; CHECK у БД з 0004 ще допускає 'apple', застосунок його не записує), trusted callback allowlist и browser-bound attempt. PKCE verifier изолирован, Supabase owns upstream OAuth state. App correlation token не подменяет state Supabase.
 `GET /auth/callback`: code+app attempt, browser binding/expiry/consumption проверены до code exchange. Auth code не сохраняется в logs.
 
 ## Сессии

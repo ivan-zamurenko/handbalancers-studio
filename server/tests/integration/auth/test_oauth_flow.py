@@ -81,7 +81,7 @@ def flow(storage_db):
         validator=validator,
         supabase_url="https://auth.example.test",
         public_origin="https://studio.example.test",
-        providers=frozenset({"google", "apple"}),
+        providers=frozenset({"google"}),
     )
     return service, calls, storage_db, auth_id
 
@@ -89,7 +89,7 @@ def flow(storage_db):
 def test_independent_pkce_and_allowed_return(flow):
     service, calls, _, _ = flow
     first = service.start("google", "/plans")
-    second = service.start("apple", "/plans")
+    second = service.start("google", "/plans")
     q1 = parse_qs(urlsplit(first.authorization_url).query)
     q2 = parse_qs(urlsplit(second.authorization_url).query)
     assert q1["code_challenge_method"] == ["s256"]
@@ -146,14 +146,14 @@ def test_callback_binding_replay_verified_session(flow):
     ]
 
 
-def test_apple_missing_name_same_identity_no_duplicate(flow):
+def test_missing_name_same_identity_no_duplicate(flow):
     service, calls, db, auth_id = flow
     results = []
     for _ in range(2):
-        attempt = service.start("apple", "/plans")
+        attempt = service.start("google", "/plans")
         results.append(
             asyncio.run(
-                service.finish("apple", attempt.attempt, attempt.binding.get_secret_value(), "code")
+                service.finish("google", attempt.attempt, attempt.binding.get_secret_value(), "code")
             )
         )
     assert results[0].user_id == results[1].user_id
@@ -209,11 +209,11 @@ def test_cancel_timeout_consume_and_expiry(flow):
     from studio.auth.gateway import AuthFailure, AuthFailureKind
 
     service, calls, db, _ = flow
-    cancelled = service.start("apple", "/plans")
-    service.cancel("apple", cancelled.attempt, cancelled.binding.get_secret_value())
+    cancelled = service.start("google", "/plans")
+    service.cancel("google", cancelled.attempt, cancelled.binding.get_secret_value())
     with pytest.raises(StoreError):
         asyncio.run(
-            service.finish("apple", cancelled.attempt, cancelled.binding.get_secret_value(), "code")
+            service.finish("google", cancelled.attempt, cancelled.binding.get_secret_value(), "code")
         )
     expired = service.start("google", "/plans")
     with db.begin() as c:
@@ -328,7 +328,7 @@ def test_logout_csrf_and_revocation(flow):
     app.state.oauth_service = service
     client = TestClient(app, base_url=service.public_origin)
     start = client.post(
-        "/api/auth/oauth/apple/start", headers={"Origin": service.public_origin}, json={}
+        "/api/auth/oauth/google/start", headers={"Origin": service.public_origin}, json={}
     )
     callback = parse_qs(urlsplit(start.json()["authorization_url"]).query)["redirect_to"][0]
     client.get(callback + "&code=synthetic", follow_redirects=False)
