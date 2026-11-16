@@ -1,0 +1,88 @@
+{
+  "task_id": "S04-02",
+  "status": "done_local",
+  "implementation_status": "IMPLEMENTED_LOCAL",
+  "live_verified": false,
+  "branch": "task/execution-v4",
+  "base_sha": "d1c7251",
+  "changed_paths": [
+    "server/tests/security/accounts/test_oauth_callback.py",
+    ".workflow/evidence/S04-02.json",
+    ".workflow/state.json",
+    ".workflow/CURRENT.md"
+  ],
+  "scenario": "GET /auth/callback?attempt&provider&code: attempt format + browser binding cookie + expiry/consumption checked and committed before code exchange; success uses shared provisioning (studio.users) and opaque session cookie, redirect only to allowlisted local return path; cancel (?error=) -> /login?oauth=cancelled with alert and retry possible; code never in server logs or outgoing URLs.",
+  "red": {
+    "command": "DOCKER_HOST=unix://$HOME/.colima/studio-s01/docker.sock DOCKER_CONTEXT=default .venv/bin/python -m tools.local_stack test .venv/bin/python -m pytest server/tests/security/accounts/test_oauth_callback.py -q",
+    "observed_failure": "No behavioral RED: callback behavior pre-existed from S04-01a. First run had 1 failure from the test itself (caplog included the in-process test browser's own httpx request line containing the code); assertion narrowed to server-side records plus outgoing request URLs. Not claimed as RED.",
+    "not_an_environment_failure": null
+  },
+  "mutation_checks": [
+    {
+      "mutation": "M1 binding not checked in consume_attempt",
+      "caught_by": [
+        "test_missing_browser_binding"
+      ]
+    },
+    {
+      "mutation": "M2 consumed_at ignored (replay)",
+      "caught_by": [
+        "test_replay_rejected"
+      ],
+      "note": "initially NOT caught because the binding cookie was deleted after the first callback; test now replays with the retained binding cookie"
+    },
+    {
+      "mutation": "M3 cancel redirected as failure",
+      "caught_by": [
+        "test_cancel_is_recoverable"
+      ]
+    },
+    {
+      "mutation": "M4 server logs callback URL",
+      "caught_by": [
+        "test_verified_user_provisioned_once"
+      ]
+    },
+    {
+      "mutation": "M5 return-path allowlist removed",
+      "caught_by": [
+        "test_redirect_only_allowed_local_path x3"
+      ]
+    },
+    {
+      "mutation": "M6 access log carries path+query via `extra` field (format-string leak)",
+      "caught_by": [
+        "test_verified_user_provisioned_once"
+      ],
+      "note": "Not caught before review fix; log check now inspects all LogRecord attributes and requires a captured studio.access record."
+    }
+  ],
+  "green": {
+    "command": "same as red command",
+    "exit_code": 0,
+    "summary": "7 passed"
+  },
+  "regression_commands": [
+    {
+      "command": "local_stack test pytest server/tests/integration/database server/tests/security/database server/tests/security/accounts server/tests/integration/auth -q",
+      "result": "201 passed"
+    }
+  ],
+  "scope_deviations": [
+    "Test placed in server/tests/security/accounts (DB suite registered in CI DB_SUITES since d1c7251) instead of server/tests/contracts/accounts: CI runs server/tests/contracts without a database, and the card requires real provisioning/session checks.",
+    "No runtime change: oauth.py/routes.py already satisfy the card (S04-01a)."
+  ],
+  "not_verified": [
+    "Real Google callback (owner manual sign-in 2026-11-16 only); S17-01 covers cancel/relogin/duplicate with real Google."
+  ],
+  "review": {
+    "reviewer": "code-review subagent (read-only)",
+    "result": "finding_fixed",
+    "findings": [
+      "Log assertion read only getMessage(); access log data lives in `extra` fields -> now checks vars(record) and requires studio.access record; verified by M6."
+    ],
+    "placement": "Reviewer confirmed security/accounts DB-suite placement is sound (in DB_SUITES; contracts suite runs without DB)."
+  },
+  "push_status": "not_started",
+  "verification_command": "DOCKER_HOST=unix://$HOME/.colima/studio-s01/docker.sock DOCKER_CONTEXT=default .venv/bin/python -m tools.local_stack test .venv/bin/python -m pytest server/tests/security/accounts/test_oauth_callback.py -q (card command path server/tests/contracts/accounts/... replaced, see scope_deviations)"
+}

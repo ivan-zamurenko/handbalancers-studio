@@ -1,4 +1,13 @@
-# Поточний checkpoint — S04-01 oauth attempt, 2026-11-16
+# Поточний checkpoint — S04-02 oauth callback, 2026-11-16
+
+S04-02 виконано локально (IMPLEMENTED_LOCAL). Поведінка callback уже була з S04-01a;
+додано HTTP-тести `server/tests/security/accounts/test_oauth_callback.py`
+(DB-suite замість contracts/, бо contracts у CI без БД): replay, чужий браузер,
+скасування з повторною спробою, профіль один раз, redirect лише на дозволений шлях,
+code не в серверних логах. 7 GREEN; DB suites 201; 6 мутацій зловлено; review —
+перевірку логів посилено. Докази: `.workflow/evidence/S04-02.json`.
+
+## Попередньо — S04-01 oauth attempt
 
 S04-01 виконано локально (IMPLEMENTED_LOCAL). Поведінку вже реалізувала S04-01a,
 тому RED поведінки немає (чесно записано); додано тести картки
@@ -51,4 +60,4 @@ SMTP Supabase, але hosted-шаблон надсилає посилання, �
 
 ## Наступний крок
 
-S04-02 `oauth_callback` — обмін OAuth code і відновлення шляху користувача (`tools/roadmap.py next`).
+S04-03 `apple_adapter` за roadmap, але Apple виключено власником — потрібне рішення: позначити blocked/skip чи працювати далі (`tools/roadmap.py next`).
