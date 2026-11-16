@@ -48,11 +48,11 @@ enable_confirmations = true
 otp_length = 6
 
 [auth.email.template.confirmation]
-subject = "Handbalancer’s Studio — код підтвердження"
+subject = "Your Handbalancer’s Studio confirmation code"
 content_path = "./supabase/templates/confirmation.html"
 
 [auth.email.template.recovery]
-subject = "Handbalancer’s Studio — відновлення пароля"
+subject = "Reset your Handbalancer’s Studio password"
 content_path = "./supabase/templates/recovery.html"
 
 [realtime]
