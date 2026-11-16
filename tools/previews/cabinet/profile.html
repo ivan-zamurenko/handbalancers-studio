@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="uk" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Профіль · Handbalancer’s Studio · макет</title>
+  <link rel="stylesheet" href="/static/css/tokens.css">
+  <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="./cabinet.css">
+  <script type="module" src="./cabinet.js"></script>
+</head>
+<body data-page="profile">
+<div class="cab">
+  <aside class="cab-side" data-side></aside>
+  <main class="cab-main">
+    <div class="cab-top">
+      <a class="mobile-brand" href="/">h<span>.</span></a>
+      <div class="crumbs"><span>Ваша студія</span><span>/</span><span>Профіль</span></div>
+      <div class="tools"><span class="status-dot">Pro · активна</span><button class="theme-btn" type="button" data-theme-button>Світла тема</button><span>UA</span></div>
+    </div>
+
+    <div class="page-head">
+      <div><p class="eyebrow">Профіль</p><h1>Ваші дані.</h1><p>Те, на що спирається ваш план.</p></div>
+      <a class="btn" href="#">Редагувати</a>
+    </div>
+
+    <div class="grid">
+      <section class="card span-12">
+        <div class="profile-hero">
+          <span class="avatar lg">ІЗ</span>
+          <div><h2>Іван Заморенко</h2><p>34 роки · Київ (Europe/Kyiv) · з нами з жовтня 2026</p></div>
+          <span class="badge ok">Pro · активна до 16 грудня 2026</span>
+        </div>
+      </section>
+
+      <section class="card span-6" aria-labelledby="basic">
+        <div class="card-head"><h2 id="basic">Основне</h2></div>
+        <dl class="rows">
+          <div><dt>Ім’я</dt><dd>Іван</dd></div>
+          <div><dt>Прізвище</dt><dd>Заморенко</dd></div>
+          <div><dt>Вік</dt><dd>34 роки<span class="opt">дата народження прихована</span></dd></div>
+          <div><dt>Зріст</dt><dd>178 см<span class="opt">необов’язково</span></dd></div>
+          <div><dt>Вага</dt><dd>74 кг<span class="opt">оновлено 2 тижні тому</span></dd></div>
+        </dl>
+        <p class="note">Вік, зріст і вагу ви вказуєте самі. Це не медична оцінка й не бачать інші клієнти.</p>
+      </section>
+
+      <section class="card span-6" aria-labelledby="training">
+        <div class="card-head"><h2 id="training">Тренування</h2><span class="meta">впливає на план</span></div>
+        <p class="sub-label">Цілі</p>
+        <div class="chips"><span class="chip on">Стійка на руках</span><span class="chip on">Сила</span><span class="chip">Гнучкість і рухливість</span><span class="chip on">Загальна форма</span></div>
+        <p class="sub-label">Зручні дні</p>
+        <div class="days"><span>Нд</span><span class="on">Пн</span><span>Вт</span><span class="on">Ср</span><span>Чт</span><span class="on">Пт</span><span>Сб</span></div>
+        <p class="sub-label">Час і тривалість</p>
+        <div class="chips"><span class="chip on">Вечір · 18:00–21:00</span><span class="chip on">45 хв</span></div>
+      </section>
+
+      <section class="card span-4" aria-labelledby="sub">
+        <div class="card-head"><h2 id="sub">Підписка</h2></div>
+        <dl class="rows">
+          <div><dt>Тариф</dt><dd>Pro</dd></div>
+          <div><dt>Активна до</dt><dd>16 грудня 2026</dd></div>
+          <div><dt>Наступна оплата</dt><dd>179,99 €</dd></div>
+        </dl>
+        <a class="link-row" href="#" style="margin-top:8px">Керувати підпискою <span>→</span></a>
+      </section>
+
+      <section class="card span-4" aria-labelledby="settings">
+        <div class="card-head"><h2 id="settings">Налаштування</h2></div>
+        <dl class="rows">
+          <div><dt>Мова</dt><dd>Українська</dd></div>
+          <div><dt>Часовий пояс</dt><dd>Europe/Kyiv</dd></div>
+          <div><dt>Тема</dt><dd>Автоматично</dd></div>
+        </dl>
+      </section>
+
+      <section class="card span-4" aria-labelledby="security">
+        <div class="card-head"><h2 id="security">Безпека</h2></div>
+        <div>
+          <a class="link-row" href="#">ivan@…gmail.com <span>Google</span></a>
+          <a class="link-row" href="#">Змінити пароль <span>→</span></a>
+          <a class="link-row danger" href="#">Вийти з усіх пристроїв <span>→</span></a>
+        </div>
+      </section>
+    </div>
+
+    <p class="synthetic"><span>Синтетичний макет · не справжні дані</span><span>h. Studio / Member</span></p>
+  </main>
+</div>
+<nav class="cab-tabs" data-tabs aria-label="Кабінет"></nav>
+</body>
+</html>

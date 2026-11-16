@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="uk" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Прогрес · Handbalancer’s Studio · макет</title>
+  <link rel="stylesheet" href="/static/css/tokens.css">
+  <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="./cabinet.css">
+  <script type="module" src="./cabinet.js"></script>
+</head>
+<body data-page="progress">
+<div class="cab">
+  <aside class="cab-side" data-side></aside>
+  <main class="cab-main">
+    <div class="cab-top">
+      <a class="mobile-brand" href="/">h<span>.</span></a>
+      <div class="crumbs"><span>Ваша студія</span><span>/</span><span>Прогрес</span></div>
+      <div class="tools"><span class="status-dot">Pro · активна</span><button class="theme-btn" type="button" data-theme-button>Світла тема</button><span>UA</span></div>
+    </div>
+
+    <div class="page-head">
+      <div><p class="eyebrow">Тиждень 47 · 15–21 листопада</p><h1>Ваш прогрес.</h1><p>Лише завершені заняття. Немає даних — не те саме, що нуль.</p></div>
+    </div>
+
+    <div class="grid">
+      <section class="card kpi span-3">
+        <div class="card-head"><h2>Хвилини тижня</h2></div>
+        <div class="ring-wrap">
+          <svg class="ring" viewBox="0 0 80 80" aria-hidden="true"><circle class="track" cx="40" cy="40" r="33"/><circle class="fill" cx="40" cy="40" r="33" stroke-dasharray="207.3" stroke-dashoffset="69.1"/></svg>
+          <div><div class="value">90<small> / 135</small></div><div class="label">хвилин: зроблено / план</div></div>
+        </div>
+      </section>
+      <section class="card kpi span-3">
+        <div class="card-head"><h2>Заняття тижня</h2></div>
+        <div class="value">2<small> / 3</small></div>
+        <div class="dots" aria-label="2 із 3 занять"><i class="on"></i><i class="on"></i><i></i></div>
+        <div class="label">наступне — п’ятниця</div>
+      </section>
+      <section class="card kpi span-3">
+        <div class="card-head"><h2>Регулярність</h2></div>
+        <div class="value">6<small> тижнів</small></div>
+        <div class="label">поспіль із заняттями · рекорд 9</div>
+      </section>
+      <section class="card kpi span-3">
+        <div class="card-head"><h2>Час практики</h2></div>
+        <div class="value">14<small> год 20 хв</small></div>
+        <div class="label">усього · 5 год 10 хв за місяць</div>
+      </section>
+
+      <section class="card span-12" aria-labelledby="heat-title">
+        <div class="card-head"><h2 id="heat-title">Регулярність за рік</h2><span class="meta" data-heat-count></span></div>
+        <div class="heat-scroll"><div class="heat" data-heat role="img" aria-label="Карта занять за останні 12 місяців"></div></div>
+        <div class="heat-foot">
+          <span>Тиждень починається в неділю · за вашим часовим поясом</span>
+          <span class="legend">Менше <i class="c" style="background:var(--raised)"></i><i class="c" style="background:color-mix(in srgb,var(--accent) 30%,var(--raised))"></i><i class="c" style="background:color-mix(in srgb,var(--accent) 55%,var(--raised))"></i><i class="c" style="background:color-mix(in srgb,var(--accent) 78%,var(--raised))"></i><i class="c" style="background:var(--accent)"></i> Більше</span>
+        </div>
+      </section>
+
+      <section class="card span-7" aria-labelledby="hold-title">
+        <div class="card-head"><h2 id="hold-title">Найкраще утримання стійки</h2><span class="meta">12 тижнів</span></div>
+        <div class="big-stat"><b>38 с</b><span>+26 с від старту</span></div>
+        <svg class="chart" data-hold role="img" aria-label="Найкраще утримання стійки за 12 тижнів: від 12 до 38 секунд"></svg>
+      </section>
+
+      <section class="card span-5" aria-labelledby="feel-title">
+        <div class="card-head"><h2 id="feel-title">Самопочуття після занять</h2><span class="meta">8 занять</span></div>
+        <div class="feel">
+          <div><span>Енергія</span><span class="bars"><i style="height:50%"></i><i style="height:62%"></i><i style="height:58%"></i><i class="none"></i><i style="height:70%"></i><i style="height:76%"></i><i style="height:80%"></i><i style="height:84%"></i></span><b>4,2</b></div>
+          <div><span>Сон</span><span class="bars"><i style="height:60%"></i><i style="height:56%"></i><i style="height:64%"></i><i class="none"></i><i style="height:66%"></i><i style="height:72%"></i><i style="height:70%"></i><i style="height:74%"></i></span><b>3,8</b></div>
+        </div>
+        <p class="note">Оцінка від 1 до 5, яку ви ставите після заняття. Пунктир — заняття без оцінки.</p>
+      </section>
+
+      <section class="card span-7" aria-labelledby="ex-title">
+        <div class="card-head"><h2 id="ex-title">Ключові вправи</h2><span class="meta">найкращий підхід</span></div>
+        <div class="trend">
+          <div><span>Підйом плечей біля стіни<small>час утримання</small></span><svg data-spark="25,26,28,30,32,31,35,40"></svg><span class="delta">40 с<span>+15 с</span></span></div>
+          <div><span>Відтискання від підлоги<small>повтори</small></span><svg data-spark="10,10,11,12,12,13,14,14"></svg><span class="delta">14<span>+4</span></span></div>
+          <div><span>Тяга до поясу з гантелею<small>повтори × вага</small></span><svg data-spark="8,8,9,9,10,10,10,12"></svg><span class="delta">12 × 14 кг<span>+2 кг</span></span></div>
+          <div><span>Рухливість зап’ясть<small>час</small></span><svg></svg><span class="nodata">ще немає даних</span></div>
+        </div>
+      </section>
+
+      <section class="card span-5" aria-labelledby="tests-title">
+        <div class="card-head"><h2 id="tests-title">Тестові програми</h2><span class="meta">переоцінка раз на 6 тижнів</span></div>
+        <table class="tests">
+          <thead><tr><th>Тест</th><th>Жовтень</th><th>Листопад</th></tr></thead>
+          <tbody>
+            <tr><td>Стійка біля стіни</td><td>20 с</td><td>45 с<span class="up">↑</span></td></tr>
+            <tr><td>Відтискання</td><td>10</td><td>14<span class="up">↑</span></td></tr>
+            <tr><td>Нахил вперед</td><td>−8 см</td><td>−3 см<span class="up">↑</span></td></tr>
+          </tbody>
+        </table>
+        <p class="note">Висновок тренера з’являється тут лише після публікації.</p>
+      </section>
+    </div>
+
+    <p class="synthetic"><span>Синтетичний макет · не справжні дані</span><span>h. Studio / Member</span></p>
+  </main>
+</div>
+<nav class="cab-tabs" data-tabs aria-label="Кабінет"></nav>
+</body>
+</html>
