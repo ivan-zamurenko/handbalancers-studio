@@ -21,3 +21,17 @@ def test_auth_pages_are_private_and_do_not_echo_query_credentials(path, language
     assert 'data-oauth-provider="apple"' not in response.text
     assert 'name="password"' not in response.text
     assert 'name="token"' not in response.text
+
+
+@pytest.mark.parametrize(
+    ("language", "hint"),
+    [
+        ("uk", "Якщо акаунт із цією адресою вже існує, лист не надійде"),
+        ("en", "If an account with this address already exists, no email will arrive"),
+    ],
+)
+def test_verify_page_neutral_existing_account_hint(language, hint):
+    with TestClient(create_app({"app_env": "test"})) as client:
+        response = client.get("/verify-email", params={"lang": language})
+    assert hint in response.text
+    assert f'href="/login?lang={language}"' in response.text

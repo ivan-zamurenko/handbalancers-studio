@@ -20,6 +20,15 @@ DOCKER_CONTEXT=default .venv/bin/python -m tools.local_stack test .venv/bin/pyth
 Hosted OTP/recovery, key rotation, cloud 0007 та provider gates лишаються відкритими.
 Попередній checkpoint (мобільна навігація, `9ff4f3d`): `history/2026-11-08-mobile-navigation.md`.
 
+## Live-перевірка hosted dev (2026-11-16)
+
+Google-вхід працює (з боку власника). Лист на новий аліас доставлено вбудованим
+SMTP Supabase, але hosted-шаблон надсилає посилання, а не 6-значний код —
+підтвердження на hosted неможливе, доки шаблон не змінено (на поточному плані
+редагування недоступне). Для наявного email лист не надсилається навмисно;
+на сторінці коду додано нейтральну підказку. Докази:
+`.workflow/evidence/live-auth-check-2026-11-16.json`. G_SMTP/G_AUTH_PROVIDERS — pending.
+
 ## Наступний крок
 
 S04-01 `oauth_attempt` — Google OAuth через Supabase PKCE (`tools/roadmap.py next`).

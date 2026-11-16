@@ -13,6 +13,7 @@
       <button class="auth-resend" type="button" data-auth-resend data-label="{{ copy('Надіслати новий код', 'Send a new code') }}" data-wait="{{ copy('Новий код через', 'New code in') }}" data-pending-label="{{ copy('Надсилаємо…', 'Sending…') }}" disabled>{{ copy('Надіслати новий код', 'Send a new code') }}</button>
     </form>
     {% with auth_action='verify' %}{% include 'auth/form_status.html' %}{% endwith %}
+    <p class="login-signup">{{ copy('Якщо акаунт із цією адресою вже існує, лист не надійде —', 'If an account with this address already exists, no email will arrive —') }} <a href="/login?lang={{ language }}">{% if 'google' in oauth_providers %}{{ copy('увійдіть паролем або через Google', 'sign in with your password or Google') }}{% else %}{{ copy('увійдіть паролем', 'sign in with your password') }}{% endif %}</a>.</p>
     <p class="login-signup"><a href="/register?lang={{ language }}">{{ copy('Повернутися до реєстрації', 'Back to registration') }}</a></p>
     <noscript><p class="small">{{ copy('Увімкніть JavaScript для підтвердження пошти.', 'Enable JavaScript to confirm your email.') }}</p></noscript>
   </div>

@@ -1,0 +1,11 @@
+{
+  "scope": "Owner-requested live check against hosted dev Supabase project dwckvtuhgelhsbjyhpks via local app at http://127.0.0.1:8000 (not staging; not S17-01 closure).",
+  "hosted_auth_settings": {"external_enabled": ["google", "email"], "mailer_autoconfirm": false, "disable_signup": false, "health": 200},
+  "google_oauth": {"result": "owner reports successful sign-in and return to site as authenticated", "relogin": "not reported", "cancel_or_duplicate_identity": "not checked"},
+  "email_existing_address": {"result": "no email by design", "diagnosis": "Direct hosted signup probe returned HTTP 200 with identities=[] (obfuscated existing user); Supabase sends nothing for an already-confirmed account (likely created by Google sign-in)."},
+  "email_new_alias": {"result": "delivered to owner Gmail inbox from 'Supabase Auth'", "defect": "Hosted project uses default confirmation template with a link, not supabase/templates/confirmation.html with {{ .Token }}; six-digit verification therefore impossible on hosted.", "blocker": "Owner reports template editing unavailable on current plan."},
+  "ui_change": "verify page shows neutral hint: existing account gets no email, link to /login (Google mentioned only when configured). Contract test RED 2 failed -> GREEN; server/tests/contracts/auth 35 passed; tests/e2e/s03-10-registration-ui.spec.js 12 passed; screenshots 390/1440 uk/en reviewed.",
+  "test_accounts_created_in_hosted_dev": ["ivan.zamurenko.ds+studio1@gmail.com (unconfirmed)"],
+  "gates": {"G_AUTH_PROVIDERS": "pending (Google basic sign-in observed by owner only)", "G_SMTP": "pending (default Supabase SMTP; template not OTP)"},
+  "secrets_printed": false
+}
