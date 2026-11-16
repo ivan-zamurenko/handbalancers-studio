@@ -96,6 +96,7 @@ class MigrationCITests(unittest.TestCase):
     def test_auth_suite_is_required_and_run(self):
         checker = self.checker()
         self.assertIn("server/tests/integration/auth", checker.DB_SUITES)
+        self.assertIn("server/tests/security/accounts", checker.DB_SUITES)
         with (
             patch.object(checker, "require_test_database"),
             patch.object(checker.subprocess, "run", return_value=SimpleNamespace(returncode=0)) as run,

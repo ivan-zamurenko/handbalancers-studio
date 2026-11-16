@@ -6,6 +6,8 @@ import hmac
 import re
 import secrets
 import time
+import tomllib
+from pathlib import Path
 from uuid import UUID, uuid4
 
 import httpx
@@ -22,6 +24,10 @@ from tools import local_stack
 live = email_support.live
 member = email_support.member
 member_password = email_support.member_password
+# Single source of truth for the configured recovery subject (owner chose English emails).
+RECOVERY_SUBJECT = tomllib.loads(Path("supabase/config.toml").read_text())["auth"]["email"][
+    "template"
+]["recovery"]["subject"]
 
 
 def request_code(client, email):
@@ -30,7 +36,7 @@ def request_code(client, email):
     with httpx.Client(base_url="http://127.0.0.1:55324", timeout=5, trust_env=False) as mail:
         for _ in range(40):
             for message in mail.get("/api/v1/messages").json()["messages"]:
-                if "відновлення" in message["Subject"] and any(
+                if message["Subject"] == RECOVERY_SUBJECT and any(
                     r["Address"] == email for r in message["To"]
                 ):
                     body = mail.get("/api/v1/message/" + message["ID"]).json()

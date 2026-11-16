@@ -7,6 +7,14 @@ S04-01 виконано локально (IMPLEMENTED_LOCAL). Поведінку
 GREEN 15; regression security+oauth+contracts 209; 6 мутацій зловлено; review —
 2 слабкі асерти виправлено. Докази: `.workflow/evidence/S04-01.json`.
 
+## CI-ремонт (2026-11-16)
+
+CI був червоний з 4b4c4b4: (1) pip-audit — CVE-2026-126360 у opentelemetry-api
+1.45.1 → оновлено до 1.45.2 у uv.lock; (2) з 7544ace DB-job — тест відновлення
+шукав лист за українською темою; тепер тема береться з supabase/config.toml.
+Також `server/tests/security/accounts` (S04-01) додано в DB_SUITES CI.
+Локально: baseline checks.py зелений; DB suites 179 passed; tools/tests 68.
+
 ## Попередньо — S03-11 auth local e2e
 
 S03-11 виконано локально (IMPLEMENTED_LOCAL, live_verified=false).

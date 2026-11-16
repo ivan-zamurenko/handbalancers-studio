@@ -25,6 +25,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DB_SUITES = (
     "server/tests/integration/database",
     "server/tests/security/database",
+    "server/tests/security/accounts",
     "server/tests/integration/auth",
 )
 
