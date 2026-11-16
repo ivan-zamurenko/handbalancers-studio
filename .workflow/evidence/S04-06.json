@@ -1,0 +1,79 @@
+{
+  "task_id": "S04-06",
+  "status": "done_local",
+  "implementation_status": "IMPLEMENTED_LOCAL",
+  "live_verified": false,
+  "branch": "task/execution-v4",
+  "base_sha": "217f32a",
+  "changed_paths": [
+    "server/alembic/versions/0009_preferences.py",
+    "server/studio/accounts/service.py",
+    "server/studio/accounts/routes.py",
+    "server/studio/accounts/models.py",
+    "server/studio/db.py",
+    "server/studio/main.py",
+    "server/studio/public/routes.py",
+    "server/templates/member/profile.html",
+    "server/templates/public/base.html",
+    "server/static/js/features/account/profile.js",
+    "server/static/js/features/auth/session.js",
+    "server/static/js/state/theme.js",
+    "server/static/css/public.css",
+    "server/static/css/auth.css",
+    ".env.example",
+    "server/tests/security/accounts/test_profile_preferences.py",
+    "tests/js/s04-06-theme-account.test.js",
+    "server/tests/security/accounts/test_oauth_callback.py",
+    "server/tests/integration/database/test_migration_baseline.py"
+  ],
+  "scenario": "GET/PATCH /api/me/profile (first_name,last_name,locale,timezone only; extra fields 422; CSRF) and GET/PATCH /api/me/preferences {theme_preference, expected_revision} with 409 + current on stale revision. Writes run as studio_web under own-row RLS (DATABASE_URL). /profile page edits name/language/theme; signed-in theme loads from server and is stored under studio:account:<id>:theme (cleared on logout/account switch).",
+  "red": {
+    "commands": [
+      "local_stack test pytest server/tests/security/accounts/test_profile_preferences.py -q",
+      "npm run test:js"
+    ],
+    "observed_failure": "4 failed: relation studio.user_preferences does not exist / no /api/me routes; JS: theme.js has no export accountThemeKey.",
+    "not_an_environment_failure": true
+  },
+  "green": {
+    "summary": "backend 4 passed; JS 42 passed (incl. local_theme_account_isolation)."
+  },
+  "regression_commands": [
+    {
+      "command": "python -m tools.check_migrations",
+      "result": "59+20+35+100 passed"
+    },
+    {
+      "command": "uv run --locked python tools/checks.py",
+      "result": "exit 0"
+    },
+    {
+      "command": "npx playwright test",
+      "result": "96 passed"
+    }
+  ],
+  "manual_checks": [
+    "/profile signed-in screenshots 390/1440 light/dark (+390 dark EN) reviewed; empty status divider hidden.",
+    "Ad-hoc browser race check: 3 fast toggles with 300ms server -> final dark on server/screen/storage, 2 PATCHes, no 409."
+  ],
+  "review": {
+    "reviewer": "code-review subagent (read-only)",
+    "result": "findings_fixed",
+    "findings": [
+      "Concurrent theme PATCHes with same revision made own 409 undo the latest choice -> single-flight queue sending latest value.",
+      "Late /api/me/preferences response after logout/account switch re-attached old account storage -> ignored unless still current account."
+    ]
+  },
+  "scope_deviations": [
+    "Migration 0009_preferences (card: 0007, taken).",
+    "Test file in security/accounts DB suite (contracts suite runs without DB).",
+    "Extra RLS test test_other_user_rows_invisible for the new table.",
+    "test_oauth_callback.py:126 users-table query narrowed to names ending in user/users because user_preferences matched '%user%' (guarantee unchanged).",
+    "Header 'Profile' link + /profile page route; DATABASE_URL note in .env.example."
+  ],
+  "not_verified": [
+    "Hosted: DATABASE_URL (studio_web login) not configured and 0008/0009 not applied to cloud DB, so /api/me/* returns 503 there.",
+    "Checkout gating on profile_complete (Checkout not built; S13-08)."
+  ],
+  "push_status": "not_started"
+}

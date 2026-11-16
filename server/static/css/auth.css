@@ -55,3 +55,4 @@
 .auth-code { letter-spacing: .28em; font-variant-numeric: tabular-nums; }
 .login-signup a { color: var(--text); text-underline-offset: 4px; }
 @media(max-width: 420px) { .auth-name-row { grid-template-columns: 1fr; gap: 0; } }
+[data-profile-status]:empty { display: none; }

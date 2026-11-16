@@ -78,3 +78,22 @@ class AuditEvent(Base):
     actor: Mapped[str] = mapped_column(Text, nullable=False)
     action: Mapped[str] = mapped_column(Text, nullable=False)
     subject_user_id: Mapped[UUID] = mapped_column(ForeignKey(User.id), nullable=False, index=True)
+
+
+class UserPreferences(Base):
+    __tablename__ = "user_preferences"
+    __table_args__ = (
+        CheckConstraint(
+            "theme_preference IN ('auto', 'light', 'dark')", name="ck_preferences_theme"
+        ),
+        CheckConstraint("revision > 0", name="ck_preferences_revision"),
+    )
+
+    user_id: Mapped[UUID] = mapped_column(ForeignKey(User.id), primary_key=True)
+    theme_preference: Mapped[str] = mapped_column(
+        Text, nullable=False, server_default=text("'auto'")
+    )
+    revision: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text("1"))
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=text("now()")
+    )

@@ -125,6 +125,11 @@ async def register_page(request: Request) -> HTMLResponse:
     return render(request, "auth/register.html")
 
 
+@router.get("/profile", response_class=HTMLResponse, include_in_schema=False)
+async def profile_page(request: Request) -> HTMLResponse:
+    return render(request, "member/profile.html")
+
+
 @router.get("/verify-email", response_class=HTMLResponse, include_in_schema=False)
 async def verify_page(request: Request) -> HTMLResponse:
     return render(request, "auth/verify.html")

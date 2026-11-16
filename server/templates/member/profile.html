@@ -1,0 +1,20 @@
+{% extends "public/base.html" %}
+{% block title %}{{ copy('Профіль', 'Profile') }} — Handbalancer’s Studio{% endblock %}
+{% block head %}{{ super() }}<link rel="stylesheet" href="/static/css/auth.css">{% endblock %}
+{% block public_content %}
+<section class="login-section wrap" aria-labelledby="profile-title">
+  <div class="login-heading"><p class="eyebrow">Handbalancer’s Studio</p><h1 id="profile-title">{{ copy('Ваш профіль.', 'Your profile.') }}</h1><p>{{ copy('Ім’я потрібне перед оформленням плану.', 'Your name is required before choosing a plan.') }}</p></div>
+  <div class="login-card">
+    <form id="profile-form" data-profile-form aria-describedby="profile-status" hidden>
+      <div class="form-field"><label class="form-field__label" for="profile-first-name">{{ copy('Ім’я', 'First name') }}</label><input class="form-field__control" id="profile-first-name" name="first_name" autocomplete="given-name" maxlength="100" required></div>
+      <div class="form-field"><label class="form-field__label" for="profile-last-name">{{ copy('Прізвище', 'Last name') }}</label><input class="form-field__control" id="profile-last-name" name="last_name" autocomplete="family-name" maxlength="100" required></div>
+      <div class="form-field"><label class="form-field__label" for="profile-locale">{{ copy('Мова', 'Language') }}</label><select class="form-field__control" id="profile-locale" name="locale"><option value="uk">Українська</option><option value="en">English</option></select></div>
+      <div class="form-field"><label class="form-field__label" for="profile-theme">{{ copy('Тема', 'Theme') }}</label><select class="form-field__control" id="profile-theme" name="theme_preference"><option value="auto">{{ copy('Автоматично', 'Automatic') }}</option><option value="light">{{ copy('Світла', 'Light') }}</option><option value="dark">{{ copy('Темна', 'Dark') }}</option></select></div>
+      <button class="primary login-submit" type="submit" data-pending-label="{{ copy('Зберігаємо…', 'Saving…') }}">{{ copy('Зберегти', 'Save') }}</button>
+    </form>
+    <p id="profile-status" class="login-status" role="status" aria-live="polite" data-profile-status data-saved="{{ copy('Збережено.', 'Saved.') }}" data-error="{{ copy('Не вдалося зберегти. Спробуйте ще раз.', 'Could not save. Please try again.') }}" data-unavailable="{{ copy('Профіль тимчасово недоступний.', 'Profile is temporarily unavailable.') }}">{{ copy('Завантажуємо…', 'Loading…') }}</p>
+    <noscript><p class="small">{{ copy('Увімкніть JavaScript, щоб редагувати профіль.', 'Enable JavaScript to edit your profile.') }}</p></noscript>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}<script type="module" src="/static/js/features/account/profile.js"></script>{% endblock %}

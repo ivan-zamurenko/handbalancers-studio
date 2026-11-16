@@ -1,4 +1,14 @@
-# Поточний checkpoint — S04-05 coach bootstrap, 2026-11-16
+# Поточний checkpoint — S04-06 profile & preferences, 2026-11-16
+
+S04-06 виконано локально: сторінка /profile (ім’я, прізвище, мова, тема),
+API /api/me/profile і /api/me/preferences (ревізія, 409 при конфлікті) від імені
+studio_web під RLS; міграція 0009 (studio.user_preferences). Тема акаунта
+зберігається під studio:account:<id>:theme і очищається при виході.
+Review знайшов 2 гонки теми на клієнті — виправлено й перевірено в браузері.
+У хмарі: DATABASE_URL не налаштовано, 0008/0009 не застосовано → /api/me = 503.
+Докази: `.workflow/evidence/S04-06.json`.
+
+## Попередньо — S04-05 coach bootstrap
 
 S04-05 виконано локально: роль coach видає лише власник CLI
 `python -m studio.accounts.cli grant-coach|revoke-coach <auth_user_id> --actor <ім'я>`
@@ -85,4 +95,4 @@ SMTP Supabase, але hosted-шаблон надсилає посилання, �
 
 ## Наступний крок
 
-S04-06 `profile_preferences` — Сохранить профиль и выбор темы на сервере (`tools/roadmap.py next`).
+S05-01 `onboarding_model` — Сохранить анкету без медицинского scoring (`tools/roadmap.py next`).

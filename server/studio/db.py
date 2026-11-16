@@ -1,10 +1,11 @@
-from collections.abc import Iterator, MutableMapping
-from contextlib import contextmanager
+from collections.abc import Callable, Iterator, MutableMapping
+from contextlib import AbstractContextManager, contextmanager
 from typing import Literal
 
-from sqlalchemy import Engine, MetaData, text
+from sqlalchemy import Engine, MetaData, create_engine, text
 from sqlalchemy.orm import DeclarativeBase, Session
 
+from studio.settings import Settings
 from studio.shared.context import Actor
 
 
@@ -47,3 +48,24 @@ def command_transaction(engine: Engine, actor: Actor | None) -> Iterator[Session
             {"user_id": str(actor.user_id) if actor is not None else ""},
         )
         yield session
+
+
+def web_transaction_factory(
+    settings: Settings,
+) -> Callable[[Actor], AbstractContextManager[Session]] | None:
+    """studio_web login (DATABASE_URL); None keeps /api/me fail-closed (503)."""
+    if settings.database_url is None:
+        return None
+    engine = create_engine(
+        settings.database_url.get_secret_value(),
+        hide_parameters=True,
+        pool_size=5,
+        max_overflow=0,
+        pool_timeout=5,
+        connect_args={"connect_timeout": 5},
+    )
+
+    def transaction(actor: Actor) -> AbstractContextManager[Session]:
+        return command_transaction(engine, actor)
+
+    return transaction

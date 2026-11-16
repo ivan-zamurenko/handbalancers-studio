@@ -4,15 +4,70 @@ import {beginLoading, beginNavigation} from '../../components/loading.js';
 // Credentials, CSRF and current account identity live only in memory.
 const logout = document.querySelector('[data-logout]');
 const login = document.querySelector('[data-login-link]');
+const profileLink = document.querySelector('[data-profile-link]');
 let csrf = null;
 let accountId = null;
 let revision = 0;
 let logoutPending = false;
+let themeRevision = null;
+let themeInFlight = false;
+let themeWanted = null;
+
+function announceAccount(id, preference) {
+  document.dispatchEvent(new CustomEvent('studio:account', {detail: {id, preference}}));
+}
 
 function forgetAccount() {
+  const hadAccount = !!accountId;
   clearAccountState(accountId);
   accountId = null;
   csrf = null;
+  themeRevision = null;
+  themeWanted = null;
+  if (hadAccount) announceAccount(null);
+}
+
+async function loadServerTheme(id) {
+  let current = null;
+  try {
+    const response = await fetch('/api/me/preferences', {credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(8000)});
+    if (response.ok) current = await response.json();
+  } catch {
+    // Server preference is optional for rendering; keep the account-local value.
+  }
+  // A late answer for a signed-out or replaced account must not re-attach its storage.
+  if (accountId !== id) return;
+  if (current) themeRevision = current.revision;
+  announceAccount(id, current?.theme_preference);
+}
+
+// One PATCH at a time; the latest local choice is sent after the previous one settles.
+async function saveServerTheme(preference) {
+  themeWanted = preference;
+  if (themeInFlight) return;
+  themeInFlight = true;
+  try {
+    while (themeWanted !== null && accountId && csrf && themeRevision !== null) {
+      const id = accountId;
+      const sending = themeWanted;
+      themeWanted = null;
+      const response = await fetch('/api/me/preferences', {
+        method: 'PATCH', credentials: 'same-origin', signal: AbortSignal.timeout(8000),
+        headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrf},
+        body: JSON.stringify({theme_preference: sending, expected_revision: themeRevision}),
+      }).catch(() => null);
+      if (!response || accountId !== id) return;
+      const body = await response.json().catch(() => null);
+      if (response.ok && body) themeRevision = body.revision;
+      else if (response.status === 409 && body?.current) {
+        themeRevision = body.current.revision;
+        // Another device won. Keep a newer local choice (retried next loop), else adopt.
+        if (themeWanted === null) announceAccount(id, body.current.theme_preference);
+      } else return;
+    }
+  } finally {
+    themeInFlight = false;
+  }
 }
 
 async function refresh() {
@@ -26,14 +81,17 @@ async function refresh() {
     const authenticated = snapshot.authenticated === true && !!snapshot.csrf_token;
     if (!authenticated || (accountId && accountId !== snapshot.user?.id)) forgetAccount();
     csrf = authenticated ? snapshot.csrf_token : null;
+    const previous = accountId;
     accountId = authenticated ? snapshot.user?.id || null : null;
+    if (accountId && accountId !== previous) loadServerTheme(accountId);
     logout.hidden = !authenticated; login.hidden = authenticated;
+    if (profileLink) profileLink.hidden = !authenticated;
     logout.disabled = false;
   } catch {
     if (requestRevision !== revision) return;
     // An outage is not proof of logout. Keep the existing session/CSRF retryable.
     logout.disabled = false;
-    if (!csrf) { logout.hidden = true; login.hidden = false; }
+    if (!csrf) { logout.hidden = true; login.hidden = false; if (profileLink) profileLink.hidden = true; }
   }
 }
 
@@ -48,6 +106,7 @@ logout?.addEventListener('click', async () => {
     if (response.status === 204) {
       forgetAccount();
       logout.hidden = true; login.hidden = false;
+      if (profileLink) profileLink.hidden = true;
       beginNavigation();
       window.location.assign('/login');
       return;
@@ -62,3 +121,4 @@ logout?.addEventListener('click', async () => {
 });
 window.addEventListener('pageshow', refresh);
 window.addEventListener('studio:session-changed', refresh);
+document.addEventListener('studio:theme-changed', event => saveServerTheme(event.detail));

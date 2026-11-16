@@ -123,7 +123,7 @@ def test_verified_user_provisioned_once(flow, caplog):
         tables = conn.scalars(
             text(
                 "SELECT table_schema || '.' || table_name FROM information_schema.tables "
-                "WHERE table_name ILIKE '%user%' AND table_schema LIKE 'studio%'"
+                "WHERE table_name ~* 'users?$' AND table_schema LIKE 'studio%'"
             )
         ).all()
     assert tables == ["studio.users"]
