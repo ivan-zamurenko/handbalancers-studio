@@ -1,28 +1,25 @@
-# Поточний checkpoint — мобільна навігація, 2026-11-08
+# Поточний checkpoint — S03-11 auth local e2e, 2026-11-16
 
-За прямим дорученням власника виправлено мобільну шапку: логотип/вхід зверху,
-Directions/Method/Plans, UA/EN і тема разом у наступному рядку. Перевірено
-ширини 320/360/390/430/768/1440, обидві мови й теми на шести поточних сторінках.
-Збільшено зони натискання, виправлено перенесення при тексті 200% та відступ
-від sticky header. No-JS вхід працює також зі старою session cookie.
+S03-11 виконано локально (IMPLEMENTED_LOCAL, live_verified=false).
+Наскрізний gate на реальному local Supabase test stack без моків:
+register → код лише з loopback Mailpit (лист видаляється в catcher) →
+verify → session → logout (CSRF) → login. Профіль пов'язаний з реальним
+managed `auth.users` (validated FK), повторний login не створює профіль,
+після logout стара cookie дає 401, а upstream refresh token відхиляється.
 
-GREEN: 96 браузерних тестів (11 нових), 11 Python UI/contract тестів,
-roadmap valid (142 задачі), diff check. Незалежний review — clear.
-Докази RED/GREEN, поправки test fixture й межі перевірок:
-`.workflow/evidence/mobile-navigation-polish.json`.
-На фізичних телефонах/Safari не перевірялося; backend/БД не змінено.
+Нове: `tools/local_auth_fixture.py`, `server/tests/integration/auth/test_auth_local_e2e.py`.
+RED: ImportError відсутньої фікстури. GREEN: 4 passed; regression
+`server/tests/integration/auth`: 100 passed; мутаційна перевірка ловить
+невидалений лист і відсутній auth user. Review — clear.
+Докази: `.workflow/evidence/S03-11.json`.
 
-Два короткі дописи англійською та три прямі скриншоти застосунку:
-`private-evidence/social-2026-11-08/LinkedIn.pdf`, `Instagram.pdf` і `screenshots/`.
-Тексти — поруч у .txt; загальний ZIP — `private-evidence/handbalancers-studio-social-pack.zip`.
-Матеріали ignored, у Git не входять; нічого не опубліковано в соцмережах.
-Коміт/push — після фінального staged review; SHA у звіті власнику.
+Запуск: Colima `studio-s01`, `DOCKER_HOST=unix://$HOME/.colima/studio-s01/docker.sock
+DOCKER_CONTEXT=default .venv/bin/python -m tools.local_stack test .venv/bin/python -m pytest …`.
 
-## Попередній стан і наступний крок
+Не підтверджено: hosted email/SMTP, Google OAuth live, браузерний шлях цього gate.
+Hosted OTP/recovery, key rotation, cloud 0007 та provider gates лишаються відкритими.
+Попередній checkpoint (мобільна навігація, `9ff4f3d`): `history/2026-11-08-mobile-navigation.md`.
 
-Очищення 70 залишкових файлів завершено та pushed: `18d1e57`.
-Попереднє runtime cleanup: `c359849`; S03-10: `f3d4e03`.
-Google та email/password лишаються; Apple виключено власником.
-Наступна roadmap-картка — S03-11, повний локальний Auth E2E.
-Hosted OTP/recovery, key rotation, cloud 0007 та provider gates не закриті
-цим UI-виправленням; див. evidence і [архів](history/2026-11-08-through-S03-10.md).
+## Наступний крок
+
+S04-01 `oauth_attempt` — Google OAuth через Supabase PKCE (`tools/roadmap.py next`).

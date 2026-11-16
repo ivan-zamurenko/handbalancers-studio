@@ -1,0 +1,61 @@
+{
+  "task_id": "S03-11",
+  "status": "done_local",
+  "implementation_status": "IMPLEMENTED_LOCAL",
+  "live_verified": false,
+  "branch": "task/execution-v4",
+  "base_sha": "9ff4f3d",
+  "changed_paths": [
+    "tools/local_auth_fixture.py",
+    "server/tests/integration/auth/test_auth_local_e2e.py",
+    ".workflow/evidence/S03-11.json",
+    ".workflow/state.json",
+    ".workflow/CURRENT.md"
+  ],
+  "scenario": "Disposable example.test email -> POST /api/auth/register -> confirmation code read from loopback Mailpit (message deleted in catcher) -> POST /api/auth/verify-email -> GET /api/session -> POST /api/auth/logout (CSRF) -> POST /api/auth/login -> same profile; old cookie and upstream refresh token denied after logout. Real local Supabase Auth (GoTrue), real JWT validation, real studio DB; no gateway/JWT/mail mocks.",
+  "environment": "Isolated test stack handbalancer-studio-test (API 55321, DB 55322, Mailpit 55324) on Colima profile studio-s01; run via guarded tools.local_stack test wrapper.",
+  "red": {
+    "command": "DOCKER_HOST=unix://$HOME/.colima/studio-s01/docker.sock DOCKER_CONTEXT=default .venv/bin/python -m tools.local_stack test .venv/bin/python -m pytest server/tests/integration/auth/test_auth_local_e2e.py -q",
+    "observed_failure": "Collection error: ImportError: cannot import name 'local_auth_fixture' from 'tools' — the card's disposable-identity/mail-catcher fixture did not exist.",
+    "not_an_environment_failure": true
+  },
+  "mutation_checks": [
+    {
+      "change": "Temporarily disabled Mailpit DELETE in read_code and pointed managed_user lookup at a random UUID.",
+      "result": "test_actual_email_code failed (message still in catcher) and test_actual_profile_fk failed (managed user None); 2 failed, 2 passed. File restored before GREEN."
+    }
+  ],
+  "green": {
+    "command": "DOCKER_HOST=unix://$HOME/.colima/studio-s01/docker.sock DOCKER_CONTEXT=default .venv/bin/python -m tools.local_stack test .venv/bin/python -m pytest server/tests/integration/auth/test_auth_local_e2e.py -q",
+    "exit_code": 0,
+    "summary": "4 passed: actual_email_code, actual_profile_fk, repeat_login_same_profile, logout_then_refresh_denied."
+  },
+  "regression_commands": [
+    {
+      "command": "DOCKER_HOST=unix://$HOME/.colima/studio-s01/docker.sock DOCKER_CONTEXT=default .venv/bin/python -m tools.local_stack test .venv/bin/python -m pytest server/tests/integration/auth -q",
+      "result": "100 passed"
+    },
+    {
+      "command": ".venv/bin/ruff check / ruff format --check on changed Python files",
+      "result": "clean after formatting"
+    }
+  ],
+  "manual_checks": [],
+  "scope_deviations": [
+    "Card lists server/tests/integration/auth/test_local_auth_roundtrip.py as a target path; the named test_file test_auth_local_e2e.py already covers the full roundtrip, so no duplicate file was created.",
+    "Card command 'uv run pytest ...' requires the guarded local_stack test wrapper to provide the test target environment (same as earlier auth integration cards)."
+  ],
+  "not_verified": [
+    "Hosted Supabase email delivery / external SMTP.",
+    "Provider OAuth (Google) live flow.",
+    "Browser UI path; this gate is HTTP-level against the real local stack."
+  ],
+  "review": {
+    "reviewer": "code-review subagent (read-only)",
+    "result": "clear",
+    "findings": [],
+    "notes": "No high-confidence issues; noted caplog captures WARNING+ only and messages_for check proves deletion in catcher, not absence of other copies."
+  },
+  "push_status": "not_started",
+  "next_step": "S04-01 per tools/roadmap.py next after commit."
+}
