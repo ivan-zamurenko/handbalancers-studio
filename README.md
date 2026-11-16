@@ -107,6 +107,19 @@ uv run --locked python -m tools.check_migrations
 CI використовує зафіксовані залежності й окремий DB job; автоматичного deploy немає.
 Зелені локальні тести не підтверджують hosted OAuth, доставку листів або оплату.
 
+## Роль тренера (coach)
+
+Публічної реєстрації тренера немає. Роль видає власник операторською командою за
+Supabase auth UUID уже підтвердженого користувача (не за email); кожна зміна
+пишеться в `studio_private.audit_events`:
+
+```sh
+STUDIO_MIGRATION_DATABASE_URL=… uv run --locked python -m studio.accounts.cli grant-coach <auth_user_id> --actor <ім'я>
+STUDIO_MIGRATION_DATABASE_URL=… uv run --locked python -m studio.accounts.cli revoke-coach <auth_user_id> --actor <ім'я>
+```
+
+Потрібна міграція `0008_audit`. У хмарній БД вона ще не застосована.
+
 ## Робочі правила
 
 [AGENTS.md](AGENTS.md) описує межі змін, перевірки й handoff.

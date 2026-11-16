@@ -1,4 +1,14 @@
-# Поточний checkpoint — S04-04 identity linking, 2026-11-16
+# Поточний checkpoint — S04-05 coach bootstrap, 2026-11-16
+
+S04-05 виконано локально: роль coach видає лише власник CLI
+`python -m studio.accounts.cli grant-coach|revoke-coach <auth_user_id> --actor <ім'я>`
+(операторський DB-доступ, не email), з аудитом у новій таблиці
+`studio_private.audit_events` (міграція 0008, RLS, без грантів runtime-ролям).
+RED 4→GREEN 4; check_migrations усі набори зелені; review clear.
+У хмарній БД 0008 НЕ застосовано — потрібен дозвіл власника.
+Докази: `.workflow/evidence/S04-05.json`.
+
+## Попередньо — S04-04 identity linking
 
 S04-04 виконано локально: профіль = auth UUID, без злиття за email. 4 тести
 (`server/tests/security/accounts/test_identity_linking.py`), 2 ключові мутації
@@ -75,4 +85,4 @@ SMTP Supabase, але hosted-шаблон надсилає посилання, �
 
 ## Наступний крок
 
-S04-05 `coach_bootstrap` — Выдать владельцу coach вне публичной регистрации (`tools/roadmap.py next`).
+S04-06 `profile_preferences` — Сохранить профиль и выбор темы на сервере (`tools/roadmap.py next`).

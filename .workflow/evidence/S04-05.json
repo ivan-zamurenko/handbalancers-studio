@@ -1,0 +1,49 @@
+{
+  "task_id": "S04-05",
+  "status": "done_local",
+  "implementation_status": "IMPLEMENTED_LOCAL",
+  "live_verified": false,
+  "branch": "task/execution-v4",
+  "base_sha": "a2be961",
+  "changed_paths": [
+    "server/alembic/versions/0008_audit.py",
+    "server/studio/accounts/roles.py",
+    "server/studio/accounts/cli.py",
+    "server/studio/accounts/models.py",
+    "server/tests/security/accounts/test_coach_bootstrap.py",
+    "server/tests/integration/database/test_migration_baseline.py",
+    "README.md",
+    ".workflow/evidence/S04-05.json",
+    ".workflow/state.json",
+    ".workflow/CURRENT.md"
+  ],
+  "scenario": "Owner runs `python -m studio.accounts.cli grant-coach|revoke-coach <auth_user_id> --actor <name>` with STUDIO_MIGRATION_DATABASE_URL. In one transaction: lock the active studio.users row for that auth UUID (exists only after verified provisioning), change role if different, insert studio_private.audit_events. Email input rejected (exit 2). No HTTP route; runtime roles cannot update role or touch audit. Next session_profile reads the current role from DB.",
+  "red": {
+    "command": "DOCKER_HOST=unix://$HOME/.colima/studio-s01/docker.sock DOCKER_CONTEXT=default .venv/bin/python -m tools.local_stack test .venv/bin/python -m pytest server/tests/security/accounts/test_coach_bootstrap.py -q",
+    "observed_failure": "4 failed: relation studio_private.audit_events does not exist; cannot import studio.accounts.roles / cli.",
+    "not_an_environment_failure": true
+  },
+  "green": {"command": "same as red", "exit_code": 0, "summary": "4 passed"},
+  "mutation_checks": [
+    {"mutation": "audit insert skipped", "caught_by": ["test_repeat_bootstrap_no_duplicate", "test_role_revocation_effective"]},
+    {"mutation": "missing profile silently accepted", "caught_by": ["test_verified_owner_only (+2)"]}
+  ],
+  "regression_commands": [
+    {"command": "python -m tools.check_migrations (guarded local test stack)", "result": "59 + 20 + 31 + 100 passed (incl. ORM/migration parity)"},
+    {"command": "uv run --locked python tools/checks.py", "result": "exit 0"}
+  ],
+  "scope_deviations": [
+    "Migration numbered 0008_audit (card says 0006, already taken by 0006_oauth_profile_data).",
+    "AuditEvent ORM model added to accounts/models.py for ORM/migration parity test.",
+    "test_migration_baseline.py:121 expected head 0007 -> 0008 (new migration; same guarantee).",
+    "README: short owner instruction for the CLI."
+  ],
+  "decisions": [
+    "Verified identity = active product profile exists; avoids granting migration_owner SELECT on auth.users.",
+    "Operator authorization = possession of the migration-owner DB credential; no endpoint.",
+    "Idempotent: same role -> no update, no audit row."
+  ],
+  "not_verified": ["0008 not applied to the hosted Supabase project (cloud DB uses owner-approved bootstrap SQL; applying needs owner approval)."],
+  "review": {"reviewer": "code-review subagent (read-only)", "result": "clear", "findings": []},
+  "push_status": "not_started"
+}

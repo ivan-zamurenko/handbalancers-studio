@@ -55,3 +55,26 @@ class User(Base):
         DateTime(timezone=True), nullable=False, server_default=text("now()")
     )
     row_version: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text("1"))
+
+
+class AuditEvent(Base):
+    """Operator-written history; no runtime role can read or write it."""
+
+    __tablename__ = "audit_events"
+    __table_args__ = (
+        CheckConstraint("actor_type IN ('human', 'system')", name="ck_audit_actor_type"),
+        CheckConstraint("length(actor) BETWEEN 1 AND 100", name="ck_audit_actor"),
+        CheckConstraint("action ~ '^[a-z_]{1,64}$'", name="ck_audit_action"),
+        {"schema": "studio_private"},
+    )
+
+    id: Mapped[UUID] = mapped_column(
+        Uuid, primary_key=True, server_default=text("gen_random_uuid()")
+    )
+    occurred_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=text("clock_timestamp()")
+    )
+    actor_type: Mapped[str] = mapped_column(Text, nullable=False)
+    actor: Mapped[str] = mapped_column(Text, nullable=False)
+    action: Mapped[str] = mapped_column(Text, nullable=False)
+    subject_user_id: Mapped[UUID] = mapped_column(ForeignKey(User.id), nullable=False, index=True)
