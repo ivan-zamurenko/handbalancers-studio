@@ -1,4 +1,13 @@
-# Поточний checkpoint — S03-11 auth local e2e, 2026-11-16
+# Поточний checkpoint — S04-01 oauth attempt, 2026-11-16
+
+S04-01 виконано локально (IMPLEMENTED_LOCAL). Поведінку вже реалізувала S04-01a,
+тому RED поведінки немає (чесно записано); додано тести картки
+`server/tests/security/accounts/test_oauth_attempt.py`: PKCE verifier на кожну
+спробу, allowlist return_to і провайдерів, паралельні старти без змішування.
+GREEN 15; regression security+oauth+contracts 209; 6 мутацій зловлено; review —
+2 слабкі асерти виправлено. Докази: `.workflow/evidence/S04-01.json`.
+
+## Попередньо — S03-11 auth local e2e
 
 S03-11 виконано локально (IMPLEMENTED_LOCAL, live_verified=false).
 Наскрізний gate на реальному local Supabase test stack без моків:
@@ -34,4 +43,4 @@ SMTP Supabase, але hosted-шаблон надсилає посилання, �
 
 ## Наступний крок
 
-S04-01 `oauth_attempt` — Google OAuth через Supabase PKCE (`tools/roadmap.py next`).
+S04-02 `oauth_callback` — обмін OAuth code і відновлення шляху користувача (`tools/roadmap.py next`).

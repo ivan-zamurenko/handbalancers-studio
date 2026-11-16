@@ -1,0 +1,92 @@
+{
+  "task_id": "S04-01",
+  "status": "done_local",
+  "implementation_status": "IMPLEMENTED_LOCAL",
+  "live_verified": false,
+  "branch": "task/execution-v4",
+  "base_sha": "315e069",
+  "changed_paths": [
+    "server/tests/security/accounts/test_oauth_attempt.py",
+    ".workflow/evidence/S04-01.json",
+    ".workflow/state.json",
+    ".workflow/CURRENT.md"
+  ],
+  "scenario": "POST /api/auth/oauth/{provider}/start creates a DB-stored, browser-bound attempt (opaque attempt in callback query + HttpOnly binding cookie) with a fresh PKCE verifier per attempt; Supabase /authorize receives only provider, redirect_to and S256 challenge (no own state/verifier). Callback validates attempt format allowlist and binding before exchange.",
+  "red": {
+    "command": "DOCKER_HOST=unix://$HOME/.colima/studio-s01/docker.sock DOCKER_CONTEXT=default .venv/bin/python -m tools.local_stack test .venv/bin/python -m pytest server/tests/security/accounts/test_oauth_attempt.py -q",
+    "observed_failure": "No behavioral RED: runtime (oauth.py, oauth_routes.py, token_store.py) was already implemented by S04-01a, so card tests passed on first correct run. First run had 1 failure caused by the test itself (16 starts from one client exceeded the existing 10/client start quota -> OAuthRateLimited); test fixed to use distinct client keys. Not claimed as RED.",
+    "not_an_environment_failure": null
+  },
+  "mutation_checks": [
+    {
+      "mutation": "M1 shared verifier across attempts",
+      "caught_by": [
+        "test_pkce_verifier_per_attempt",
+        "test_no_shared_mutable_client"
+      ]
+    },
+    {
+      "mutation": "M2 removed provider allowlist (service, route and store)",
+      "caught_by": [
+        "test_provider_allowlist x6"
+      ]
+    },
+    {
+      "mutation": "M3 removed return-path allowlist in store",
+      "caught_by": [
+        "test_return_path_allowlist x7"
+      ]
+    },
+    {
+      "mutation": "M4 verifier kept in shared instance field during concurrent starts",
+      "caught_by": [
+        "test_no_shared_mutable_client"
+      ]
+    },
+    {
+      "mutation": "M5 binding cookie value equals callback attempt",
+      "caught_by": [
+        "test_pkce_verifier_per_attempt"
+      ]
+    },
+    {
+      "mutation": "M6 start route sets binding cookie for rejected provider",
+      "caught_by": [
+        "test_provider_allowlist x5 (empty provider is unrouted)"
+      ]
+    }
+  ],
+  "test_adjustment": "After M1 the concurrency test only failed via the per-attempt test; added distinct code_challenge assertion so it independently catches a shared verifier.",
+  "green": {
+    "command": "same as red command",
+    "exit_code": 0,
+    "summary": "15 passed (4 card tests incl. parametrized cases)."
+  },
+  "regression_commands": [
+    {
+      "command": "local_stack test pytest server/tests/security server/tests/integration/auth/test_oauth_flow.py server/tests/integration/auth/test_oauth_profile.py server/tests/contracts -q",
+      "result": "209 passed (before review fixes); card file 15 passed after fixes"
+    },
+    {
+      "command": "ruff format/check on new test file",
+      "result": "clean"
+    }
+  ],
+  "scope_deviations": [
+    "Card target runtime files oauth.py/oauth_storage.py not changed: behavior already present (storage lives in token_store.py from S04-01a). Only the card test file added."
+  ],
+  "not_verified": [
+    "Live Google roundtrip beyond owner's manual basic sign-in on 2026-11-16 (see live-auth-check-2026-11-16.json).",
+    "Cancel/duplicate identity with real Google (S17-01)."
+  ],
+  "review": {
+    "reviewer": "code-review subagent (read-only)",
+    "result": "findings_fixed",
+    "findings": [
+      "Cookie-leak assertion used endswith('studio_oauth_') and could never fail; replaced with no set-cookie header plus positive google control (200, authorization_url, binding cookie).",
+      "attempt-not-in-binding compared against masked SecretStr; now compares secret value. Both re-verified by mutations M5/M6."
+    ],
+    "no_runtime_gaps": "No Supabase state reuse; external return_to rejected; callback attempt format allowlisted; return path re-validated on consume."
+  },
+  "push_status": "not_started"
+}
