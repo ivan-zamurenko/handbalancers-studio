@@ -35,3 +35,21 @@ def test_verify_page_neutral_existing_account_hint(language, hint):
         response = client.get("/verify-email", params={"lang": language})
     assert hint in response.text
     assert f'href="/login?lang={language}"' in response.text
+
+
+@pytest.mark.parametrize("language", ["uk", "en"])
+def test_login_page_has_no_separate_verify_link(language):
+    with TestClient(create_app({"app_env": "test"})) as client:
+        response = client.get("/login", params={"lang": language})
+    assert 'href="/verify-email' not in response.text
+    assert f'href="/recovery?lang={language}"' in response.text
+
+
+@pytest.mark.parametrize("path", ["/", "/login", "/register", "/verify-email"])
+def test_single_brand_logo_in_header(path):
+    with TestClient(create_app({"app_env": "test"})) as client:
+        response = client.get(path)
+    assert response.text.count('class="wordmark"') == 1
+    header = response.text.split('<header class="site-header">', 1)[1].split("</header>", 1)[0]
+    assert 'class="wordmark"' in header
+    assert "Handbalancer’s Studio</span>" in response.text.split("<footer", 1)[1]

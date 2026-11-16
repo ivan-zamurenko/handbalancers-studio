@@ -20,7 +20,7 @@
           {% with password_id='login-password' %}{% include 'auth/password_toggle.html' %}{% endwith %}
         </div>
       </div>
-      <div class="login-help"><a href="/verify-email?lang={{ language }}">{{ copy('Підтвердити пошту', 'Verify email') }}</a><a href="/recovery?lang={{ language }}">{{ copy('Забули пароль?', 'Forgot password?') }}</a></div>
+      <div class="login-help"><a href="/recovery?lang={{ language }}">{{ copy('Забули пароль?', 'Forgot password?') }}</a></div>
       <button class="primary login-submit" type="submit" data-auth-submit data-pending-label="{{ copy('Входимо…', 'Signing in…') }}" disabled>{{ copy('Увійти', 'Log in') }}</button>
     </form>
     {% with auth_action='login' %}{% include 'auth/form_status.html' %}{% endwith %}
