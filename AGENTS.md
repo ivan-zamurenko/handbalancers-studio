@@ -12,7 +12,7 @@
 Одна карточка — один основной green commit с тестами и реализацией. Сначала узкие тесты, затем affected-module suite. Полный suite — на PR/этапе, а не пять раз на неизменённом коде. CI green не означает реальный OAuth/Stripe/AI. Без стенда статус env_blocked, не passed. Не пропускай падающий тест, не используй broad mocks вместо DB/RLS/concurrency.
 
 ## Границы
-FastAPI + SQLAlchemy 2 + Alembic + PostgreSQL/Supabase Auth + Jinja/HTML/CSS/vanilla JS. Не вводи React, микросервисы, ORM repository hierarchy, внешнюю очередь или новые provider integrations без измеренной необходимости/записанного решения. Новый SQL создаётся перед первой использующей его командой, не весь будущий словарь сразу.
+FastAPI + SQLAlchemy 2 + Alembic + PostgreSQL/Supabase Auth + Jinja/HTML/CSS/vanilla JS. Sign in with Apple видалено рішенням власника (немає оплати Apple Developer), див. `docs/adr/apple-sign-in-removed.md`; не повертай без нового доручення. Не вводи React, микросервисы, ORM repository hierarchy, внешнюю очередь или новые provider integrations без измеренной необходимости/записанного решения. Новый SQL создаётся перед первой использующей его командой, не весь будущий словарь сразу.
 
 HTTP routes тонкие; authorization и transaction orchestration в module service. Domain policy не зависит от Request/Stripe/Supabase SDK. Одна product command — одна транзакция; внешняя сеть не внутри длительных DB locks. У completed snapshots и published trees отдельная защита от изменения.
 

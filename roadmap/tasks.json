@@ -1622,7 +1622,7 @@
       ],
       "api": "Нет нового публичного API.",
       "db": "Нет изменения схемы.",
-      "notes": "Документировать Apple Services ID/redirect/secret expiry. Не считать adapter unit tests реальным входом Apple. Ротация secret и live smoke — внешний gate.",
+      "notes": "SKIPPED 2026-11-16: Apple удалён решением владельца (нет оплаты Apple Developer). См. docs/adr/apple-sign-in-removed.md.",
       "command": "uv run pytest server/tests/contracts/accounts/test_apple_adapter.py -q",
       "commit": "feat(accounts): [S04-03] apple adapter",
       "status": "todo",
@@ -1653,7 +1653,7 @@
       "test_cases": [
         {
           "name": "same_auth_uuid_same_profile",
-          "expected": "Google/Apple, возвращающие один verified auth UUID, ведут к одному профилю."
+          "expected": "Google и email/password, возвращающие один verified auth UUID, ведут к одному профилю (Apple удалён, ADR apple-sign-in-removed)."
         },
         {
           "name": "unverified_claim_no_link",
@@ -6432,7 +6432,7 @@
       "id": "S17-01",
       "stage": "17",
       "slug": "smtp_oauth_live",
-      "title": "Проверить внешний email и Google/Apple на staging",
+      "title": "Проверить внешний email и Google на staging",
       "goal": "Настроенные владельцем credentials/redirect allowlists используются только в выделенном staging.",
       "module": "release",
       "kind": "gate",
@@ -6456,10 +6456,6 @@
         {
           "name": "google_real_roundtrip",
           "expected": "Успешный/cancel/relogin/duplicate identity проверены с Google."
-        },
-        {
-          "name": "apple_real_roundtrip",
-          "expected": "Apple relay/missing-name/relogin проверены, secret expiry записан."
         },
         {
           "name": "no_secret_in_report",

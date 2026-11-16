@@ -1,4 +1,4 @@
-# S17-01 — Проверить внешний email и Google/Apple на staging
+# S17-01 — Проверить внешний email и Google на staging
 
 **Одна задача:** Настроенные владельцем credentials/redirect allowlists используются только в выделенном staging.
 
@@ -27,7 +27,7 @@
 |---|---|
 | `external_email_delivered` | Реальное письмо получено и verified flow завершён. |
 | `google_real_roundtrip` | Успешный/cancel/relogin/duplicate identity проверены с Google. |
-| `apple_real_roundtrip` | Apple relay/missing-name/relogin проверены, secret expiry записан. |
+| ~~`apple_real_roundtrip`~~ | Удалено 2026-11-16: Apple не входит в продукт (ADR apple-sign-in-removed). |
 | `no_secret_in_report` | В отчёте нет tokens/keys и email тела. |
 
 Команда проверки (создать test-файл до реализации):

@@ -4,6 +4,7 @@
 oauth_apple_enabled прибрано, docs оновлено); S04-03 — skipped, S04-04 тепер залежить
 від S04-02. CHECK у БД (0004) ще допускає 'apple' — застосунок не записує.
 RED→GREEN; checks.py exit 0; DB suites 202. Докази: `.workflow/evidence/S04-03.json`.
+Причина й правила для агентів: `docs/adr/apple-sign-in-removed.md` (посилання також в AGENTS.md).
 
 ## Попередньо — S04-02 oauth callback
 

@@ -92,7 +92,7 @@ AUTH_EMAIL_ENABLED=true. Це незалежний прапорець від Goo
 Email/password login і сторінки реєстрації ще мають окремі наступні roadmap картки.
 
 Після налаштування Google, DB та ключів: OAUTH_GOOGLE_ENABLED=true.
-OAUTH_APPLE_ENABLED=false до окремого налаштування Apple.
+(OAUTH_APPLE_ENABLED більше не існує — Apple видалено 2026-11-16.)
 Зупинити попередній локальний preview через його термінал, потім з кореня:
 
 ```sh
@@ -108,7 +108,7 @@ uv run --env-file .env.local uvicorn studio.main:create_app --factory --host 127
 Google та email/password через Supabase Auth. OAUTH_APPLE_ENABLED=false;
 кнопка Apple видалена з форми входу. Членство, ключі та provider setup більше не є очікуваними
 кроками чи блокерами. До Apple повертатися лише за новим запитом власника.
-Існуюча підтримка Apple в коді лишається вимкненою.
+2026-11-16: підтримку Apple видалено з коду, див. `docs/adr/apple-sign-in-removed.md`.
 
 ## Які дані зберігаються
 

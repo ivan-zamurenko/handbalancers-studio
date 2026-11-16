@@ -1,4 +1,6 @@
-# Google та Apple: налаштування нового проєкту
+# Google: налаштування нового проєкту
+
+> Apple видалено з продукту 2026-11-16 (`docs/adr/apple-sign-in-removed.md`). Розділ про Apple нижче — історичний, не виконувати.
 
 Конкретні адреси й кроки для проєкту власника: [oauth-project-setup.md](oauth-project-setup.md).
 
@@ -52,7 +54,7 @@ https://supabase.com/docs/guides/auth/sessions/pkce-flow
 - TOKEN_ENCRYPTION_KEY — 32 випадкові байти у стандартному Base64, зберігати стабільно.
 - AUTH_DATABASE_URL — окремий LOGIN із membership studio_auth_runtime,
   без migration_owner, власності schemas/tables, SUPERUSER/BYPASSRLS/CREATEROLE.
-- OAUTH_GOOGLE_ENABLED / OAUTH_APPLE_ENABLED — true лише після налаштування
+- OAUTH_GOOGLE_ENABLED — true лише після налаштування
   відповідного провайдера; спочатку перевірити на ізольованому staging.
 
 Перед запуском застосувати міграції до нової БД через окремий migration operator.

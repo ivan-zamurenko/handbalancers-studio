@@ -26,7 +26,7 @@
 ## Сначала тесты
 | Тест | Что обязан доказать |
 |---|---|
-| `same_auth_uuid_same_profile` | Google/Apple, возвращающие один verified auth UUID, ведут к одному профилю. |
+| `same_auth_uuid_same_profile` | Google и email/password, возвращающие один verified auth UUID, ведут к одному профилю (Apple удалён, ADR apple-sign-in-removed). |
 | `unverified_claim_no_link` | Неподтверждённый claim не сопоставляет чужие записи. |
 | `email_not_primary_key` | Изменение provider email не создаёт новую product identity. |
 | `conflict_no_auto_merge` | Противоречивые identities остаются явной ошибкой/путём поддержки. |
