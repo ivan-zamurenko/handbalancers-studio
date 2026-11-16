@@ -1,4 +1,11 @@
-# Поточний checkpoint — Apple видалено, S04-03 skipped, 2026-11-16
+# Поточний checkpoint — S04-04 identity linking, 2026-11-16
+
+S04-04 виконано локально: профіль = auth UUID, без злиття за email. 4 тести
+(`server/tests/security/accounts/test_identity_linking.py`), 2 ключові мутації
+зловлено, regression 127. Код не змінювався. Докази: `.workflow/evidence/S04-04.json`.
+Власник 2026-11-16: лише необхідні й критичні тести, без надмірності.
+
+## Попередньо — Apple видалено, S04-03 skipped
 
 За рішенням власника Apple-вхід видалено з коду (allowlist лише google, налаштування
 oauth_apple_enabled прибрано, docs оновлено); S04-03 — skipped, S04-04 тепер залежить
@@ -68,4 +75,4 @@ SMTP Supabase, але hosted-шаблон надсилає посилання, �
 
 ## Наступний крок
 
-S04-04 `identity_linking` — linking і конфлікти identities (`tools/roadmap.py next`).
+S04-05 `coach_bootstrap` — Выдать владельцу coach вне публичной регистрации (`tools/roadmap.py next`).

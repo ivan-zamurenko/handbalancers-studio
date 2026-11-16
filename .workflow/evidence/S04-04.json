@@ -1,0 +1,25 @@
+{
+  "task_id": "S04-04",
+  "status": "done_local",
+  "implementation_status": "IMPLEMENTED_LOCAL",
+  "live_verified": false,
+  "branch": "task/execution-v4",
+  "base_sha": "e583fbd",
+  "changed_paths": ["server/tests/security/accounts/test_identity_linking.py", ".workflow/evidence/S04-04.json", ".workflow/state.json", ".workflow/CURRENT.md"],
+  "scenario": "Product identity is the Supabase auth UUID (studio.users.auth_user_id, no email column). Google and email/password with the same UUID share one profile; email change keeps the profile; unconfirmed email and payload-user/JWT-subject mismatch are rejected without creating or merging profiles.",
+  "red": {
+    "command": "DOCKER_HOST=unix://$HOME/.colima/studio-s01/docker.sock DOCKER_CONTEXT=default .venv/bin/python -m tools.local_stack test .venv/bin/python -m pytest server/tests/security/accounts/test_identity_linking.py -q",
+    "observed_failure": "No behavioral RED: policy already enforced by provisioning (S01/S03) and accept_identity (S04-01a). First run had 1 test-side failure (session count not scoped to the test user in a module-shared DB); fixed. Not claimed as RED.",
+    "not_an_environment_failure": null
+  },
+  "mutation_checks": [
+    {"mutation": "accept_identity accepts unconfirmed email", "caught_by": ["test_unverified_claim_no_link"]},
+    {"mutation": "accept_identity trusts payload user id over JWT subject", "caught_by": ["test_conflict_no_auto_merge"]}
+  ],
+  "green": {"command": "same as red", "exit_code": 0, "summary": "4 passed"},
+  "regression_commands": [{"command": "local_stack test pytest server/tests/security/accounts server/tests/integration/auth -q", "result": "127 passed"}],
+  "scope_deviations": ["No runtime change; identity_policy.py not created because the policy already lives in provisioning.py/oauth.py. Test count kept minimal per owner instruction 2026-11-16."],
+  "not_verified": ["Real Supabase automatic identity linking with live Google (S17-01)."],
+  "review": {"reviewer": null, "result": "skipped_small_test_only_change", "findings": []},
+  "push_status": "not_started"
+}

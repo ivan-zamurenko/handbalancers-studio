@@ -167,12 +167,12 @@
     "S04-03": {
       "status": "skipped",
       "evidence": ".workflow/evidence/S04-03.json",
-      "push_status": "pending"
+      "push_status": "pushed"
     },
     "S04-04": {
-      "status": "todo",
-      "evidence": null,
-      "push_status": "not_started"
+      "status": "done",
+      "evidence": ".workflow/evidence/S04-04.json",
+      "push_status": "pending"
     },
     "S04-05": {
       "status": "todo",
