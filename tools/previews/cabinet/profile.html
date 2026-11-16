@@ -6,6 +6,7 @@
   <title>Профіль · Handbalancer’s Studio · макет</title>
   <link rel="stylesheet" href="/static/css/tokens.css">
   <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/handstand.css">
   <link rel="stylesheet" href="./cabinet.css">
   <script type="module" src="./cabinet.js"></script>
 </head>
@@ -24,6 +25,24 @@
       <a class="btn" href="#">Редагувати</a>
     </div>
 
+    <section class="card empty" aria-labelledby="empty-title">
+      <svg class="cycle-figure" data-handstand-cycle viewBox="0 0 240 184" fill="none" aria-hidden="true" focusable="false">
+            <ellipse class="cycle-contact-shadow" data-contact-shadow cx="64" cy="167" rx="16" ry="2.2"/>
+            <path class="cycle-mat" d="M32 168H211"/>
+            <path class="cycle-ground" d="M32 166H211" />
+            <path class="cycle-marks" d="M32 163V169M211 163V169"/>
+            <g class="cycle-rear"><path data-bone="back-leg" d="M68 105L62 135L62 164"/><path data-bone="back-foot" d="M62 164H68"/><path data-bone="back-arm" d="M68 65L57 86L57 108"/><path data-bone="back-hand" d="M57 108H62"/></g>
+            <path data-bone="torso" d="M68 105V65"/>
+            <path data-bone="front-leg" d="M68 105L74 135L74 164"/><path data-bone="front-foot" d="M74 164H80"/>
+            <path data-bone="front-arm" d="M68 65L82 86L82 108"/><path data-bone="front-hand" d="M82 108H87"/>
+            <path data-bone="neck" d="M64 64L73 50"/><circle data-head cx="73" cy="50" r="7.2"/><path class="cycle-eye" data-bone="eye-left" d="M75 49h.2"/><path class="cycle-eye" data-bone="eye-right" d="M78.5 49h.2"/>
+          </svg>
+      <h2 id="empty-title">Почнімо знайомство.</h2>
+      <p>Розкажіть про цілі, зручні дні й час — і план підлаштується саме під вас. Це займе дві хвилини.</p>
+      <div class="steps"><span class="done">Акаунт створено</span><span>Цілі</span><span>Розклад</span><span>Про себе</span></div>
+      <a class="btn primary" href="#">Заповнити профіль</a>
+    </section>
+
     <div class="grid">
       <section class="card span-12">
         <div class="profile-hero">
@@ -33,7 +52,7 @@
         </div>
       </section>
 
-      <section class="card span-6" aria-labelledby="basic">
+      <section class="card span-6" aria-labelledby="basic" data-acc data-summary="Іван Заморенко · 34 роки">
         <div class="card-head"><h2 id="basic">Основне</h2></div>
         <dl class="rows">
           <div><dt>Ім’я</dt><dd>Іван</dd></div>
@@ -45,7 +64,7 @@
         <p class="note">Вік, зріст і вагу ви вказуєте самі. Це не медична оцінка й не бачать інші клієнти.</p>
       </section>
 
-      <section class="card span-6" aria-labelledby="training">
+      <section class="card span-6" aria-labelledby="training" data-acc data-summary="Пн, Ср, Пт · вечір · 45 хв">
         <div class="card-head"><h2 id="training">Тренування</h2><span class="meta">впливає на план</span></div>
         <p class="sub-label">Цілі</p>
         <div class="chips"><span class="chip on">Стійка на руках</span><span class="chip on">Сила</span><span class="chip">Гнучкість і рухливість</span><span class="chip on">Загальна форма</span></div>
@@ -55,7 +74,7 @@
         <div class="chips"><span class="chip on">Вечір · 18:00–21:00</span><span class="chip on">45 хв</span></div>
       </section>
 
-      <section class="card span-4" aria-labelledby="sub">
+      <section class="card span-4" aria-labelledby="sub" data-acc data-summary="Pro · до 16 грудня">
         <div class="card-head"><h2 id="sub">Підписка</h2></div>
         <dl class="rows">
           <div><dt>Тариф</dt><dd>Pro</dd></div>
@@ -65,7 +84,7 @@
         <a class="link-row" href="#" style="margin-top:8px">Керувати підпискою <span>→</span></a>
       </section>
 
-      <section class="card span-4" aria-labelledby="settings">
+      <section class="card span-4" aria-labelledby="settings" data-acc data-summary="Українська · авто">
         <div class="card-head"><h2 id="settings">Налаштування</h2></div>
         <dl class="rows">
           <div><dt>Мова</dt><dd>Українська</dd></div>
@@ -74,7 +93,7 @@
         </dl>
       </section>
 
-      <section class="card span-4" aria-labelledby="security">
+      <section class="card span-4" aria-labelledby="security" data-acc data-summary="Google · пароль">
         <div class="card-head"><h2 id="security">Безпека</h2></div>
         <div>
           <a class="link-row" href="#">ivan@…gmail.com <span>Google</span></a>

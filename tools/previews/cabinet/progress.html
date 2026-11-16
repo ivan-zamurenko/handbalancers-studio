@@ -6,6 +6,7 @@
   <title>Прогрес · Handbalancer’s Studio · макет</title>
   <link rel="stylesheet" href="/static/css/tokens.css">
   <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/handstand.css">
   <link rel="stylesheet" href="./cabinet.css">
   <script type="module" src="./cabinet.js"></script>
 </head>
@@ -23,7 +24,25 @@
       <div><p class="eyebrow">Тиждень 47 · 15–21 листопада</p><h1>Ваш прогрес.</h1><p>Лише завершені заняття. Немає даних — не те саме, що нуль.</p></div>
     </div>
 
+    <section class="card empty" aria-labelledby="empty-title">
+      <svg class="cycle-figure" data-handstand-cycle viewBox="0 0 240 184" fill="none" aria-hidden="true" focusable="false">
+            <ellipse class="cycle-contact-shadow" data-contact-shadow cx="64" cy="167" rx="16" ry="2.2"/>
+            <path class="cycle-mat" d="M32 168H211"/>
+            <path class="cycle-ground" d="M32 166H211" />
+            <path class="cycle-marks" d="M32 163V169M211 163V169"/>
+            <g class="cycle-rear"><path data-bone="back-leg" d="M68 105L62 135L62 164"/><path data-bone="back-foot" d="M62 164H68"/><path data-bone="back-arm" d="M68 65L57 86L57 108"/><path data-bone="back-hand" d="M57 108H62"/></g>
+            <path data-bone="torso" d="M68 105V65"/>
+            <path data-bone="front-leg" d="M68 105L74 135L74 164"/><path data-bone="front-foot" d="M74 164H80"/>
+            <path data-bone="front-arm" d="M68 65L82 86L82 108"/><path data-bone="front-hand" d="M82 108H87"/>
+            <path data-bone="neck" d="M64 64L73 50"/><circle data-head cx="73" cy="50" r="7.2"/><path class="cycle-eye" data-bone="eye-left" d="M75 49h.2"/><path class="cycle-eye" data-bone="eye-right" d="M78.5 49h.2"/>
+          </svg>
+      <h2 id="empty-title">Тут з’явиться ваш прогрес.</h2>
+      <p>Після першого завершеного заняття ви побачите хвилини тижня, регулярність і свої рекорди. Поки даних немає — і це не нуль.</p>
+      <a class="btn primary" href="#">Почати перше заняття</a>
+    </section>
+
     <div class="grid">
+      <div class="kpi-row" data-carousel aria-label="Показники тижня">
       <section class="card kpi span-3">
         <div class="card-head"><h2>Хвилини тижня</h2></div>
         <div class="ring-wrap">
@@ -47,8 +66,19 @@
         <div class="value">14<small> год 20 хв</small></div>
         <div class="label">усього · 5 год 10 хв за місяць</div>
       </section>
+      </div>
+      <div class="carousel-dots" data-dots aria-hidden="true"></div>
 
-      <section class="card span-12" aria-labelledby="heat-title">
+      <div class="seg" role="tablist" aria-label="Розділи прогресу" data-seg>
+        <button type="button" role="tab" aria-selected="true" aria-controls="p-year">Рік</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="p-hold">Стійка</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="p-ex">Вправи</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="p-tests">Тести</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="p-feel">Самопочуття</button>
+      </div>
+      <div class="panels" data-panels>
+
+      <section class="card span-12" id="p-year" role="tabpanel" aria-labelledby="heat-title">
         <div class="card-head"><h2 id="heat-title">Регулярність за рік</h2><span class="meta" data-heat-count></span></div>
         <div class="heat-scroll"><div class="heat" data-heat role="img" aria-label="Карта занять за останні 12 місяців"></div></div>
         <div class="heat-foot">
@@ -57,13 +87,13 @@
         </div>
       </section>
 
-      <section class="card span-7" aria-labelledby="hold-title">
+      <section class="card span-7" id="p-hold" role="tabpanel" aria-labelledby="hold-title">
         <div class="card-head"><h2 id="hold-title">Найкраще утримання стійки</h2><span class="meta">12 тижнів</span></div>
         <div class="big-stat"><b>38 с</b><span>+26 с від старту</span></div>
         <svg class="chart" data-hold role="img" aria-label="Найкраще утримання стійки за 12 тижнів: від 12 до 38 секунд"></svg>
       </section>
 
-      <section class="card span-5" aria-labelledby="feel-title">
+      <section class="card span-5" id="p-feel" role="tabpanel" aria-labelledby="feel-title">
         <div class="card-head"><h2 id="feel-title">Самопочуття після занять</h2><span class="meta">8 занять</span></div>
         <div class="feel">
           <div><span>Енергія</span><span class="bars"><i style="height:50%"></i><i style="height:62%"></i><i style="height:58%"></i><i class="none"></i><i style="height:70%"></i><i style="height:76%"></i><i style="height:80%"></i><i style="height:84%"></i></span><b>4,2</b></div>
@@ -72,7 +102,7 @@
         <p class="note">Оцінка від 1 до 5, яку ви ставите після заняття. Пунктир — заняття без оцінки.</p>
       </section>
 
-      <section class="card span-7" aria-labelledby="ex-title">
+      <section class="card span-7" id="p-ex" role="tabpanel" aria-labelledby="ex-title">
         <div class="card-head"><h2 id="ex-title">Ключові вправи</h2><span class="meta">найкращий підхід</span></div>
         <div class="trend">
           <div><span>Підйом плечей біля стіни<small>час утримання</small></span><svg data-spark="25,26,28,30,32,31,35,40"></svg><span class="delta">40 с<span>+15 с</span></span></div>
@@ -82,7 +112,7 @@
         </div>
       </section>
 
-      <section class="card span-5" aria-labelledby="tests-title">
+      <section class="card span-5" id="p-tests" role="tabpanel" aria-labelledby="tests-title">
         <div class="card-head"><h2 id="tests-title">Тестові програми</h2><span class="meta">переоцінка раз на 6 тижнів</span></div>
         <table class="tests">
           <thead><tr><th>Тест</th><th>Жовтень</th><th>Листопад</th></tr></thead>
@@ -94,6 +124,7 @@
         </table>
         <p class="note">Висновок тренера з’являється тут лише після публікації.</p>
       </section>
+      </div>
     </div>
 
     <p class="synthetic"><span>Синтетичний макет · не справжні дані</span><span>h. Studio / Member</span></p>

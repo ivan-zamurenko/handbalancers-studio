@@ -90,3 +90,82 @@ for (const spark of document.querySelectorAll('[data-spark]')) {
   spark.setAttribute('viewBox', '0 0 96 28');
   spark.innerHTML = `<polyline points="${pts.join(' ')}"/>`;
 }
+
+// Empty state preview: ?state=empty. Reuses the product handstand figure.
+if (params.get('state') === 'empty') document.body.dataset.state = 'empty';
+const emptyFigure = document.querySelector('.empty [data-handstand-cycle]');
+if (emptyFigure && document.body.dataset.state === 'empty') {
+  const {mountHandstandCycle, drawPose} = await import('/static/js/components/handstand-motion.js');
+  // Reduced motion: a still pose at the top of the handstand instead of the loop.
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) drawPose(emptyFigure, 0.55);
+  else mountHandstandCycle(emptyFigure);
+}
+
+const mobile = matchMedia('(max-width: 760px)');
+
+// KPI carousel dots follow the snapped card.
+const carousel = document.querySelector('[data-carousel]');
+const dots = document.querySelector('[data-dots]');
+if (carousel && dots) {
+  dots.innerHTML = [...carousel.children].map(() => '<i></i>').join('');
+  const mark = () => {
+    const width = carousel.children[0].getBoundingClientRect().width + 12;
+    const index = Math.round(carousel.scrollLeft / width);
+    [...dots.children].forEach((d, i) => d.classList.toggle('on', i === index));
+  };
+  carousel.addEventListener('scroll', mark, {passive: true});
+  mark();
+}
+
+// Segmented tabs + swipeable panels stay in sync.
+const seg = document.querySelector('[data-seg]');
+const panels = document.querySelector('[data-panels]');
+if (seg && panels) {
+  const tabsList = [...seg.querySelectorAll('[role=tab]')];
+  const select = id => tabsList.forEach(t => {
+    const on = t.getAttribute('aria-controls') === id;
+    t.setAttribute('aria-selected', String(on));
+    t.tabIndex = on ? 0 : -1;
+    if (on) t.scrollIntoView({block: 'nearest', inline: 'nearest'});
+  });
+  tabsList.forEach(t => t.addEventListener('click', () => {
+    const panel = document.getElementById(t.getAttribute('aria-controls'));
+    const left = panel.offsetLeft - panels.children[0].offsetLeft;
+    panels.scrollTo({left, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+    select(panel.id);
+  }));
+  seg.addEventListener('keydown', e => {
+    const i = tabsList.findIndex(t => t.getAttribute('aria-selected') === 'true');
+    const next = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : null;
+    if (next === null || !tabsList[next]) return;
+    tabsList[next].click(); tabsList[next].focus();
+  });
+  panels.addEventListener('scroll', () => {
+    const step = panels.children[1].offsetLeft - panels.children[0].offsetLeft;
+    const index = Math.round(panels.scrollLeft / step);
+    const panel = panels.children[index];
+    if (panel) select(panel.id);
+  }, {passive: true});
+}
+
+// Profile accordion on phones; desktop shows every section.
+const sections = [...document.querySelectorAll('.card[data-acc]')];
+for (const [i, card] of sections.entries()) {
+  const head = card.querySelector('.card-head');
+  const body = document.createElement('div');
+  body.className = 'acc-body';
+  while (head.nextSibling) body.append(head.nextSibling);
+  card.append(body);
+  head.insertAdjacentHTML('beforeend', `<span class="acc-summary">${card.dataset.summary}</span><svg class="acc-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg>`);
+  const apply = () => {
+    if (!mobile.matches) { card.dataset.open = 'true'; head.removeAttribute('role'); head.removeAttribute('tabindex'); head.removeAttribute('aria-expanded'); return; }
+    head.setAttribute('role', 'button'); head.tabIndex = 0;
+    if (!card.dataset.touched) card.dataset.open = String(i === 0);
+    head.setAttribute('aria-expanded', card.dataset.open);
+  };
+  const toggle = () => { if (!mobile.matches) return; card.dataset.touched = '1'; card.dataset.open = String(card.dataset.open !== 'true'); apply(); };
+  head.addEventListener('click', toggle);
+  head.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+  mobile.addEventListener('change', apply);
+  apply();
+}
