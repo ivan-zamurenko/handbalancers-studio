@@ -33,7 +33,7 @@
   },
   "secrets_printed": false,
   "custom_smtp": {
-    "provider": "Resend (eu-west-1), domain mail.handbalancers.com; Cloudflare DNS: SPF/MX on send.mail, DKIM resend._domainkey.mail verified by dig; DMARC not yet published",
+    "provider": "Resend (eu-west-1), domain mail.handbalancers.com; Cloudflare DNS: SPF/MX on send.mail, DKIM resend._domainkey.mail verified by dig; DMARC p=none published (_dmarc.handbalancers.com, checked via 1.1.1.1 and 8.8.8.8)",
     "supabase": "custom SMTP no-reply@mail.handbalancers.com; templates from supabase/templates (English, app design); Email OTP length changed 8 -> 6 by owner",
     "signup_result": "owner: six-digit code email delivered to Gmail Inbox, code accepted, signed in",
     "recovery_result": "owner: reset email delivered to Inbox from Handbalancer’s Studio <no-reply@mail.handbalancers.com>, password changed, re-login ok",
