@@ -107,11 +107,12 @@ export function poseAt(progress) {
     armLength=track(t,[[.88,46],[.96,44],[1,44]]);
   }
   const shoulder=polar(hip,40,angle);
-  // Keep the head outside the supporting arm silhouette; a small preparatory
-  // nod and a relaxed settling pose provide character without extra effects.
+  // Standing: the face sits slightly forward. On the hands the head moves onto
+  // the arm line, between the arms (front arm is painted over it).
   const head=polar(shoulder,14,angle);
-  head[0]+=-Math.sin(angle*rad)*4;
-  head[1]+=Math.cos(angle*rad)*4;
+  const forward=4*(1-smooth((angle-45)/40));
+  head[0]+=-Math.sin(angle*rad)*forward;
+  head[1]+=Math.cos(angle*rad)*forward;
   const nod=track(time,[[0,0],[.035,1],[.075,0],[.94,0],[.967,1],[1,0]]);
   head[0]+=.5*nod;
   head[1]+=.4*nod;

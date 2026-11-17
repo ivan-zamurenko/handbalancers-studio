@@ -81,3 +81,16 @@ test('hand contact and release preserve joint velocities; push-off starts from r
   const foot=poseAt(low).frontFoot,next=poseAt(low+dt).frontFoot;
   assert.ok(distance(foot,next)/dt<1,'push-off must accelerate from rest');
 });
+
+test('head_between_arms_in_handstand', async () => {
+  const {readFileSync} = await import('node:fs');
+  const {poseAt} = await import('../../server/static/js/components/handstand-motion.js');
+  const pose = poseAt(0.6); // held handstand
+  const armLine = (pose.backHand[0] + pose.frontHand[0]) / 2;
+  assert.ok(Math.abs(pose.head[0] - armLine) < 0.5, `head x ${pose.head[0]} off arm line ${armLine}`);
+  assert.ok(pose.head[1] > pose.backShoulder[1] && pose.head[1] < pose.backHand[1], 'head between shoulders and hands');
+  // Paint order: rear arm < head < front arm, so the front arm passes in front of the head.
+  const svg = readFileSync('server/templates/shared/loading.html', 'utf8');
+  const at = s => svg.indexOf(s);
+  assert.ok(at('data-bone="back-arm"') < at('data-head') && at('data-head') < at('data-bone="front-arm"'));
+});
