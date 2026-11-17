@@ -81,3 +81,20 @@ Supabase migrations не змінюються. Помилка відкочує �
 на локальному стенді. Цей режим прив'язаний до `0006`, не є універсальним repair.
 
 Семантика stamp: [офіційна документація Alembic](https://alembic.sqlalchemy.org/en/latest/api/commands.html#alembic.command.stamp).
+
+## Оновлення хмари до 0009 (дозвіл власника 2026-11-17)
+
+`tools.migrate_cloud` без `--adopt-bootstrap` оновлює прийняту базу `0006` до
+`APPROVED_CLOUD_REVISION = 0009` (0007 refresh grants, 0008 audit, 0009 preferences)
+в одній транзакції з перевірками ownership/RLS. Спершу без `--apply` (rollback):
+
+```sh
+.venv/bin/python -m tools.migrate_cloud --ssl-root-cert .local-tools/supabase/prod-ca-2021.crt
+.venv/bin/python -m tools.migrate_cloud --ssl-root-cert .local-tools/supabase/prod-ca-2021.crt --apply
+```
+
+Успіх: `Applied migration upgrade to Alembic 0009; ownership and RLS verified.`
+Потім `supabase/web-login.sql` у SQL Editor (свій пароль замість CHANGE_ME) і в `.env.local`:
+`DATABASE_URL='postgresql+psycopg://studio_web_app.dwckvtuhgelhsbjyhpks:<пароль>@aws-1-eu-west-1.pooler.supabase.com:5432/postgres?sslmode=verify-full&sslrootcert=.local-tools/supabase/prod-ca-2021.crt'`
+(той самий формат, що й AUTH_DATABASE_URL). Застосунок відхиляє логін ширший за studio_web.
+Вищі за 0009 міграції потребують нового дозволу власника.

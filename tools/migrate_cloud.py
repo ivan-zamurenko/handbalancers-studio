@@ -23,7 +23,11 @@ from tools.check_migrations import (
 
 PROJECT_REF = "dwckvtuhgelhsbjyhpks"
 POOLER_HOST = "aws-1-eu-west-1.pooler.supabase.com"
+# Adoption baseline of the 2026-10-21 direct SQL bootstrap. Never changes.
 TARGET_REVISION = "0006"
+# Highest revision the owner approved for the cloud project (2026-11-17:
+# 0007 refresh grants, 0008 audit, 0009 preferences). Raise only on new approval.
+APPROVED_CLOUD_REVISION = "0009"
 
 
 def safe_failure_reason(error: Exception, phase: str) -> str:
@@ -52,6 +56,7 @@ def upgrade_verified(connection: Connection, *, adopt_bootstrap: bool = False) -
     require(connection.in_transaction(), "An enclosing transaction is required")
     # Validate the graph, but never replace the owner-approved target with its head.
     # Later local migrations do not authorize applying them to the cloud project.
+    target = TARGET_REVISION if adopt_bootstrap else APPROVED_CLOUD_REVISION
     single_head(ROOT / "server/alembic")
     connection.exec_driver_sql("SET LOCAL lock_timeout = '5s'")
     connection.exec_driver_sql("SET LOCAL statement_timeout = '60s'")
@@ -84,10 +89,9 @@ def upgrade_verified(connection: Connection, *, adopt_bootstrap: bool = False) -
         connection.exec_driver_sql("ALTER TABLE studio.alembic_version ENABLE ROW LEVEL SECURITY")
         verify_registration_baseline(connection)
     else:
-        command.upgrade(config, TARGET_REVISION)
+        command.upgrade(config, target)
     require(
-        connection.scalar(text("SELECT version_num FROM studio.alembic_version"))
-        == TARGET_REVISION,
+        connection.scalar(text("SELECT version_num FROM studio.alembic_version")) == target,
         "Unexpected Alembic revision",
     )
     verify_isolation(connection, owner="postgres")
@@ -100,7 +104,7 @@ def upgrade_verified(connection: Connection, *, adopt_bootstrap: bool = False) -
         "Auth foreign key missing or unvalidated",
     )
     require(managed_fingerprint(connection) == managed_before, "Managed schema changed")
-    return TARGET_REVISION
+    return target
 
 
 def main() -> int:
@@ -130,7 +134,7 @@ def main() -> int:
     try:
         with engine.begin() as connection:
             phase = "verify_and_apply"
-            upgrade_verified(connection, adopt_bootstrap=arguments.adopt_bootstrap)
+            revision = upgrade_verified(connection, adopt_bootstrap=arguments.adopt_bootstrap)
             if not arguments.apply:
                 phase = "rollback"
                 connection.rollback()
@@ -138,7 +142,7 @@ def main() -> int:
                 phase = "commit"
         outcome = "Applied" if arguments.apply else "Checked and rolled back"
         operation = "baseline adoption" if arguments.adopt_bootstrap else "migration upgrade"
-        print(f"{outcome} {operation} to Alembic {TARGET_REVISION}; ownership and RLS verified.", flush=True)
+        print(f"{outcome} {operation} to Alembic {revision}; ownership and RLS verified.", flush=True)
         return 0
     except (SQLAlchemyError, MigrationCheckError, RuntimeError) as error:
         sqlstate = getattr(getattr(error, "orig", None), "sqlstate", None) or "unavailable"

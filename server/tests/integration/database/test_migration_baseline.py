@@ -172,12 +172,14 @@ def test_verified_cloud_upgrade_preserves_managed_schemas(operator_engine):
 
     with operator_engine.connect() as connection, connection.begin() as transaction:
         before = operator_membership(connection)
-        assert upgrade_verified(connection) == "0006"
-        # A later local head must never expand the approved cloud baseline target.
-        assert not connection.scalar(text(
+        # Owner approved cloud upgrade to 0009 on 2026-11-17 (refresh grants, audit, preferences).
+        assert upgrade_verified(connection) == "0009"
+        assert connection.scalar(text(
             "SELECT has_column_privilege('studio_auth_runtime', "
             "'studio_private.web_sessions', 'encrypted_tokens', 'UPDATE')"
         ))
+        for table in ("studio_private.audit_events", "studio.user_preferences"):
+            assert connection.scalar(text("SELECT relrowsecurity FROM pg_class WHERE oid=to_regclass(:t)"), {"t": table})
         assert operator_membership(connection) == before
         assert connection.scalar(text("SELECT current_user")) == "postgres"
         transaction.rollback()
@@ -229,6 +231,10 @@ INSERT INTO auth.users (id) VALUES ('{identity_id}');
         assert {table: connection.execute(text(f"SELECT * FROM {table}")).all()
                 for table in tables} == before
         assert connection.scalar(text("SELECT version_num FROM studio.alembic_version")) == "0006"
+        # The adopted cloud baseline then upgrades to the approved revision, data intact.
+        assert upgrade_verified(connection) == "0009"
+        assert {table: connection.execute(text(f"SELECT * FROM {table}")).all()
+                for table in tables} == before
         connection.exec_driver_sql("CREATE FUNCTION studio_private.future_fn() RETURNS int "
                                    "LANGUAGE sql AS 'SELECT 1'")
         connection.exec_driver_sql("CREATE TYPE studio_private.future_type AS ENUM ('test')")

@@ -105,3 +105,13 @@ def test_other_user_rows_invisible(device):
             text("UPDATE studio.user_preferences SET theme_preference='light'")
         ).rowcount
     assert updated == 0
+
+
+def test_web_login_must_be_narrow_role(flow):
+    # An owner/elevated DATABASE_URL would bypass RLS; the web transaction must refuse it.
+    from studio.db import UnsafeWebRole, web_transaction_for
+    from studio.shared.context import Actor
+
+    transaction = web_transaction_for(flow[2])  # migration-owner engine
+    with pytest.raises(UnsafeWebRole), transaction(Actor(UUID(int=1))):
+        pass
