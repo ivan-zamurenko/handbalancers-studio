@@ -3,19 +3,22 @@
 .save-feedback[hidden] { display: none; }
 .save-feedback svg { width: min(300px, 78vw); height: auto; overflow: visible; }
 .save-feedback .sf-floor { stroke: var(--accent); stroke-width: 3; stroke-linecap: round; opacity: .16; }
-.sf-figure { transform-box: fill-box; transform-origin: center; }
+.sf-figure { transform-box: view-box; transform-origin: 130px 110px; }
 .sf-figure path { fill: none; stroke: var(--text); stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round; }
 .sf-figure [data-bone="torso"] { stroke: var(--accent); stroke-width: 4.8; }
 .sf-figure [data-bone="arm-l"] { opacity: .9; }
 .sf-figure .sf-head { fill: var(--surface); stroke: var(--text); stroke-width: 2.2; }
 .sf-figure [data-bone="eyes"] { stroke-width: 1.5; }
-.sf-swirl { transform-box: fill-box; transform-origin: center; opacity: 0; }
-.sf-swirl circle { fill: none; stroke: var(--accent); stroke-width: 2.2; stroke-linecap: round; }
-.sf-badge { transform-box: fill-box; transform-origin: center; }
+.sf-paint { opacity: 0; }
+.sf-flow-lines path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.sf-flow-disc { fill: #1f9d55; }
+.save-feedback[data-result-color="error"] .sf-flow-disc { fill: #d93b3b; }
+.sf-badge { transform-box: view-box; transform-origin: 130px 110px; }
 .sf-badge circle { fill: #1f9d55; }
 .save-feedback[data-outcome="error"] .sf-badge circle { fill: #d93b3b; }
-.save-feedback[data-outcome="error"] .sf-swirl circle { stroke: #d93b3b; }
 .sf-mark { fill: none; stroke: #fff; stroke-width: 8; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; }
 .sf-text { min-height: 28px; font-size: 20px; font-weight: 600; letter-spacing: -.02em; color: var(--text); }
+.sf-dismiss { min-height: 44px; padding: 8px 16px; border: 0; background: transparent; color: var(--muted); font-size: .875rem; }
+.sf-dismiss:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .save-feedback[data-mode="static"] .sf-figure, .save-feedback[data-mode="static"] .sf-floor { display: none; }
 .save-feedback[data-mode="static"][data-outcome="pending"] { display: none; }

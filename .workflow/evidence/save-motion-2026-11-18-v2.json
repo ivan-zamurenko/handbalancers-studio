@@ -1,0 +1,72 @@
+{
+  "date": "2026-11-18",
+  "scope": "Owner-requested save animation refinement; no roadmap or mobile layout changes in this iteration",
+  "status": "verified_local",
+  "red": [
+    {
+      "command": "node --test tests/js/acro-rig.test.js",
+      "result": "7 passed, 2 failed: elevated shoulders throughout transfer; alternating loss-phase leg corrections"
+    },
+    {
+      "command": "playwright test tests/e2e/profile-form.spec.js --grep error",
+      "result": "Expected paint phase absent: prior implementation used hold/fall/vortex/result"
+    }
+  ],
+  "green": [
+    {
+      "command": "node --test tests/js/acro-rig.test.js",
+      "passed": 9,
+      "failed": 0
+    },
+    {
+      "command": "PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers node --test tests/js/*.test.js",
+      "passed": 52,
+      "failed": 0
+    },
+    {
+      "command": "PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers node node_modules/@playwright/test/cli.js test tests/e2e/profile-form.spec.js",
+      "passed": 5,
+      "failed": 0
+    }
+  ],
+  "test_change_reason": "Error phase no longer expects successful hold: owner explicitly requested immediate loss of balance. Phase history now rejects hold and requires fall/paint; data retention and focus assertions retained.",
+  "review": {
+    "agent": "mobile_menu_review",
+    "mode": "read_only",
+    "blockers": 0,
+    "checks": [
+      "stacked support arm and elevated shoulders",
+      "fixed lengths/floor constraints",
+      "phase and pose continuity",
+      "no failure hold or postlanding wait",
+      "no body rotation during paint",
+      "skip/repeat/reduced motion paths"
+    ]
+  },
+  "visual": {
+    "viewport": [
+      390,
+      844
+    ],
+    "theme": "dark",
+    "synthetic_api": true,
+    "checked": [
+      "rig contact sheet",
+      "both recorded sequences sampled at 4 fps",
+      "pigment transition and final marks"
+    ],
+    "artifact_status": "Original iteration files removed after owner approval; see artifact_cleanup for retained final videos"
+  },
+  "limitations": [
+    "Stylised constrained choreography, not a human biomechanical simulation",
+    "No live save, cloud migration, physical phone or Safari verification",
+    "Preexisting uncommitted changes preserved; no commit or push"
+  ],
+  "next": "Owner visual review of revised motion; S05-02 and cloud 0010 gate unchanged",
+  "artifact_cleanup": {
+    "date": "2026-11-18",
+    "reason": "Owner approved success v3 and failure v4 and requested deletion of obsolete variants",
+    "approved_videos": "private-evidence/save-feedback-approved/{success,error}.mp4",
+    "removed": "Superseded motion captures, duplicate raw videos and standalone save-feedback preview; historical test results retained"
+  }
+}

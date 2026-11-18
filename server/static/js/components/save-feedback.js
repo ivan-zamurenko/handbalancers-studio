@@ -1,25 +1,35 @@
 // Save result: the hero, facing us on two hands, shifts onto one hand and holds.
-// Success → vortex into a white check on a green disc. Error → loses balance and falls
-// (physical rig in acro-rig.js), then vortex into a white cross on a red disc.
+// Success holds; failure makes leg corrections and falls. Both dissolve into
+// its own contours, curled into a fluid vortex that settles into the result disc.
 // Runs only for a real server save.
-import {balanceParams, holdParams, pose, simulateFall, SEG} from './acro-rig.js';
+import {vortexPoint} from './save-vortex.js';
+import {balanceParams, holdParams, pose, simulateFall, centerOfMass, lowestPoint, SEG} from './acro-rig.js';
 
 const clamp = t => Math.max(0, Math.min(1, t));
 
 export const timings = {
-  full: {fadeForm: 180, appear: 180, shift: 560, hold: 1000, vortex: 650, mark: 380, result: 1100},
-  short: {fadeForm: 140, appear: 120, shift: 380, hold: 200, vortex: 420, mark: 240, result: 650},
+  full: {fadeForm: 180, appear: 180, shift: 560, hold: 1000, paint: 1000, mark: 380, result: 1100},
+  short: {fadeForm: 140, appear: 120, shift: 560, hold: 1000, paint: 900, mark: 240, result: 650},
 };
 
 // World (y up, support wrist at origin) → SVG.
 const ORIGIN = [112, 196];
 const screen = ([x, y]) => [ORIGIN[0] + x, ORIGIN[1] - y];
 let fallFrames = null;
-const fallAt = seconds => {
-  fallFrames ??= simulateFall();
-  return fallFrames.find(frame => frame.t >= seconds) ?? fallFrames.at(-1);
-};
-const fallDuration = () => { fallFrames ??= simulateFall(); return fallFrames.at(-1).t; };
+function airborneFall() {
+  if (!fallFrames) {
+    const frames = simulateFall();
+    // End in the late tipping phase, with 12 px of clearance under the body.
+    // The same final pose feeds both the drawing and the contour vortex;
+    // the landing/collapse is deliberately not played for save feedback.
+    const end = frames.findLastIndex(frame => frame.phase === 'tip'
+      && lowestPoint(pose(frame.params), ['handR']) >= 12);
+    fallFrames = frames.slice(0, end + 1);
+  }
+  return fallFrames;
+}
+const fallAt = seconds => airborneFall().find(frame => frame.t >= seconds) ?? airborneFall().at(-1);
+const fallDuration = () => airborneFall().at(-1).t;
 
 const NS = 'http://www.w3.org/2000/svg';
 const svgEl = (name, attrs = {}) => {
@@ -41,22 +51,24 @@ function build() {
   }
   figure.append(svgEl('circle', {class: 'sf-head', r: '9.5'}));
   figure.append(svgEl('path', {class: 'sf-eyes', 'data-bone': 'eyes'}));
-  const swirl = svgEl('g', {class: 'sf-swirl'});
-  for (const [r, len] of [[46, 150], [34, 110], [22, 70]]) {
-    swirl.append(svgEl('circle', {cx: 130, cy: 110, r, 'stroke-dasharray': `${len} 400`}));
-  }
+  const paint = svgEl('g', {class: 'sf-paint'});
+  paint.append(svgEl('circle', {class: 'sf-flow-disc', cx: 130, cy: 110, r: 0}));
+  paint.append(svgEl('g', {class: 'sf-flow-lines'}));
   const badge = svgEl('g', {class: 'sf-badge'});
   badge.append(svgEl('circle', {cx: 130, cy: 110, r: 44}));
   badge.append(svgEl('path', {class: 'sf-mark', pathLength: 1}));
-  svg.append(figure, swirl, badge);
+  svg.append(figure, paint, badge);
   const text = document.createElement('p');
   text.className = 'sf-text';
   text.dataset.sfText = '';
   text.setAttribute('role', 'status');
   text.setAttribute('aria-live', 'polite');
-  root.append(svg, text);
+  const dismiss = document.createElement('button');
+  dismiss.type = 'button';
+  dismiss.className = 'sf-dismiss';
+  root.append(svg, text, dismiss);
   document.body.append(root);
-  return {root, svg, figure, swirl, badge, mark: badge.querySelector('.sf-mark'), text};
+  return {root, svg, figure, paint, badge, mark: badge.querySelector('.sf-mark'), text, dismiss};
 }
 
 function draw(parts, params) {
@@ -85,7 +97,60 @@ function draw(parts, params) {
   set('eyes', `M${fmt(eye(-1))}h.2M${fmt(eye(1))}h.2`);
 }
 
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+const ease = t => { t = clamp(t); return t * t * (3 - 2 * t); };
+
+// Sample each subpath separately so a pen-up between legs or eyes never
+// becomes a new connecting line. These are the actual last drawn contours.
+function captureFlow(parts, origin) {
+  const group = parts.paint.querySelector('.sf-flow-lines');
+  group.replaceChildren();
+  const strokes = [];
+  for (const source of parts.figure.querySelectorAll('path, circle')) {
+    const style = getComputedStyle(source);
+    const isHead = source.tagName.toLowerCase() === 'circle';
+    const contours = isHead ? [null] : source.getAttribute('d').split(/(?=M)/).filter(Boolean);
+    for (const d of contours) {
+      const path = svgEl('path', d ? {d} : {});
+      group.append(path);
+      let points;
+      if (isHead) {
+        const x = Number(source.getAttribute('cx')), y = Number(source.getAttribute('cy'));
+        const r = Number(source.getAttribute('r'));
+        points = Array.from({length: 49}, (_, i) => [x + r * Math.cos(i * Math.PI / 24), y + r * Math.sin(i * Math.PI / 24)]);
+      } else {
+        const length = path.getTotalLength(), count = Math.max(2, Math.ceil(length / 1.5));
+        points = Array.from({length: count + 1}, (_, i) => {
+          const p = path.getPointAtLength(length * i / count);
+          return [p.x, p.y];
+        });
+      }
+      strokes.push({path, points, width: parseFloat(style.strokeWidth), fill: isHead ? style.fill : null,
+        color: style.stroke.match(/[\d.]+/g).slice(0, 3).map(Number), opacity: Number(style.opacity)});
+    }
+  }
+  const extent = Math.max(...strokes.flatMap(s => s.points.map(p => Math.hypot(p[0] - origin[0], p[1] - origin[1]))));
+  return {strokes, origin, extent};
+}
+
+function drawPaint(parts, flow, k, ok) {
+  const color = ok ? [31, 157, 85] : [217, 59, 59];
+  const tint = ease(k / 0.65), merge = ease((k - 0.62) / 0.38);
+  // Substitute identical contours at k=0, then deform them point by point.
+  parts.figure.style.opacity = '0';
+  parts.root.querySelector('.sf-floor').style.opacity = String(0.16 * (1 - ease(k / 0.25)));
+  parts.paint.style.opacity = '1';
+  const disc = parts.paint.querySelector('.sf-flow-disc');
+  disc.setAttribute('r', String(44 * merge));
+  for (const stroke of flow.strokes) {
+    const points = stroke.points.map(p => vortexPoint(p, flow.origin, flow.extent, k));
+    stroke.path.setAttribute('d', points.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(2)} ${p[1].toFixed(2)}`).join(''));
+    stroke.path.style.stroke = `rgb(${stroke.color.map((c, i) => Math.round(c + (color[i] - c) * tint)).join(',')})`;
+    stroke.path.style.strokeWidth = String(stroke.width + (10 - stroke.width) * ease(k / 0.8));
+    stroke.path.style.opacity = String(stroke.opacity * (1 - ease((k - 0.8) / 0.2)));
+    // Keep the head's occlusion at the hand-off, then let it dissolve as it curls.
+    if (stroke.fill) stroke.path.style.fill = `color-mix(in srgb, ${stroke.fill} ${100 * (1 - ease(k / 0.25))}%, transparent)`;
+  }
+}
 
 function tween(ms, step, signal) {
   return new Promise(resolve => {
@@ -108,111 +173,115 @@ const wait = (ms, signal) => new Promise(resolve => {
 
 let parts = null;
 
-/**
- * Plays the save feedback while `request` settles. `request` resolves to true (saved)
- * or false/throws (error). Returns the boolean outcome after the overlay closes.
- */
+/** Result feedback only: no figure while the request is pending or on page load. */
 export async function playSaveFeedback({request, variant = 'short', form, labels}) {
+  const wasInert = form?.inert ?? false;
+  if (form) form.inert = true;
+  const ok = await Promise.resolve(request).then(Boolean, () => false);
   parts ??= build();
   const t = timings[variant] ?? timings.short;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const signal = {skip: false, onSkip: null};
-  const skip = () => { signal.skip = true; signal.onSkip?.(); };
-  const onKey = event => { if (event.key === 'Escape') skip(); };
-  const {root, figure, swirl, badge, mark, text} = parts;
+  const activeAnimations = [];
+  const animate = (node, frames, options) => {
+    if (!node) return;
+    const animation = node.animate(frames, options);
+    activeAnimations.push(animation);
+    return animation;
+  };
+  const skip = () => {
+    signal.skip = true;
+    signal.onSkip?.();
+    for (const animation of activeAnimations) {
+      if (animation.playState === 'running') animation.finish();
+    }
+  };
+  const onKey = event => {
+    if (event.key === 'Escape') { event.preventDefault(); skip(); }
+    if (event.key === 'Tab') { event.preventDefault(); parts.dismiss.focus({preventScroll: true}); }
+  };
+  const {root, figure, paint, badge, mark, text, dismiss} = parts;
   const floor = root.querySelector('.sf-floor');
-  const outcome = Promise.resolve(request).then(Boolean, () => false);
-
+  document.dispatchEvent(new Event('studio:close-menu'));
+  const previousFocus = document.activeElement;
+  const background = [...document.querySelectorAll('header, main, footer, .skip-link')].map(node => [node, node.inert]);
+  for (const [node] of background) node.inert = true;
   root.hidden = false;
+  root.setAttribute('role', 'dialog');
+  root.setAttribute('aria-modal', 'true');
+  const uk = document.documentElement.lang !== 'en';
+  root.setAttribute('aria-label', uk ? 'Результат збереження' : 'Save result');
+  dismiss.textContent = uk ? 'Пропустити' : 'Skip';
+  root.tabIndex = -1;
+  root.focus({preventScroll: true});
   root.dataset.outcome = 'pending';
+  root.dataset.phase = 'shift';
   root.dataset.mode = reduced ? 'static' : 'motion';
   text.textContent = '';
   figure.style.cssText = '';
   floor.style.cssText = '';
   badge.style.cssText = 'opacity:0';
-  swirl.style.cssText = 'opacity:0';
+  paint.style.cssText = 'opacity:0';
   mark.style.strokeDashoffset = '1';
   root.addEventListener('click', skip);
   document.addEventListener('keydown', onKey);
-  if (form) form.inert = true;
-
-  let ok;
-  if (reduced) {
-    ok = await outcome;
-  } else {
-    form?.animate([{opacity: 1}, {opacity: 0}], {duration: t.fadeForm, fill: 'forwards', easing: 'ease-out'});
-    draw(parts, balanceParams(0));
-    root.animate([{opacity: 0}, {opacity: 1}], {duration: t.appear, easing: 'ease-out'});
-    await wait(t.appear, signal);
-    // Quick, physical transfer: weight shift on both hands, free hand peels off, arm opens.
-    await tween(t.shift, k => draw(parts, balanceParams(k)), signal);
-    const holdStart = performance.now();
-    let settled = false;
-    outcome.then(() => { settled = true; });
-    // Hold at least the configured time and until the server has answered.
-    await new Promise(resolve => {
-      const frame = now => {
-        const elapsed = (now - holdStart) / 1000;
-        draw(parts, holdParams(elapsed));
-        if ((elapsed * 1000 >= t.hold || signal.skip) && settled) resolve();
-        else requestAnimationFrame(frame);
-      };
-      requestAnimationFrame(frame);
-    });
-    ok = await outcome;
-    if (!ok) {
-      // Real-time playback of the simulated fall (balance lost → tip over → lie on the side).
-      await tween(fallDuration() * 1000, k => draw(parts, fallAt(k * fallDuration()).params), signal);
-      await wait(180, signal);
+  try {
+    if (!reduced) {
+      animate(form, [{opacity: 1}, {opacity: 0}], {duration: t.fadeForm, fill: 'forwards', easing: 'ease-out'});
+      draw(parts, balanceParams(0));
+      animate(root, [{opacity: 0}, {opacity: 1}], {duration: t.appear, easing: 'ease-out'});
+      await wait(t.appear, signal);
+      await tween(t.shift, k => draw(parts, balanceParams(k)), signal);
+      if (ok) {
+        root.dataset.phase = 'hold';
+        await tween(t.hold, k => draw(parts, holdParams(Math.sin(Math.PI * k) * 0.08)), signal);
+      } else if (!signal.skip) {
+        root.dataset.phase = 'fall';
+        // No successful hold in a failed attempt: the legs try to correct the
+        // balance immediately. Merge from the late airborne pose, before landing.
+        await tween(fallDuration() * 1000, k => draw(parts, fallAt(k * fallDuration()).params), signal);
+      }
+      root.dataset.phase = 'paint';
+      root.dataset.resultColor = ok ? 'success' : 'error';
+      if (!signal.skip) {
+        const lastPose = ok ? balanceParams(1) : fallAt(fallDuration()).params;
+        const source = screen(centerOfMass(pose(lastPose)));
+        const flow = captureFlow(parts, source);
+        await tween(t.paint, k => drawPaint(parts, flow, k, ok), signal);
+      }
     }
-    // Vortex: the figure spins down into the centre while the disc spins up.
-    const spin = {duration: signal.skip ? 1 : t.vortex, fill: 'forwards'};
-    floor.animate([{opacity: 0.16}, {opacity: 0}], {...spin, easing: 'ease-in'});
-    figure.animate([{transform: 'rotate(0deg) scale(1)', opacity: 1},
-      {transform: 'rotate(600deg) scale(0.04)', opacity: 0}], {...spin, easing: 'cubic-bezier(.55,0,.8,.25)'});
-    swirl.animate([{transform: 'rotate(0deg) scale(1.15)', opacity: 0}, {opacity: 0.9, offset: 0.4},
-      {transform: 'rotate(-480deg) scale(0.2)', opacity: 0}], {...spin, easing: 'ease-in'});
-    await wait(t.vortex * 0.55, signal);
-  }
-
-  root.dataset.outcome = ok ? 'success' : 'error';
-  mark.setAttribute('d', ok ? 'M109 111L124 126L152 95' : 'M115 95L145 125M145 95L115 125');
-  figure.style.opacity = '0';
-  floor.style.opacity = '0';
-  if (reduced || signal.skip) {
-    badge.style.opacity = '1';
-    mark.style.strokeDashoffset = '0';
-  } else {
-    badge.animate([{transform: 'rotate(-220deg) scale(0)', opacity: 0},
-      {transform: 'rotate(0deg) scale(1)', opacity: 1}],
-    {duration: t.vortex * 0.6, easing: 'cubic-bezier(.2,1.4,.4,1)', fill: 'forwards'});
-    await wait(t.vortex * 0.45, signal);
-    mark.animate([{strokeDashoffset: 1}, {strokeDashoffset: 0}],
-      {duration: t.mark, easing: 'ease-out', fill: 'forwards'});
-    await wait(t.mark, signal);
-  }
-  text.textContent = ok ? labels.saved : labels.error;
-  await wait(signal.skip ? 350 : t.result, {skip: false});
-
-  root.removeEventListener('click', skip);
-  document.removeEventListener('keydown', onKey);
-  for (const node of [figure, swirl, badge, mark]) node.getAnimations().forEach(a => a.cancel());
-  if (!reduced) await root.animate([{opacity: 1}, {opacity: 0}], {duration: 200, easing: 'ease-in'}).finished;
-  root.hidden = true;
-  if (form) {
-    form.getAnimations().forEach(a => a.cancel());
-    form.inert = false;
-    if (!reduced) form.animate([{opacity: 0}, {opacity: 1}], {duration: 200, easing: 'ease-out'});
+    root.dataset.phase = 'result';
+    root.dataset.outcome = ok ? 'success' : 'error';
+    mark.setAttribute('d', ok ? 'M109 111L124 126L152 95' : 'M115 95L145 125M145 95L115 125');
+    figure.style.opacity = '0';
+    floor.style.opacity = '0';
+    paint.style.opacity = '0';
+    if (reduced || signal.skip) {
+      badge.style.opacity = '1';
+      mark.style.strokeDashoffset = '0';
+    } else {
+      // The curled contours have merged into this exact circle; no replacement pop.
+      badge.style.opacity = '1';
+      animate(mark, [{strokeDashoffset: 1}, {strokeDashoffset: 0}],
+        {duration: t.mark, easing: 'ease-out', fill: 'forwards'});
+      await wait(t.mark, signal);
+    }
+    text.textContent = ok ? labels.saved : labels.error;
+    dismiss.textContent = uk ? 'Повернутися до форми' : 'Back to form';
+    if (signal.skip) await new Promise(resolve => setTimeout(resolve, 350));
+    else await wait(t.result, signal);
+    if (!reduced && !signal.skip) {
+      animate(root, [{opacity: 1}, {opacity: 0}], {duration: 160});
+      await wait(160, signal);
+    }
+  } finally {
+    root.removeEventListener('click', skip);
+    document.removeEventListener('keydown', onKey);
+    activeAnimations.forEach(animation => animation.cancel());
+    root.hidden = true;
+    for (const [node, inert] of background) node.inert = inert;
+    if (form) form.inert = wasInert;
+    if (previousFocus?.isConnected) previousFocus.focus({preventScroll: true});
   }
   return ok;
-}
-
-// Static frame for design review (tools/previews/save-feedback): no timers, no server.
-export function previewPose(params) {
-  parts ??= build();
-  parts.root.hidden = false;
-  parts.root.dataset.outcome = 'pending';
-  parts.root.dataset.mode = 'motion';
-  parts.badge.style.opacity = '0';
-  draw(parts, params);
 }

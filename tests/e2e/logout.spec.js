@@ -1,5 +1,13 @@
 import {test, expect} from '@playwright/test';
 
+async function headerItem(page, locator) {
+  // Phones keep language/theme/account inside the menu panel.
+  if (await page.locator('[data-menu-toggle]').isVisible()) {
+    if (await page.locator('[data-menu-toggle]').getAttribute('aria-expanded') !== 'true') await page.locator('[data-menu-toggle]').click();
+  }
+  return locator;
+}
+
 for (const width of [390,1440]) for (const theme of ['light','dark']) {
   test(`logout clears account drafts and cache ${width} ${theme}`, async ({page}) => {
     await page.setViewportSize({width,height:1000});
@@ -22,9 +30,15 @@ for (const width of [390,1440]) for (const theme of ['light','dark']) {
       }
     },theme);
     await page.reload();
-    await expect(page.locator('[data-logout]')).toBeVisible();
-    await page.locator('[data-logout]').click();
-    await expect(page.locator('[data-login-link]')).toBeVisible();
+    await expect(await headerItem(page, page.locator('[data-logout]'))).toBeVisible();
+    // Logout redirects even when already on /login. Open the new page's menu,
+    // not the outgoing one (which disappears when navigation commits).
+    await Promise.all([
+      page.waitForEvent('framenavigated', frame => frame === page.mainFrame()),
+      page.locator('[data-logout]').click(),
+    ]);
+    await page.waitForLoadState('domcontentloaded');
+    await expect(await headerItem(page, page.locator('[data-login-link]'))).toBeVisible();
     await expect(page.locator('[data-logout]')).toBeHidden();
     expect(await page.evaluate(() => [localStorage,sessionStorage].map(storage => [
       storage.getItem('studio:account:member-a:draft'),

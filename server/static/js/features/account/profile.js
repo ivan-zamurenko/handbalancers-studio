@@ -23,6 +23,7 @@ let onboardingRevision = 0;
 let setupMode = false;
 let mode = 'full';
 let stepIndex = 0;
+let saving = false;
 
 async function json(url, options = {}) {
   const response = await fetch(url, {credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(8000), ...options});
@@ -107,15 +108,18 @@ function wrapSections() {
     if (section.querySelector(':scope > [data-section-body]')) continue;
     const body = document.createElement('div');
     body.dataset.sectionBody = '';
+    body.id = `profile-section-${section.dataset.step}`;
     for (const node of [...section.childNodes]) if (node.nodeName !== 'LEGEND') body.append(node);
     section.append(body);
     const legend = section.querySelector('legend');
+    legend.tabIndex = -1;
     const title = legend.textContent.trim();
     legend.textContent = '';
     const toggle = document.createElement('button');
     toggle.type = 'button';
     toggle.className = 'acc-toggle';
     toggle.dataset.accToggle = '';
+    toggle.setAttribute('aria-controls', body.id);
     toggle.innerHTML = '<span class="acc-title"></span><span class="acc-summary" data-acc-summary></span><svg class="acc-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg>';
     toggle.querySelector('.acc-title').textContent = title;
     toggle.addEventListener('click', () => { if (mode === 'accordion') setOpen(section, section.dataset.open !== 'true'); });
@@ -163,7 +167,7 @@ function showStep(index, {focus = true} = {}) {
   errorBox.hidden = true;
   if (focus) {
     window.scrollTo({top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
-    steps[stepIndex].querySelector('input:not([type=checkbox]):not([type=radio]), select')?.focus({preventScroll: true});
+    steps[stepIndex].querySelector('legend')?.focus({preventScroll: true});
   }
 }
 
@@ -171,6 +175,11 @@ function applyMode() {
   const next = phone.matches ? (setupMode ? 'wizard' : 'accordion') : 'full';
   mode = next;
   form.dataset.mode = mode;
+  for (const section of sections) {
+    const toggle = section.querySelector('[data-acc-toggle]');
+    toggle.disabled = mode !== 'accordion';
+    if (mode !== 'accordion') toggle.removeAttribute('aria-expanded');
+  }
   wizardHead.hidden = mode !== 'wizard';
   if (mode === 'wizard') {
     showStep(stepIndex, {focus: false});
@@ -248,8 +257,13 @@ form?.addEventListener('keydown', event => {
 
 form?.addEventListener('submit', async event => {
   event.preventDefault();
+  if (saving) return;
   if (!validate()) return;
+  saving = true;
   buttons.submit.disabled = true;
+  const submitLabel = buttons.submit.textContent;
+  buttons.submit.textContent = document.documentElement.lang === 'en' ? 'Saving…' : 'Зберігаємо…';
+  form.setAttribute('aria-busy', 'true');
   const request = save().catch(() => ({kind: 'error'}));
   const variant = setupMode ? 'full' : 'short';
   await playSaveFeedback({
@@ -260,6 +274,9 @@ form?.addEventListener('submit', async event => {
   });
   const result = await request;
   buttons.submit.disabled = false;
+  buttons.submit.textContent = submitLabel;
+  form.removeAttribute('aria-busy');
+  saving = false;
   if (result.kind === 'ok') {
     onboardingRevision = result.onboarding.body.revision;
     status.textContent = '';
@@ -276,6 +293,7 @@ form?.addEventListener('submit', async event => {
   } else {
     status.textContent = status.dataset.error;
   }
+  buttons.submit.focus({preventScroll: true});
 });
 
 document.addEventListener('studio:account', event => {

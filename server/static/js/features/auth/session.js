@@ -5,6 +5,7 @@ import {beginLoading, beginNavigation} from '../../components/loading.js';
 const logout = document.querySelector('[data-logout]');
 const login = document.querySelector('[data-login-link]');
 const profileLink = document.querySelector('[data-profile-link]');
+const loginCta = document.querySelector('[data-login-cta]');
 let csrf = null;
 let accountId = null;
 let revision = 0;
@@ -101,12 +102,13 @@ async function refresh() {
     if (authenticated && snapshot.setup_required === true) offerSetup(accountId);
     logout.hidden = !authenticated; login.hidden = authenticated;
     if (profileLink) profileLink.hidden = !authenticated;
+    if (loginCta) loginCta.hidden = authenticated;
     logout.disabled = false;
   } catch {
     if (requestRevision !== revision) return;
     // An outage is not proof of logout. Keep the existing session/CSRF retryable.
     logout.disabled = false;
-    if (!csrf) { logout.hidden = true; login.hidden = false; if (profileLink) profileLink.hidden = true; }
+    if (!csrf) { logout.hidden = true; login.hidden = false; if (profileLink) profileLink.hidden = true; if (loginCta) loginCta.hidden = false; }
   }
 }
 
@@ -122,6 +124,7 @@ logout?.addEventListener('click', async () => {
       forgetAccount();
       logout.hidden = true; login.hidden = false;
       if (profileLink) profileLink.hidden = true;
+      if (loginCta) loginCta.hidden = false;
       beginNavigation();
       window.location.assign('/login');
       return;

@@ -1,0 +1,41 @@
+{
+  "date": "2026-11-18",
+  "scope": "Start failure vortex during late fall, before landing; success unchanged",
+  "status": "verified_local",
+  "red": {
+    "command": "playwright test tests/e2e/profile-form.spec.js --grep \"server error:\"",
+    "result": "Expected airborne leg bounds <188; received 189.61 from old settled pose"
+  },
+  "green": {
+    "command": "playwright test tests/e2e/profile-form.spec.js",
+    "passed": 5,
+    "failed": 0
+  },
+  "geometry": {
+    "merge_time_seconds": 1.1708333333,
+    "previous_fall_end_seconds": 1.7925,
+    "body_clearance_excluding_support_hand_px": 12.2495,
+    "source": "Same final airborne pose for rendered contours and vortex centre"
+  },
+  "visual": {
+    "synthetic_api": true,
+    "viewport": [
+      390,
+      844
+    ],
+    "theme": "dark",
+    "checked": "Recorded sequence sampled at 5 fps; no floor landing before vortex",
+    "artifact_status": "Original iteration files removed after owner approval; see artifact_cleanup for retained final videos"
+  },
+  "limitations": [
+    "No hosted save, physical phone or Safari verification",
+    "Preexisting dirty work preserved; no commit/push"
+  ],
+  "next": "Owner visual review; S05-02 and cloud gate unchanged",
+  "artifact_cleanup": {
+    "date": "2026-11-18",
+    "reason": "Owner approved success v3 and failure v4 and requested deletion of obsolete variants",
+    "approved_videos": "private-evidence/save-feedback-approved/{success,error}.mp4",
+    "removed": "Superseded motion captures, duplicate raw videos and standalone save-feedback preview; historical test results retained"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "date": "2026-11-18",
+  "scope": "Owner-authorized removal of obsolete save-animation previews and recordings",
+  "status": "verified_local",
+  "retained": [
+    "private-evidence/save-feedback-approved/success.mp4",
+    "private-evidence/save-feedback-approved/error.mp4"
+  ],
+  "removed": [
+    "Old save-motion v2/v3/v4 folders after hash-verified copying of approved MP4s",
+    "Superseded save-mobile motion recordings and capture scripts",
+    "tools/previews/save-feedback/index.html",
+    "Unused previewPose export"
+  ],
+  "preserved": [
+    "Approved runtime motion and active full/short timings",
+    "Unrelated mobile UI evidence",
+    "Historical RED/GREEN results annotated with artifact removal"
+  ],
+  "validation": {
+    "approved_video_copies": "SHA-256 matched originals before removal",
+    "artifact_and_reference_checks": "passed",
+    "git_diff_check": "passed",
+    "profile_form_browser_suite": {
+      "passed": 5,
+      "failed": 0
+    }
+  },
+  "review": "mobile_menu_review read-only dependency audit; no runtime dependency on removed preview",
+  "privacy": "Approved videos remain Git-ignored",
+  "commit_push": "not performed"
+}

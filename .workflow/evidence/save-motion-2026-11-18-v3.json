@@ -1,0 +1,77 @@
+{
+  "date": "2026-11-18",
+  "scope": "Owner-requested extra unilateral shoulder push and continuous contour vortex; no mobile layout or backend change",
+  "status": "verified_local",
+  "red": [
+    {
+      "command": "node --test tests/js/acro-rig.test.js",
+      "result": "9 passed, 1 failed: extra support-shoulder push was absent"
+    },
+    {
+      "command": "node --test tests/js/save-vortex.test.js",
+      "result": "Test file failed because the new contour deformation module did not exist yet"
+    }
+  ],
+  "green": [
+    {
+      "command": "node --test tests/js/acro-rig.test.js",
+      "passed": 10,
+      "failed": 0
+    },
+    {
+      "command": "node --test tests/js/save-vortex.test.js",
+      "passed": 3,
+      "failed": 0
+    },
+    {
+      "command": "PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers node --test tests/js/*.test.js",
+      "passed": 56,
+      "failed": 0
+    },
+    {
+      "command": "PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers node node_modules/@playwright/test/cli.js test tests/e2e/profile-form.spec.js",
+      "passed": 5,
+      "failed": 0
+    }
+  ],
+  "runner_note": "First broad JS run omitted PLAYWRIGHT_BROWSERS_PATH; browser-dependent design-token cases could not find the installed executable. Rerun with the existing local browser path passed; no assertion weakened.",
+  "review": {
+    "agent": "mobile_menu_review",
+    "mode": "read_only",
+    "blockers": 0,
+    "finding_fixed": "Preserve head fill at contour substitution, fading it during early curl; re-recorded videos and reran browser suite after the fix.",
+    "checks": [
+      "transfer to fall pose continuity",
+      "fixed lengths and wrist stack",
+      "differential contour curl, bounded frame displacement",
+      "repeat/skip/reduced-motion lifecycle"
+    ]
+  },
+  "visual": {
+    "viewport": [
+      390,
+      844
+    ],
+    "theme": "dark",
+    "synthetic_api": true,
+    "checked": [
+      "recorded success and failure sequences sampled at 6 fps",
+      "extra push and stable support arm",
+      "source contours curling into a disc instead of independent blobs",
+      "no successful hold in failure"
+    ],
+    "artifact_status": "Original iteration files removed after owner approval; see artifact_cleanup for retained final videos"
+  },
+  "limitations": [
+    "Stylised constrained motion, not a human biomechanics simulation",
+    "No live save, migration, physical phone or Safari verification",
+    "Preexisting dirty work preserved; no commit or push"
+  ],
+  "next": "Owner visual review; roadmap S05-02 and cloud 0010 gate unchanged",
+  "artifact_cleanup": {
+    "date": "2026-11-18",
+    "reason": "Owner approved success v3 and failure v4 and requested deletion of obsolete variants",
+    "approved_videos": "private-evidence/save-feedback-approved/{success,error}.mp4",
+    "removed": "Superseded motion captures, duplicate raw videos and standalone save-feedback preview; historical test results retained"
+  }
+}

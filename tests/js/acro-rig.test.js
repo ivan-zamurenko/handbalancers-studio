@@ -25,6 +25,33 @@ test('two_hands_balanced_between_hands', () => {
   assert.ok(Math.abs(R.centerOfMass(j)[0] - (j.handL[0] + j.handR[0]) / 2) < 0.5);
 });
 
+test('supporting shoulder stays stacked and elevated from the first frame through the transfer', () => {
+  for (const j of [...transition, ...hold]) {
+    assert.ok(Math.abs(j.shoulderR[0] - j.handR[0]) < 0.25, 'shoulder cannot drift sideways off the wrist');
+    assert.ok(Math.abs(j.elbowR[0] - j.handR[0]) < 0.25, 'support elbow stays in the same vertical line');
+    assert.ok(Math.abs(j.shoulderR[1] - j.head[1]) < 7, 'elevated shoulder is already beside the ear, not above the head');
+  }
+  assert.ok(Math.abs(transition[0].shoulderL[1] - transition[0].head[1]) < 7, 'both shoulders elevated initially');
+});
+
+test('one-arm push lifts the trunk further without moving the supporting wrist or stretching bones', () => {
+  const two = transition[0], one = transition.at(-1);
+  assert.ok(one.neck[1] > two.neck[1] + 2.5, 'visible extra push through the support shoulder');
+  assert.ok(one.head[1] > two.head[1] + 2.5, 'head and ribcage rise with the push');
+  assert.ok(one.shoulderL[1] > one.shoulderR[1] + 2.5, 'free shoulder rises relative to the elevated support shoulder');
+  for (let i = 1; i < transition.length; i++) {
+    assert.ok(dist(transition[i].neck, transition[i - 1].neck) < 1, 'no snap during scapular lift');
+  }
+});
+
+test('failed balance makes alternating leg corrections before tipping', () => {
+  const loss = fall.filter(f => f.phase === 'loss');
+  const angles = loss.map(f => f.params.legR);
+  assert.ok(Math.max(...angles) - Math.min(...angles) > 8, 'legs actively try to find balance');
+  const changes = angles.slice(1).map((a, i) => Math.sign(a - angles[i])).filter(Boolean);
+  assert.ok(changes.some((sign, i) => i && sign !== changes[i - 1]), 'correction reverses direction before balance is lost');
+});
+
 test('free_hand_lifts_only_with_com_over_support_palm', () => {
   let lifted = false;
   for (const j of [...transition, ...hold]) {
@@ -70,4 +97,16 @@ test('fall_follows_gravity_and_never_goes_through_floor', () => {
 test('free_arm_opens_without_swinging_overhead', () => {
   // The free hand goes out to the side; it never passes above shoulder height + a little.
   for (const j of transition) assert.ok(j.handL[1] <= j.shoulderL[1] + 8, `hand ${j.handL[1]} above shoulder ${j.shoulderL[1]}`);
+});
+
+test('after landing the supporting wrist releases instead of tethering the fallen body', () => {
+  const landed = fall.filter(f => f.phase === 'collapse' || f.phase === 'rest');
+  assert.ok(landed.some(f => dist(R.pose(f.params).handR, [0, 0]) > 8), 'wrist must release during the side landing');
+  const rest = R.pose(landed.at(-1).params);
+  assert.ok(rest.shoulderR[0] > rest.elbowR[0], 'support arm unfolds along the floor rather than folding back through the torso');
+  // Continuity across touchdown: no frame may teleport a joint to its final pose.
+  for (let i = 1; i < fall.length; i++) {
+    const a = R.pose(fall[i - 1].params), b = R.pose(fall[i].params);
+    for (const joint of Object.keys(a)) assert.ok(dist(a[joint], b[joint]) < 6, `${joint} jumps at ${fall[i].phase}`);
+  }
 });

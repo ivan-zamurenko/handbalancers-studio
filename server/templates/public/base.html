@@ -8,28 +8,48 @@
 <header class="site-header">
   <div class="header-inner">
     <a class="wordmark" href="/?lang={{ language }}" aria-label="Handbalancer’s Studio">h<span>.</span></a>
-    <nav class="primary-nav" aria-label="{{ copy('Основна навігація', 'Main navigation') }}">
-      <a href="/?lang={{ language }}#directions">{{ copy('Напрями', 'Directions') }}</a>
-      <a href="/?lang={{ language }}#method">{{ copy('Методика', 'Method') }}</a>
-      <a href="/?lang={{ language }}#plans">{{ copy('Тарифи', 'Plans') }}</a>
-    </nav>
-    <div class="header-controls">
-      <nav class="locale-nav" aria-label="{{ copy('Мова', 'Language') }}">
-        <a href="{{ page_path }}?lang=uk" lang="uk"{% if language == 'uk' %} aria-current="page"{% endif %}>UA</a>
-        <span aria-hidden="true">/</span>
-        <a href="{{ page_path }}?lang=en" lang="en"{% if language == 'en' %} aria-current="page"{% endif %}>EN</a>
-      </nav>
-      <button class="theme-toggle" type="button" data-theme-control aria-label="{{ copy('Тема', 'Theme') }}" title="{{ copy('Тема', 'Theme') }}" aria-pressed="false" disabled>
-        <span class="theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="4.1"/><path d="M12 2.7v2.4M12 18.9v2.4M2.7 12h2.4M18.9 12h2.4M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/></svg></span>
-        <span class="theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M20.1 14.3A8.3 8.3 0 0 1 9.7 3.9a8.4 8.4 0 1 0 10.4 10.4Z"/></svg></span>
-      </button>
-      <a data-profile-link href="/profile?lang={{ language }}"{% if not signed_in %} hidden{% endif %}{% if page_path == '/profile' %} aria-current="page"{% endif %}>{{ copy('Профіль', 'Profile') }}</a>
-      <button type="button" data-logout data-pending-label="{{ copy('Виходимо…', 'Signing out…') }}"{% if not signed_in %} hidden{% endif %}>{{ copy("Вийти", "Log out") }}</button>
-      <a data-login-link class="login-link btn" href="/login?lang={{ language }}"{% if signed_in %} hidden{% endif %}{% if page_path == '/login' %} aria-current="page"{% endif %}>{{ copy('Логін', 'Log in') }}</a>
-      {% if signed_in %}<noscript><a class="login-link btn" href="/login?lang={{ language }}">{{ copy('Логін', 'Log in') }}</a></noscript>{% endif %}
+    <a class="header-cta btn" data-login-cta href="/login?lang={{ language }}"{% if signed_in %} hidden{% endif %}>{{ copy('Увійти', 'Log in') }}</a>
+    {% if signed_in %}<noscript><a class="header-cta btn" href="/login?lang={{ language }}">{{ copy('Увійти', 'Log in') }}</a></noscript>{% endif %}
+    <a class="menu-toggle" data-menu-toggle href="#site-menu" role="button" aria-controls="site-menu" aria-expanded="false" aria-label="{{ copy('Меню', 'Menu') }}">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </a>
+    <div class="site-menu" id="site-menu" aria-label="{{ copy('Меню', 'Menu') }}">
+      <a class="menu-backdrop" data-menu-close-backdrop href="#" tabindex="-1" aria-hidden="true"></a>
+      <div class="menu-panel">
+        <div class="menu-head">
+          <span class="menu-title">{{ copy('Меню', 'Menu') }}</span>
+          <a class="menu-close" data-menu-close href="#" role="button" aria-label="{{ copy('Закрити меню', 'Close menu') }}"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg></a>
+        </div>
+        <nav class="primary-nav" aria-label="{{ copy('Основна навігація', 'Main navigation') }}">
+          <a href="/?lang={{ language }}#directions">{{ copy('Напрями', 'Directions') }}</a>
+          <a href="/?lang={{ language }}#method">{{ copy('Методика', 'Method') }}</a>
+          <a href="/?lang={{ language }}#plans">{{ copy('Тарифи', 'Plans') }}</a>
+        </nav>
+        <div class="header-controls">
+          <div class="menu-account">
+            <a data-profile-link href="/profile?lang={{ language }}"{% if not signed_in %} hidden{% endif %}{% if page_path == '/profile' %} aria-current="page"{% endif %}>{{ copy('Профіль', 'Profile') }}</a>
+            <button type="button" data-logout data-pending-label="{{ copy('Виходимо…', 'Signing out…') }}"{% if not signed_in %} hidden{% endif %}>{{ copy("Вийти", "Log out") }}</button>
+            <a data-login-link class="login-link btn" href="/login?lang={{ language }}"{% if signed_in %} hidden{% endif %}{% if page_path == '/login' %} aria-current="page"{% endif %}>{{ copy('Увійти', 'Log in') }}</a>
+            {% if signed_in %}<noscript><a class="login-link btn" href="/login?lang={{ language }}">{{ copy('Увійти', 'Log in') }}</a></noscript>{% endif %}
+          </div>
+          <div class="menu-settings">
+            <nav class="locale-nav" aria-label="{{ copy('Мова', 'Language') }}">
+              <a href="{{ page_path }}?lang=uk" lang="uk"{% if language == 'uk' %} aria-current="page"{% endif %}>UA</a>
+              <span aria-hidden="true">/</span>
+              <a href="{{ page_path }}?lang=en" lang="en"{% if language == 'en' %} aria-current="page"{% endif %}>EN</a>
+            </nav>
+            <button class="theme-toggle" type="button" data-theme-control aria-label="{{ copy('Тема', 'Theme') }}" title="{{ copy('Тема', 'Theme') }}" aria-pressed="false" disabled>
+              <span class="theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="4.1"/><path d="M12 2.7v2.4M12 18.9v2.4M2.7 12h2.4M18.9 12h2.4M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/></svg></span>
+              <span class="theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M20.1 14.3A8.3 8.3 0 0 1 9.7 3.9a8.4 8.4 0 1 0 10.4 10.4Z"/></svg></span>
+              <span class="theme-toggle__label">{{ copy('Тема', 'Theme') }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </header>
+<script type="module" src="/static/js/components/site-menu.js"></script>
 <script type="module" src="/static/js/features/auth/session.js"></script>
 <main id="main" tabindex="-1">{% block public_content %}{% endblock %}</main>
 <footer class="site-footer wrap">

@@ -1,5 +1,11 @@
 import { expect, test } from '@playwright/test';
 
+async function openMenuOnPhone(page) {
+  // Phones keep language/theme inside the menu panel.
+  const toggle = page.locator('[data-menu-toggle]');
+  if (await toggle.isVisible() && await toggle.getAttribute('aria-expanded') !== 'true') await toggle.click();
+}
+
 const prices = { essential: 1999, plus: 4999, pro: 17999, 'pro-plus': 29999 };
 
 test('prices_unchanged and trial_terms_visible', async ({ page }) => {
@@ -54,6 +60,7 @@ for (const width of [390, 1440]) for (const theme of ['light', 'dark']) {
   test(`public page ${width} ${theme}, language and theme persist`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/');
+    await openMenuOnPhone(page);
     const themeToggle = page.getByRole('button', { name: 'Тема' });
     await themeToggle.click();
     if (await page.locator('html').getAttribute('data-theme') !== theme) await themeToggle.click();
@@ -62,6 +69,7 @@ for (const width of [390, 1440]) for (const theme of ['light', 'dark']) {
     await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Рухатися вільніше.');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await openMenuOnPhone(page);
     await page.getByRole('link', { name: 'EN', exact: true }).click();
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Move more freely.');

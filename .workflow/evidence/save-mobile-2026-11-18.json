@@ -1,0 +1,80 @@
+{
+  "date": "2026-11-18",
+  "scope": "Owner-requested save-result animation and mobile UX corrections, not S05-02 implementation",
+  "status": "verified_local",
+  "red": [
+    {
+      "command": "node --test tests/js/acro-rig.test.js",
+      "result": "6 passed, 1 failed: wrist never released in side landing"
+    },
+    {
+      "command": "playwright test profile-form.spec.js mobile-navigation.spec.js --grep feedback/keyboard/enlarged/setup",
+      "result": "4 expected failures: pending overlay visible, step focus missing, modal background not inert, text did not enlarge"
+    },
+    {
+      "command": "playwright test profile-form.spec.js --grep feedback waits",
+      "result": "Review repro: menu remained open when save result appeared"
+    }
+  ],
+  "green": [
+    {
+      "command": "PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers node --test tests/js/*.test.js",
+      "passed": 50,
+      "failed": 0
+    },
+    {
+      "command": "playwright test profile-form.spec.js mobile-navigation.spec.js landing-refinement.spec.js login-form.spec.js logout.spec.js s05-03-public-pages.spec.js",
+      "passed": 55,
+      "failed": 1,
+      "failure": "logout test reopened outgoing menu before redirect committed"
+    },
+    {
+      "command": "playwright test logout.spec.js",
+      "passed": 8,
+      "failed": 0,
+      "correction": "Await main-frame navigation AND DOMContentLoaded before querying/opening new menu. Assertions for auth state and private draft removal unchanged."
+    }
+  ],
+  "review": {
+    "agent": "mobile_menu_review",
+    "fixed": [
+      "Space on close",
+      "modal background including header siblings and skip link",
+      "rem text zoom test",
+      "overlapping menu/save inert snapshots",
+      "keyboard focus containment"
+    ]
+  },
+  "visual": {
+    "viewports": [
+      320,
+      390,
+      1440
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "private_artifacts": "private-evidence/save-mobile-2026-11-18",
+    "synthetic_api": true,
+    "checks": [
+      "transition and fall contact sheet",
+      "recorded result sequences sampled at 3 fps",
+      "mobile steps/menu/accordion",
+      "green check/red cross labels"
+    ],
+    "artifact_status": "Mobile layout images retained; obsolete save-animation recordings and capture script removed"
+  },
+  "limitations": [
+    "Stylised fixed-bone choreography, not human biomechanics simulation",
+    "No live save, migration, external provider, physical device or Safari verification",
+    "Preexisting uncommitted navigation work preserved and extended; no commit or push"
+  ],
+  "next": "Owner visual review in actual form; roadmap S05-02 unchanged; cloud 0010 gate unchanged",
+  "artifact_cleanup": {
+    "date": "2026-11-18",
+    "reason": "Owner approved success v3 and failure v4 and requested deletion of obsolete variants",
+    "approved_videos": "private-evidence/save-feedback-approved/{success,error}.mp4",
+    "removed": "Superseded motion captures, duplicate raw videos and standalone save-feedback preview; historical test results retained"
+  }
+}

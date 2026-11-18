@@ -1,11 +1,19 @@
 import { test, expect } from '@playwright/test';
+
+async function headerItem(page, locator) {
+  // Phones keep language/theme/account inside the menu panel.
+  if (await page.locator('[data-menu-toggle]').isVisible()) {
+    if (await page.locator('[data-menu-toggle]').getAttribute('aria-expanded') !== 'true') await page.locator('[data-menu-toggle]').click();
+  }
+  return locator;
+}
 for (const width of [390,1440]) for (const theme of ['light','dark']) {
   test(`login form ${width} ${theme}`, async ({page}) => {
     await page.setViewportSize({width,height:900});
     await page.goto('/?lang=uk');
     await page.evaluate(preference => localStorage.setItem('studio:theme:guest', preference), theme);
     await page.reload();
-    await page.getByRole('link',{name:'Логін',exact:true}).click();
+    await page.getByRole('link',{name:'Увійти',exact:true}).click();
     await expect(page).toHaveURL(/\/login\?lang=uk$/);
     await expect(page.getByRole('heading',{level:1})).toHaveText('Раді бачити вас знову.');
     await expect(page.getByLabel('Email', {exact:true})).toHaveAttribute('autocomplete','username');
@@ -25,7 +33,7 @@ for (const width of [390,1440]) for (const theme of ['light','dark']) {
     await expect(page).toHaveURL(/\/login\?lang=uk$/);
     expect(requests.some(r=>r.includes('synthetic-password-only'))).toBe(false);
     expect(await page.evaluate(()=>JSON.stringify({...localStorage,...sessionStorage}))).not.toContain('synthetic-password-only');
-    await page.getByRole('link',{name:'EN',exact:true}).click();
+    await (await headerItem(page, page.getByRole('link',{name:'EN',exact:true}))).click();
     await expect(page.getByRole('heading',{level:1})).toHaveText('Good to see you again.');
     await expect(page.getByLabel('Password',{exact:true})).toHaveValue('');
     await expect(page.locator('html')).toHaveAttribute('data-theme',theme);
