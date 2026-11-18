@@ -1,89 +1,99 @@
 {
-  "scope": "Direct one-time SQL bootstrap for registration database, with a separate restricted application login",
-  "project_ref": "dwckvtuhgelhsbjyhpks",
-  "owner_approval": "2026-10-21: do not run migrations for first-stage registration DB; create tables directly",
-  "status": "direct_sql_bootstrap_applied_runtime_connection_pending",
-  "direct_sql_bootstrap": {
-    "file": "supabase/bootstrap-registration.sql",
-    "method": "Supabase execute_sql directly; no migration API or migration ledger write",
-    "objects": [
-      "studio.users",
-      "studio_private.web_sessions",
-      "studio_private.auth_attempts",
-      "studio_private.auth_rate_limits",
-      "studio_private.provision_member(uuid,text,text,text,text)",
-      "studio_private.provision_oauth_member(uuid,text,text,text)",
-      "studio_private.auth_profile(uuid)"
-    ],
-    "verified": {
-      "auth_fk": "studio.users.auth_user_id references auth.users.id",
-      "rls": "enabled on all four product tables",
-      "anonymous_roles": "anon/authenticated have no table DML or function EXECUTE",
-      "runtime": "studio_auth_runtime has intended private table grants and function EXECUTE",
-      "rows": "all four newly created tables are empty",
-      "migration_ledger": "unchanged at four existing Supabase records",
-      "legacy_archive": "studio_legacy_20261020 preserved"
-    }
-  },
-  "simplification_checks": {
-    "red": "2 failed, 1 passed: existing guard rejects direct postgres migrations",
-    "green": "3 focused integration scenarios passed; cloud verifier passed separately; scoped Ruff passed",
-    "coverage": "Administrator upgrade/repeat, FK enforcement, protected runtime grants, rollback, runtime rejected as migrator",
-    "full_suite": "Not rerun, per owner instruction to use a few focused checks",
-    "removed": "Role switching, temporary role memberships, operator-only FK path, redundant rehearsal/repeat executions and obsolete tests",
-    "historical_evidence_below": true
-  },
-  "red": [
-    "pytest server/tests/integration/database/test_migration_baseline.py -k operator -q: 2 failed, 1 passed; operator mode rejected by existing migration_owner guard",
-    "pytest server/tests/integration/database/test_migration_baseline.py -k verified_cloud -q: missing tools.migrate_cloud module",
-    "pytest server/tests/unit/database/test_migration_connection.py -k verified_tls -q: require != verify-full",
-    "Explicit CA option tests: 2 failed on unrecognized --ssl-root-cert before implementation"
+ "scope": "Direct one-time SQL bootstrap for registration database, with a separate restricted application login",
+ "project_ref": "dwckvtuhgelhsbjyhpks",
+ "owner_approval": "2026-10-21: do not run migrations for first-stage registration DB; create tables directly",
+ "status": "direct_sql_bootstrap_applied_runtime_connection_pending",
+ "direct_sql_bootstrap": {
+  "file": "supabase/bootstrap-registration.sql",
+  "method": "Supabase execute_sql directly; no migration API or migration ledger write",
+  "objects": [
+   "studio.users",
+   "studio_private.web_sessions",
+   "studio_private.auth_attempts",
+   "studio_private.auth_rate_limits",
+   "studio_private.provision_member(uuid,text,text,text,text)",
+   "studio_private.provision_oauth_member(uuid,text,text,text)",
+   "studio_private.auth_profile(uuid)"
   ],
-  "green": [
-    "Migration baseline: 17 passed, including SQL failure/retry, repeat, ownership, orphan FK rejection, opt-in, 4 membership variants, and concurrent subprocesses",
-    "Affected database integration/security plus URL/TLS tests: 78 passed before the final extra CA parameter case",
-    "Final URL/TLS unit tests: 8 passed",
-    "Ruff: touched Python files passed before the final CA option; final recheck pending",
-    "Mypy: 4 source files passed with MYPYPATH=server",
-    "Read-only follow-up review: no blocking findings",
-    "Cloud rollback-only SQL probe: FK works, no persistent role or schema changes",
-    "Real password-free psycopg TLS probe: verify-full with official Supabase CA reached the password challenge"
-  ],
-  "test_harness_corrections": [
-    "Use repository test project marker handbalancer-studio-test; wrong marker was an environment error, not RED",
-    "SQLAlchemy wraps FK and division errors as IntegrityError/DataError; assert SQLSTATE 23503/22012",
-    "Run orphan INSERT as table owner after temporary operator privileges are restored",
-    "Rollback the successful retry to isolate shared disposable database tests",
-    "Resolve auth.users OID in operator context before checking FK from migration_owner; relation-name resolution itself needs schema USAGE"
-  ],
-  "cloud_application": "Registration schema applied directly. Restricted runtime login studio_app verified, and a real signup/confirm/login round trip succeeded on the cloud database.",
-  "google_oauth": {
-    "status": "verified_live",
-    "flow": "/login Google button -> Supabase authorize -> Google consent -> /auth/callback -> redirect to /plans",
-    "identity_linking": "Supabase linked the google identity to the existing confirmed email user: 1 auth user, 2 providers, 1 product profile, no duplicate",
-    "sessions": "2 active sessions (email login and Google login); PKCE attempt consumed once",
-    "pitfall": "Google Cloud audience was Internal, returning HTTP 403 org_internal before consent. Fixed in Google Auth Platform > Audience > Make external, not in code or Supabase",
-    "supabase_config": "Google provider already enabled with client credentials; Site URL and redirect http://127.0.0.1:8000/auth/callback allow-listed"
-  },
-  "live_registration": {
-    "signup": "POST /api/auth/register returned 202; auth identity created with confirmation email sent",
-    "confirmation": "Cloud project uses the default link template, so the email link confirmed the identity instead of the six-digit OTP endpoint",
-    "login": "POST /api/auth/login returned 200 and provisioned the product profile",
-    "database_state": "1 confirmed identity, 1 profile (role=member, linked to auth.users), 1 active session, rate-limit buckets populated",
-    "security": "Stored tokens encrypted, no plaintext JWT, session cookie stored only as SHA-256 hash",
-    "not_verified": "Cloud OTP verify-email endpoint and registration/login UI pages"
-  },
-  "runtime_login": {
-    "role": "studio_app",
-    "attributes": "LOGIN INHERIT, no superuser/createdb/createrole/bypassrls, inherits studio_auth_runtime only",
-    "verified": "Real connection succeeded: current_user=studio_app, TLS active, private function EXECUTE allowed, CREATE in studio/studio_private denied, check_auth_role passed",
-    "app_wiring": "create_app wires auth/verification services and opens a restricted transaction as studio_app"
-  },
-  "unverified": [
-    "Dedicated runtime LOGIN and AUTH_DATABASE_URL",
-    "Dedicated migration_owner login",
-    "Real cloud registration, email confirmation, profile and browser session",
-    "CLI advisors (CLI profile has no Supabase access token; manual privilege/RLS queries passed)",
-    "Earlier exposed encryption-key rotation, preserving any dependent ciphertext"
-  ]
+  "verified": {
+   "auth_fk": "studio.users.auth_user_id references auth.users.id",
+   "rls": "enabled on all four product tables",
+   "anonymous_roles": "anon/authenticated have no table DML or function EXECUTE",
+   "runtime": "studio_auth_runtime has intended private table grants and function EXECUTE",
+   "rows": "all four newly created tables are empty",
+   "migration_ledger": "unchanged at four existing Supabase records",
+   "legacy_archive": "studio_legacy_20261020 preserved"
+  }
+ },
+ "simplification_checks": {
+  "red": "2 failed, 1 passed: existing guard rejects direct postgres migrations",
+  "green": "3 focused integration scenarios passed; cloud verifier passed separately; scoped Ruff passed",
+  "coverage": "Administrator upgrade/repeat, FK enforcement, protected runtime grants, rollback, runtime rejected as migrator",
+  "full_suite": "Not rerun, per owner instruction to use a few focused checks",
+  "removed": "Role switching, temporary role memberships, operator-only FK path, redundant rehearsal/repeat executions and obsolete tests",
+  "historical_evidence_below": true
+ },
+ "red": [
+  "pytest server/tests/integration/database/test_migration_baseline.py -k operator -q: 2 failed, 1 passed; operator mode rejected by existing migration_owner guard",
+  "pytest server/tests/integration/database/test_migration_baseline.py -k verified_cloud -q: missing tools.migrate_cloud module",
+  "pytest server/tests/unit/database/test_migration_connection.py -k verified_tls -q: require != verify-full",
+  "Explicit CA option tests: 2 failed on unrecognized --ssl-root-cert before implementation"
+ ],
+ "green": [
+  "Migration baseline: 17 passed, including SQL failure/retry, repeat, ownership, orphan FK rejection, opt-in, 4 membership variants, and concurrent subprocesses",
+  "Affected database integration/security plus URL/TLS tests: 78 passed before the final extra CA parameter case",
+  "Final URL/TLS unit tests: 8 passed",
+  "Ruff: touched Python files passed before the final CA option; final recheck pending",
+  "Mypy: 4 source files passed with MYPYPATH=server",
+  "Read-only follow-up review: no blocking findings",
+  "Cloud rollback-only SQL probe: FK works, no persistent role or schema changes",
+  "Real password-free psycopg TLS probe: verify-full with official Supabase CA reached the password challenge"
+ ],
+ "test_harness_corrections": [
+  "Use repository test project marker handbalancer-studio-test; wrong marker was an environment error, not RED",
+  "SQLAlchemy wraps FK and division errors as IntegrityError/DataError; assert SQLSTATE 23503/22012",
+  "Run orphan INSERT as table owner after temporary operator privileges are restored",
+  "Rollback the successful retry to isolate shared disposable database tests",
+  "Resolve auth.users OID in operator context before checking FK from migration_owner; relation-name resolution itself needs schema USAGE"
+ ],
+ "cloud_application": "Registration schema applied directly. Restricted runtime login studio_app verified, and a real signup/confirm/login round trip succeeded on the cloud database.",
+ "google_oauth": {
+  "status": "verified_live",
+  "flow": "/login Google button -> Supabase authorize -> Google consent -> /auth/callback -> redirect to /plans",
+  "identity_linking": "Supabase linked the google identity to the existing confirmed email user: 1 auth user, 2 providers, 1 product profile, no duplicate",
+  "sessions": "2 active sessions (email login and Google login); PKCE attempt consumed once",
+  "pitfall": "Google Cloud audience was Internal, returning HTTP 403 org_internal before consent. Fixed in Google Auth Platform > Audience > Make external, not in code or Supabase",
+  "supabase_config": "Google provider already enabled with client credentials; Site URL and redirect http://127.0.0.1:8000/auth/callback allow-listed"
+ },
+ "live_registration": {
+  "signup": "POST /api/auth/register returned 202; auth identity created with confirmation email sent",
+  "confirmation": "Cloud project uses the default link template, so the email link confirmed the identity instead of the six-digit OTP endpoint",
+  "login": "POST /api/auth/login returned 200 and provisioned the product profile",
+  "database_state": "1 confirmed identity, 1 profile (role=member, linked to auth.users), 1 active session, rate-limit buckets populated",
+  "security": "Stored tokens encrypted, no plaintext JWT, session cookie stored only as SHA-256 hash",
+  "not_verified": "Cloud OTP verify-email endpoint and registration/login UI pages"
+ },
+ "runtime_login": {
+  "role": "studio_app",
+  "attributes": "LOGIN INHERIT, no superuser/createdb/createrole/bypassrls, inherits studio_auth_runtime only",
+  "verified": "Real connection succeeded: current_user=studio_app, TLS active, private function EXECUTE allowed, CREATE in studio/studio_private denied, check_auth_role passed",
+  "app_wiring": "create_app wires auth/verification services and opens a restricted transaction as studio_app"
+ },
+ "unverified": [
+  "Dedicated runtime LOGIN and AUTH_DATABASE_URL",
+  "Dedicated migration_owner login",
+  "Real cloud registration, email confirmation, profile and browser session",
+  "CLI advisors (CLI profile has no Supabase access token; manual privilege/RLS queries passed)",
+  "Earlier exposed encryption-key rotation, preserving any dependent ciphertext"
+ ],
+ "cloud_upgrade_0009": {
+  "date": "2026-11-17/18",
+  "approval": "owner 2026-11-17",
+  "dry_run": "Checked and rolled back migration upgrade to Alembic 0009; ownership and RLS verified. (owner terminal)",
+  "apply": "owner ran --apply; verified afterwards: studio.user_preferences exists (0009), studio_web_app cannot access studio_private",
+  "web_login": "studio_web_app created via supabase/web-login.sql (non-superuser postgres fix 1d7fe41); app role guard accepted it; DATABASE_URL in .env.local only",
+  "app_check": "local app on 8000 with cloud DB: /api/me/* 401 without session (was 503)",
+  "secret_hygiene": "owner pasted the password into the tracked SQL template; restored with git checkout before any commit",
+  "not_verified": "signed-in /profile save against cloud DB (pending owner browser check)"
+ }
 }
