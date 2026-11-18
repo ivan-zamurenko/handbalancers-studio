@@ -172,16 +172,40 @@ def test_verified_cloud_upgrade_preserves_managed_schemas(operator_engine):
 
     with operator_engine.connect() as connection, connection.begin() as transaction:
         before = operator_membership(connection)
-        # Owner approved cloud upgrade to 0009 on 2026-11-17 (refresh grants, audit, preferences).
-        assert upgrade_verified(connection) == "0009"
+        command.upgrade(configuration(connection), "0009")
+        assert connection.scalar(text("SELECT to_regclass('studio.onboarding_profiles')")) is None
+        # Owner approved the questionnaire migration 0010 on 2026-11-18.
+        assert upgrade_verified(connection) == "0010"
+        assert upgrade_verified(connection) == "0010"  # A second run is a verified no-op.
         assert connection.scalar(text(
             "SELECT has_column_privilege('studio_auth_runtime', "
             "'studio_private.web_sessions', 'encrypted_tokens', 'UPDATE')"
         ))
-        for table in ("studio_private.audit_events", "studio.user_preferences"):
+        for table in ("studio_private.audit_events", "studio.user_preferences", "studio.onboarding_profiles"):
             assert connection.scalar(text("SELECT relrowsecurity FROM pg_class WHERE oid=to_regclass(:t)"), {"t": table})
         assert operator_membership(connection) == before
         assert connection.scalar(text("SELECT current_user")) == "postgres"
+        transaction.rollback()
+
+
+@pytest.mark.parametrize("drift", [
+    "DROP TABLE studio.onboarding_profiles",
+    "ALTER POLICY onboarding_select_own ON studio.onboarding_profiles USING (true)",
+    "GRANT UPDATE(user_id) ON studio.onboarding_profiles TO studio_web",
+    "GRANT SELECT ON studio.onboarding_profiles TO studio_auth_runtime",
+    "ALTER FUNCTION studio.has_distinct_elements(anyarray) SECURITY DEFINER",
+    "GRANT EXECUTE ON FUNCTION studio.has_distinct_elements(anyarray) TO PUBLIC",
+])
+def test_cloud_onboarding_drift_is_rejected(operator_engine, monkeypatch, drift):
+    from tools import migrate_cloud
+    from tools.check_migrations import MigrationCheckError
+
+    monkeypatch.setattr(migrate_cloud, "APPROVED_CLOUD_REVISION", "0010")
+    with operator_engine.connect() as connection, connection.begin() as transaction:
+        command.upgrade(configuration(connection), "0010")
+        connection.exec_driver_sql(drift)
+        with pytest.raises(MigrationCheckError, match="Onboarding"):
+            migrate_cloud.upgrade_verified(connection)
         transaction.rollback()
 
 
@@ -232,7 +256,7 @@ INSERT INTO auth.users (id) VALUES ('{identity_id}');
                 for table in tables} == before
         assert connection.scalar(text("SELECT version_num FROM studio.alembic_version")) == "0006"
         # The adopted cloud baseline then upgrades to the approved revision, data intact.
-        assert upgrade_verified(connection) == "0009"
+        assert upgrade_verified(connection) == "0010"
         assert {table: connection.execute(text(f"SELECT * FROM {table}")).all()
                 for table in tables} == before
         connection.exec_driver_sql("CREATE FUNCTION studio_private.future_fn() RETURNS int "

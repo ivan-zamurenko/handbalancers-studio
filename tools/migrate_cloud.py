@@ -25,9 +25,68 @@ PROJECT_REF = "dwckvtuhgelhsbjyhpks"
 POOLER_HOST = "aws-1-eu-west-1.pooler.supabase.com"
 # Adoption baseline of the 2026-10-21 direct SQL bootstrap. Never changes.
 TARGET_REVISION = "0006"
-# Highest revision the owner approved for the cloud project (2026-11-17:
-# 0007 refresh grants, 0008 audit, 0009 preferences). Raise only on new approval.
-APPROVED_CLOUD_REVISION = "0009"
+# Highest revision explicitly approved by the owner (2026-11-18: questionnaire).
+# The baseline remains 0006; future revisions still require new approval.
+APPROVED_CLOUD_REVISION = "0010"
+
+
+def verify_onboarding(connection: Connection) -> None:
+    """Fail closed on missing objects or weakened access at the approved 0010 target."""
+    require(connection.scalar(text(
+        "SELECT to_regclass('studio.onboarding_profiles') IS NOT NULL"
+    )), "Onboarding table is missing")
+    own = "user_id = NULLIF(pg_catalog.current_setting('studio.user_id', true), '')::uuid"
+
+    def canonical(expression: str | None) -> str | None:
+        if expression is None:
+            return None
+        return "".join(expression.replace("pg_catalog.", "").replace("::text", "")
+                       .replace("(", "").replace(")", "").split()).lower()
+
+    policies = connection.execute(text("""
+        SELECT policyname, cmd, permissive, roles::text, qual, with_check
+        FROM pg_policies WHERE schemaname='studio' AND tablename='onboarding_profiles'
+    """)).all()
+    actual = {(name, cmd, mode, roles, canonical(qual), canonical(check))
+              for name, cmd, mode, roles, qual, check in policies}
+    condition = canonical(own)
+    expected = {
+        ("onboarding_select_own", "SELECT", "PERMISSIVE", "{studio_web}", condition, None),
+        ("onboarding_insert_own", "INSERT", "PERMISSIVE", "{studio_web}", None, condition),
+        ("onboarding_update_own", "UPDATE", "PERMISSIVE", "{studio_web}", condition, condition),
+    }
+    require(actual == expected, "Onboarding owner policies differ")
+    for role in ("anon", "authenticated", "studio_auth_runtime", "studio_worker"):
+        require(not connection.scalar(text("""
+            SELECT has_table_privilege(:role,'studio.onboarding_profiles','SELECT,INSERT,UPDATE,DELETE,TRUNCATE')
+                OR has_any_column_privilege(:role,'studio.onboarding_profiles','SELECT,INSERT,UPDATE')
+        """), {"role": role}), "Onboarding unexpected runtime access")
+    require(connection.scalar(text("""
+        SELECT has_table_privilege('studio_web','studio.onboarding_profiles','SELECT')
+           AND has_table_privilege('studio_web','studio.onboarding_profiles','INSERT')
+           AND NOT has_table_privilege('studio_web','studio.onboarding_profiles','DELETE,TRUNCATE')
+    """)), "Onboarding web grants differ")
+    writable = set(connection.scalars(text("""
+        SELECT attname FROM pg_attribute WHERE attrelid='studio.onboarding_profiles'::regclass
+          AND attnum>0 AND NOT attisdropped
+          AND has_column_privilege('studio_web',attrelid,attname,'UPDATE')
+    """)))
+    require(writable == {"goal_codes", "self_reported_level", "session_minutes", "weekdays",
+                         "time_of_day", "birth_year", "height_cm", "weight_kg", "updated_at",
+                         "row_version"}, "Onboarding writable columns differ")
+    helper = connection.execute(text("""
+        SELECT prosecdef,provolatile,proisstrict,proconfig FROM pg_proc
+        WHERE oid=to_regprocedure('studio.has_distinct_elements(anyarray)')
+    """)).one_or_none()
+    require(helper == (False, "i", True, ["search_path=pg_catalog"]),
+            "Onboarding validation helper is missing or unsafe")
+    for role in ("anon", "authenticated", "studio_auth_runtime", "studio_worker"):
+        require(not connection.scalar(text(
+            "SELECT has_function_privilege(:role,'studio.has_distinct_elements(anyarray)','EXECUTE')"
+        ), {"role": role}), "Onboarding unexpected helper access")
+    require(connection.scalar(text(
+        "SELECT has_function_privilege('studio_web','studio.has_distinct_elements(anyarray)','EXECUTE')"
+    )), "Onboarding web helper access missing")
 
 
 def safe_failure_reason(error: Exception, phase: str) -> str:
@@ -95,6 +154,8 @@ def upgrade_verified(connection: Connection, *, adopt_bootstrap: bool = False) -
         "Unexpected Alembic revision",
     )
     verify_isolation(connection, owner="postgres")
+    if target == "0010":
+        verify_onboarding(connection)
     require(
         connection.execute(text(
             "SELECT convalidated, confrelid = 'auth.users'::regclass "

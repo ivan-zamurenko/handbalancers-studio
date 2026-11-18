@@ -34,7 +34,7 @@
     "Test file in security/accounts DB suite instead of integration/onboarding (same DB fixtures)."
   ],
   "not_verified": [
-    "Cloud: 0010 not applied (needs owner approval); until then /profile on the hosted DB cannot load the questionnaire."
+    "Full manual browser save against hosted DB after 0010; schema and RLS were independently checked read-only."
   ],
   "review": {
     "reviewer": null,
@@ -66,5 +66,11 @@
     "reason": "Owner approved success v3 and failure v4 and requested deletion of obsolete variants",
     "approved_videos": "private-evidence/save-feedback-approved/{success,error}.mp4",
     "removed": "Superseded motion captures, duplicate raw videos and standalone save-feedback preview; historical test results retained"
+  },
+  "cloud_followup_2026_11_18": {
+    "migration": "0010",
+    "operator_report": "Applied migration upgrade to Alembic 0010; ownership and RLS verified.",
+    "independent_read_only_verification": "passed",
+    "evidence": ".workflow/evidence/cloud-0010-2026-11-18.json"
   }
 }

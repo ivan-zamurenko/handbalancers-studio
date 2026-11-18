@@ -1,0 +1,52 @@
+{
+  "date": "2026-11-18",
+  "scope": "Owner-authorized hosted upgrade to Alembic 0010",
+  "status": "applied_owner_confirmed_metadata_verified",
+  "authorization": "User explicitly requested migration in this session",
+  "operator_result": "Applied migration upgrade to Alembic 0010; ownership and RLS verified.",
+  "execution": "Owner ran tools.migrate_cloud --ssl-root-cert .local-tools/supabase/prod-ca-2021.crt --apply with hidden postgres password; assistant has runtime credentials only",
+  "red": [
+    {
+      "scenario": "Approved target 0009→0010 and populated bootstrap data preservation",
+      "result": "2 expected failures: runner still returned 0009"
+    },
+    {
+      "scenario": "Missing table, weakened policy, protected column grant, auth runtime grant, SECURITY DEFINER helper, PUBLIC execute",
+      "result": "6 expected failures: old verifier accepted drift"
+    }
+  ],
+  "green": {
+    "db_tests": 42,
+    "ruff": "passed",
+    "mypy": "passed",
+    "review": "read-only migration review: no blockers"
+  },
+  "cloud_before": {
+    "table_exists": false
+  },
+  "cloud_after": {
+    "read_only": true,
+    "table_exists": true,
+    "owner_postgres": true,
+    "rls_enabled": true,
+    "policies": [
+      "onboarding_insert_own",
+      "onboarding_select_own",
+      "onboarding_update_own"
+    ],
+    "roles_denied": [
+      "anon",
+      "authenticated",
+      "studio_auth_runtime",
+      "studio_worker"
+    ],
+    "no_context_sees_no_rows": true
+  },
+  "limitations": [
+    "Full manual hosted browser save not performed",
+    "Runtime role cannot independently read Alembic revision; revision confirmed by owner operator CLI",
+    "Verifier checks selected safety invariants, not full schema/function-body equivalence"
+  ],
+  "private_data": "No secrets or user records logged; private-evidence remains ignored",
+  "next": "S05-02; manual hosted form save can now be checked"
+}
