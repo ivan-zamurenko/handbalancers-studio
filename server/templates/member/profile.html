@@ -1,21 +1,10 @@
 {% extends "public/base.html" %}
 {% block title %}{{ copy('Профіль', 'Profile') }} — Handbalancer’s Studio{% endblock %}
-{% block head %}{{ super() }}<link rel="stylesheet" href="/static/css/auth.css"><link rel="stylesheet" href="/static/css/handstand.css"><link rel="stylesheet" href="/static/css/profile.css">{% endblock %}
+{% block head %}{{ super() }}<link rel="stylesheet" href="/static/css/auth.css"><link rel="stylesheet" href="/static/css/save-feedback.css"><link rel="stylesheet" href="/static/css/profile.css">{% endblock %}
 {% macro chip(name, value, label, type='checkbox') %}<label class="chip-option"><input type="{{ type }}" name="{{ name }}" value="{{ value }}"><span>{{ label }}</span></label>{% endmacro %}
 {% block public_content %}
 <section class="profile-section wrap" aria-labelledby="profile-title">
   <div class="profile-intro" data-setup-intro hidden>
-    <svg class="cycle-figure" data-handstand-cycle viewBox="0 0 240 184" fill="none" aria-hidden="true" focusable="false">
-            <ellipse class="cycle-contact-shadow" data-contact-shadow cx="64" cy="167" rx="16" ry="2.2"/>
-            <path class="cycle-mat" d="M32 168H211"/>
-            <path class="cycle-ground" d="M32 166H211" />
-            <path class="cycle-marks" d="M32 163V169M211 163V169"/>
-            <g class="cycle-rear"><path data-bone="back-leg" d="M68 105L62 135L62 164"/><path data-bone="back-foot" d="M62 164H68"/><path data-bone="back-arm" d="M68 65L57 86L57 108"/><path data-bone="back-hand" d="M57 108H62"/></g>
-            <path data-bone="torso" d="M68 105V65"/>
-            <path data-bone="front-leg" d="M68 105L74 135L74 164"/><path data-bone="front-foot" d="M74 164H80"/>
-            <path data-bone="neck" d="M64 64L73 50"/><circle data-head cx="73" cy="50" r="7.2"/><path class="cycle-eye" data-bone="eye-left" d="M75 49h.2"/><path class="cycle-eye" data-bone="eye-right" d="M78.5 49h.2"/>
-            <path data-bone="front-arm" d="M68 65L82 86L82 108"/><path data-bone="front-hand" d="M82 108H87"/>
-          </svg>
     <p class="eyebrow">Handbalancer’s Studio</p>
     <h1 id="setup-title">{{ copy('Почнімо знайомство.', 'Let’s get to know you.') }}</h1>
     <p>{{ copy('Розкажіть про цілі, зручні дні й час — і план підлаштується саме під вас. Це займе дві хвилини.', 'Tell us your goals, days and time — your plan adapts to you. It takes two minutes.') }}</p>
@@ -23,45 +12,58 @@
   <div class="login-heading" data-profile-heading><p class="eyebrow">{{ copy('Профіль', 'Profile') }}</p><h1 id="profile-title">{{ copy('Ваші дані.', 'Your details.') }}</h1><p>{{ copy('Те, на що спирається ваш план.', 'What your plan is built on.') }}</p></div>
 
   <form id="profile-form" class="profile-form" data-profile-form aria-describedby="profile-status" novalidate hidden>
-    <fieldset class="profile-card">
-      <legend>{{ copy('Основне', 'Basics') }}</legend>
+    <div class="wizard-head" data-wizard-head hidden>
+      <p class="wizard-count" data-wizard-count aria-live="polite"></p>
+      <div class="wizard-bar" aria-hidden="true"><span data-wizard-bar></span></div>
+    </div>
+
+    <fieldset class="profile-card" data-step="about">
+      <legend>{{ copy('Про вас', 'About you') }}</legend>
       <div class="profile-row">
-        <div class="form-field"><label class="form-field__label" for="profile-first-name">{{ copy('Ім’я', 'First name') }}</label><input class="form-field__control" id="profile-first-name" name="first_name" autocomplete="given-name" maxlength="100" required></div>
-        <div class="form-field"><label class="form-field__label" for="profile-last-name">{{ copy('Прізвище', 'Last name') }}</label><input class="form-field__control" id="profile-last-name" name="last_name" autocomplete="family-name" maxlength="100" required></div>
+        <div class="form-field"><label class="form-field__label" for="profile-first-name">{{ copy('Ім’я', 'First name') }}</label><input class="form-field__control" id="profile-first-name" name="first_name" autocomplete="given-name" autocapitalize="words" enterkeyhint="next" maxlength="100" required></div>
+        <div class="form-field"><label class="form-field__label" for="profile-last-name">{{ copy('Прізвище', 'Last name') }}</label><input class="form-field__control" id="profile-last-name" name="last_name" autocomplete="family-name" autocapitalize="words" enterkeyhint="next" maxlength="100" required></div>
       </div>
-      <div class="profile-row profile-row--three">
-        <div class="form-field"><label class="form-field__label" for="profile-birth-year">{{ copy('Рік народження', 'Birth year') }}</label><input class="form-field__control" id="profile-birth-year" name="birth_year" type="number" inputmode="numeric" min="1920" max="2020" step="1"></div>
-        <div class="form-field"><label class="form-field__label" for="profile-height">{{ copy('Зріст, см', 'Height, cm') }}</label><input class="form-field__control" id="profile-height" name="height_cm" type="number" inputmode="numeric" min="100" max="250" step="1"></div>
-        <div class="form-field"><label class="form-field__label" for="profile-weight">{{ copy('Вага, кг', 'Weight, kg') }}</label><input class="form-field__control" id="profile-weight" name="weight_kg" type="number" inputmode="decimal" min="25" max="300" step="0.1"></div>
-      </div>
-      <p class="profile-note">{{ copy('Вік, зріст і вагу бачите лише ви та ваш тренер. Це не медична оцінка.', 'Only you and your coach see age, height and weight. This is not a medical assessment.') }}</p>
     </fieldset>
 
-    <fieldset class="profile-card">
-      <legend>{{ copy('Тренування', 'Training') }}</legend>
-      <p class="profile-label" id="goals-label">{{ copy('Цілі', 'Goals') }} <span>{{ copy('одна або кілька', 'one or more') }}</span></p>
-      <div class="chip-group" role="group" aria-labelledby="goals-label" data-group="goal_codes" data-min="1" data-max="4">
+    <fieldset class="profile-card" data-step="goals">
+      <legend>{{ copy('Цілі', 'Goals') }}</legend>
+      <p class="profile-label" id="goals-label">{{ copy('Над чим працюємо', 'What we work on') }} <span>{{ copy('одна або кілька', 'one or more') }}</span></p>
+      <div class="chip-group chip-group--tiles" role="group" aria-labelledby="goals-label" data-group="goal_codes" data-min="1" data-max="4">
         {{ chip('goal_codes','handstand',copy('Стійка на руках','Handstand')) }}{{ chip('goal_codes','strength',copy('Сила','Strength')) }}{{ chip('goal_codes','mobility',copy('Гнучкість і рухливість','Flexibility & mobility')) }}{{ chip('goal_codes','fitness',copy('Загальна форма','General fitness')) }}
       </div>
       <p class="profile-label" id="level-label">{{ copy('Ваш рівень зараз', 'Your level now') }} <span>{{ copy('самооцінка', 'self-assessment') }}</span></p>
-      <div class="chip-group" role="radiogroup" aria-labelledby="level-label" data-group="self_reported_level" data-min="1">
+      <div class="chip-group chip-group--segmented" role="radiogroup" aria-labelledby="level-label" data-group="self_reported_level" data-min="1">
         {{ chip('self_reported_level','1',copy('Початківець','Beginner'),'radio') }}{{ chip('self_reported_level','2',copy('Маю досвід','Some experience'),'radio') }}{{ chip('self_reported_level','3',copy('Впевнено','Confident'),'radio') }}
       </div>
+    </fieldset>
+
+    <fieldset class="profile-card" data-step="schedule">
+      <legend>{{ copy('Розклад', 'Schedule') }}</legend>
       <p class="profile-label" id="days-label">{{ copy('Зручні дні', 'Preferred days') }} <span>{{ copy('до трьох', 'up to three') }}</span></p>
       <div class="chip-group chip-group--days" role="group" aria-labelledby="days-label" data-group="weekdays" data-min="1" data-max="3">
         {% for code, uk, en in [(7,'Нд','Sun'),(1,'Пн','Mon'),(2,'Вт','Tue'),(3,'Ср','Wed'),(4,'Чт','Thu'),(5,'Пт','Fri'),(6,'Сб','Sat')] %}{{ chip('weekdays', code, copy(uk, en)) }}{% endfor %}
       </div>
       <p class="profile-label" id="time-label">{{ copy('Зручний час', 'Preferred time') }}</p>
-      <div class="chip-group" role="radiogroup" aria-labelledby="time-label" data-group="time_of_day">
+      <div class="chip-group chip-group--segmented" role="radiogroup" aria-labelledby="time-label" data-group="time_of_day">
         {{ chip('time_of_day','morning',copy('Ранок','Morning'),'radio') }}{{ chip('time_of_day','afternoon',copy('День','Afternoon'),'radio') }}{{ chip('time_of_day','evening',copy('Вечір','Evening'),'radio') }}
       </div>
       <p class="profile-label" id="minutes-label">{{ copy('Тривалість заняття', 'Session length') }}</p>
-      <div class="chip-group" role="radiogroup" aria-labelledby="minutes-label" data-group="session_minutes" data-min="1">
+      <div class="chip-group chip-group--segmented" role="radiogroup" aria-labelledby="minutes-label" data-group="session_minutes" data-min="1">
         {% for m in [30,45,60,90] %}{{ chip('session_minutes', m, m ~ copy(' хв',' min'), 'radio') }}{% endfor %}
       </div>
     </fieldset>
 
-    <fieldset class="profile-card">
+    <fieldset class="profile-card" data-step="body" data-optional>
+      <legend>{{ copy('Параметри', 'Body') }}</legend>
+      <div class="profile-row profile-row--three">
+        <div class="form-field"><label class="form-field__label" for="profile-birth-year">{{ copy('Рік народження', 'Birth year') }}</label><input class="form-field__control" id="profile-birth-year" name="birth_year" type="number" inputmode="numeric" min="1920" max="2020" step="1" enterkeyhint="next"></div>
+        <div class="form-field"><label class="form-field__label" for="profile-height">{{ copy('Зріст, см', 'Height, cm') }}</label><input class="form-field__control" id="profile-height" name="height_cm" type="number" inputmode="numeric" min="100" max="250" step="1" enterkeyhint="next"></div>
+        <div class="form-field"><label class="form-field__label" for="profile-weight">{{ copy('Вага, кг', 'Weight, kg') }}</label><input class="form-field__control" id="profile-weight" name="weight_kg" type="number" inputmode="decimal" min="25" max="300" step="0.1" enterkeyhint="done"></div>
+      </div>
+      <p class="profile-note">{{ copy('Бачите лише ви та ваш тренер. Це не медична оцінка.', 'Only you and your coach see this. Not a medical assessment.') }}</p>
+    </fieldset>
+
+    <fieldset class="profile-card" data-step="settings" data-setup-skip>
       <legend>{{ copy('Налаштування', 'Settings') }}</legend>
       <div class="profile-row">
         <div class="form-field"><label class="form-field__label" for="profile-locale">{{ copy('Мова', 'Language') }}</label><select class="form-field__control" id="profile-locale" name="locale"><option value="uk">Українська</option><option value="en">English</option></select></div>
@@ -69,12 +71,17 @@
       </div>
     </fieldset>
 
-    <div class="profile-actions">
+    <div class="profile-actions" data-actions>
       <p class="profile-error" data-profile-error role="alert" hidden>{{ copy('Заповніть позначені поля.', 'Please complete the highlighted fields.') }}</p>
-      <button class="primary login-submit" type="submit" data-pending-label="{{ copy('Зберігаємо…', 'Saving…') }}">{{ copy('Зберегти', 'Save') }}</button>
+      <div class="profile-buttons">
+        <button type="button" class="wizard-back" data-wizard-back hidden>{{ copy('Назад', 'Back') }}</button>
+        <button type="button" class="wizard-skip" data-wizard-skip hidden>{{ copy('Пропустити', 'Skip') }}</button>
+        <button type="button" class="primary login-submit" data-wizard-next hidden>{{ copy('Далі', 'Next') }}</button>
+        <button class="primary login-submit" type="submit">{{ copy('Зберегти', 'Save') }}</button>
+      </div>
     </div>
   </form>
-  <p id="profile-status" class="profile-status" role="status" aria-live="polite" data-profile-status data-saved="{{ copy('Збережено.', 'Saved.') }}" data-error="{{ copy('Виникла помилка. Спробуйте ще раз.', 'Something went wrong. Please try again.') }}" data-conflict="{{ copy('Дані змінено на іншому пристрої — показуємо актуальні.', 'Changed on another device — showing the latest.') }}" data-unavailable="{{ copy('Профіль тимчасово недоступний.', 'Profile is temporarily unavailable.') }}">{{ copy('Завантажуємо…', 'Loading…') }}</p>
+  <p id="profile-status" class="profile-status" role="status" aria-live="polite" data-profile-status data-step-label="{{ copy('Крок {n} з {total}', 'Step {n} of {total}') }}" data-feedback-saved="{{ copy('Збережено', 'Saved') }}" data-feedback-error="{{ copy('Виникла помилка', 'Something went wrong') }}" data-saved="{{ copy('Збережено.', 'Saved.') }}" data-error="{{ copy('Виникла помилка. Спробуйте ще раз.', 'Something went wrong. Please try again.') }}" data-conflict="{{ copy('Дані змінено на іншому пристрої — показуємо актуальні.', 'Changed on another device — showing the latest.') }}" data-unavailable="{{ copy('Профіль тимчасово недоступний.', 'Profile is temporarily unavailable.') }}">{{ copy('Завантажуємо…', 'Loading…') }}</p>
   <noscript><p class="small">{{ copy('Увімкніть JavaScript, щоб редагувати профіль.', 'Enable JavaScript to edit your profile.') }}</p></noscript>
 </section>
 {% endblock %}

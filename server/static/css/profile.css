@@ -45,3 +45,50 @@
 }
 @media (prefers-reduced-motion: reduce) { .chip-option span { transition: none; } }
 .profile-intro[hidden], .profile-form[hidden], .profile-error[hidden] { display: none; }
+
+/* Section header: plain title on desktop, accordion toggle on phones. */
+.profile-card legend .acc-toggle { all: unset; display: flex; align-items: center; gap: 10px; width: 100%; font: inherit; color: inherit; cursor: default; }
+.acc-summary, .acc-chevron { display: none; }
+.profile-buttons { display: flex; gap: 10px; }
+.profile-buttons > * { flex: 1; }
+.profile-buttons [hidden] { display: none; }
+.wizard-back, .wizard-skip { min-height: 50px; }
+.wizard-head[hidden] { display: none; }
+.chip-group--segmented { display: grid; grid-auto-columns: minmax(0, 1fr); grid-auto-flow: column; gap: 0; border: 1px solid var(--line); border-radius: var(--radius-button); padding: 3px; }
+.chip-group--segmented .chip-option span { border: 0; border-radius: calc(var(--radius-button) - 2px); padding: 0 8px; text-align: center; }
+.chip-group--segmented .chip-option input:checked + span { background: var(--button); color: var(--button-text); }
+@media (max-width: 760px) {
+  .profile-section { padding-top: 20px; padding-bottom: 0; }
+  .profile-intro { margin-bottom: 20px; gap: 8px; }
+  .profile-intro h1 { font-size: 28px; }
+  .profile-intro p:last-child { font-size: 14px; }
+  .profile-form { gap: 12px; }
+  .profile-form[data-mode="wizard"] + .profile-status, .profile-form[data-mode="accordion"] + .profile-status { margin-bottom: 96px; }
+  .chip-group--tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .chip-group--tiles .chip-option span { min-height: 56px; border-radius: var(--radius-button); padding: 0 10px; text-align: center; line-height: 1.25; }
+  .chip-group--segmented .chip-option span { min-height: 44px; font-size: 13px; }
+  /* Sticky action bar in the thumb zone. */
+  .profile-actions { position: sticky; bottom: 0; z-index: 4; margin: 0 -18px; padding: 12px 18px calc(12px + env(safe-area-inset-bottom)); background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-top: 1px solid var(--line); }
+  /* Step-by-step first fill. */
+  .wizard-head { position: sticky; top: 0; z-index: 3; display: grid; gap: 8px; padding: 10px 0 12px; background: var(--bg); }
+  .wizard-count { font-size: 12px; color: var(--muted); letter-spacing: .04em; }
+  .wizard-bar { height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; }
+  .wizard-bar span { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 2px; transition: width 260ms ease; }
+  .profile-form[data-mode="wizard"] .profile-card { border: 0; padding: 4px 0 8px; background: transparent; }
+  .profile-form[data-mode="wizard"] .profile-card legend { font-size: 26px; font-weight: 600; letter-spacing: -.03em; margin-bottom: 18px; }
+  .profile-form[data-mode="wizard"] .profile-row--three { grid-template-columns: minmax(0, 1fr); }
+  /* Editing later: collapsible sections with a one-line summary. */
+  .profile-form[data-mode="accordion"] .profile-card { padding: 0 16px; }
+  .profile-form[data-mode="accordion"] .profile-card legend { margin: 0; }
+  .profile-form[data-mode="accordion"] .acc-toggle { cursor: pointer; min-height: 56px; }
+  .profile-form[data-mode="accordion"] .acc-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  .profile-form[data-mode="accordion"] .acc-summary { display: block; margin-left: auto; max-width: 58%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 400; color: var(--muted); letter-spacing: 0; }
+  .profile-form[data-mode="accordion"] fieldset[data-open="true"] .acc-chevron { margin-left: auto; }
+  .profile-form[data-mode="accordion"] .acc-chevron { display: block; width: 16px; height: 16px; flex: none; stroke: var(--muted); fill: none; stroke-width: 1.8; transition: transform 200ms ease; }
+  .profile-form[data-mode="accordion"] fieldset[data-open="true"] .acc-chevron { transform: rotate(180deg); }
+  .profile-form[data-mode="accordion"] fieldset[data-open="true"] .acc-summary { display: none; }
+  .profile-form[data-mode="accordion"] fieldset[data-open="false"] [data-section-body] { display: none; }
+  .profile-form[data-mode="accordion"] fieldset[data-open="true"] [data-section-body] { padding-bottom: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .wizard-bar span, .acc-chevron { transition: none; } }
+.login-heading[hidden] { display: none; }
