@@ -1,52 +1,25 @@
 // Save result: the hero, facing us on two hands, shifts onto one hand and holds.
-// Success → vortex into a white check on a green disc. Error → falls sideways,
-// then vortex into a white cross on a red disc. Runs only for a real server save.
-const rad = Math.PI / 180;
+// Success → vortex into a white check on a green disc. Error → loses balance and falls
+// (physical rig in acro-rig.js), then vortex into a white cross on a red disc.
+// Runs only for a real server save.
+import {balanceParams, holdParams, pose, simulateFall, SEG} from './acro-rig.js';
+
 const clamp = t => Math.max(0, Math.min(1, t));
-const mix = (a, b, t) => a + (b - a) * t;
-const lerp = (p, q, t) => [mix(p[0], q[0], t), mix(p[1], q[1], t)];
-const easeOut = t => 1 - (1 - t) ** 3;
-const easeInOut = t => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2);
-
-export const FLOOR = 196;
-const PLANT_L = [79, FLOOR];
-const PLANT_R = [121, FLOOR];
-const SHOULDER_HALF = 17;
-const ARM = Math.hypot(PLANT_L[0] - (100 - SHOULDER_HALF), PLANT_L[1] - 148);
-
-// Front-view rig. shift/lift 0..1 → one-arm balance; fall 0..1 → topples around the support hand.
-export function frontPose({shift = 0, lift = 0, fall = 0, wobble = 0} = {}) {
-  const cx = 100 + 4 * shift + wobble;
-  const pose = {
-    shoulderL: [cx - SHOULDER_HALF, 148], shoulderR: [cx + SHOULDER_HALF, 148],
-    hipL: [cx - 6, 86], hipR: [cx + 6, 86],
-    footL: [cx - 5 - 9 * shift, 30], footR: [cx + 5 + 3 * shift, 30],
-    head: [cx, 170], neck: [cx, 159], chest: [cx, 148], pelvis: [cx, 86],
-    handR: [...PLANT_R],
-  };
-  // Free arm opens to the side; while falling it flails up instead of catching the floor.
-  const out = (172 + 75 * fall) * rad;
-  pose.handL = lerp(PLANT_L, [pose.shoulderL[0] + ARM * Math.cos(out), pose.shoulderL[1] + ARM * Math.sin(out)], lift);
-  if (fall > 0) {
-    // Gravity: accelerate, then a small rebound when the body meets the floor.
-    const angle = -84 * fall * rad;
-    const [px, py] = PLANT_R;
-    for (const key of Object.keys(pose)) {
-      const [x, y] = pose[key];
-      const dx = x - px, dy = y - py;
-      pose[key] = [px + dx * Math.cos(angle) - dy * Math.sin(angle), py + dx * Math.sin(angle) + dy * Math.cos(angle)];
-    }
-    // Keep every joint on or above the floor after the rotation.
-    const lowest = Math.max(...Object.values(pose).map(p => p[1]));
-    if (lowest > FLOOR) for (const key of Object.keys(pose)) pose[key][1] -= lowest - FLOOR;
-  }
-  return pose;
-}
 
 export const timings = {
-  full: {fadeForm: 180, appear: 180, shift: 380, hold: 1000, fall: 520, vortex: 650, mark: 380, result: 1100},
-  short: {fadeForm: 140, appear: 120, shift: 220, hold: 200, fall: 380, vortex: 420, mark: 240, result: 650},
+  full: {fadeForm: 180, appear: 180, shift: 560, hold: 1000, vortex: 650, mark: 380, result: 1100},
+  short: {fadeForm: 140, appear: 120, shift: 380, hold: 200, vortex: 420, mark: 240, result: 650},
 };
+
+// World (y up, support wrist at origin) → SVG.
+const ORIGIN = [112, 196];
+const screen = ([x, y]) => [ORIGIN[0] + x, ORIGIN[1] - y];
+let fallFrames = null;
+const fallAt = seconds => {
+  fallFrames ??= simulateFall();
+  return fallFrames.find(frame => frame.t >= seconds) ?? fallFrames.at(-1);
+};
+const fallDuration = () => { fallFrames ??= simulateFall(); return fallFrames.at(-1).t; };
 
 const NS = 'http://www.w3.org/2000/svg';
 const svgEl = (name, attrs = {}) => {
@@ -60,20 +33,20 @@ function build() {
   root.className = 'save-feedback';
   root.dataset.saveFeedback = '';
   root.hidden = true;
-  const svg = svgEl('svg', {viewBox: '-70 0 340 220', 'aria-hidden': 'true', focusable: 'false'});
-  svg.append(svgEl('path', {class: 'sf-floor', d: 'M30 197H170'}));
+  const svg = svgEl('svg', {viewBox: '0 0 260 220', 'aria-hidden': 'true', focusable: 'false'});
+  svg.append(svgEl('path', {class: 'sf-floor', d: 'M14 197H246'}));
   const figure = svgEl('g', {class: 'sf-figure', 'data-sf-figure': ''});
-  for (const bone of ['arm-l', 'legs', 'torso', 'shoulders', 'hips', 'arm-r', 'neck']) {
+  for (const bone of ['arm-l', 'legs', 'torso', 'shoulders', 'hips', 'neck', 'arm-r']) {
     figure.append(svgEl('path', {'data-bone': bone}));
   }
   figure.append(svgEl('circle', {class: 'sf-head', r: '9.5'}));
   figure.append(svgEl('path', {class: 'sf-eyes', 'data-bone': 'eyes'}));
   const swirl = svgEl('g', {class: 'sf-swirl'});
   for (const [r, len] of [[46, 150], [34, 110], [22, 70]]) {
-    swirl.append(svgEl('circle', {cx: 100, cy: 120, r, 'stroke-dasharray': `${len} 400`}));
+    swirl.append(svgEl('circle', {cx: 130, cy: 110, r, 'stroke-dasharray': `${len} 400`}));
   }
   const badge = svgEl('g', {class: 'sf-badge'});
-  badge.append(svgEl('circle', {cx: 100, cy: 120, r: 44}));
+  badge.append(svgEl('circle', {cx: 130, cy: 110, r: 44}));
   badge.append(svgEl('path', {class: 'sf-mark', pathLength: 1}));
   svg.append(figure, swirl, badge);
   const text = document.createElement('p');
@@ -86,25 +59,30 @@ function build() {
   return {root, svg, figure, swirl, badge, mark: badge.querySelector('.sf-mark'), text};
 }
 
-function draw(parts, pose) {
+function draw(parts, params) {
+  const j = pose(params);
+  const P = name => screen(j[name]);
   const fmt = p => `${p[0].toFixed(2)} ${p[1].toFixed(2)}`;
+  const line = (...names) => names.map((name, i) => `${i ? 'L' : 'M'}${fmt(P(name))}`).join('');
   const set = (bone, d) => parts.figure.querySelector(`[data-bone="${bone}"]`).setAttribute('d', d);
-  set('arm-l', `M${fmt(pose.shoulderL)}L${fmt(pose.handL)}`);
-  set('arm-r', `M${fmt(pose.shoulderR)}L${fmt(pose.handR)}`);
-  set('shoulders', `M${fmt(pose.shoulderL)}L${fmt(pose.shoulderR)}`);
-  set('hips', `M${fmt(pose.hipL)}L${fmt(pose.hipR)}`);
-  set('torso', `M${fmt(pose.chest)}L${fmt(pose.pelvis)}`);
-  set('legs', `M${fmt(pose.hipL)}L${fmt(pose.footL)}M${fmt(pose.hipR)}L${fmt(pose.footR)}`);
-  set('neck', `M${fmt(pose.chest)}L${fmt(pose.neck)}`);
-  const head = parts.figure.querySelector('.sf-head');
-  head.setAttribute('cx', pose.head[0].toFixed(2));
-  head.setAttribute('cy', pose.head[1].toFixed(2));
-  // Upside-down face: eyes sit below the head centre, along the head's own axis.
-  const axis = Math.atan2(pose.head[1] - pose.neck[1], pose.head[0] - pose.neck[0]);
-  const along = [Math.cos(axis), Math.sin(axis)], across = [-along[1], along[0]];
-  const eye = side => [pose.head[0] + along[0] * 2.5 + across[0] * 3.4 * side, pose.head[1] + along[1] * 2.5 + across[1] * 3.4 * side];
-  const [l, r] = [eye(-1), eye(1)];
-  set('eyes', `M${fmt(l)}h.2M${fmt(r)}h.2`);
+  set('arm-l', line('shoulderL', 'elbowL', 'handL'));
+  set('arm-r', line('shoulderR', 'elbowR', 'handR'));
+  set('shoulders', line('shoulderL', 'neck', 'shoulderR'));
+  set('hips', line('hipL', 'pelvis', 'hipR'));
+  set('torso', line('neck', 'pelvis'));
+  set('legs', `${line('hipR', 'kneeR', 'footR')}${line('hipL', 'kneeL', 'footL')}`);
+  const head = P('head'), neck = P('neck');
+  const axis = [head[0] - neck[0], head[1] - neck[1]];
+  const length = Math.hypot(...axis);
+  const along = [axis[0] / length, axis[1] / length], across = [-along[1], along[0]];
+  // The neck meets the head at its edge, not its centre.
+  set('neck', `M${fmt(neck)}L${fmt([head[0] - along[0] * SEG.head, head[1] - along[1] * SEG.head])}`);
+  const circle = parts.figure.querySelector('.sf-head');
+  circle.setAttribute('cx', head[0].toFixed(2));
+  circle.setAttribute('cy', head[1].toFixed(2));
+  // Face towards us: eyes sit slightly towards the crown, either side of the head's axis.
+  const eye = side => [head[0] + along[0] * 2 + across[0] * 3.3 * side, head[1] + along[1] * 2 + across[1] * 3.3 * side];
+  set('eyes', `M${fmt(eye(-1))}h.2M${fmt(eye(1))}h.2`);
 }
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -163,29 +141,29 @@ export async function playSaveFeedback({request, variant = 'short', form, labels
     ok = await outcome;
   } else {
     form?.animate([{opacity: 1}, {opacity: 0}], {duration: t.fadeForm, fill: 'forwards', easing: 'ease-out'});
-    draw(parts, frontPose());
+    draw(parts, balanceParams(0));
     root.animate([{opacity: 0}, {opacity: 1}], {duration: t.appear, easing: 'ease-out'});
     await wait(t.appear, signal);
-    // Quick weight shift onto the right hand; the free arm opens to the side.
-    await tween(t.shift, k => draw(parts, frontPose({shift: easeInOut(k), lift: easeOut(k)})), signal);
+    // Quick, physical transfer: weight shift on both hands, free hand peels off, arm opens.
+    await tween(t.shift, k => draw(parts, balanceParams(k)), signal);
     const holdStart = performance.now();
     let settled = false;
     outcome.then(() => { settled = true; });
-    // Hold for at least the configured time and until the server has answered.
+    // Hold at least the configured time and until the server has answered.
     await new Promise(resolve => {
       const frame = now => {
-        const elapsed = now - holdStart;
-        const wobble = signal.skip ? 0 : 0.8 * Math.sin(elapsed / 140);
-        draw(parts, frontPose({shift: 1, lift: 1, wobble}));
-        if ((elapsed >= t.hold || signal.skip) && settled) resolve();
+        const elapsed = (now - holdStart) / 1000;
+        draw(parts, holdParams(elapsed));
+        if ((elapsed * 1000 >= t.hold || signal.skip) && settled) resolve();
         else requestAnimationFrame(frame);
       };
       requestAnimationFrame(frame);
     });
     ok = await outcome;
     if (!ok) {
-      await tween(t.fall, k => draw(parts, frontPose({shift: 1, lift: 1, fall: k ** 2})), signal);
-      await wait(120, signal);
+      // Real-time playback of the simulated fall (balance lost → tip over → lie on the side).
+      await tween(fallDuration() * 1000, k => draw(parts, fallAt(k * fallDuration()).params), signal);
+      await wait(180, signal);
     }
     // Vortex: the figure spins down into the centre while the disc spins up.
     const spin = {duration: signal.skip ? 1 : t.vortex, fill: 'forwards'};
@@ -198,7 +176,7 @@ export async function playSaveFeedback({request, variant = 'short', form, labels
   }
 
   root.dataset.outcome = ok ? 'success' : 'error';
-  mark.setAttribute('d', ok ? 'M79 121L94 136L122 105' : 'M85 105L115 135M115 105L85 135');
+  mark.setAttribute('d', ok ? 'M109 111L124 126L152 95' : 'M115 95L145 125M145 95L115 125');
   figure.style.opacity = '0';
   floor.style.opacity = '0';
   if (reduced || signal.skip) {
@@ -227,4 +205,14 @@ export async function playSaveFeedback({request, variant = 'short', form, labels
     if (!reduced) form.animate([{opacity: 0}, {opacity: 1}], {duration: 200, easing: 'ease-out'});
   }
   return ok;
+}
+
+// Static frame for design review (tools/previews/save-feedback): no timers, no server.
+export function previewPose(params) {
+  parts ??= build();
+  parts.root.hidden = false;
+  parts.root.dataset.outcome = 'pending';
+  parts.root.dataset.mode = 'motion';
+  parts.badge.style.opacity = '0';
+  draw(parts, params);
 }

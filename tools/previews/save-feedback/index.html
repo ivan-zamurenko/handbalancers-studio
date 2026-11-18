@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="uk" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Анімація збереження · Handbalancer’s Studio · перегляд</title>
+  <link rel="stylesheet" href="/static/css/tokens.css">
+  <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/save-feedback.css">
+  <style>
+    body { padding: 24px; font-family: var(--font-family); }
+    .bar { position: fixed; z-index: 100; left: 16px; right: 16px; bottom: 16px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+    .save-feedback { backdrop-filter: none; }
+    .bar[hidden] { display: none; }
+  </style>
+</head>
+<body>
+  <div class="bar">
+    <button type="button" data-run="ok-full">Успіх (повна)</button>
+    <button type="button" data-run="ok-short">Успіх (коротка)</button>
+    <button type="button" data-run="error-full">Помилка (повна)</button>
+    <button type="button" data-run="error-short">Помилка (коротка)</button>
+    <button type="button" data-theme-switch>Тема</button>
+  </div>
+  <script type="module">
+    import {playSaveFeedback, previewPose} from '/static/js/components/save-feedback.js';
+    import {balanceParams, simulateFall} from '/static/js/components/acro-rig.js';
+    const root = document.documentElement;
+    const params = new URLSearchParams(location.search);
+    if (params.get('theme')) root.dataset.theme = params.get('theme');
+    document.querySelector('[data-theme-switch]').onclick = () => { root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark'; };
+    // ?frame=balance:0.55 or ?frame=fall:1.12 renders a single static pose.
+    const frame = params.get('frame');
+    if (frame) {
+      const [kind, value] = frame.split(':');
+      const fall = simulateFall();
+      previewPose(kind === 'fall' ? (fall.find(f => f.t >= Number(value)) ?? fall.at(-1)).params : balanceParams(Number(value)));
+      document.querySelector('.bar').hidden = true;
+    }
+    for (const button of document.querySelectorAll('[data-run]')) {
+      button.onclick = () => {
+        const [result, variant] = button.dataset.run.split('-');
+        const request = new Promise(resolve => setTimeout(() => resolve(result === 'ok'), 300));
+        playSaveFeedback({request, variant, labels: {saved: 'Збережено', error: 'Виникла помилка'}});
+      };
+    }
+  </script>
+</body>
+</html>

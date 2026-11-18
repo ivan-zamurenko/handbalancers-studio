@@ -52,5 +52,13 @@
       "template restructured into 5 sections; setup intro figure removed (no decorative animation)"
     ],
     "manual_checks": "frames of success/error and phone wizard/accordion reviewed at 390 light/dark; no console errors/overflow"
+  },
+  "animation_physics_rework_2026_11_18": {
+    "owner_feedback": "previous one-arm hold and fall were physically impossible",
+    "reference": "owner photo: one-arm handstand facing camera, support arm vertical, free arm out to the side, wide straddle (one leg horizontal), head beside the support arm",
+    "implementation": "server/static/js/components/acro-rig.js: rigid segments (fixed lengths), Dempster-style segment masses, centre of mass; two-hand → one-arm by parallelogram weight shift with free hand planted (no sliding) until COM is over the support palm, free hand peels straight up, then opens sideways; hold keeps COM within ±4 px palm; fall = balance loss → inverted pendulum I·θ''=M·g·r·sinθ about the wrist (exact floor contact) → collapse timed by free fall → lying on the side",
+    "tests": "tests/js/acro-rig.test.js (6): rigid lengths everywhere; COM between hands at start; free hand lifts only with COM on palm and never slides; final shape matches reference; fall never below floor, pivot fixed while tipping, angular speed increases, COM keeps dropping, ends lying on side, 0.8–2 s; free arm never swings overhead",
+    "preview": "tools/previews/save-feedback/index.html (buttons for success/error full/short; ?frame=balance:k|fall:t for static frames)",
+    "known_flaky": "tests/e2e/loading.spec.js 'whole-screen delay is 500ms' fails intermittently also without these changes (2/3 runs on stashed tree); not touched"
   }
 }
