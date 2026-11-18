@@ -1,6 +1,7 @@
 """Minimal product profile; managed Auth metadata is reference-only."""
 
 from datetime import datetime
+from decimal import Decimal
 from uuid import UUID
 
 from sqlalchemy import (
@@ -11,12 +12,15 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     MetaData,
+    Numeric,
+    SmallInteger,
     Table,
     Text,
     UniqueConstraint,
     Uuid,
     text,
 )
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column
 
 from studio.db import Base
@@ -97,3 +101,26 @@ class UserPreferences(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=text("now()")
     )
+
+
+class OnboardingProfile(Base):
+    """Self-reported questionnaire; never an objective assessment or readiness."""
+
+    __tablename__ = "onboarding_profiles"
+
+    user_id: Mapped[UUID] = mapped_column(ForeignKey(User.id), primary_key=True)
+    goal_codes: Mapped[list[str]] = mapped_column(ARRAY(Text), nullable=False)
+    self_reported_level: Mapped[int] = mapped_column(SmallInteger, nullable=False)
+    session_minutes: Mapped[int] = mapped_column(SmallInteger, nullable=False)
+    weekdays: Mapped[list[int]] = mapped_column(ARRAY(SmallInteger), nullable=False)
+    time_of_day: Mapped[str | None] = mapped_column(Text)
+    birth_year: Mapped[int | None] = mapped_column(SmallInteger)
+    height_cm: Mapped[int | None] = mapped_column(SmallInteger)
+    weight_kg: Mapped[Decimal | None] = mapped_column(Numeric(4, 1))
+    completed_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=text("now()")
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=text("now()")
+    )
+    row_version: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text("1"))

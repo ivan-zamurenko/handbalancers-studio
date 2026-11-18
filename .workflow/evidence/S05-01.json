@@ -1,0 +1,25 @@
+{
+  "task_id": "S05-01",
+  "status": "done_local",
+  "implementation_status": "IMPLEMENTED_LOCAL",
+  "branch": "task/execution-v4",
+  "base_sha": "33b60e4",
+  "scenario": "Questionnaire as self-report: 1-4 distinct goals (handstand/strength/mobility/fitness), level 1-3, session 30/45/60/90, 1-3 distinct ISO weekdays, optional time of day, optional birth year/height/weight (owner 2026-11-18). Same limits in UI, API (pydantic) and DB (CHECK + immutable helper). Own row via studio_web RLS; optimistic revision 409. /api/session.setup_required drives a one-time-per-tab redirect to /profile when name or questionnaire is missing (owner: fill the form right away when Google gives too little).",
+  "red": {"command": "local_stack test pytest server/tests/security/accounts/test_onboarding_model.py -q", "observed_failure": "11 failed: 404 on /api/me/onboarding (no API/table yet).", "not_an_environment_failure": true},
+  "green": {"summary": "11 passed (incl. DB-level rejection of duplicate/4/invalid weekdays when API is bypassed)."},
+  "regression_commands": [
+    {"command": "python -m tools.check_migrations", "result": "59+20+47+100 passed"},
+    {"command": "npm run test:js; npx playwright test; pytest server/tests/contracts", "result": "43; 96; 54 passed"}
+  ],
+  "manual_checks": ["Browser (mocked API): empty submit shows error + focuses first invalid field; 4th weekday disabled after 3; payload exact; intro hides after save. Screenshots 390/1440 light/dark, setup and filled, no overflow/errors."],
+  "scope_deviations": [
+    "Migration 0010_onboarding (card: 0008, taken).",
+    "Card says no public API; owner asked for the form now, so GET/PUT /api/me/onboarding (S05-02 contract, without guest draft) added; guest draft stays in S05-02.",
+    "Added time_of_day and optional birth_year/height_cm/weight_kg (owner decision 2026-11-18); weight history/tracking is a later progress card.",
+    "setup_required in /api/session + one-time redirect (session.js); profile page extended (template, profile.css, profile.js).",
+    "Test file in security/accounts DB suite instead of integration/onboarding (same DB fixtures)."
+  ],
+  "not_verified": ["Cloud: 0010 not applied (needs owner approval); until then /profile on the hosted DB cannot load the questionnaire."],
+  "review": {"reviewer": null, "result": "not_run", "findings": []},
+  "push_status": "not_started"
+}

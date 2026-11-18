@@ -2,9 +2,11 @@
 
 import hashlib
 import re
+from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, ConfigDict
+from sqlalchemy.exc import SQLAlchemyError
 from starlette.responses import JSONResponse, RedirectResponse
 
 from studio.auth.csrf import require_csrf
@@ -139,11 +141,27 @@ async def session_snapshot(request: Request) -> JSONResponse:
         {
             "authenticated": True,
             "user": profile,
+            "setup_required": await _setup_required(request, profile),
             "entitlements": [],
             "csrf_token": service_for(request).csrf_token(cookie),
         },
         headers=HEADERS,
     )
+
+
+async def _setup_required(request: Request, profile: dict[str, object]) -> bool:
+    """Name + questionnaire done? Read as studio_web; never blocks the session snapshot."""
+    from studio.accounts.onboarding import setup_required
+    from studio.db import UnsafeWebRole
+    from studio.shared.context import Actor
+
+    transaction = getattr(request.app.state, "web_transaction", None)
+    if transaction is None:
+        return not profile.get("profile_complete")
+    try:
+        return await run_db(setup_required, transaction, Actor(UUID(str(profile["id"]))))
+    except (SQLAlchemyError, UnsafeWebRole):
+        return not profile.get("profile_complete")
 
 
 @router.post("/api/auth/logout")

@@ -92,7 +92,11 @@ def managed_fingerprint(connection: Connection) -> tuple:
 def verify_isolation(connection: Connection, *, owner: str = "migration_owner") -> None:
     tables = ["studio.users", "studio_private.web_sessions", "studio_private.auth_attempts"]
     # Later tables are checked once present (adopted 0006 baseline predates them).
-    for later in ("studio_private.audit_events", "studio.user_preferences"):
+    for later in (
+        "studio_private.audit_events",
+        "studio.user_preferences",
+        "studio.onboarding_profiles",
+    ):
         if connection.scalar(text("SELECT to_regclass(:t)"), {"t": later}) is not None:
             tables.append(later)
     for table in tables:

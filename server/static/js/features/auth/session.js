@@ -70,6 +70,20 @@ async function saveServerTheme(preference) {
   }
 }
 
+// Missing name/questionnaire: open the profile form once per tab, not on every page.
+const setupExempt = new Set(['/profile', '/login', '/register', '/verify-email', '/recovery']);
+function offerSetup(id) {
+  const key = `studio:account:${id}:setup-offered`;
+  try {
+    if (setupExempt.has(window.location.pathname) || sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, '1');
+  } catch {
+    return;
+  }
+  beginNavigation();
+  window.location.assign(`/profile?lang=${document.documentElement.lang || 'uk'}`);
+}
+
 async function refresh() {
   if (logoutPending || !logout || !login) return;
   const requestRevision = ++revision;
@@ -84,6 +98,7 @@ async function refresh() {
     const previous = accountId;
     accountId = authenticated ? snapshot.user?.id || null : null;
     if (accountId && accountId !== previous) loadServerTheme(accountId);
+    if (authenticated && snapshot.setup_required === true) offerSetup(accountId);
     logout.hidden = !authenticated; login.hidden = authenticated;
     if (profileLink) profileLink.hidden = !authenticated;
     logout.disabled = false;

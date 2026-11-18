@@ -8,7 +8,7 @@ from fastapi import APIRouter, HTTPException, Request
 from pydantic import AfterValidator, BaseModel, ConfigDict, Field
 from starlette.responses import JSONResponse
 
-from studio.accounts import service
+from studio.accounts import onboarding, service
 from studio.auth.csrf import require_csrf
 from studio.auth.db_work import run_db
 from studio.auth.jwt import InvalidIdentity
@@ -95,6 +95,23 @@ async def patch_preferences(request: Request, data: PreferencesPatch) -> JSONRes
             data.theme_preference,
             data.expected_revision,
         )
+    except service.RevisionConflict as conflict:
+        return JSONResponse({"current": conflict.current}, status_code=409, headers=HEADERS)
+    return JSONResponse(current, headers=HEADERS)
+
+
+@router.get("/onboarding")
+async def read_onboarding(request: Request) -> JSONResponse:
+    actor, transaction = await _actor(request, mutating=False)
+    current = await run_db(onboarding.get_onboarding, transaction, actor)
+    return JSONResponse(current, headers=HEADERS)
+
+
+@router.put("/onboarding")
+async def put_onboarding(request: Request, data: onboarding.OnboardingInput) -> JSONResponse:
+    actor, transaction = await _actor(request, mutating=True)
+    try:
+        current = await run_db(onboarding.save_onboarding, transaction, actor, data)
     except service.RevisionConflict as conflict:
         return JSONResponse({"current": conflict.current}, status_code=409, headers=HEADERS)
     return JSONResponse(current, headers=HEADERS)
