@@ -16,8 +16,12 @@ email/Google-входу та першого успішного save — dashboar
 У спільній OAuth-фікстурі є 8 попередніх lint-зауважень (такі самі в HEAD). Read-only review схвалив після
 виправлень перекладу тривалості/title/мови OAuth.
 
-Live: сервер оновлено; стара сесія браузера закінчилась, dashboard правильно
-перенаправив на login. Новий повний hosted Google/email roundtrip не підтверджено.
+Live після входу власника: /api/session = 200, authenticated=true,
+setup_required=false; /dashboard = 200. Прямий /onboarding → 303 → dashboard,
+анкета не показується. UA/EN без перезавантаження підтверджено. Записів у профіль
+чи анкету не було. Перевірено наявний завершений акаунт із хмарною БД; сценарій
+нової реєстрації/першого Google-входу окремо не виконувався.
+Реалізація f54e0f3 запушена в origin/task/execution-v4.
 Мобільний гостьовий UI перевірено; скріншоти лише private-evidence, поза Git.
 Докази: `.workflow/evidence/onboarding-entry-2026-11-19.json`.
 Наступна roadmap-картка: S05-03. Нових міграцій немає.

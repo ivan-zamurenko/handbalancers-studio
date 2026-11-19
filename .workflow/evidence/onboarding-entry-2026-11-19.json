@@ -74,7 +74,7 @@
     "noAccountWrites": true
   },
   "unverified": [
-    "New hosted Google/email roundtrip pending user login; existing browser session expired.",
+    "Observed the existing completed account after user login; a fresh account registration/Google onboarding roundtrip was not performed by this check. Login credentials/provider exchange were not inspected.",
     "Assigned workouts, checkout and entitlements are future stages, not implemented by this correction.",
     "Physical phone/Safari not checked; local Chromium 390/1440 with themes checked."
   ],
@@ -115,5 +115,25 @@
     "tests/e2e/profile-form.spec.js",
     "tests/e2e/s03-10-registration-ui.spec.js",
     "tests/e2e/s05-02-guest-onboarding.spec.js"
-  ]
+  ],
+  "hosted_authenticated_check": {
+    "date": "2026-11-19",
+    "environment": "local app with hosted database, user-authenticated browser",
+    "session": {
+      "status": 200,
+      "authenticated": true,
+      "setup_required": false
+    },
+    "dashboard_status": 200,
+    "destination": "/dashboard",
+    "empty_state": true,
+    "language_without_reload": true,
+    "onboarding_redirect_status": 303,
+    "completed_skips_onboarding": true,
+    "no_questionnaire_visible": true,
+    "account_write_requests": [],
+    "personal_data_logged": false
+  },
+  "implementation_commit": "f54e0f3",
+  "implementation_push_status": "pushed to origin/task/execution-v4"
 }
