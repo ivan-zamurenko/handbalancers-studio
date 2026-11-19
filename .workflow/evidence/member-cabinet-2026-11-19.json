@@ -1,0 +1,120 @@
+{
+  "task_id": "S05-02",
+  "status": "done",
+  "scope_deviations": [
+    "Owner follow-up: separate signed-in cabinet from guest marketing, adapt prior C1 layout to dashboard/progress/profile with honest empty visualizations. Public root/plans redirect verified members to entry destination. Reuse completion gate for progress. No schema, workout facts, billing, AI or synthetic metrics."
+  ],
+  "red": [
+    {
+      "command": "PATH=\"$PWD/.local-tools/uv-env/bin:$PWD/.local-tools/node-v24.21.0-darwin-arm64/bin:$PATH\" UV_CACHE_DIR=.local-tools/uv-cache PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers .local-tools/node-v24.21.0-darwin-arm64/bin/node node_modules/@playwright/test/cli.js test tests/e2e/member-cabinet.spec.js --grep \"1440 dark\"",
+      "result": "1 failed: member shell absent"
+    },
+    {
+      "command": "DOCKER_HOST=\"unix://$HOME/.colima/studio-s01/docker.sock\" .venv/bin/python tools/local_stack.py test .venv/bin/python -m pytest server/tests/security/accounts/test_onboarding_entry.py -q -k \"cabinet or progress\"",
+      "result": "2 failed: public redirect and protected progress route absent"
+    },
+    {
+      "command": "PATH=\"$PWD/.local-tools/uv-env/bin:$PWD/.local-tools/node-v24.21.0-darwin-arm64/bin:$PATH\" UV_CACHE_DIR=.local-tools/uv-cache PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers .local-tools/node-v24.21.0-darwin-arm64/bin/node node_modules/@playwright/test/cli.js test tests/e2e/member-cabinet.spec.js --grep \"results 320\"",
+      "result": "1 failed: translated selected tab right edge 323px exceeds 309px allowed viewport edge"
+    }
+  ],
+  "date": "2026-11-19",
+  "branch": "task/execution-v4",
+  "base_sha": "65dad6fc6e088c8a3c056a4205f62f9d75c888d9",
+  "behavior": "Separate C1 member shell for overview/progress/profile, no public marketing or Today nav. Real-session public entry redirects, guarded progress, responsive empty metrics/heatmap, accessible progress tabs. No fake workout facts or entitlements.",
+  "regression": {
+    "command": "PATH=\"$PWD/.local-tools/uv-env/bin:$PWD/.local-tools/node-v24.21.0-darwin-arm64/bin:$PATH\" UV_CACHE_DIR=.local-tools/uv-cache PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers .local-tools/node-v24.21.0-darwin-arm64/bin/node node_modules/@playwright/test/cli.js test tests/e2e/member-cabinet.spec.js tests/e2e/profile-form.spec.js tests/e2e/onboarding-entry.spec.js tests/e2e/logout.spec.js tests/e2e/mobile-navigation.spec.js tests/e2e/s05-02-guest-onboarding.spec.js",
+    "result": "51 passed, 1 failed: stale cookie on public root returned503 with auth disabled. Fixed public-only fallback; existing protected gates unchanged. Final affected subset below covers failure; counts overlap."
+  },
+  "green": [
+    {
+      "command": "PATH=\"$PWD/.local-tools/uv-env/bin:$PWD/.local-tools/node-v24.21.0-darwin-arm64/bin:$PATH\" UV_CACHE_DIR=.local-tools/uv-cache PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers .local-tools/node-v24.21.0-darwin-arm64/bin/node node_modules/@playwright/test/cli.js test tests/e2e/member-cabinet.spec.js tests/e2e/mobile-navigation.spec.js",
+      "result": "24 passed, including stale cookie public access and cabinet 390/1440 light/dark, progress320/1440"
+    },
+    {
+      "command": "PATH=\"$PWD/.local-tools/uv-env/bin:$PWD/.local-tools/node-v24.21.0-darwin-arm64/bin:$PATH\" UV_CACHE_DIR=.local-tools/uv-cache PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers .local-tools/node-v24.21.0-darwin-arm64/bin/node node_modules/@playwright/test/cli.js test tests/e2e/member-cabinet.spec.js",
+      "result": "6 passed after selected-tab visibility fix"
+    },
+    {
+      "command": "DOCKER_HOST=\"unix://$HOME/.colima/studio-s01/docker.sock\" .venv/bin/python tools/local_stack.py test .venv/bin/python -m pytest server/tests/security/accounts/test_onboarding_entry.py -q",
+      "result": "9 passed isolated PostgreSQL/RLS"
+    },
+    {
+      "command": ".venv/bin/python -m pytest server/tests/contracts/test_guest_onboarding.py server/tests/contracts/auth -q",
+      "result": "61 passed"
+    },
+    {
+      "command": "PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers .local-tools/node-v24.21.0-darwin-arm64/bin/node --test tests/js/*.test.js",
+      "result": "61 passed; initial sandbox Chromium permission failure rerun with approved local browser access, no expectations changed"
+    }
+  ],
+  "test_adjustments": [
+    "Browser theme setting now waits for account preference initialization before setting/asserting theme; initial light screenshot exposed race in test setup, not runtime.",
+    "Hosted profile check waits for form visibility after asynchronous cloud fetch; immediate isVisible initially measured loading state. No account answers printed.",
+    "Prior incomplete root test followed redirect and accidentally allowed200; now explicitly asserts303/profile per latest owner contract."
+  ],
+  "review": {
+    "reviewer": "cabinet_reference_review",
+    "result": "approved, including narrow public503 fallback and translated tab visibility follow-up",
+    "nonblocking": "Empty heatmap remains decorative; when real day facts arrive, provide accessible named facts and keyboard inspection."
+  },
+  "live": {
+    "session": {
+      "status": 200,
+      "authenticated": true,
+      "setup_required": false
+    },
+    "root_destination": "/dashboard",
+    "status": 200,
+    "member_shell": true,
+    "navigation": "Огляд\nПрогрес\nПрофіль",
+    "metrics": [
+      "—",
+      "—",
+      "—",
+      "—"
+    ],
+    "progress_status": 200,
+    "progress_tabs": true,
+    "profile_status": 200,
+    "profile_member_shell": true,
+    "profile_form": true,
+    "account_write_requests": [],
+    "environment": "User-authenticated Chromium, local app with hosted Supabase database; read-only GETs, no account writes or migrations."
+  },
+  "checks": {
+    "ruff": "3 affected Python files check+format passed",
+    "mypy": "public routes passed",
+    "roadmap": "142 tasks valid",
+    "privacy": "private-evidence ignored and zero tracked paths; no CV/social/career/business/screenshots staged",
+    "diff_check": "passed"
+  },
+  "unverified": [
+    "No fresh Google/email registration performed in this hosted read-only check.",
+    "Workout assignments/logging/analytics/billing remain future stages; visual empty states are not implemented training facts.",
+    "Physical phone/Safari not checked; Chromium desktop/emulated320/390/1440 checked."
+  ],
+  "next_task": "S05-03",
+  "push_status": "pending_at_commit",
+  "changed_paths": [
+    ".workflow/CURRENT.md",
+    ".workflow/state.json",
+    "docs/decisions.md",
+    "roadmap/tasks/S05-02_guest_onboarding.md",
+    "server/static/js/features/auth/session.js",
+    "server/studio/public/routes.py",
+    "server/templates/member/dashboard.html",
+    "server/templates/member/profile.html",
+    "server/templates/public/base.html",
+    "server/tests/security/accounts/test_onboarding_entry.py",
+    ".workflow/evidence/member-cabinet-2026-11-19.json",
+    "server/static/css/cabinet.css",
+    "server/static/js/features/account/progress.js",
+    "server/templates/member/base.html",
+    "server/templates/member/heatmap.html",
+    "server/templates/member/metrics.html",
+    "server/templates/member/progress.html",
+    "tests/e2e/member-cabinet.spec.js",
+    "tests/fixtures/render_member_page.py"
+  ]
+}

@@ -1,14 +1,16 @@
-{% extends "public/base.html" %}
-{% block title %}{{ copy('Сьогодні', 'Today') }} · Handbalancer’s Studio{% endblock %}
-{% block head %}{{ super() }}<link rel="stylesheet" href="/static/css/profile.css">{% endblock %}
-{% block public_content %}
-<section class="profile-section wrap" aria-labelledby="today-title">
-  <div class="profile-heading"><p class="eyebrow">{{ copy('Ваша практика', 'Your practice') }}</p><h1 id="today-title">{{ copy('Сьогодні', 'Today') }}</h1></div>
-  <div class="profile-card" data-today-empty>
-    <h2>{{ copy('Заняття ще не призначено', 'No workout assigned yet') }}</h2>
-    <p>{{ copy('Вашу анкету збережено. Коли з’явиться призначене заняття, ви побачите його тут.', 'Your questionnaire is saved. When a workout is assigned, you will find it here.') }}</p>
-    <p class="muted">{{ copy('Студія готується до відкриття. Тренувальні програми та оплата поки недоступні.', 'The studio is getting ready to open. Training programmes and payments are not available yet.') }}</p>
-    <a class="btn" href="/profile?lang={{ language }}">{{ copy('Переглянути профіль', 'View profile') }}</a>
-  </div>
-</section>
+{% extends "member/base.html" %}
+{% block title %}{{ copy('Огляд','Overview') }} · Handbalancer’s Studio{% endblock %}
+{% block member_content %}
+<div class="cabinet-page-head"><p class="eyebrow">{{ copy('Ваш простір для руху','Your space to move') }}</p><h1 id="today-title">{{ copy('Ваша практика.', 'Your practice.') }}</h1><p>{{ copy('Заняття, ритм і поступ — в одному місці.', 'Your sessions, rhythm and progress, in one place.') }}</p></div>
+<div class="cabinet-grid">
+  <section class="cabinet-card workout-card" data-today-empty aria-labelledby="workout-title">
+    <div class="workout-copy"><p class="eyebrow"><span class="quiet-dot" aria-hidden="true"></span>{{ copy('Поточне заняття','Current session') }}</p><h2 id="workout-title">{{ copy('Заняття ще не призначено', 'No workout assigned yet') }}</h2><p>{{ copy('Анкету збережено. Коли з’явиться ваша програма, тут буде наступне заняття й усе необхідне, щоб почати.', 'Your questionnaire is saved. When your programme is ready, your next session and everything you need to begin will be here.') }}</p><a class="btn primary" href="/profile?lang={{ language }}">{{ copy('Мій профіль','My profile') }}<span aria-hidden="true">↗</span></a></div>
+    <div class="workout-art" aria-hidden="true"><svg viewBox="0 0 240 240" fill="none"><circle class="art-orbit" cx="120" cy="120" r="96"/><circle class="art-orbit" cx="120" cy="120" r="72"/><path class="art-ground" d="M56 198h128"/><g class="art-figure"><path d="M103 195v-45l17-10 17 10v45M120 140V91M120 91l-33-46M120 91l34-46"/><circle cx="120" cy="160" r="10"/></g><path class="art-accent" d="M120 140V91"/><circle class="art-point" cx="210" cy="84" r="4"/></svg></div>
+  </section>
+  <aside class="cabinet-card practice-note"><span class="note-mark" aria-hidden="true">↗</span><p class="eyebrow">{{ copy('Крок за кроком','Step by step') }}</p><h2>{{ copy('Маленькі кроки. Помітні зміни.','Small steps. Visible change.') }}</h2><p>{{ copy('Тут збиратиметься ваша практика — без гонитви за чужими цифрами.', 'This is where your practice takes shape, at your own pace.') }}</p><a class="cabinet-text-link" href="/progress?lang={{ language }}">{{ copy('До прогресу','View progress') }}<span aria-hidden="true">→</span></a></aside>
+</div>
+<div class="cabinet-section-head"><h2>{{ copy('Ваш ритм','Your rhythm') }}</h2><span>{{ copy('Показники з’являться після перших занять','Metrics will appear after your first sessions') }}</span></div>
+{% include 'member/metrics.html' %}
+<section class="cabinet-card activity-card" aria-labelledby="activity-title"><div class="cabinet-card-head"><h2 id="activity-title">{{ copy('Карта регулярності','Consistency map') }}</h2><a class="cabinet-text-link" href="/progress?lang={{ language }}">{{ copy('Детальніше','Explore') }}<span aria-hidden="true">↗</span></a></div>{% include 'member/heatmap.html' %}</section>
+<p class="cabinet-footnote">{{ copy('Студія готується до відкриття. Програми й запис тренувань ще недоступні.', 'The studio is getting ready to open. Programmes and workout logging are not available yet.') }}</p>
 {% endblock %}

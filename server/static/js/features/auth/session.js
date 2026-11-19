@@ -100,8 +100,6 @@ async function refresh() {
     } else if (authenticated && snapshot.setup_required === true) offerSetup();
     logout.hidden = !authenticated; login.hidden = authenticated;
     if (profileLink) profileLink.hidden = !authenticated;
-    const dashboardLink = document.querySelector('[data-dashboard-link]');
-    if (dashboardLink) dashboardLink.hidden = !authenticated;
     if (loginCta) loginCta.hidden = authenticated;
     logout.disabled = false;
   } catch {

@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.templating import Jinja2Templates
 from starlette.responses import HTMLResponse, RedirectResponse
 
@@ -111,13 +111,30 @@ def render(request: Request, template: str) -> HTMLResponse:
 
 
 @router.get("/", response_class=HTMLResponse, include_in_schema=False)
-async def index(request: Request) -> HTMLResponse:
+async def index(request: Request):
+    destination = await public_entry_destination(request)
+    if destination != "/login":
+        return member_redirect(request, destination)
     return render(request, "public/index.html")
 
 
 @router.get("/plans", response_class=HTMLResponse, include_in_schema=False)
-async def plans_page(request: Request) -> HTMLResponse:
+async def plans_page(request: Request):
+    destination = await public_entry_destination(request)
+    if destination != "/login":
+        return member_redirect(request, destination)
     return render(request, "public/plans.html")
+
+
+async def public_entry_destination(request: Request) -> str:
+    # Public copy stays available during auth outages. This fallback grants no
+    # member access: dashboard/progress still use the fail-closed entry guard.
+    try:
+        return await entry_destination(request)
+    except HTTPException as exc:
+        if exc.status_code != 503:
+            raise
+        return "/login"
 
 
 @router.get("/onboarding", response_class=HTMLResponse, include_in_schema=False)
@@ -170,3 +187,11 @@ async def dashboard_page(request: Request):
     if destination != "/dashboard":
         return member_redirect(request, destination)
     return render(request, "member/dashboard.html")
+
+
+@router.get("/progress", response_class=HTMLResponse, include_in_schema=False)
+async def progress_page(request: Request):
+    destination = await entry_destination(request)
+    if destination != "/dashboard":
+        return member_redirect(request, destination)
+    return render(request, "member/progress.html")

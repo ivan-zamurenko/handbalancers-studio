@@ -1,0 +1,9 @@
+<div class="cabinet-metrics" role="group" aria-label="{{ copy('Показники практики', 'Practice metrics') }}">
+  {% for uk, en, hint_uk, hint_en in [('Хвилини тижня','Weekly minutes','Виконано / заплановано','Completed / planned'),('Заняття тижня','Weekly sessions','Завершені заняття','Completed sessions'),('Регулярність','Consistency','Тижні практики поспіль','Consecutive practice weeks'),('Час практики','Practice time','Усі завершені заняття','All completed sessions')] %}
+  <section class="cabinet-card metric-card">
+    <h2>{{ copy(uk,en) }}</h2>
+    <div class="metric-body"><span class="metric-value" data-empty-metric aria-label="{{ copy('Ще немає даних','No data yet') }}">—</span>{% if loop.first %}<svg class="empty-ring" viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="24"/></svg>{% else %}<span class="metric-line" aria-hidden="true"></span>{% endif %}</div>
+    <p>{{ copy(hint_uk,hint_en) }}</p>
+  </section>
+  {% endfor %}
+</div>

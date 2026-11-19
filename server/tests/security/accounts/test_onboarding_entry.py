@@ -32,7 +32,8 @@ def test_incomplete_repeat_login_cannot_bypass_dashboard(device):
         result = client.get("/dashboard?lang=en", follow_redirects=False)
         assert result.status_code == 303
         assert result.headers["location"] == "/profile?lang=en"
-        assert client.get("/?lang=en").status_code == 200  # public pages are not paid access
+        entry = client.get("/?lang=en", follow_redirects=False)
+        assert entry.status_code == 303 and entry.headers["location"] == "/profile?lang=en"
 
 
 def test_completed_new_device_skips_onboarding_and_enters_dashboard(device):
@@ -72,6 +73,11 @@ def test_completion_db_failure_fails_closed(device):
 
     client.app.state.web_transaction = unavailable
     assert client.get("/dashboard", follow_redirects=False).status_code == 503
+    assert client.get("/progress", follow_redirects=False).status_code == 503
+    for path in ["/", "/plans"]:
+        result = client.get(path, follow_redirects=False)
+        assert result.status_code == 200
+        assert "data-member-shell" not in result.text
     assert client.get("/api/session").json()["setup_required"] is None
 
 
@@ -99,3 +105,33 @@ def test_google_default_callback_enters_guarded_dashboard(device):
     client.headers["X-CSRF-Token"] = client.get("/api/session").json()["csrf_token"]
     complete(client)
     assert client.get("/dashboard").status_code == 200
+
+
+def test_completed_member_enters_cabinet_from_public_pages(device):
+    open_device, _, _ = device
+    client = open_device()
+    complete(client)
+    for path in ["/", "/plans"]:
+        result = client.get(path + "?lang=en", follow_redirects=False)
+        assert result.status_code == 303
+        assert result.headers["location"] == "/dashboard?lang=en"
+    result = client.get("/progress?lang=en")
+    assert result.status_code == 200
+    assert "data-member-shell" in result.text
+    assert "No results yet" in result.text
+    assert 'href="/?lang=en#directions"' not in result.text
+
+
+def test_progress_uses_same_completion_gate(device):
+    open_device, _, _ = device
+    client = open_device()
+    assert (
+        client.get("/progress?lang=en", follow_redirects=False).headers["location"]
+        == "/profile?lang=en"
+    )
+    client.cookies.clear()
+    assert (
+        client.get("/progress?lang=en", follow_redirects=False).headers["location"]
+        == "/login?lang=en"
+    )
+    assert client.get("/?lang=en", follow_redirects=False).status_code == 200

@@ -1,7 +1,7 @@
-{% extends "public/base.html" %}
+{% extends "member/base.html" %}
 {% block title %}{{ copy('Профіль', 'Profile') }} — Handbalancer’s Studio{% endblock %}
 {% block head %}{{ super() }}<link rel="stylesheet" href="/static/css/auth.css"><link rel="stylesheet" href="/static/css/save-feedback.css"><link rel="stylesheet" href="/static/css/profile.css">{% endblock %}
-{% block public_content %}
+{% block member_content %}
 <section class="profile-section wrap" aria-labelledby="profile-title">
   <div class="profile-intro" data-setup-intro hidden>
     <p class="eyebrow">Handbalancer’s Studio</p>

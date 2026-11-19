@@ -96,3 +96,24 @@ auth/session/profile JS, спільний i18n модуль із public copy pai
 пристрою не отримує онбординг; недійсна сесія → login, збій БД → 503; новий Google
 callback → guard; UA/EN/тема зберігають DOM, крок і вибір на 390/1440; пароль не в storage.
 Commit: `fix(onboarding): [S05-02] completion-aware entry and live language`.
+
+## Уточнення кабінету після входу — 2026-11-19
+
+Власник погодив окрему C1-навігацію для учасника: огляд, прогрес, профіль,
+без маркетингових посилань і «Сьогодні». Dashboard/progress показують чесні
+порожні візуалізації до появи тренувальних фактів. Profile використовує ту саму
+оболонку без зміни анкети/збереження. Гості мають публічну навігацію; головна
+й тарифи для підтвердженої сесії ведуть за чинним completion guard.
+
+Приймання: 390/1440 та light/dark; мобільний drawer з focus/inert/Escape;
+порожні показники й heatmap; вкладки прогресу з клавіатури й UA/EN без reload
+на 320/1440; завершена сесія → dashboard, незавершена → profile, чужа/відсутня
+сесія не відкриває protected view. При недоступному auth/DB публічні root/plans
+лишаються читабельними; protected dashboard/progress — 503. Форма й save feedback
+не регресують. Дані власника під час hosted перевірки не змінюються.
+
+Область: member templates, cabinet.css, progress.js, public routes, видалення
+старого dashboard link, вузькі DB/browser тести й test-only Jinja renderer.
+Без зміни схеми/цін/provider integrations. Evidence:
+`.workflow/evidence/member-cabinet-2026-11-19.json`.
+Commit: `feat(cabinet): [S05-02] separate member workspace from public pages`.

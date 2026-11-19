@@ -1,0 +1,39 @@
+{% extends "shared/base.html" %}
+{% macro icon(name) %}<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">{% if name == 'overview' %}<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>{% elif name == 'progress' %}<path d="M4 4v16h16M8 15l4-5 4 2 4-7"/>{% else %}<circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/>{% endif %}</svg>{% endmacro %}
+{% block head %}<link rel="stylesheet" href="/static/css/cabinet.css">{% endblock %}
+{% block content %}
+<div class="cabinet-shell" data-member-shell>
+  <a class="skip-link" href="#main">{{ copy('До вмісту', 'Skip to content') }}</a>
+  <header class="cabinet-header site-header">
+    <div class="header-inner">
+      <a class="cabinet-brand mobile-brand" href="/dashboard?lang={{ language }}" aria-label="Handbalancer’s Studio">h<span>.</span></a>
+      <div class="cabinet-crumb"><span>{{ copy('Кабінет', 'Your studio') }}</span><span aria-hidden="true">/</span><span>{{ copy('Профіль','Profile') if page_path == '/profile' else copy('Прогрес','Progress') if page_path == '/progress' else copy('Огляд','Overview') }}</span></div>
+      <a class="menu-toggle" data-menu-toggle href="#site-menu" role="button" aria-controls="site-menu" aria-expanded="false" aria-label="{{ copy('Меню', 'Menu') }}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></a>
+      <div class="cabinet-menu" id="site-menu" aria-label="{{ copy('Меню кабінету', 'Studio menu') }}">
+        <a class="menu-backdrop" data-menu-close-backdrop href="#" tabindex="-1" aria-hidden="true"></a>
+        <div class="menu-panel">
+          <div class="menu-head"><span>{{ copy('Кабінет', 'Your studio') }}</span><a data-menu-close href="#" role="button" aria-label="{{ copy('Закрити меню', 'Close menu') }}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></a></div>
+          <a class="cabinet-brand side-brand" href="/dashboard?lang={{ language }}" aria-label="Handbalancer’s Studio">h<span>.</span><small>handbalancer’s<br>studio</small></a>
+          <p class="cabinet-nav-label">{{ copy('Ваша практика', 'Your practice') }}</p>
+          <nav class="primary-nav" data-member-nav aria-label="{{ copy('Кабінет', 'Your studio') }}">
+            <a href="/dashboard?lang={{ language }}"{% if page_path == '/dashboard' %} aria-current="page"{% endif %}>{{ icon('overview') }}<span>{{ copy('Огляд', 'Overview') }}</span></a>
+            <a href="/progress?lang={{ language }}"{% if page_path == '/progress' %} aria-current="page"{% endif %}>{{ icon('progress') }}<span>{{ copy('Прогрес', 'Progress') }}</span></a>
+            <a href="/profile?lang={{ language }}" data-profile-link{% if page_path == '/profile' %} aria-current="page"{% endif %}>{{ icon('profile') }}<span>{{ copy('Профіль', 'Profile') }}</span></a>
+          </nav>
+          <div class="cabinet-utilities">
+            <div class="cabinet-display">
+              <nav class="locale-nav" aria-label="{{ copy('Мова', 'Language') }}"><a href="{{ page_path }}?lang=uk" lang="uk"{% if language == 'uk' %} aria-current="page"{% endif %}>UA</a><span aria-hidden="true">/</span><a href="{{ page_path }}?lang=en" lang="en"{% if language == 'en' %} aria-current="page"{% endif %}>EN</a></nav>
+              <button class="theme-toggle" type="button" data-theme-control aria-label="{{ copy('Тема', 'Theme') }}" title="{{ copy('Тема', 'Theme') }}" aria-pressed="false" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/></svg></button>
+            </div>
+            <button class="cabinet-logout" type="button" data-logout data-pending-label="{{ copy('Виходимо…', 'Signing out…') }}" disabled>{{ copy('Вийти', 'Log out') }}<span aria-hidden="true">↗</span></button>
+            <a href="/login?lang={{ language }}" data-login-link hidden>{{ copy('Увійти', 'Log in') }}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main class="cabinet-main" id="main" tabindex="-1">{% block member_content %}{% endblock %}</main>
+</div>
+<script type="module" src="/static/js/components/site-menu.js"></script>
+<script type="module" src="/static/js/features/auth/session.js"></script>
+{% endblock %}
