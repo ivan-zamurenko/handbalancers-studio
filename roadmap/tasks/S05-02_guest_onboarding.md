@@ -133,3 +133,20 @@ Commit: `fix(cabinet): [S05-02] align brand and contain profile controls`.
 API/БД/guards не змінюються. Evidence:
 `.workflow/evidence/progress-empty-2026-11-19.json`.
 Commit: `feat(cabinet): [S05-02] add calm animated empty progress`.
+
+
+## Автономний roundtrip за дорученням власника - 2026-11-19
+
+Дозволено створити власні тестові акаунти та зберегти доступ приватно.
+Локальна реальна Supabase/Auth/пошта: register/verify, interrupted onboarding,
+save/reload, fresh-context login, offline/error/retry, негативні CSRF/revision
+перевірки. Hosted-акаунт власника не змінювати. Credentials та screenshots
+лише в ігнорованій private-evidence, без секретів у tracked evidence.
+
+Виявлені дефекти теми виправляються у features/auth/session.js і
+features/account/profile.js; регресії у account-theme-race.spec.js та
+profile-form.spec.js. Ранній вибір теми має пережити GET preferences,
+профільний select/summary відповідають header; старий snapshot завантаження
+не відновлює попередню тему. Без schema/API/provider/price змін.
+Evidence: `.workflow/evidence/onboarding-roundtrip-2026-11-19.json`.
+Commit: `fix(onboarding): [S05-02] preserve and synchronize account theme choices`.

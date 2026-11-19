@@ -1,0 +1,71 @@
+{
+  "task_id": "S05-02",
+  "date": "2026-11-19",
+  "status": "done",
+  "base_sha": "7816e9e",
+  "scope": "Owner approved autonomous local test registration and full real browser roundtrip. Follow-up S05-02: auth/session.js early theme queue and account/profile.js theme synchronization with late-load protection; focused browser tests. No schema, provider, price or hosted-owner writes. S05-03 remains todo.",
+  "red": [
+    {
+      "command": "Playwright tests/e2e/account-theme-race.spec.js",
+      "result": "3 failed for expected reasons, 2 passed before fix: early queued choice never PATCHed/overwritten; failed GET resets choice."
+    },
+    {
+      "command": "Playwright tests/e2e/profile-form.spec.js --grep 'header theme'",
+      "result": "2 failed: root dark but select light at390/1440."
+    },
+    {
+      "command": "Playwright tests/e2e/profile-form.spec.js --grep 'late profile load'",
+      "result": "1 failed after first listener fix: delayed profile load overwrote newer select dark with snapshot light. Reviewer found this remaining race."
+    }
+  ],
+  "private": "Credentials0600 and screenshots under ignored private-evidence/onboarding-roundtrip-2026-11-19; never Git.",
+  "branch": "task/execution-v4",
+  "green": [
+    {
+      "command": "PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers .local-tools/node-v24.21.0-darwin-arm64/bin/node node_modules/@playwright/test/cli.js test tests/e2e/account-theme-race.spec.js tests/e2e/logout.spec.js tests/e2e/onboarding-entry.spec.js tests/e2e/profile-form.spec.js tests/e2e/member-cabinet.spec.js tests/e2e/s05-02-guest-onboarding.spec.js tests/e2e/login-form.spec.js tests/e2e/s03-10-registration-ui.spec.js",
+      "result": "73 passed after session theme fix, before additional profile synchronization fix."
+    },
+    {
+      "command": "PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers .local-tools/node-v24.21.0-darwin-arm64/bin/node node_modules/@playwright/test/cli.js test tests/e2e/profile-form.spec.js tests/e2e/account-theme-race.spec.js tests/e2e/onboarding-entry.spec.js",
+      "result": "20 passed after final profile fix (overlaps prior suite; do not sum as unique cases)."
+    },
+    {
+      "command": ".local-tools/node-v24.21.0-darwin-arm64/bin/node --test tests/js/s04-06-theme-account.test.js tests/js/s02-03-theme-clock.test.js tests/js/s05-02-onboarding-draft.test.js",
+      "result": "12 passed."
+    }
+  ],
+  "real_browser": {
+    "command": "PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers .local-tools/node-v24.21.0-darwin-arm64/bin/node private-evidence/onboarding-roundtrip-2026-11-19/studio-onboarding-roundtrip.cjs",
+    "environment": "Actual local Supabase Auth, PostgreSQL and mail catcher; real FastAPI backend. Runtime DB roles studio_web/studio_auth_runtime, no browser HTTP mocks. Disposable synthetic test accounts, no owner data.",
+    "result": "68 checks,15 views,0 page errors; passed.",
+    "scenarios": [
+      "UI registration and email code verification from local mail catcher",
+      "Unverified account cannot access questionnaire; verified account has member role and no paid entitlement",
+      "Incomplete onboarding redirects protected views to profile; logout/login resumes required setup",
+      "UA/EN and theme keep form DOM, answers and wizard step",
+      "Missing/stale CSRF403; supplied user_id or role422; questionnaire unchanged",
+      "First PUT succeeds revision1, approved success animation, dashboard redirect and reload persistence",
+      "Stale questionnaire revision returns409 without mutation",
+      "Logout and fresh browser context login reach dashboard; completed questionnaire remains and onboarding redirects",
+      "Real browser offline submit shows error animation; form restored with unsaved input retained",
+      "Reconnect leaves original server data intact; successful retry persists exactly one new questionnaire revision"
+    ]
+  },
+  "harness_notes": "Initial private visual runs checked theme before account preferences loaded. Added explicit studio:account readiness and waited for real PATCH200, keeping original expectations. Full final real flow passed. Independent controlled-response tests reproduce actual product races; harness timing failures are not counted as product RED.",
+  "implementation": "Newest local theme choice survives pending account GET and is PATCHed using returned revision. Failed GET retains local choice without invented revision. Profile select and mobile summary follow theme/account events; fill cannot overwrite newer event with delayed snapshot. No theme event feedback loop.",
+  "review": {
+    "reviewer": "cabinet_reference_review",
+    "result": "approved final code/tests; reported late-profile P2 reproduced RED then fixed GREEN"
+  },
+  "limits": [
+    "Local verification is not hosted delivery/reliability proof. Fresh hosted email signup, Google OAuth and hosted save/relogin not tested in this step.",
+    "No pentest claim. This step checks current onboarding/account paths; training, billing and other future roadmap modules are not implemented by it."
+  ],
+  "push_status": "pending_at_commit",
+  "next_step": "S05-03: approved public pages and plans, with honest availability and unchanged prices.",
+  "visual_review": {
+    "result": "12 actual backend views passed after final fix, 0 page errors, no overflow; profile select matches root theme. Personally inspected desktop/mobile light/dark, setup UA/EN, success and network-error screenshots.",
+    "command": "PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers .local-tools/node-v24.21.0-darwin-arm64/bin/node private-evidence/onboarding-roundtrip-2026-11-19/studio-roundtrip-visual.cjs"
+  },
+  "privacy": "git check-ignore confirms ignored account; git ls-files private-evidence empty. Account files0600, folder0700; credentials never printed. Private replay files/screenshots excluded from staging."
+}

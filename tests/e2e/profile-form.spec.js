@@ -22,6 +22,62 @@ async function mockProfile(page, {setup, onboardingStatus = 200}) {
   return sent;
 }
 
+for (const width of [390, 1440]) {
+  test(`header theme and profile settings stay in sync at ${width}px`, async ({page}) => {
+    await page.setViewportSize({width, height:900});
+    await mockProfile(page, {setup:false});
+    let preference = {theme_preference:'light', revision:0};
+    await page.route('**/api/me/preferences', async route => {
+      if (route.request().method() === 'PATCH') {
+        preference = {theme_preference:route.request().postDataJSON().theme_preference, revision:preference.revision + 1};
+      }
+      await route.fulfill({json:preference});
+    });
+    await page.goto('/profile?lang=uk');
+    const select = page.locator('[name=theme_preference]');
+    await expect(select).toHaveValue('light');
+    await expect(page.locator('[data-profile-form]')).toBeVisible();
+    for (const [theme, label] of [['dark', 'Темна'], ['light', 'Світла']]) {
+      if (width === 390) await page.locator('[data-menu-toggle]').click();
+      const saved = page.waitForResponse(r => r.url().endsWith('/api/me/preferences') && r.request().method() === 'PATCH');
+      await page.locator('[data-theme-control]').click();
+      expect((await saved).status()).toBe(200);
+      if (width === 390) await page.locator('[data-menu-close]').click();
+      await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
+      await expect(select).toHaveValue(theme);
+      if (width === 390) await expect(page.locator('[data-step=settings] [data-acc-summary]')).toContainText(label);
+      await expect(page.locator('#profile-first-name')).toHaveValue('Іван');
+    }
+  });
+}
+
+test('late profile load cannot overwrite a theme chosen in the header', async ({page}) => {
+  await page.setViewportSize({width:390, height:900});
+  await mockProfile(page, {setup:false});
+  let pendingProfile;
+  await page.route('**/api/me/profile', route => { pendingProfile = route; });
+  let preference = {theme_preference:'light', revision:0};
+  await page.route('**/api/me/preferences', async route => {
+    if (route.request().method() === 'PATCH') preference = {
+      theme_preference:route.request().postDataJSON().theme_preference, revision:1,
+    };
+    await route.fulfill({json:preference});
+  });
+  await page.goto('/profile?lang=uk');
+  await expect.poll(() => Boolean(pendingProfile)).toBe(true);
+  await expect(page.locator('[name=theme_preference]')).toHaveValue('light');
+  await page.locator('[data-menu-toggle]').click();
+  const saved = page.waitForResponse(r => r.url().endsWith('/api/me/preferences') && r.request().method() === 'PATCH');
+  await page.locator('[data-theme-control]').click();
+  expect((await saved).status()).toBe(200);
+  await page.locator('[data-menu-close]').click();
+  await pendingProfile.fulfill({json:{first_name:'Іван', last_name:'Петренко', locale:'uk'}});
+  await expect(page.locator('[data-profile-form]')).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
+  await expect(page.locator('[name=theme_preference]')).toHaveValue('dark');
+  await expect(page.locator('[data-step=settings] [data-acc-summary]')).toContainText('Темна');
+});
+
 test('mobile setup is a step-by-step form and ends with the save animation', async ({page}) => {
   await page.setViewportSize({width:390, height:844});
   const sent = await mockProfile(page, {setup:true});

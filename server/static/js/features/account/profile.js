@@ -28,6 +28,7 @@ let saving = false;
 let draft = null;
 let draftUsed = false;
 let accountId = null;
+let latestThemePreference = null;
 const draftNotice = document.querySelector('[data-draft-notice]');
 
 function applyDraft() {
@@ -81,7 +82,8 @@ function setChoices(name, values) {
 
 function fill(profile, onboarding, preferences) {
   for (const name of profileFields) form.elements[name].value = profile[name] || (name === 'locale' ? 'uk' : '');
-  if (preferences) form.elements.theme_preference.value = preferences.theme_preference;
+  // Loading profile fields may finish after a newer header/account theme event.
+  if (preferences) form.elements.theme_preference.value = latestThemePreference ?? preferences.theme_preference;
   onboardingRevision = onboarding?.revision ?? 0;
   for (const name of ['goal_codes', 'weekdays']) setChoices(name, onboarding?.[name]);
   for (const name of ['self_reported_level', 'time_of_day', 'session_minutes']) setChoices(name, onboarding?.[name] == null ? [] : [onboarding[name]]);
@@ -328,10 +330,15 @@ form?.addEventListener('submit', async event => {
   buttons.submit.focus({preventScroll: true});
 });
 
-document.addEventListener('studio:account', event => {
-  const preference = event.detail?.preference;
-  if (form && preference) form.elements.theme_preference.value = preference;
-});
+function syncThemePreference(preference) {
+  if (!form || !preference) return;
+  latestThemePreference = preference;
+  form.elements.theme_preference.value = preference;
+  updateSummaries();
+}
+
+document.addEventListener('studio:account', event => syncThemePreference(event.detail?.preference));
+document.addEventListener('studio:theme-changed', event => syncThemePreference(event.detail));
 
 phone.addEventListener('change', () => { if (!form.hidden) applyMode(); });
 

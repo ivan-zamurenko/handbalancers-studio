@@ -40,7 +40,10 @@ async function loadServerTheme(id) {
   // A late answer for a signed-out or replaced account must not re-attach its storage.
   if (accountId !== id) return;
   if (current) themeRevision = current.revision;
-  announceAccount(id, current?.theme_preference);
+  const wanted = themeWanted;
+  // A choice made during this fetch wins over the older server snapshot.
+  announceAccount(id, wanted ?? current?.theme_preference);
+  if (wanted !== null && current) saveServerTheme(wanted);
 }
 
 // One PATCH at a time; the latest local choice is sent after the previous one settles.
