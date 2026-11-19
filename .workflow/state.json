@@ -194,7 +194,8 @@
       "evidence": ".workflow/evidence/S05-02.json",
       "push_status": "pending_at_commit",
       "follow_up_evidence": ".workflow/evidence/onboarding-entry-2026-11-19.json",
-      "cabinet_follow_up_evidence": ".workflow/evidence/member-cabinet-2026-11-19.json"
+      "cabinet_follow_up_evidence": ".workflow/evidence/member-cabinet-2026-11-19.json",
+      "cabinet_alignment_evidence": ".workflow/evidence/cabinet-alignment-2026-11-19.json"
     },
     "S05-03": {
       "status": "todo",

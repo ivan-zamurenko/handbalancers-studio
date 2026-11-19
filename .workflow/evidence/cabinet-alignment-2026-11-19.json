@@ -1,0 +1,42 @@
+{
+  "task_id": "S05-02",
+  "date": "2026-11-19",
+  "status": "done",
+  "branch": "task/execution-v4",
+  "base_sha": "517542d",
+  "scope": "Owner screenshot correction: centered sidebar mark/name, hide oversized desktop profile chevron, contain mobile sticky save bar. No API/schema/auth/animation changes.",
+  "red": [
+    {
+      "command": "PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers .local-tools/node-v24.21.0-darwin-arm64/bin/node node_modules/@playwright/test/cli.js test tests/e2e/member-cabinet.spec.js tests/e2e/profile-form.spec.js --grep \"1440 dark\"",
+      "result": "2 failed: name center off15.5px, profile legend602px tall."
+    },
+    {
+      "command": "Same browser command, profile-form.spec.js --grep \"section geometry 390 dark\"",
+      "result": "1 failed: profile-actions right392 exceeds390px viewport; old -18px margins incompatible with cabinet16px padding."
+    }
+  ],
+  "green": {
+    "command": "PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers .local-tools/node-v24.21.0-darwin-arm64/bin/node node_modules/@playwright/test/cli.js test tests/e2e/member-cabinet.spec.js tests/e2e/profile-form.spec.js",
+    "result": "15 passed, including both themes390/1440, progress320/1440, save feedback and keyboard/menu behavior."
+  },
+  "test_correction": "New mobile test initially clicked initially-open about section and incorrectly expected it open. Corrected to assert initial visibility, click/hidden, click/visible per existing UX; runtime behavior unchanged.",
+  "review": {
+    "reviewer": "cabinet_reference_review",
+    "result": "approved including mobile gutter follow-up"
+  },
+  "live": {
+    "brandCenterOffset": 0,
+    "legendHeight": 20,
+    "chevronDisplay": "none",
+    "accountWriteCount": 0
+  },
+  "privacy": "Live geometry only, no account writes/values logged. Screenshots use synthetic data, ignored under private-evidence; no private files staged.",
+  "unverified": [
+    "Physical phone and Safari; no deployment performed."
+  ],
+  "checks": {
+    "diff_check": "passed"
+  },
+  "push_status": "pending_at_commit",
+  "next_task": "S05-03"
+}

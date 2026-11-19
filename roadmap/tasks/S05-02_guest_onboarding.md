@@ -117,3 +117,10 @@ Commit: `fix(onboarding): [S05-02] completion-aware entry and live language`.
 Без зміни схеми/цін/provider integrations. Evidence:
 `.workflow/evidence/member-cabinet-2026-11-19.json`.
 Commit: `feat(cabinet): [S05-02] separate member workspace from public pages`.
+
+Корекція геометрії за скріншотом власника: центрований sidebar brand,
+прихований desktop-chevron профілю й компактний legend, mobile save bar
+без виходу за екран. Перевірки 390/1440 light/dark, accordion close/open,
+існуючі save-feedback сценарії. Докази:
+`.workflow/evidence/cabinet-alignment-2026-11-19.json`.
+Commit: `fix(cabinet): [S05-02] align brand and contain profile controls`.

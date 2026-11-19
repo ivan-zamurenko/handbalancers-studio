@@ -154,3 +154,36 @@ test('reduced motion shows a static result without the figure', async ({page}) =
   await expect(overlay.locator('[data-sf-text]')).toHaveText('Збережено');
   await expect(overlay.locator('[data-sf-figure]')).toBeHidden();
 });
+
+for (const width of [390,1440]) for (const theme of ['light','dark']) {
+  test(`profile section geometry ${width} ${theme}`, async ({page}) => {
+    await page.setViewportSize({width,height:1000});
+    await mockProfile(page, {setup:false});
+    await page.goto('/profile?lang=uk');
+    await expect(page.locator('[data-profile-form]')).toBeVisible();
+    await expect.poll(()=>page.evaluate(()=>localStorage.getItem('studio:account:member-a:theme'))).not.toBeNull();
+    await page.evaluate(theme=>document.dispatchEvent(new CustomEvent('studio:theme-select',{detail:theme})),theme);
+    await expect(page.locator('html')).toHaveAttribute('data-theme',theme);
+    const section=page.locator('fieldset[data-step="about"]');
+    const heading=await section.locator('legend').boundingBox();
+    expect(heading.height).toBeLessThan(80);
+    const chevron=section.locator('.acc-chevron');
+    if(width>780) {
+      await expect(chevron).toBeHidden();
+      const field=await section.locator('#profile-first-name').boundingBox();
+      expect(field.y-heading.y).toBeLessThan(120);
+    } else {
+      await expect(chevron).toHaveCSS('width','16px');
+      await expect(chevron).toHaveCSS('height','16px');
+      await expect(section.locator('#profile-first-name')).toBeVisible();
+      await section.locator('.acc-toggle').click();
+      await expect(section.locator('#profile-first-name')).toBeHidden();
+      await section.locator('.acc-toggle').click();
+      await expect(section.locator('#profile-first-name')).toBeVisible();
+    }
+    const overflow=await page.evaluate(()=>[...document.querySelectorAll('main,main *')].filter(el=>el.getBoundingClientRect().right>innerWidth+1).map(el=>({tag:el.tagName,cls:el.className,width:el.getBoundingClientRect().width,right:el.getBoundingClientRect().right})).slice(0,8));
+    expect(overflow).toEqual([]);
+
+    await page.screenshot({path:`private-evidence/member-cabinet-2026-11-19/profile-${width}-${theme}.png`,fullPage:true});
+  });
+}

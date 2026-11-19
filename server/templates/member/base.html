@@ -6,14 +6,14 @@
   <a class="skip-link" href="#main">{{ copy('До вмісту', 'Skip to content') }}</a>
   <header class="cabinet-header site-header">
     <div class="header-inner">
-      <a class="cabinet-brand mobile-brand" href="/dashboard?lang={{ language }}" aria-label="Handbalancer’s Studio">h<span>.</span></a>
+      <a class="cabinet-brand mobile-brand" href="/dashboard?lang={{ language }}" aria-label="Handbalancer’s Studio"><span class="cabinet-brand-mark">h<span>.</span></span></a>
       <div class="cabinet-crumb"><span>{{ copy('Кабінет', 'Your studio') }}</span><span aria-hidden="true">/</span><span>{{ copy('Профіль','Profile') if page_path == '/profile' else copy('Прогрес','Progress') if page_path == '/progress' else copy('Огляд','Overview') }}</span></div>
       <a class="menu-toggle" data-menu-toggle href="#site-menu" role="button" aria-controls="site-menu" aria-expanded="false" aria-label="{{ copy('Меню', 'Menu') }}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></a>
       <div class="cabinet-menu" id="site-menu" aria-label="{{ copy('Меню кабінету', 'Studio menu') }}">
         <a class="menu-backdrop" data-menu-close-backdrop href="#" tabindex="-1" aria-hidden="true"></a>
         <div class="menu-panel">
           <div class="menu-head"><span>{{ copy('Кабінет', 'Your studio') }}</span><a data-menu-close href="#" role="button" aria-label="{{ copy('Закрити меню', 'Close menu') }}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></a></div>
-          <a class="cabinet-brand side-brand" href="/dashboard?lang={{ language }}" aria-label="Handbalancer’s Studio">h<span>.</span><small>handbalancer’s<br>studio</small></a>
+          <a class="cabinet-brand side-brand" href="/dashboard?lang={{ language }}" aria-label="Handbalancer’s Studio"><span class="cabinet-brand-mark">h<span>.</span></span><small>handbalancer’s<br>studio</small></a>
           <p class="cabinet-nav-label">{{ copy('Ваша практика', 'Your practice') }}</p>
           <nav class="primary-nav" data-member-nav aria-label="{{ copy('Кабінет', 'Your studio') }}">
             <a href="/dashboard?lang={{ language }}"{% if page_path == '/dashboard' %} aria-current="page"{% endif %}>{{ icon('overview') }}<span>{{ copy('Огляд', 'Overview') }}</span></a>

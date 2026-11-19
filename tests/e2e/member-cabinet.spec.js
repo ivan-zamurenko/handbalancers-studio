@@ -17,6 +17,12 @@ for(const width of [390,1440])for(const theme of ['light','dark'])test(`cabinet 
  await page.evaluate(theme=>document.dispatchEvent(new CustomEvent('studio:theme-select',{detail:theme})),theme);
  await expect(page.locator('html')).toHaveAttribute('data-theme',theme);
  await expect(page.locator('[data-member-shell]')).toBeVisible();
+ if(width>780){
+  const brand=await page.locator('.side-brand').boundingBox();
+  const name=await page.locator('.side-brand small').boundingBox();
+  expect(Math.abs(brand.y+brand.height/2-name.y-name.height/2)).toBeLessThan(2);
+ }
+
  await expect(page.locator('.site-header')).toHaveCSS('border-bottom-width','1px');
  await expect(page.locator('[data-member-nav]')).not.toContainText(/Напрями|Методика|Тарифи|Сьогодні/);
  await expect(page.locator('[data-member-nav] a[aria-current=page]')).toHaveAttribute('href','/dashboard?lang=uk');

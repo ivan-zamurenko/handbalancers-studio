@@ -2,16 +2,18 @@
 .cabinet-shell { --sidebar-width: 232px; min-height: 100dvh; }
 .cabinet-shell h1, .cabinet-shell h2, .cabinet-shell h3, .cabinet-shell p { margin: 0; }
 .cabinet-shell a { color: inherit; text-decoration: none; }
-.cabinet-shell svg { display: block; }
+.cabinet-header svg, .workout-art svg { display: block; }
 .cabinet-shell .skip-link { position: absolute; top: -100px; left: 16px; z-index: 200; padding: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
 .cabinet-shell .skip-link:focus { top: 8px; }
 .cabinet-header { margin-left: var(--sidebar-width); border-bottom: 1px solid var(--line); }
 .cabinet-header .header-inner { min-height: 76px; display: flex; align-items: center; gap: 20px; padding: 0 40px; }
 .cabinet-crumb { display: flex; gap: 12px; align-items: center; font-size: 12px; color: var(--muted); }
 .cabinet-crumb span:last-child { color: var(--text); }
-.cabinet-brand { display: inline-flex; align-items: baseline; font-size: 48px; line-height: 1; font-weight: 750; letter-spacing: -.06em; }
-.cabinet-brand > span { color: var(--accent); }
-.cabinet-brand small { margin-left: 12px; font-size: 10px; line-height: 1.45; font-weight: 500; letter-spacing: .02em; color: var(--muted); }
+.cabinet-brand { display: inline-flex; align-items: center; gap: 12px; font-size: 48px; line-height: 1; font-weight: 750; letter-spacing: -.06em; }
+.cabinet-brand-mark { display: inline-block; flex: none; }
+.cabinet-brand-mark > span { color: var(--accent); }
+.cabinet-brand.side-brand { justify-content: center; }
+.cabinet-brand small { font-size: 10px; line-height: 1.45; font-weight: 500; letter-spacing: .02em; color: var(--muted); }
 .cabinet-header .mobile-brand, .cabinet-header .menu-toggle, .cabinet-header .menu-head, .cabinet-header .menu-backdrop { display: none; }
 .cabinet-menu .menu-panel { position: fixed; inset: 0 auto 0 0; width: var(--sidebar-width); background: var(--surface); border-right: 1px solid var(--line); padding: 30px 20px 24px; display: flex; flex-direction: column; z-index: 30; overflow-y: auto; }
 .cabinet-nav-label { margin: 56px 12px 16px !important; font-size: 10px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
@@ -137,4 +139,7 @@
   .cabinet-card-head h2 { font-size: 15px; }
   .progress-tabs { margin-inline: -4px; }
   .cabinet-main .profile-section .login-heading h1 { font-size: 30px; }
+}
+@media (max-width: 760px) {
+  .cabinet-main .profile-actions { margin-inline: -16px; padding-inline: 16px; }
 }
