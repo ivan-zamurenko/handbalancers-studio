@@ -1,0 +1,38 @@
+{
+  "task_id": "S05-03",
+  "status": "done",
+  "base_sha": "30e6f6f",
+  "scope": "Approved public landing/plans path; retain approved prices/copy/style. Extend named card to shared public/plan_cards.html and public.css because both landing and /plans include the cards; render_public_pages.py test-only availability fixture; existing guest journey test must represent enabled registration explicitly. No backend/provider/schema/billing changes. Test registration availability rather than inferring it from draft presence. Add early truthful launch status and fix stale noscript copy.",
+  "branch": "task/execution-v4",
+  "acceptance": [
+    "Approved landing/navigation/plan copy and prices preserved; no invented customers or functioning AI claim.",
+    "Essential1999/Plus4999/Pro17999/Pro+29999 EUR minor monthly; trial seven days, card, monthly automatic charge, once/account for Essential/Plus only.",
+    "Allowlisted plan survives reload and landing/plans navigation; Plus only default without valid choice.",
+    "Direct plan choice reaches registration when server advertises email or Google availability. Draft presence does not override closed registration.",
+    "Landing and noscript accurately describe current product availability. Selection never grants access or starts payment."
+  ],
+  "red": {
+    "command": "PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers .local-tools/node-v24.21.0-darwin-arm64/bin/node node_modules/@playwright/test/cli.js test tests/e2e/s05-03-public-pages.spec.js",
+    "result": "5 expected failures, 10 passed before implementation: direct registration UK/EN, launch status absent, draft incorrectly bypasses closed registration, blocked storage registration path."
+  },
+  "green": {
+    "command": "PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers .local-tools/node-v24.21.0-darwin-arm64/bin/node node_modules/@playwright/test/cli.js test tests/e2e/s05-03-public-pages.spec.js tests/e2e/s05-02-guest-onboarding.spec.js tests/e2e/onboarding-entry.spec.js",
+    "result": "32 passed (25.3s). Real Jinja presentation fixtures model enabled registration; no fake provider result claimed. Includes Google-only availability added after implementation."
+  },
+  "test_adjustment": "Existing selected_dom_value90 guest journey now explicitly renders enabled registration using the real template fixture, because the isolated preview runtime disables auth. All original assertions retained; draft presence is not registration availability.",
+  "visual": {
+    "environment": "Running local server127.0.0.1:8000 configured with hosted backend, fresh anonymous Chromium contexts; no account submission or owner session access.",
+    "result": "16 landing/plans views at390/1440, light/dark, uk/en returned200; no overflow or JS errors. Plan Pro retained on reload; eight transitions reached register form. Personally inspected eight screenshots covering both layouts/themes/languages and continue/trial area.",
+    "artifacts": "private-evidence/s05-03-public-pages/ (ignored, not staged)"
+  },
+  "review": {
+    "agent": "cabinet_reference_review",
+    "result": "approved, no blockers; read-only final code and test review"
+  },
+  "limits": [
+    "No live Google OAuth completion, registration submission, payment/trial activation or production readiness claim.",
+    "No backend/API/schema/entitlement change. Physical mobile devices not tested."
+  ],
+  "next_task": "S05-04",
+  "push_status": "pending_until_commit"
+}

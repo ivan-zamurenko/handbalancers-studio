@@ -1,5 +1,4 @@
 // Presentation preference only. Never grants a subscription or performs a payment.
-import {readGuestDraft} from '../onboarding/draft.js';
 const names = { essential: 'Essential', plus: 'Plus', pro: 'Pro', 'pro-plus': 'Pro+' };
 const storageKey = 'studio:public:plan';
 const english = () => document.documentElement.lang === 'en';
@@ -34,8 +33,9 @@ for (const radio of radios) radio.addEventListener('change', () => {
 });
 render();
 
-// An onboarding visitor can create an account now, but this does not start a trial/payment.
-if (button && readGuestDraft()) {
+// The server advertises available registration; a saved draft is not a feature flag.
+// Selecting a plan never starts a trial/payment or grants access.
+if (button?.dataset.registrationOpen === 'true') {
   button.removeAttribute('data-dialog-open');
   button.addEventListener('click', () => {
     const current = radios.find(r => r.checked)?.value;

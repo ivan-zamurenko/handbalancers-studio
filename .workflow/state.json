@@ -202,9 +202,9 @@
       "profile_validation_evidence": ".workflow/evidence/profile-validation-2026-11-19.json"
     },
     "S05-03": {
-      "status": "todo",
-      "evidence": null,
-      "push_status": "not_started"
+      "status": "done",
+      "evidence": ".workflow/evidence/S05-03.json",
+      "push_status": "pending"
     },
     "S05-04": {
       "status": "todo",

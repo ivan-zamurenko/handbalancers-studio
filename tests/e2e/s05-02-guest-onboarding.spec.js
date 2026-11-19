@@ -1,5 +1,7 @@
 import {test, expect} from '@playwright/test';
 import {mkdir} from 'node:fs/promises';
+import {execFileSync} from 'node:child_process';
+const registrationPlans = JSON.parse(execFileSync('.venv/bin/python', ['tests/fixtures/render_public_pages.py'], {encoding:'utf8'}))['/plans?lang=uk'];
 
 const guest = {goal_codes:['handstand'], self_reported_level:2, session_minutes:90,
   weekdays:[1,3,5], time_of_day:'evening'};
@@ -41,6 +43,8 @@ test('fresh_days_empty', async ({page}) => {
 });
 
 test('selected_dom_value: 90 survives plans/auth navigation and explicit profile save', async ({page}) => {
+  // This journey requires registration enabled; draft presence does not enable it.
+  await page.route('**/plans?lang=uk', r=>r.fulfill({contentType:'text/html',body:registrationPlans}));
   await questionnaire(page);
   await page.locator('[name=session_minutes][value="30"]').check();
   // Browser restoration/programmatic selection need not fire a change event.
@@ -50,6 +54,7 @@ test('selected_dom_value: 90 survives plans/auth navigation and explicit profile
   await page.getByRole('radio',{name:'Essential',exact:true}).check();
   await page.locator('[data-continue-plan]').click();
   await expect(page).toHaveURL(/\/register\?lang=uk$/);
+  await page.unroute('**/plans?lang=uk');
   // Synthetic authenticated boundary, real public/profile pages and draft endpoint.
   const writes=await account(page);
   await page.goto('/plans?lang=uk');

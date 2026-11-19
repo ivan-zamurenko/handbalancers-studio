@@ -1,3 +1,4 @@
+{% set registration_open = email_auth_enabled or 'google' in oauth_providers %}
 <section class="plans-section wrap" id="plans" aria-labelledby="plans-title">
   <div class="section-heading centered">
     <p class="eyebrow">{{ copy('Увага, яку можна відчути.', 'Attention you can feel.') }}</p>
@@ -23,8 +24,8 @@
   </fieldset>
   <p id="trial-terms" class="trial-terms">{{ copy('Після відкриття: 7 днів пробного періоду для Essential і Plus. Потрібна картка; після 7 днів автоматично списується 19,99 € або 49,99 € на місяць відповідно. Пробний період — один раз на акаунт. Pro та Pro+ — без пробного періоду.', 'After launch: a 7-day trial for Essential and Plus. A card is required; after 7 days, €19.99 or €49.99 is charged automatically each month respectively. One trial per account. Pro and Pro+ have no trial.') }}</p>
   <div class="plan-action">
-    <button class="primary continue-plan" disabled type="button" data-dialog-open="availability-dialog" data-continue-plan>{{ copy('Продовжити з Plus', 'Continue with Plus') }}</button>
+    <button class="primary continue-plan" disabled type="button" data-registration-open="{{ 'true' if registration_open else 'false' }}" data-dialog-open="availability-dialog" data-continue-plan>{{ copy('Продовжити з Plus', 'Continue with Plus') }}</button>
     <p class="muted storage-status" data-storage-status aria-live="polite"></p>
-    <noscript><p>{{ copy('Увімкніть JavaScript, щоб зберегти вибір пакета. Реєстрація й оплата ще не відкриті.', 'Enable JavaScript to save your plan choice. Registration and payments are not open yet.') }}</p></noscript>
+    <noscript><p>{% if registration_open %}{{ copy('Увімкніть JavaScript для вибору пакета та реєстрації. Оплата ще недоступна.', 'Enable JavaScript to choose a plan and register. Payments are not available yet.') }}{% else %}{{ copy('Увімкніть JavaScript, щоб зберегти вибір пакета. Реєстрація й оплата ще не відкриті.', 'Enable JavaScript to save your plan choice. Registration and payments are not open yet.') }}{% endif %}</p></noscript>
   </div>
 </section>

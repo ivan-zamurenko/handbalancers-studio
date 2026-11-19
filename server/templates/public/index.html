@@ -7,6 +7,7 @@
   <div class="hero-bottom"><p class="hero-description">{{ copy('Опанувати стійку, стати гнучкішими чи перемкнутися після роботи. Почніть із того, що потрібно саме вам.', 'Learn to handstand, become more flexible or reset after work. Start with what you need most.') }}</p>
     <a class="btn primary" href="/onboarding?lang={{ language }}">{{ copy('Знайти свій напрям', 'Find your direction') }} <span aria-hidden="true">↗</span></a>
   </div>
+  <p class="public-status" data-public-status>{% if email_auth_enabled or 'google' in oauth_providers %}{{ copy('Студія в розробці. Уже можна створити акаунт і заповнити анкету. Тренування й оплата ще недоступні.', 'The studio is in development. You can create an account and fill in your profile. Training and payments are not available yet.') }}{% else %}{{ copy('Студія в розробці. Поки можна ознайомитися з напрямами й обрати пакет. Тренування й оплата ще недоступні.', 'The studio is in development. For now, explore the directions and choose a plan. Training and payments are not available yet.') }}{% endif %}</p>
   <div class="hero-caption"><span>HANDBALANCER’S STUDIO</span><span>{{ copy('Баланс · Сила · Рухливість', 'Balance · Strength · Mobility') }}</span></div>
 </section>
 <section class="journey-section wrap" aria-labelledby="journey-title">

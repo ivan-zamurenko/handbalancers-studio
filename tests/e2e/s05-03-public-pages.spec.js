@@ -1,4 +1,12 @@
 import { expect, test } from '@playwright/test';
+import {execFileSync} from 'node:child_process';
+const registrationPages = JSON.parse(execFileSync('.venv/bin/python', ['tests/fixtures/render_public_pages.py'], {encoding:'utf8'}));
+async function enableRegistrationPages(page) {
+  await page.route(/\/(?:plans)?\?lang=(?:uk|en)$/, route => {
+    const url = new URL(route.request().url());
+    return route.fulfill({contentType:'text/html', body:registrationPages[url.pathname + url.search]});
+  });
+}
 
 async function openMenuOnPhone(page) {
   // Phones keep language/theme inside the menu panel.
@@ -112,4 +120,53 @@ test('plans heading and keyboard selection; unknown saved choice falls back safe
   await page.keyboard.press('ArrowRight');
   await expect(page.getByRole('radio', { name: 'Pro', exact: true })).toBeChecked();
   await expect(page.getByRole('button', { name: 'Continue with Pro', exact: true })).toBeEnabled();
+});
+
+
+for (const lang of ['uk','en']) test(`direct plan choice continues to available registration ${lang}`,async({page})=>{
+  await enableRegistrationPages(page);
+  await page.goto(`/plans?lang=${lang}`);
+  await page.getByRole('radio',{name:'Pro',exact:true}).check();
+  await page.reload();
+  await expect(page.getByRole('radio',{name:'Pro',exact:true})).toBeChecked();
+  await page.locator('[data-continue-plan]').click();
+  await expect(page).toHaveURL(new RegExp(`/register\\?lang=${lang}$`));
+  expect(await page.evaluate(()=>localStorage.getItem('studio:public:plan'))).toBe('pro');
+  await page.goto(`/?lang=${lang}`);
+  await expect(page.getByRole('radio',{name:'Pro',exact:true})).toBeChecked();
+});
+
+test('landing explains current availability before describing the future product',async({page})=>{
+  await enableRegistrationPages(page);
+  await page.goto('/?lang=en');
+  await expect(page.locator('.hero [data-public-status]')).toContainText('Training and payments are not available yet');
+  await expect(page.locator('.hero [data-public-status]')).toContainText('create an account');
+  await expect(page.locator('noscript')).not.toContainText('Registration and payments are not open yet');
+});
+
+test('a saved guest questionnaire does not override closed registration',async({page})=>{
+  await page.addInitScript(()=>sessionStorage.setItem('studio:guest:onboarding-draft',JSON.stringify({version:1,expiresAt:Date.now()+60000,data:{goal_codes:['handstand'],self_reported_level:2,session_minutes:45,weekdays:[1],time_of_day:null}})));
+  await page.goto('/plans?lang=en');
+  await page.locator('[data-continue-plan]').click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await expect(page).toHaveURL(/\/plans\?lang=en$/);
+});
+
+test('registration path remains usable when storage is blocked',async({page})=>{
+  await enableRegistrationPages(page);
+  await page.addInitScript(()=>{Storage.prototype.getItem=()=>{throw Error('disabled');};Storage.prototype.setItem=()=>{throw Error('disabled');};});
+  await page.goto('/plans?lang=en');
+  await page.getByRole('radio',{name:'Essential',exact:true}).check();
+  await expect(page.locator('[data-storage-status]')).toContainText('storage is disabled');
+  await page.locator('[data-continue-plan]').click();
+  await expect(page).toHaveURL(/\/register\?lang=en$/);
+});
+
+
+test('Google-only registration is available without enabling email registration',async({page})=>{
+  const pages=JSON.parse(execFileSync('.venv/bin/python',['tests/fixtures/render_public_pages.py','--google-only'],{encoding:'utf8'}));
+  await page.route('**/plans?lang=en',r=>r.fulfill({contentType:'text/html',body:pages['/plans?lang=en']}));
+  await page.goto('/plans?lang=en');
+  await page.locator('[data-continue-plan]').click();
+  await expect(page).toHaveURL(/\/register\?lang=en$/);
 });

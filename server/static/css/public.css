@@ -55,6 +55,7 @@ a { color: inherit; }
 .hero-bottom { display: flex; gap: 60px; align-items: flex-end; justify-content: space-between; }
 .hero-description { max-width: 600px; font-size: 20px; line-height: 1.65; color: var(--muted); }
 .hero-bottom .btn { flex-shrink: 0; padding: 16px 24px; gap: 26px; }
+.public-status { max-width: 640px; margin-top: 24px; color: var(--muted); font-size: 14px; line-height: 1.65; }
 .hero-caption { display: flex; justify-content: space-between; gap: 24px; padding: 36px 0 26px; border-bottom: 1px solid var(--line); margin-top: 62px; font-size: 10px; letter-spacing: .13em; color: var(--muted); }
 .journey-section, .directions-section, .method-section, .plans-section, .equipment-section { padding-top: 96px; padding-bottom: 80px; }
 .section-heading { margin-bottom: 40px; }
