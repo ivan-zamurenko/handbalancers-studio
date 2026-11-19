@@ -19,6 +19,10 @@
   <script type="module" src="/static/js/components/forms.js"></script>
   <script type="module" src="/static/js/components/dialog.js"></script>
   <script type="module" src="/static/js/state/theme.js"></script>
+  {% if translations is defined %}
+  <script type="application/json" id="page-translations">{{ translations | tojson }}</script>
+  <script type="module" src="/static/js/i18n/language.js"></script>
+  {% endif %}
   {% block scripts %}{% endblock %}
 </body>
 </html>

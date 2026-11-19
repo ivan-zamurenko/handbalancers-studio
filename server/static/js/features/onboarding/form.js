@@ -79,3 +79,7 @@ if(draft)for(const input of form.querySelectorAll('input')){
 }
 for(const legend of form.querySelectorAll('legend'))legend.tabIndex=-1;
 syncLimits();show(0,false);next.disabled=false;
+
+document.addEventListener('studio:language-changed',()=>{
+  count.textContent=count.dataset.label.replace('{n}',step+1);
+});

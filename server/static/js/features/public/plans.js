@@ -2,7 +2,7 @@
 import {readGuestDraft} from '../onboarding/draft.js';
 const names = { essential: 'Essential', plus: 'Plus', pro: 'Pro', 'pro-plus': 'Pro+' };
 const storageKey = 'studio:public:plan';
-const english = document.documentElement.lang === 'en';
+const english = () => document.documentElement.lang === 'en';
 const radios = [...document.querySelectorAll('input[name="plan"]')];
 const button = document.querySelector('[data-continue-plan]');
 const status = document.querySelector('[data-storage-status]');
@@ -17,12 +17,12 @@ if (button) button.disabled = false;
 
 function render() {
   for (const radio of radios) radio.checked = radio.value === selected;
-  if (button) button.textContent = `${english ? 'Continue with' : 'Продовжити з'} ${names[selected]}`;
+  if (button) button.textContent = `${english() ? 'Continue with' : 'Продовжити з'} ${names[selected]}`;
   const message = document.querySelector('[data-selection-message]');
   if (message) message.textContent = canStore
-    ? `${english ? 'Your choice in this browser:' : 'Ваш вибір у цьому браузері:'} ${names[selected]}.`
-    : `${english ? 'Current choice:' : 'Поточний вибір:'} ${names[selected]}.`;
-  if (status) status.textContent = canStore ? '' : (english
+    ? `${english() ? 'Your choice in this browser:' : 'Ваш вибір у цьому браузері:'} ${names[selected]}.`
+    : `${english() ? 'Current choice:' : 'Поточний вибір:'} ${names[selected]}.`;
+  if (status) status.textContent = canStore ? '' : (english()
     ? 'Browser storage is disabled. Your choice lasts until you leave this page.'
     : 'Локальне збереження вимкнене. Вибір діє до закриття цієї сторінки.');
 }
@@ -42,6 +42,8 @@ if (button && readGuestDraft()) {
     if (Object.hasOwn(names, current)) {
       try { localStorage.setItem(storageKey, current); } catch { /* Preference only. */ }
     }
-    window.location.assign(`/register?lang=${english ? 'en' : 'uk'}`);
+    window.location.assign(`/register?lang=${english() ? 'en' : 'uk'}`);
   });
 }
+
+document.addEventListener('studio:language-changed',render);

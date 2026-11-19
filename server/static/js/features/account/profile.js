@@ -264,6 +264,8 @@ async function save() {
 form?.addEventListener('change', event => {
   if (event.target.name === 'theme_preference') {
     document.dispatchEvent(new CustomEvent('studio:theme-select', {detail: event.target.value}));
+  } else if (event.target.name === 'locale') {
+    document.dispatchEvent(new CustomEvent('studio:language-select', {detail: event.target.value}));
   } else {
     syncLimits();
     event.target.closest('[data-group]')?.setAttribute('aria-invalid', 'false');
@@ -294,7 +296,6 @@ form?.addEventListener('submit', async event => {
   if (!validate()) return;
   saving = true;
   buttons.submit.disabled = true;
-  const submitLabel = buttons.submit.textContent;
   buttons.submit.textContent = document.documentElement.lang === 'en' ? 'Saving…' : 'Зберігаємо…';
   form.setAttribute('aria-busy', 'true');
   const request = save().catch(() => ({kind: 'error'}));
@@ -303,11 +304,11 @@ form?.addEventListener('submit', async event => {
     request: request.then(result => result.kind === 'ok'),
     variant,
     form,
-    labels: {saved: status.dataset.feedbackSaved, error: status.dataset.feedbackError},
+    labels: {get saved() { return status.dataset.feedbackSaved; }, get error() { return status.dataset.feedbackError; }},
   });
   const result = await request;
   buttons.submit.disabled = false;
-  buttons.submit.textContent = submitLabel;
+  buttons.submit.textContent = document.documentElement.lang === 'en' ? 'Save' : 'Зберегти';
   form.removeAttribute('aria-busy');
   saving = false;
   if (result.kind === 'ok') {
@@ -315,11 +316,8 @@ form?.addEventListener('submit', async event => {
     onboardingRevision = result.onboarding.body.revision;
     status.textContent = '';
     if (setupMode) {
-      setupMode = false;
-      intro.hidden = true;
-      heading.hidden = false;
-      applyMode();
-      window.scrollTo({top: 0});
+      window.location.assign(`/dashboard?lang=${document.documentElement.lang || 'uk'}`);
+      return;
     }
   } else if (result.kind === 'conflict') {
     fill(result.profile.body ?? {}, result.onboarding.body.current, null);
@@ -338,3 +336,14 @@ document.addEventListener('studio:account', event => {
 phone.addEventListener('change', () => { if (!form.hidden) applyMode(); });
 
 if (form && status) load().catch(() => { status.textContent = status.dataset.unavailable; });
+
+document.addEventListener('studio:language-changed', () => {
+  if (!form || form.hidden) return;
+  form.elements.locale.value = document.documentElement.lang;
+  updateSummaries();
+  if (saving) buttons.submit.textContent = document.documentElement.lang === 'en' ? 'Saving…' : 'Зберігаємо…';
+  if (mode === 'wizard') {
+    wizardHead.querySelector('[data-wizard-count]').textContent = status.dataset.stepLabel
+      .replace('{n}', stepIndex + 1).replace('{total}', wizardSteps().length);
+  }
+});

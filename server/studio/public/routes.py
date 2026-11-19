@@ -4,8 +4,9 @@ from pathlib import Path
 
 from fastapi import APIRouter, Request
 from fastapi.templating import Jinja2Templates
-from starlette.responses import HTMLResponse
+from starlette.responses import HTMLResponse, RedirectResponse
 
+from studio.accounts.entry import entry_destination
 from studio.auth.oauth_routes import session_name
 from studio.shared.i18n import get_locale
 
@@ -75,7 +76,15 @@ PLANS = (
 def render(request: Request, template: str) -> HTMLResponse:
     language = get_locale(request.query_params.get("lang"))
 
+    translations: list[tuple[str, str]] = [
+        ("Завантажуємо сторінку…", "Loading page…"),
+        ("Завантажуємо…", "Loading…"),
+    ]
+
     def copy(uk: str, en: str) -> str:
+        pair = (uk, en)
+        if pair not in translations:
+            translations.append(pair)
         return uk if language == "uk" else en
 
     oauth = getattr(request.app.state, "oauth_service", None)
@@ -86,6 +95,7 @@ def render(request: Request, template: str) -> HTMLResponse:
         context={
             "language": language,
             "copy": copy,
+            "translations": translations,
             "plans": PLANS,
             "page_path": request.url.path,
             "oauth_providers": providers,
@@ -111,7 +121,10 @@ async def plans_page(request: Request) -> HTMLResponse:
 
 
 @router.get("/onboarding", response_class=HTMLResponse, include_in_schema=False)
-async def onboarding_page(request: Request) -> HTMLResponse:
+async def onboarding_page(request: Request):
+    destination = await entry_destination(request)
+    if destination != "/login":
+        return member_redirect(request, destination)
     return render(request, "public/onboarding.html")
 
 
@@ -138,3 +151,22 @@ async def profile_page(request: Request) -> HTMLResponse:
 @router.get("/verify-email", response_class=HTMLResponse, include_in_schema=False)
 async def verify_page(request: Request) -> HTMLResponse:
     return render(request, "auth/verify.html")
+
+
+def member_redirect(request: Request, destination: str) -> RedirectResponse:
+    suffix = (
+        f"?lang={get_locale(request.query_params['lang'])}"
+        if "lang" in request.query_params
+        else ""
+    )
+    return RedirectResponse(
+        f"{destination}{suffix}", status_code=303, headers={"Cache-Control": "no-store"}
+    )
+
+
+@router.get("/dashboard", response_class=HTMLResponse, include_in_schema=False)
+async def dashboard_page(request: Request):
+    destination = await entry_destination(request)
+    if destination != "/dashboard":
+        return member_redirect(request, destination)
+    return render(request, "member/dashboard.html")

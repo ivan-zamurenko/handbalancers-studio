@@ -2,11 +2,9 @@
 
 import hashlib
 import re
-from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, ConfigDict
-from sqlalchemy.exc import SQLAlchemyError
 from starlette.responses import JSONResponse, RedirectResponse
 
 from studio.auth.csrf import require_csrf
@@ -24,7 +22,7 @@ HEADERS = {"Cache-Control": "no-store", "Referrer-Policy": "no-referrer"}
 
 class StartInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    return_to: str = "/plans"
+    return_to: str = "/dashboard"
 
 
 def service_for(request: Request) -> OAuthService:
@@ -149,19 +147,14 @@ async def session_snapshot(request: Request) -> JSONResponse:
     )
 
 
-async def _setup_required(request: Request, profile: dict[str, object]) -> bool:
-    """Name + questionnaire done? Read as studio_web; never blocks the session snapshot."""
-    from studio.accounts.onboarding import setup_required
-    from studio.db import UnsafeWebRole
-    from studio.shared.context import Actor
+async def _setup_required(request: Request, profile: dict[str, object]) -> bool | None:
+    """Unavailable completion is unknown; protected entry separately fails closed."""
+    from studio.accounts.entry import completion_required
 
-    transaction = getattr(request.app.state, "web_transaction", None)
-    if transaction is None:
-        return not profile.get("profile_complete")
     try:
-        return await run_db(setup_required, transaction, Actor(UUID(str(profile["id"]))))
-    except (SQLAlchemyError, UnsafeWebRole):
-        return not profile.get("profile_complete")
+        return await completion_required(request, profile)
+    except HTTPException:
+        return None
 
 
 @router.post("/api/auth/logout")

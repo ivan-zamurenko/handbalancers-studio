@@ -72,16 +72,10 @@ async function saveServerTheme(preference) {
   }
 }
 
-// Missing name/questionnaire: open the profile form once per tab, not on every page.
+// Completion is server-owned. A per-tab "offered" flag must never bypass setup.
 const setupExempt = new Set(['/profile', '/onboarding', '/login', '/register', '/verify-email', '/recovery']);
-function offerSetup(id) {
-  const key = `studio:account:${id}:setup-offered`;
-  try {
-    if (setupExempt.has(window.location.pathname) || sessionStorage.getItem(key)) return;
-    sessionStorage.setItem(key, '1');
-  } catch {
-    return;
-  }
+function offerSetup() {
+  if (setupExempt.has(window.location.pathname)) return;
   beginNavigation();
   window.location.assign(`/profile?lang=${document.documentElement.lang || 'uk'}`);
 }
@@ -100,13 +94,14 @@ async function refresh() {
     const previous = accountId;
     accountId = authenticated ? snapshot.user?.id || null : null;
     if (accountId && accountId !== previous) loadServerTheme(accountId);
-    const draft = authenticated && window.location.pathname !== '/onboarding' ? claimGuestDraft(accountId) : null;
-    if (draft && window.location.pathname === '/plans') {
-      beginNavigation();
-      window.location.assign(`/profile?lang=${document.documentElement.lang || 'uk'}`);
-    } else if (authenticated && snapshot.setup_required === true) offerSetup(accountId);
+    if (authenticated) claimGuestDraft(accountId);
+    if (authenticated && window.location.pathname === '/onboarding') {
+      window.location.replace(`/dashboard?lang=${document.documentElement.lang || 'uk'}`);
+    } else if (authenticated && snapshot.setup_required === true) offerSetup();
     logout.hidden = !authenticated; login.hidden = authenticated;
     if (profileLink) profileLink.hidden = !authenticated;
+    const dashboardLink = document.querySelector('[data-dashboard-link]');
+    if (dashboardLink) dashboardLink.hidden = !authenticated;
     if (loginCta) loginCta.hidden = authenticated;
     logout.disabled = false;
   } catch {

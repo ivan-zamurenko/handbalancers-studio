@@ -18,6 +18,7 @@ async function questionnaire(page) {
 
 async function account(page, onboarding = null, {saveStatus = 200, id = 'member-a'} = {}) {
   const writes=[];
+  await page.route('**/dashboard?*',r=>r.fulfill({contentType:'text/html',body:'<h1>Today</h1>'}));
   await page.route('**/api/session', r => r.fulfill({json:{authenticated:true, csrf_token:'a'.repeat(64),
     setup_required:!onboarding, user:{id,role:'member'}}}));
   await page.route('**/api/me/profile', r => r.fulfill({json:{first_name:'Іван',last_name:'Тест',locale:'uk'}}));
@@ -60,7 +61,8 @@ test('selected_dom_value: 90 survives plans/auth navigation and explicit profile
   await expect.poll(()=>writes.length).toBe(1);
   expect(writes[0]).toMatchObject({...guest,expected_revision:0});
   await expect(page.locator('[data-save-feedback]')).toBeHidden({timeout:8000});
-  await page.reload();
+  await expect(page).toHaveURL(/\/dashboard\?lang=uk$/);
+  await page.goto('/profile?lang=uk');
   await expect(page.locator('[name=session_minutes][value="90"]')).toBeChecked();
   expect(await page.evaluate(()=>Object.keys(sessionStorage).filter(k=>k.endsWith(':onboarding-draft')))).toEqual([]);
 });
@@ -71,7 +73,9 @@ test('existing_account_no_silent_overwrite: explicit apply preserves body and re
   await expect(page).toHaveURL(/\/plans/);
   const writes=await account(page,existing);
   await page.goto('/plans?lang=uk');
-  await expect(page).toHaveURL(/\/profile/);
+  // Completed users are no longer forced back through onboarding by a guest draft.
+  await expect(page).toHaveURL(/\/plans/);
+  await page.goto('/profile?lang=uk');
   await expect(page.locator('[name=session_minutes][value="30"]')).toBeChecked();
   await expect(page.locator('[data-draft-apply]')).toBeVisible();
   expect(writes).toEqual([]);

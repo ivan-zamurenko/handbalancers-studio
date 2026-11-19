@@ -75,7 +75,8 @@ def flow(storage_db):
     service = OAuthService(
         auth_transaction=lambda: role_session(storage_db, "studio_auth_runtime"),
         store=TokenStore(
-            TokenCipher("v1", {"v1": b"a" * 32}), allowed_return_paths=frozenset({"/plans"})
+            TokenCipher("v1", {"v1": b"a" * 32}),
+            allowed_return_paths=frozenset({"/plans", "/dashboard"}),
         ),
         gateway=gateway_for(exchange),
         validator=validator,

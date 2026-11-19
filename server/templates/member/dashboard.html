@@ -1,0 +1,14 @@
+{% extends "public/base.html" %}
+{% block title %}{{ copy('Сьогодні', 'Today') }} · Handbalancer’s Studio{% endblock %}
+{% block head %}{{ super() }}<link rel="stylesheet" href="/static/css/profile.css">{% endblock %}
+{% block public_content %}
+<section class="profile-section wrap" aria-labelledby="today-title">
+  <div class="profile-heading"><p class="eyebrow">{{ copy('Ваша практика', 'Your practice') }}</p><h1 id="today-title">{{ copy('Сьогодні', 'Today') }}</h1></div>
+  <div class="profile-card" data-today-empty>
+    <h2>{{ copy('Заняття ще не призначено', 'No workout assigned yet') }}</h2>
+    <p>{{ copy('Вашу анкету збережено. Коли з’явиться призначене заняття, ви побачите його тут.', 'Your questionnaire is saved. When a workout is assigned, you will find it here.') }}</p>
+    <p class="muted">{{ copy('Студія готується до відкриття. Тренувальні програми та оплата поки недоступні.', 'The studio is getting ready to open. Training programmes and payments are not available yet.') }}</p>
+    <a class="btn" href="/profile?lang={{ language }}">{{ copy('Переглянути профіль', 'View profile') }}</a>
+  </div>
+</section>
+{% endblock %}

@@ -13,10 +13,10 @@
       <input type="radio" name="plan" value="{{ id }}" aria-label="{{ name }}" {% if id == 'plus' %}checked{% endif %}>
       <span class="plan-top"><span class="plan-name">{{ name }}</span>{% if id == 'plus' %}<span class="badge">{{ copy('Рекомендовано', 'Recommended') }}</span>{% endif %}</span>
       <span class="plan-description">{{ copy(uk_description, en_description) }}</span>
-      <span class="price">{{ ('%.2f' % (amount / 100)).replace('.', ',') if language == 'uk' else '%.2f' % (amount / 100) }}<span class="currency"> €</span></span>
+      <span class="price">{{ copy(('%.2f' % (amount / 100)).replace('.', ','), '%.2f' % (amount / 100)) }}<span class="currency"> €</span></span>
       <span class="billing-period">{{ copy('/ місяць', '/ month') }}</span>
       <span class="trial-label">{% if id in ('essential', 'plus') %}{{ copy('7 днів пробного періоду', '7-day trial') }}{% else %}{{ copy('Без пробного періоду', 'No trial period') }}{% endif %}</span>
-      <span class="plan-features">{% for feature in (uk_features if language == 'uk' else en_features) %}<span><span class="checkmark" aria-hidden="true">✓</span>{{ feature }}</span>{% endfor %}</span>
+      <span class="plan-features">{% for feature in uk_features %}<span><span class="checkmark" aria-hidden="true">✓</span>{{ copy(feature, en_features[loop.index0]) }}</span>{% endfor %}</span>
       <span class="plan-choice" aria-hidden="true">{{ copy('Обрати пакет', 'Choose plan') }} <span>↗</span></span>
     </label>
     {% endfor %}

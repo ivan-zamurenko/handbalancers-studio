@@ -27,6 +27,7 @@
         </nav>
         <div class="header-controls">
           <div class="menu-account">
+            <a data-dashboard-link href="/dashboard?lang={{ language }}"{% if not signed_in %} hidden{% endif %}{% if page_path == '/dashboard' %} aria-current="page"{% endif %}>{{ copy('Сьогодні', 'Today') }}</a>
             <a data-profile-link href="/profile?lang={{ language }}"{% if not signed_in %} hidden{% endif %}{% if page_path == '/profile' %} aria-current="page"{% endif %}>{{ copy('Профіль', 'Profile') }}</a>
             <button type="button" data-logout data-pending-label="{{ copy('Виходимо…', 'Signing out…') }}"{% if not signed_in %} hidden{% endif %}>{{ copy("Вийти", "Log out") }}</button>
             <a data-login-link class="login-link btn" href="/login?lang={{ language }}"{% if signed_in %} hidden{% endif %}{% if page_path == '/login' %} aria-current="page"{% endif %}>{{ copy('Увійти', 'Log in') }}</a>

@@ -5,6 +5,7 @@ const filled = {goal_codes:['handstand','strength'], self_reported_level:2, sess
 
 async function mockProfile(page, {setup, onboardingStatus = 200}) {
   const sent = [];
+  await page.route('**/dashboard?*',r=>r.fulfill({contentType:'text/html',body:'<h1>Today</h1>'}));
   await page.route('**/api/session', route => route.fulfill({json: {authenticated:true, setup_required:setup,
     csrf_token:'a'.repeat(64), user:{id:'member-a', role:'member'}}}));
   await page.route('**/api/me/profile', route => route.fulfill({json: {first_name:'Іван',
@@ -52,9 +53,8 @@ test('mobile setup is a step-by-step form and ends with the save animation', asy
   await expect(overlay).toHaveAttribute('data-outcome', 'success');
   await expect(overlay).toBeHidden({timeout:5000});
   expect(sent[0]).toMatchObject({session_minutes:90, weekdays:[1,3,5], birth_year:null});
-  // After the first save the phone layout switches to the editable accordion.
-  await expect(page.locator('[data-wizard-count]')).toBeHidden();
-  await expect(page.locator('fieldset[data-step="about"] [data-acc-toggle]')).toHaveAttribute('aria-expanded', 'true');
+  // Owner changed the first-save destination from profile editing to today's dashboard.
+  await expect(page).toHaveURL(/\/dashboard\?lang=uk$/);
 });
 
 test('feedback waits for a server result, repeat error restores form and focus', async ({page}) => {

@@ -49,7 +49,7 @@ def build_oauth(settings: Settings) -> OAuthService | None:
                 )
             },
         ),
-        allowed_return_paths=frozenset({"/plans"}),
+        allowed_return_paths=frozenset({"/plans", "/dashboard"}),
     )
     return OAuthService(
         auth_transaction=transaction,

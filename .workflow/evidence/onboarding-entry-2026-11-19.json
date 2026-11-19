@@ -1,0 +1,119 @@
+{
+  "task_id": "S05-02",
+  "status": "done",
+  "scope_deviations": [
+    "Owner follow-up: completion-based entry, server dashboard gate, honest empty today view, in-place language/theme with preserved form; no schema/provider/price changes. Public pages remain public; guest exit does not grant member access."
+  ],
+  "red": {
+    "browser": "3 failed: locale reload lost DOM/step/answers",
+    "database": "5 failed: dashboard gate absent, /onboarding does not redirect completed accounts"
+  },
+  "test_contract_adjustment": "Session snapshot remains authenticated on completion lookup failure but setup_required becomes null (unknown), not false; protected page fails503. This preserves session availability without granting access.",
+  "date": "2026-11-19",
+  "branch": "task/execution-v4",
+  "base_sha": "2bebf61",
+  "behavior": "Server completion gate; new Google/email accounts resume until complete, completed users enter dashboard. No workout fake; S08/S09 pending. Public pages remain public. In-place locale and theme preserve controls, answers and active step.",
+  "red_commands": [
+    {
+      "command": "PATH=\"$PWD/.local-tools/uv-env/bin:$PWD/.local-tools/node-v24.21.0-darwin-arm64/bin:$PATH\" UV_CACHE_DIR=.local-tools/uv-cache PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers .local-tools/node-v24.21.0-darwin-arm64/bin/node node_modules/@playwright/test/cli.js test tests/e2e/onboarding-entry.spec.js --workers=1",
+      "result": "3 failed: language navigation loses DOM, step and answers"
+    },
+    {
+      "command": "DOCKER_HOST=\"unix://$HOME/.colima/studio-s01/docker.sock\" .venv/bin/python tools/local_stack.py test .venv/bin/python -m pytest server/tests/security/accounts/test_onboarding_entry.py -q",
+      "result": "5 failed: route/gate absent"
+    },
+    {
+      "command": "browser onboarding-entry.spec.js --grep \"at 1440\"; DB test_onboarding_entry.py -k missing_locale",
+      "result": "Review RED: duration label remains Ukrainian; redirect manufactures lang=uk"
+    }
+  ],
+  "green": [
+    {
+      "command": "browser onboarding-entry.spec.js login-form.spec.js s03-10-registration-ui.spec.js profile-form.spec.js (same PATH/browser env as RED)",
+      "result": "32 passed"
+    },
+    {
+      "command": "DB test_onboarding_entry.py (same local_stack command as RED)",
+      "result": "7 passed"
+    },
+    {
+      "command": ".venv/bin/python -m pytest server/tests/contracts/test_guest_onboarding.py server/tests/contracts/auth -q",
+      "result": "61 passed"
+    },
+    {
+      "command": "PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers .local-tools/node-v24.21.0-darwin-arm64/bin/node --test tests/js/*.test.js",
+      "result": "61 passed"
+    },
+    {
+      "command": "DB test_onboarding_entry.py test_onboarding_model.py test_profile_preferences.py test_oauth_callback.py integration/auth/test_oauth_flow.py",
+      "result": "41 passed before adding seventh entry test; overlaps final seven"
+    },
+    {
+      "command": ".venv/bin/python -m mypy server/studio/accounts/entry.py server/studio/auth/oauth_routes.py server/studio/public/routes.py",
+      "result": "passed"
+    }
+  ],
+  "regression": "Broad browser run 81 passed, 4 failed obsolete reload-clear-password expectations. Per owner request language no longer reloads; changed expectations to preserve only DOM and added post-switch storage exclusion. Final affected 32 passed. No unrelated expectations relaxed.",
+  "test_corrections": [
+    "New title expectation corrected to actual approved title Your starting point — Handbalancer’s Studio, not guessed Your goals.",
+    "Google roundtrip test initially reused old CSRF after new login (403 expected security behavior). Now explicitly asserts old token rejected then obtains new session CSRF; no production weakening."
+  ],
+  "review": {
+    "reviewer": "onboarding_access_review",
+    "result": "approved",
+    "fixed": [
+      "whole duration translation pairs",
+      "title suffix translation",
+      "preserve missing locale through server redirect"
+    ]
+  },
+  "live": {
+    "dashboardStatus": 200,
+    "destination": "/login",
+    "guestNoOverflow": true,
+    "noAccountWrites": true
+  },
+  "unverified": [
+    "New hosted Google/email roundtrip pending user login; existing browser session expired.",
+    "Assigned workouts, checkout and entitlements are future stages, not implemented by this correction.",
+    "Physical phone/Safari not checked; local Chromium 390/1440 with themes checked."
+  ],
+  "privacy": "No hosted account writes. No migrations. Private CV/career/social/business files and screenshots ignored, never staged.",
+  "push_status": "pending_at_commit",
+  "next_task": "S05-03",
+  "checks": {
+    "mypy": "3 affected runtime modules passed",
+    "ruff": "5 runtime/new-test files check+format passed. Shared pre-existing OAuth fixture has 8 pre-existing lint findings verified unchanged against HEAD; not claimed lint-clean. Changed allowlist formatting corrected.",
+    "roadmap": "142 tasks valid",
+    "diff_check": "passed"
+  },
+  "changed_paths": [
+    ".workflow/CURRENT.md",
+    ".workflow/evidence/onboarding-entry-2026-11-19.json",
+    ".workflow/state.json",
+    "docs/decisions.md",
+    "roadmap/tasks/S05-02_guest_onboarding.md",
+    "server/static/js/features/account/profile.js",
+    "server/static/js/features/auth/registration.js",
+    "server/static/js/features/auth/session.js",
+    "server/static/js/features/onboarding/form.js",
+    "server/static/js/features/public/plans.js",
+    "server/static/js/i18n/language.js",
+    "server/studio/accounts/entry.py",
+    "server/studio/auth/oauth_routes.py",
+    "server/studio/auth/runtime.py",
+    "server/studio/public/routes.py",
+    "server/templates/member/dashboard.html",
+    "server/templates/public/base.html",
+    "server/templates/public/plan_cards.html",
+    "server/templates/shared/base.html",
+    "server/templates/shared/onboarding_choices.html",
+    "server/tests/integration/auth/test_oauth_flow.py",
+    "server/tests/security/accounts/test_onboarding_entry.py",
+    "tests/e2e/login-form.spec.js",
+    "tests/e2e/onboarding-entry.spec.js",
+    "tests/e2e/profile-form.spec.js",
+    "tests/e2e/s03-10-registration-ui.spec.js",
+    "tests/e2e/s05-02-guest-onboarding.spec.js"
+  ]
+}

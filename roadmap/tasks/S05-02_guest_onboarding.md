@@ -77,3 +77,22 @@ git commit -m "feat(onboarding): [S05-02] guest onboarding"
 Шаблон команды push намеренно не исполняется с неподтверждённым origin. Если remote отсутствует — локальный commit и push_status=pending, не blocker кодирования.
 
 Evidence: `.workflow/evidence/S05-02.json` по шаблону. Собственный SHA коммита не записывать внутрь того же коммита: branch/ref и base SHA до commit, итоговый SHA — в ответе/следующем checkpoint. Интегратор отмечает task done после проверки; dependency для следующего writer должна быть реально в его checkout.
+
+
+## Погоджене уточнення власника — 2026-11-19
+
+Follow-up до виконаної S05-02: completion-based entry та збереження форми при зміні мови.
+Кількість входів не критерій: незавершена анкета → profile; завершена → dashboard.
+Новий dashboard має серверний guard, але лише чесний порожній стан до S08–S09.
+Публічні сторінки не блокуються. Після першого save — dashboard; явне редагування — profile.
+Мова й тема не перезавантажують документ і не стирають вибрані пункти.
+
+Область: accounts/entry.py, public routes/templates, OAuth default return path,
+auth/session/profile JS, спільний i18n модуль із public copy pairs, вузькі DB/e2e тести.
+Без SQL/міграцій, зміни provider integrations або цін. Докази:
+`.workflow/evidence/onboarding-entry-2026-11-19.json`.
+
+Приймання: повторний вхід без анкети не обходить guard; завершений акаунт з іншого
+пристрою не отримує онбординг; недійсна сесія → login, збій БД → 503; новий Google
+callback → guard; UA/EN/тема зберігають DOM, крок і вибір на 390/1440; пароль не в storage.
+Commit: `fix(onboarding): [S05-02] completion-aware entry and live language`.

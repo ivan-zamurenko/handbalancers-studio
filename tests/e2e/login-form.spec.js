@@ -35,7 +35,9 @@ for (const width of [390,1440]) for (const theme of ['light','dark']) {
     expect(await page.evaluate(()=>JSON.stringify({...localStorage,...sessionStorage}))).not.toContain('synthetic-password-only');
     await (await headerItem(page, page.getByRole('link',{name:'EN',exact:true}))).click();
     await expect(page.getByRole('heading',{level:1})).toHaveText('Good to see you again.');
-    await expect(page.getByLabel('Password',{exact:true})).toHaveValue('');
+    // Locale now changes in-place: retain the field only in memory, never browser storage.
+    await expect(page.getByLabel('Password',{exact:true})).toHaveValue('synthetic-password-only');
+    expect(await page.evaluate(()=>JSON.stringify({...localStorage,...sessionStorage}))).not.toContain('synthetic-password-only');
     await expect(page.locator('html')).toHaveAttribute('data-theme',theme);
   });
 }

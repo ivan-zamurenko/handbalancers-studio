@@ -3,6 +3,8 @@ import {execFileSync} from 'node:child_process';
 
 const html = new Map();
 async function configured(page, language='uk') {
+  // Only the destination is synthetic here; real server gate has DB tests.
+  await page.route('**/dashboard?*',r=>r.fulfill({contentType:'text/html',body:'<h1>Today</h1>'}));
   for (const path of ['/register','/verify-email','/login']) {
     const url=`${path}?lang=${language}`;
     if (!html.has(url)) html.set(url,execFileSync('.venv/bin/python',['tests/fixtures/render_auth_page.py',url],{encoding:'utf8'}));
@@ -33,7 +35,7 @@ test('full_signup_keyboard',async({page})=>{
   await expect(page.getByLabel('Email',{exact:true})).toHaveValue('member@example.test');
   await page.getByLabel('Код із листа',{exact:true}).focus();
   await page.keyboard.type('012345');await page.keyboard.press('Enter');
-  await expect(page).toHaveURL(/\/plans\?lang=uk$/);
+  await expect(page).toHaveURL(/\/dashboard\?lang=uk$/);
   expect(calls).toEqual([{first_name:'Ivan',last_name:'Koval',email:'member@example.test',password:'synthetic-password-123'},{email:'member@example.test',token:'012345'}]);
   expect(await page.evaluate(()=>sessionStorage.getItem('studio:auth-draft'))).toBeNull();
 });
@@ -143,7 +145,7 @@ test('forms still work with storage denied and English copy',async({page})=>{
   await page.getByLabel('Email',{exact:true}).fill('member@example.test');
   await page.getByLabel('Password',{exact:true}).fill('synthetic');
   await page.getByRole('button',{name:'Log in',exact:true}).click();
-  await expect(page).toHaveURL(/\/plans\?lang=en$/);
+  await expect(page).toHaveURL(/\/dashboard\?lang=en$/);
 });
 
 for(const width of [390,1440]) for(const theme of ['dark','light']) test(`auth layout ${width} ${theme}`,async({page})=>{
@@ -158,4 +160,19 @@ for(const width of [390,1440]) for(const theme of ['dark','light']) test(`auth l
     await expect(page.getByRole('button',{name:/Apple/})).toHaveCount(0);
     await page.screenshot({path:test.info().outputPath(`${path.slice(1)}.png`)});
   }
+});
+
+
+test('language switch keeps login values and uses the selected language after login',async({page})=>{
+  await configured(page);
+  await page.goto('/login?lang=uk');
+  await page.getByLabel('Email',{exact:true}).fill('member@example.test');
+  await page.getByLabel('Пароль',{exact:true}).fill('synthetic-password-123');
+  let sent;
+  await page.route('**/api/auth/login',r=>{sent=r.request().postDataJSON();return r.fulfill({json:{state:'authenticated'}});});
+  await page.locator('.locale-nav a[lang=en]').click();
+  await expect(page.getByLabel('Password',{exact:true})).toHaveValue('synthetic-password-123');
+  await page.getByRole('button',{name:'Log in',exact:true}).click();
+  await expect(page).toHaveURL(/\/dashboard\?lang=en$/);
+  expect(sent).toEqual({email:'member@example.test',password:'synthetic-password-123'});
 });

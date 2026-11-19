@@ -12,7 +12,7 @@ const providers = [...document.querySelectorAll('[data-oauth-provider]')];
 const oauthMessage = document.getElementById('oauth-message');
 const toggles = [...document.querySelectorAll('[data-password-toggle]')];
 const draftKey = 'studio:auth-draft';
-const language = document.documentElement.lang === 'en' ? 'en' : 'uk';
+const language = () => document.documentElement.lang === 'en' ? 'en' : 'uk';
 let pending = null, navigating = false, completed = false;
 let resendUntil = 0, retryUntil = 0, timer;
 
@@ -52,7 +52,7 @@ function syncControls() {
   if (resend) {
     const seconds = Math.max(0,Math.ceil((resendUntil-Date.now())/1000));
     resend.disabled = busy || !enabled || seconds>0;
-    if (!busy) resend.textContent = seconds ? `${resend.dataset.wait} ${seconds} ${language==='en'?'s':'с'}` : resend.dataset.label;
+    if (!busy) resend.textContent = seconds ? `${resend.dataset.wait} ${seconds} ${language()==='en'?'s':'с'}` : resend.dataset.label;
   }
 }
 function startTimer() {
@@ -74,7 +74,7 @@ function go(path) {
   navigating = true;
   syncControls();
   beginNavigation();
-  location.assign(`${path}?lang=${language}`);
+  location.assign(`${path}?lang=${language()}`);
 }
 
 const draft = readDraft();
@@ -132,7 +132,7 @@ async function send(event, resending=false) {
       clearSecrets();
       try {sessionStorage.removeItem(draftKey);} catch { /* Optional storage. */ }
       window.dispatchEvent(new Event('studio:session-changed'));
-      go('/plans');
+      go('/dashboard');
     }
   } catch (error) {
     if (pending !== current) return;
@@ -169,7 +169,7 @@ for (const button of providers) button.addEventListener('click',async()=>{
   const finish = beginLoading({mode:'button',target:button});
   try {
     const result = await requestApi(`/api/auth/oauth/${button.dataset.oauthProvider}/start`,{
-      method:'POST',body:{return_to:'/plans'},
+      method:'POST',body:{return_to:'/dashboard'},
       signal:AbortSignal.any([current.signal,AbortSignal.timeout(8000)]),
     });
     if (pending!==current) return;

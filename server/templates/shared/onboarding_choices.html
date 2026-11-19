@@ -23,6 +23,6 @@
       </div>
       <p class="profile-label" id="minutes-label">{{ copy('Тривалість заняття', 'Session length') }}</p>
       <div class="chip-group chip-group--segmented" role="radiogroup" aria-labelledby="minutes-label" data-group="session_minutes" data-min="1">
-        {% for m in [30,45,60,90] %}{{ chip('session_minutes', m, m ~ copy(' хв',' min'), 'radio') }}{% endfor %}
+        {% for m in [30,45,60,90] %}{{ chip('session_minutes', m, copy(m ~ ' хв', m ~ ' min'), 'radio') }}{% endfor %}
       </div>
     </fieldset>
