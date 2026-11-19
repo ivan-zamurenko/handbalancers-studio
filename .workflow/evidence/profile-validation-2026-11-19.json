@@ -1,0 +1,49 @@
+{
+  "task_id": "S05-02",
+  "status": "done",
+  "scope": "Owner requests more space between profile groups and elegant red inline errors for missing required answers. Bounded follow-up: profile.css, account/profile.js, focused browser tests. No API/schema/required-field policy changes; time_of_day and measurements remain optional. UI checks at390/1440 light/dark UK/EN; credentials/screenshots ignored. S05-03 stays next.",
+  "base_sha": "cf165d3",
+  "branch": "task/execution-v4",
+  "red": [
+    {
+      "command": "Playwright tests/e2e/profile-validation.spec.js",
+      "result": "5 expected failures: no inline error messages and category spacing0 instead of24+."
+    },
+    {
+      "command": "Playwright tests/e2e/profile-validation.spec.js --grep 'corrected group'",
+      "result": "1 expected failure: resolved hidden error remained in accessible description."
+    },
+    {
+      "command": "Playwright tests/e2e/profile-validation.spec.js --grep 'selection 390'",
+      "result": "1 expected failure from visual review: hint bottom925 > sticky actions top795."
+    }
+  ],
+  "green": [
+    {
+      "command": "PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers .local-tools/node-v24.21.0-darwin-arm64/bin/node node_modules/@playwright/test/cli.js test tests/e2e/profile-validation.spec.js tests/e2e/profile-form.spec.js tests/e2e/onboarding-entry.spec.js tests/e2e/s05-02-guest-onboarding.spec.js",
+      "result": "34 passed after spacing/inline errors/accessibility fixes; before final focused scroll correction."
+    },
+    {
+      "command": "PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers .local-tools/node-v24.21.0-darwin-arm64/bin/node node_modules/@playwright/test/cli.js test tests/e2e/profile-validation.spec.js tests/e2e/profile-form.spec.js",
+      "result": "18 passed after final scroll fix; subset overlaps prior34, not52unique."
+    }
+  ],
+  "test_setup_notes": "Initial new language locator corrected to existing locale-nav API before reaching that assertion; first combined run32passed1timeout because language selection auto-closes drawer. Harness now only closes when still open; assertions unchanged. Not product RED.",
+  "implementation": "Category margins28/12 defeat cabinet paragraph reset; card spacing24 desktop16 mobile. Inline localized red errors for required names/goals/level/days/duration and invalid optional numeric values. Errors appear on continue/save, clear on correction; descriptions added/removed for groups and focused controls without dropping other hints. First invalid section opens, focus stays and scroll centers the field/group above sticky actions.",
+  "limits": [
+    "Browser requests use synthetic fixtures; no new hosted saves or Google login in this UI task.",
+    "time_of_day and blank body measurements remain optional; no change to server validation/API/schema.",
+    "Browser mobile viewport is not a physical phone keyboard test."
+  ],
+  "privacy": "Screenshots and synthetic visual script only under ignored private-evidence/profile-validation-2026-11-19. No credentials/account data staged.",
+  "push_status": "pending_at_commit",
+  "next_step": "S05-03 public pages; current request is a bounded profile follow-up.",
+  "visual_review": {
+    "command": "node private-evidence/profile-validation-2026-11-19/visual.cjs with PLAYWRIGHT_BROWSERS_PATH",
+    "result": "8 rendered combinations390/1440 light/dark UK/EN,0pageErrors,nohorizontaloverflow. Personally inspected error screens in both sizes/themes and spacing desktop. Mobile hint no longer hidden by sticky actions. Synthetic API responses, actual templates/CSS/JS."
+  },
+  "review": {
+    "reviewer": "cabinet_reference_review",
+    "result": "approved final diff including accessible-description cleanup and centered focus; P2resolved"
+  }
+}

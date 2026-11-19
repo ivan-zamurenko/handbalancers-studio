@@ -92,27 +92,83 @@ function fill(profile, onboarding, preferences) {
   updateSummaries();
 }
 
+const requiredMessages = {
+  first_name: ['Вкажіть ім’я.', 'Enter your first name.'],
+  last_name: ['Вкажіть прізвище.', 'Enter your last name.'],
+  goal_codes: ['Оберіть хоча б одну ціль.', 'Choose at least one goal.'],
+  self_reported_level: ['Оберіть ваш рівень.', 'Choose your level.'],
+  weekdays: ['Оберіть хоча б один день.', 'Choose at least one day.'],
+  session_minutes: ['Оберіть тривалість заняття.', 'Choose a session length.'],
+};
+
+function isInvalid(element) {
+  if (element.matches('[data-group]')) return checked(element.dataset.group).length < Number(element.dataset.min || 0);
+  return element.required ? !element.value.trim() : !element.checkValidity();
+}
+
+function markInvalid(element, bad) {
+  const name = element.dataset.group || element.name;
+  const id = `profile-error-${name}`;
+  element.setAttribute('aria-invalid', String(bad));
+  let message = document.getElementById(id);
+  if (bad && !message) {
+    message = document.createElement('p');
+    message.id = id;
+    message.className = 'profile-field-error';
+    element.after(message);
+  }
+  if (message) {
+    // Remove resolved errors from the accessible description; retain other hints.
+    for (const control of [element, ...element.querySelectorAll('input')]) {
+      const descriptions = new Set((control.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean));
+      if (bad) descriptions.add(id);
+      else descriptions.delete(id);
+      if (descriptions.size) control.setAttribute('aria-describedby', [...descriptions].join(' '));
+      else control.removeAttribute('aria-describedby');
+    }
+  }
+  if (element.matches('[data-group]')) {
+    for (const input of element.querySelectorAll('input')) input.setAttribute('aria-invalid', String(bad));
+  }
+  if (message) {
+    const en = document.documentElement.lang === 'en';
+    message.textContent = requiredMessages[name]?.[en ? 1 : 0]
+      ?? (en ? `Enter a value from ${element.min} to ${element.max}.` : `Вкажіть значення від ${element.min} до ${element.max}.`);
+    message.hidden = !bad;
+  }
+}
+
+function refreshFieldError(target) {
+  const element = target.closest('[data-group]') || target;
+  // Avoid showing errors before the first attempt to continue/save.
+  if (element.getAttribute('aria-invalid') !== 'true') return;
+  markInvalid(element, isInvalid(element));
+  errorBox.hidden = !form.querySelector('[aria-invalid="true"]');
+}
+
 // Validates one section (or the whole form) and focuses the first problem.
 function validate(scope = form) {
   let first = null;
   const mark = (element, bad) => {
-    element.setAttribute('aria-invalid', String(bad));
+    markInvalid(element, bad);
     if (bad && !first) first = element.matches('[data-group]') ? element.querySelector('input:not(:disabled)') : element;
   };
   for (const name of ['first_name', 'last_name']) {
     const input = form.elements[name];
-    if (scope.contains(input)) mark(input, !input.value.trim());
+    if (scope.contains(input)) mark(input, isInvalid(input));
   }
-  for (const group of groupsIn(scope)) mark(group, checked(group.dataset.group).length < Number(group.dataset.min || 0));
+  for (const group of groupsIn(scope)) mark(group, isInvalid(group));
   for (const name of numberFields) {
     const input = form.elements[name];
-    if (scope.contains(input)) mark(input, !input.checkValidity());
+    if (scope.contains(input)) mark(input, isInvalid(input));
   }
   errorBox.hidden = !first;
   if (first) {
     const section = first.closest('fieldset[data-step]');
     if (mode === 'accordion' && section) setOpen(section, true);
-    first.focus();
+    first.focus({preventScroll: true});
+    // Keep the whole choice group and its hint above the mobile sticky actions.
+    (first.closest('[data-group]') || first).scrollIntoView({block: 'center', behavior: 'instant'});
   }
   return !first;
 }
@@ -270,11 +326,11 @@ form?.addEventListener('change', event => {
     document.dispatchEvent(new CustomEvent('studio:language-select', {detail: event.target.value}));
   } else {
     syncLimits();
-    event.target.closest('[data-group]')?.setAttribute('aria-invalid', 'false');
+    refreshFieldError(event.target);
   }
   updateSummaries();
 });
-form?.addEventListener('input', updateSummaries);
+form?.addEventListener('input', event => { refreshFieldError(event.target); updateSummaries(); });
 
 buttons.next?.addEventListener('click', () => {
   if (validate(wizardSteps()[stepIndex])) showStep(stepIndex + 1);
@@ -346,6 +402,7 @@ if (form && status) load().catch(() => { status.textContent = status.dataset.una
 
 document.addEventListener('studio:language-changed', () => {
   if (!form || form.hidden) return;
+  for (const element of form.querySelectorAll('[data-group][aria-invalid="true"], .form-field__control[aria-invalid="true"]')) markInvalid(element, true);
   form.elements.locale.value = document.documentElement.lang;
   updateSummaries();
   if (saving) buttons.submit.textContent = document.documentElement.lang === 'en' ? 'Saving…' : 'Зберігаємо…';

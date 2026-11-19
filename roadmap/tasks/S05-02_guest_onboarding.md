@@ -150,3 +150,15 @@ profile-form.spec.js. Ранній вибір теми має пережити G
 не відновлює попередню тему. Без schema/API/provider/price змін.
 Evidence: `.workflow/evidence/onboarding-roundtrip-2026-11-19.json`.
 Commit: `fix(onboarding): [S05-02] preserve and synchronize account theme choices`.
+
+
+## Відступи й локальні помилки анкети - 2026-11-19
+
+На прохання власника: збільшити відступи між категоріями; після Далі/Зберегти
+порожній обов'язковий пункт має червоне обведення та коротке пояснення під ним.
+Виправлення прибирає помилку і її accessible description; повторна помилка
+відновлює опис. UK/EN без reload/втрати введення. Mobile відкриває проблемну
+секцію і тримає групу/підказку над sticky actions. Optional-політика незмінна.
+Scope: profile.css, features/account/profile.js, profile-validation.spec.js.
+Evidence: `.workflow/evidence/profile-validation-2026-11-19.json`.
+Commit: `fix(profile): [S05-02] space form groups and explain missing answers`.
