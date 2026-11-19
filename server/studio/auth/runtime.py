@@ -24,6 +24,7 @@ def build_oauth(settings: Settings) -> OAuthService | None:
     engine = create_engine(
         settings.auth_database_url.get_secret_value(),
         hide_parameters=True,
+        pool_pre_ping=True,
         pool_size=5,
         max_overflow=0,
         pool_timeout=5,

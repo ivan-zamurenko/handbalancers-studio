@@ -127,7 +127,8 @@
     "S03-06": {
       "status": "done",
       "evidence": ".workflow/evidence/S03-06.json",
-      "push_status": "pushed"
+      "push_status": "pushed",
+      "connection_recovery_evidence": ".workflow/evidence/session-db-recovery-2026-11-19.json"
     },
     "S03-07": {
       "status": "done",

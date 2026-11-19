@@ -13,6 +13,7 @@ from urllib.parse import urlencode
 from uuid import UUID
 
 from pydantic import SecretStr
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from studio.accounts.provisioning import current_profile, provision
@@ -21,7 +22,7 @@ from studio.auth.gateway import AuthFailure, AuthGateway
 from studio.auth.jwt import InvalidIdentity, JWTValidator
 from studio.auth.logout import logout_session
 from studio.auth.rate_limit import AuthLimits, allow_start
-from studio.auth.refresh import refresh_identity
+from studio.auth.refresh import RefreshUnavailable, refresh_identity
 from studio.auth.token_store import AttemptSecrets, TokenStore
 
 
@@ -223,7 +224,12 @@ class OAuthService:
             profile["profile_complete"] = bool(profile["first_name"] and profile["last_name"])
             return profile
 
-        return await run_db(current_session)
+        try:
+            return await run_db(current_session)
+        except (SQLAlchemyError, TimeoutError):
+            # A failed final recheck is temporary, not proof of an invalid session.
+            # Do not replay transactions or expose database parameters/errors.
+            raise RefreshUnavailable() from None
 
     def csrf_token(self, cookie: str) -> str:
         return hmac.new(

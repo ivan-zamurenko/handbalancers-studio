@@ -1,0 +1,126 @@
+{
+  "task_id": "S03-06",
+  "status": "done",
+  "date": "2026-11-19",
+  "base_sha": "dbdb8e9",
+  "scope": "Approved first step only: diagnose intermittent cabinet503. Auth runtime follow-up: both runtime connection pools, final session read, real isolated DB regressions. No schema, UI, account data or provider changes. S05-03 remains todo.",
+  "observed": "Existing browser /api/session500 followed by /dashboard200 and /progress200. Earlier503 had no retained cause; stale pool is a hypothesis until reproduced, not a proven historical cause.",
+  "red": {
+    "command": "DOCKER_HOST=\"unix://$HOME/.colima/studio-s01/docker.sock\" .venv/bin/python tools/local_stack.py test .venv/bin/python -m pytest server/tests/integration/auth/test_runtime_connection_recovery.py -q --tb=short",
+    "result": "5 failed for expected reasons: 2 actual closed PostgreSQL connections failed at next transaction; 3 final-read statement timeouts returned500 instead of503."
+  },
+  "green": [
+    {
+      "command": "DOCKER_HOST=\"unix://$HOME/.colima/studio-s01/docker.sock\" .venv/bin/python tools/local_stack.py test .venv/bin/python -m pytest server/tests/integration/auth/test_runtime_connection_recovery.py -q --tb=short",
+      "result": "5 passed"
+    },
+    {
+      "command": "DOCKER_HOST=\"unix://$HOME/.colima/studio-s01/docker.sock\" .venv/bin/python tools/local_stack.py test .venv/bin/python -m pytest server/tests/integration/auth server/tests/security/auth server/tests/security/accounts/test_onboarding_entry.py server/tests/security/accounts/test_profile_preferences.py server/tests/integration/database/test_transaction_context.py --import-mode=importlib -q --tb=short",
+      "result": "203 passed; 23 fixture setup errors because installed local Supabase CLI was missing from PATH."
+    },
+    {
+      "command": "PATH=\"$PWD/.local-tools/supabase-cli/node_modules/@supabase/cli-darwin-arm64/bin:$PATH\" DOCKER_HOST=\"unix://$HOME/.colima/studio-s01/docker.sock\" .venv/bin/python tools/local_stack.py test .venv/bin/python -m pytest server/tests/integration/auth server/tests/security/auth server/tests/security/accounts/test_onboarding_entry.py server/tests/security/accounts/test_profile_preferences.py server/tests/integration/database/test_transaction_context.py --import-mode=importlib --lf -q --tb=short",
+      "result": "All23 previously blocked tests passed; 226 distinct affected cases passed across these runs, no skips."
+    }
+  ],
+  "branch": "task/execution-v4",
+  "test_setup_notes": "Initial combined run had duplicate module-name collection errors; used importlib without changing test assertions. Then supplied existing local CLI in PATH and reran failed fixture cases only. No test/runtime dependencies changed.",
+  "implementation": "Pre-ping both runtime pools before reuse. Final authenticated-session DB read translates SQLAlchemyError/TimeoutError to existing RefreshUnavailable. No transaction replay or token-rotation retries, no guard bypass, no schema change.",
+  "hosted": {
+    "session": [
+      {
+        "status": 200,
+        "authenticated": true,
+        "setup_required": false
+      },
+      {
+        "status": 200,
+        "authenticated": true,
+        "setup_required": false
+      },
+      {
+        "status": 200,
+        "authenticated": true,
+        "setup_required": false
+      },
+      {
+        "status": 200,
+        "authenticated": true,
+        "setup_required": false
+      },
+      {
+        "status": 200,
+        "authenticated": true,
+        "setup_required": false
+      },
+      {
+        "status": 200,
+        "authenticated": true,
+        "setup_required": false
+      }
+    ],
+    "views": [
+      {
+        "width": 1440,
+        "path": "/dashboard",
+        "status": 200,
+        "overflow": false
+      },
+      {
+        "width": 1440,
+        "path": "/progress",
+        "status": 200,
+        "overflow": false
+      },
+      {
+        "width": 1440,
+        "path": "/profile",
+        "status": 200,
+        "overflow": false
+      },
+      {
+        "width": 390,
+        "path": "/dashboard",
+        "status": 200,
+        "overflow": false
+      },
+      {
+        "width": 390,
+        "path": "/progress",
+        "status": 200,
+        "overflow": false
+      },
+      {
+        "width": 390,
+        "path": "/profile",
+        "status": 200,
+        "overflow": false
+      }
+    ],
+    "writes": [],
+    "serverErrors": [],
+    "pageErrors": 0,
+    "scope": "Existing owner session, read-only after local server restart. Real hosted auth/DB; no fresh Google login, logout, questionnaire submission or hosted fault injection."
+  },
+  "visual_review": "Personally inspected six actual browser screenshots: overview/progress/profile at1440/390. Current rendered themes, no overflow. Profile input values masked. No template/style/JS changes in this task.",
+  "privacy": "private-evidence ignored by git check-ignore; git ls-files private-evidence empty; no account writes or credentials logged. Screenshots only in ignored folder.",
+  "review": {
+    "reviewer": "cabinet_reference_review",
+    "result": "approved; no blocking findings; read-only code/test review"
+  },
+  "checks": [
+    "ruff check and format --check: passed on all4 Python files",
+    "roadmap validator:142 tasks valid; git diff --check passed; scoped staging/privacy checked before commit"
+  ],
+  "limits": [
+    "Historical503 cause was not retained; stale connection behavior reproduced locally, not proven as its original cause.",
+    "Pre-ping cannot prevent an outage during a transaction; such failures remain fail-closed/retryable.",
+    "Fresh hosted login and end-to-end save/relogin are the next step; no questionnaire data changed here."
+  ],
+  "sources": [
+    "https://docs.sqlalchemy.org/en/20/core/pooling.html#disconnect-handling-pessimistic",
+    "https://supabase.com/docs/guides/observability.md"
+  ],
+  "push_status": "pending_at_commit",
+  "next_step": "Step2: full login/onboarding/save/relogin flow, then S05-03; do not treat this read-only check as a hosted save test."
+}

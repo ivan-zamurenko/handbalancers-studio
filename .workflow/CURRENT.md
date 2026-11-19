@@ -1,3 +1,29 @@
+# Відновлення доступу до кабінету — 2026-11-19
+
+Завершено перший погоджений крок: відтворені й виправлені збої повторного
+використання закритого DB-з’єднання та необроблена помилка фінального читання
+сесії. Обидва runtime-пули мають pre-ping; final session read повертає
+контрольований503 при тимчасовому збої без logout/replay/витоку даних.
+Схема, права, анкета, UI та провайдери незмінні. Це follow-up S03-06.
+
+RED: 5 нових сценаріїв впали за очікуваною причиною; GREEN: ті самі5 пройшли.
+Affected regression: 203 passed + 23 після виправлення PATH для вже встановленого
+локального Supabase CLI; загалом226 різних сценаріїв, без skip. Початкові
+collection/setup errors записані в evidence. Read-only review approved.
+
+Hosted після перезапуску локального сервера: session200/authenticated/complete,
+root→dashboard; overview/progress/profile200 на1440/390; шість read-only
+session checks200, account writes0, browser/server errors0. Особисто переглянуто
+шість screenshots, приватні поля замасковані; private-evidence не tracked.
+Старий503 не має збереженої причини: не називати його точну причину доведеною.
+
+Evidence: `.workflow/evidence/session-db-recovery-2026-11-19.json`.
+Базовий коміт dbdb8e9 запушений. Наступний крок — повний сценарій
+вхід → онбординг/кабінет → збереження → повторний вхід; потім S05-03.
+Справжній hosted save/relogin у цьому read-only кроці не перевірявся.
+
+## Попередній checkpoint
+
 # Порожній прогрес — 2026-11-19
 
 /progress має новий empty-state: одноразова анімація сходинок до зеленої
