@@ -1,0 +1,102 @@
+{
+  "task_id": "S05-02",
+  "date": "2026-11-19",
+  "status": "done",
+  "branch": "task/execution-v4",
+  "base_sha": "1040cee1189f8cb087b0820cd77494fd8157f2e2",
+  "scope_deviations": [
+    "Connect guest questionnaire to public landing/plans and existing authenticated profile. Share questionnaire fields, add bounded tab-only draft state and wire session/logout cleanup. Add real HTTP validation/security tests and browser tests; no SQL/schema or provider changes.",
+    "Share OnboardingChoices DTO without changing existing account validation or SQL. Browser uses default Chromium config; the card historical --project=chromium flag is not configured in this repository."
+  ],
+  "design": "POST /api/onboarding/draft validates a strict non-sensitive DTO with existing strict single same-origin pre-auth CSRF protection. Draft is untrusted sessionStorage convenience, expires after 24h, binds to confirmed account namespace, never grants entitlement. Existing profile requires explicit use of draft, then explicit Save using server revision. Auth return paths stay /plans. No cross-tab/device draft promise.",
+  "red": [
+    {
+      "command": ".venv/bin/python -m pytest server/tests/contracts/test_guest_onboarding.py -q",
+      "observed_failure": "19 failures: draft API and page absent (404)",
+      "not_an_environment_failure": true
+    },
+    {
+      "command": "PATH=\"$PWD/.local-tools/uv-env/bin:$PWD/.local-tools/node-v24.21.0-darwin-arm64/bin:$PATH\" UV_CACHE_DIR=.local-tools/uv-cache PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers .local-tools/node-v24.21.0-darwin-arm64/bin/node node_modules/@playwright/test/cli.js test tests/e2e/s05-02-guest-onboarding.spec.js --grep fresh_days_empty",
+      "observed_failure": "1 failure: guest form missing on absent /onboarding",
+      "not_an_environment_failure": true
+    },
+    {
+      "command": "PATH=\"$PWD/.local-tools/uv-env/bin:$PWD/.local-tools/node-v24.21.0-darwin-arm64/bin:$PATH\" UV_CACHE_DIR=.local-tools/uv-cache PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers .local-tools/node-v24.21.0-darwin-arm64/bin/node node_modules/@playwright/test/cli.js test tests/e2e/s05-02-guest-onboarding.spec.js --grep \"pending submission\"",
+      "observed_failure": "1 failure: editable choices stayed enabled while POST pending",
+      "not_an_environment_failure": true
+    }
+  ],
+  "green": {
+    "command": "PATH=\"$PWD/.local-tools/uv-env/bin:$PWD/.local-tools/node-v24.21.0-darwin-arm64/bin:$PATH\" UV_CACHE_DIR=.local-tools/uv-cache PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers .local-tools/node-v24.21.0-darwin-arm64/bin/node node_modules/@playwright/test/cli.js test tests/e2e/s05-02-guest-onboarding.spec.js tests/e2e/profile-form.spec.js tests/e2e/s05-03-public-pages.spec.js tests/e2e/login-form.spec.js tests/e2e/logout.spec.js tests/e2e/oauth-ui.spec.js tests/e2e/s03-10-registration-ui.spec.js",
+    "exit_code": 0,
+    "summary": "64 browser tests passed; includes 13 guest onboarding cases and 390/1440 light/dark layouts"
+  },
+  "regression_commands": [
+    {
+      "command": ".venv/bin/python -m pytest server/tests/contracts/test_guest_onboarding.py server/tests/contracts/auth -q",
+      "result": "61 passed"
+    },
+    {
+      "command": "PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers .local-tools/node-v24.21.0-darwin-arm64/bin/node --test tests/js/*.test.js",
+      "result": "61 passed"
+    },
+    {
+      "command": "DOCKER_HOST=\"unix://$HOME/.colima/studio-s01/docker.sock\" .venv/bin/python tools/local_stack.py test .venv/bin/python -m pytest server/tests/security/accounts/test_onboarding_model.py server/tests/security/accounts/test_profile_preferences.py -q",
+      "result": "16 passed on isolated local DB; no hosted test fixtures"
+    },
+    {
+      "command": ".venv/bin/python -m mypy server/studio/accounts/onboarding.py server/studio/accounts/onboarding_routes.py server/studio/public/routes.py",
+      "result": "passed"
+    },
+    {
+      "command": ".venv/bin/python -m ruff check server/studio/accounts/onboarding.py server/studio/accounts/onboarding_routes.py server/studio/main.py server/studio/public/routes.py server/tests/contracts/test_guest_onboarding.py",
+      "result": "passed; format check of same files passed"
+    }
+  ],
+  "manual_checks": [
+    "Inspected mobile dark goals and desktop light schedule screenshots; all eight viewport/theme/step captures are in ignored private-evidence/onboarding-s05-02.",
+    "Existing real account save to cloud verified below; no form answers, identity or credentials in evidence."
+  ],
+  "hosted_save": {
+    "date": "2026-11-19",
+    "environment": "local app + hosted database, existing authenticated user",
+    "mocks": false,
+    "profile_patch_status": 200,
+    "onboarding_put_status": 200,
+    "success_animation": true,
+    "animation_phases": [
+      "shift",
+      "hold",
+      "paint",
+      "result"
+    ],
+    "read_after_reload_status": 200,
+    "persisted_answers_unchanged": true,
+    "form_matches_saved_answers": true,
+    "revision_incremented_once": true,
+    "personal_data_logged": false
+  },
+  "review": {
+    "reviewer": "onboarding_boundaries",
+    "result": "approved after P2 fix",
+    "findings": [
+      "Prevent pending-request edits from being lost: freeze controls, restore after failure; observed RED then GREEN."
+    ]
+  },
+  "environment_notes": [
+    "Initial broad browser run could not find uv; corrected PATH, no assertion changed. Initial full JS run lacked browser path; corrected PLAYWRIGHT_BROWSERS_PATH. These are not TDD RED evidence.",
+    "Public copy regression restored original AI-unavailable wording; test assertion was not weakened.",
+    "Existing Starlette TestClient deprecation warning remains."
+  ],
+  "unverified": [
+    "Live guest draft through a new Google/email login is not verified; browser suite uses a synthetic authenticated boundary. Existing hosted authenticated save is verified separately.",
+    "Real physical phone/Safari not checked. No live paid access or checkout."
+  ],
+  "limitations": [
+    "Draft is temporary in one tab, no cross-device/browser transfer. Existing questionnaire requires explicit apply and Save.",
+    "Unresolved Keep/Use choice stays pending until explicit resolution; a later /plans can return to the profile."
+  ],
+  "privacy": "Private career/CV/social/business files and screenshots remain ignored and unstaged. No migrations or account credentials changed.",
+  "push_status": "pending_at_commit",
+  "next_task": "S05-03"
+}

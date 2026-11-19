@@ -1,7 +1,6 @@
 {% extends "public/base.html" %}
 {% block title %}{{ copy('Профіль', 'Profile') }} — Handbalancer’s Studio{% endblock %}
 {% block head %}{{ super() }}<link rel="stylesheet" href="/static/css/auth.css"><link rel="stylesheet" href="/static/css/save-feedback.css"><link rel="stylesheet" href="/static/css/profile.css">{% endblock %}
-{% macro chip(name, value, label, type='checkbox') %}<label class="chip-option"><input type="{{ type }}" name="{{ name }}" value="{{ value }}"><span>{{ label }}</span></label>{% endmacro %}
 {% block public_content %}
 <section class="profile-section wrap" aria-labelledby="profile-title">
   <div class="profile-intro" data-setup-intro hidden>
@@ -12,6 +11,10 @@
   <div class="login-heading" data-profile-heading><p class="eyebrow">{{ copy('Профіль', 'Profile') }}</p><h1 id="profile-title">{{ copy('Ваші дані.', 'Your details.') }}</h1><p>{{ copy('Те, на що спирається ваш план.', 'What your plan is built on.') }}</p></div>
 
   <form id="profile-form" class="profile-form" data-profile-form aria-describedby="profile-status" novalidate hidden>
+    <aside class="profile-card" data-draft-notice hidden aria-label="{{ copy('Відповіді перед входом', 'Answers from before sign-in') }}">
+      <p>{{ copy('У вас уже є збережена анкета. Залишити її чи підставити відповіді, які ви щойно обрали? Зміни запишуться лише після «Зберегти».', 'You already have a saved questionnaire. Keep it or use the answers you just selected? Changes are only saved when you press Save.') }}</p>
+      <div class="profile-buttons"><button type="button" class="wizard-back" data-draft-discard>{{ copy('Залишити мої дані', 'Keep my saved answers') }}</button><button type="button" class="wizard-back" data-draft-apply>{{ copy('Підставити нові відповіді', 'Use my new answers') }}</button></div>
+    </aside>
     <div class="wizard-head" data-wizard-head hidden>
       <p class="wizard-count" data-wizard-count aria-live="polite"></p>
       <div class="wizard-bar" aria-hidden="true"><span data-wizard-bar></span></div>
@@ -25,33 +28,7 @@
       </div>
     </fieldset>
 
-    <fieldset class="profile-card" data-step="goals">
-      <legend>{{ copy('Цілі', 'Goals') }}</legend>
-      <p class="profile-label" id="goals-label">{{ copy('Над чим працюємо', 'What we work on') }} <span>{{ copy('одна або кілька', 'one or more') }}</span></p>
-      <div class="chip-group chip-group--tiles" role="group" aria-labelledby="goals-label" data-group="goal_codes" data-min="1" data-max="4">
-        {{ chip('goal_codes','handstand',copy('Стійка на руках','Handstand')) }}{{ chip('goal_codes','strength',copy('Сила','Strength')) }}{{ chip('goal_codes','mobility',copy('Гнучкість і рухливість','Flexibility & mobility')) }}{{ chip('goal_codes','fitness',copy('Загальна форма','General fitness')) }}
-      </div>
-      <p class="profile-label" id="level-label">{{ copy('Ваш рівень зараз', 'Your level now') }} <span>{{ copy('самооцінка', 'self-assessment') }}</span></p>
-      <div class="chip-group chip-group--segmented" role="radiogroup" aria-labelledby="level-label" data-group="self_reported_level" data-min="1">
-        {{ chip('self_reported_level','1',copy('Початківець','Beginner'),'radio') }}{{ chip('self_reported_level','2',copy('Маю досвід','Some experience'),'radio') }}{{ chip('self_reported_level','3',copy('Впевнено','Confident'),'radio') }}
-      </div>
-    </fieldset>
-
-    <fieldset class="profile-card" data-step="schedule">
-      <legend>{{ copy('Розклад', 'Schedule') }}</legend>
-      <p class="profile-label" id="days-label">{{ copy('Зручні дні', 'Preferred days') }} <span>{{ copy('до трьох', 'up to three') }}</span></p>
-      <div class="chip-group chip-group--days" role="group" aria-labelledby="days-label" data-group="weekdays" data-min="1" data-max="3">
-        {% for code, uk, en in [(7,'Нд','Sun'),(1,'Пн','Mon'),(2,'Вт','Tue'),(3,'Ср','Wed'),(4,'Чт','Thu'),(5,'Пт','Fri'),(6,'Сб','Sat')] %}{{ chip('weekdays', code, copy(uk, en)) }}{% endfor %}
-      </div>
-      <p class="profile-label" id="time-label">{{ copy('Зручний час', 'Preferred time') }}</p>
-      <div class="chip-group chip-group--segmented" role="radiogroup" aria-labelledby="time-label" data-group="time_of_day">
-        {{ chip('time_of_day','morning',copy('Ранок','Morning'),'radio') }}{{ chip('time_of_day','afternoon',copy('День','Afternoon'),'radio') }}{{ chip('time_of_day','evening',copy('Вечір','Evening'),'radio') }}
-      </div>
-      <p class="profile-label" id="minutes-label">{{ copy('Тривалість заняття', 'Session length') }}</p>
-      <div class="chip-group chip-group--segmented" role="radiogroup" aria-labelledby="minutes-label" data-group="session_minutes" data-min="1">
-        {% for m in [30,45,60,90] %}{{ chip('session_minutes', m, m ~ copy(' хв',' min'), 'radio') }}{% endfor %}
-      </div>
-    </fieldset>
+    {% include "shared/onboarding_choices.html" %}
 
     <fieldset class="profile-card" data-step="body" data-optional>
       <legend>{{ copy('Параметри', 'Body') }}</legend>

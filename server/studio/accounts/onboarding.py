@@ -21,13 +21,18 @@ def _distinct[T](values: list[T]) -> list[T]:
     return values
 
 
-class OnboardingInput(BaseModel):
+class OnboardingChoices(BaseModel):
+    """Non-sensitive guest answers; never identity, entitlement or a row revision."""
+
     model_config = ConfigDict(extra="forbid", hide_input_in_errors=True)
     goal_codes: Annotated[list[Goal], Field(min_length=1, max_length=4), AfterValidator(_distinct)]
     self_reported_level: Annotated[int, Field(ge=1, le=3, strict=True)]
     session_minutes: Literal[30, 45, 60, 90]
     weekdays: Annotated[list[Weekday], Field(min_length=1, max_length=3), AfterValidator(_distinct)]
     time_of_day: Literal["morning", "afternoon", "evening"] | None = None
+
+
+class OnboardingInput(OnboardingChoices):
     birth_year: Annotated[int, Field(ge=1920, le=2020)] | None = None
     height_cm: Annotated[int, Field(ge=100, le=250)] | None = None
     weight_kg: Annotated[Decimal, Field(ge=25, le=300, max_digits=4, decimal_places=1)] | None = (

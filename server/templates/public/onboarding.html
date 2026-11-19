@@ -1,0 +1,24 @@
+{% extends "public/base.html" %}
+{% block title %}{{ copy('Початок практики', 'Your starting point') }} — Handbalancer’s Studio{% endblock %}
+{% block head %}{{ super() }}<link rel="stylesheet" href="/static/css/auth.css"><link rel="stylesheet" href="/static/css/profile.css"><link rel="stylesheet" href="/static/css/onboarding.css">{% endblock %}
+{% block public_content %}
+<section class="profile-section guest-section wrap" aria-labelledby="guest-title">
+  <div class="profile-intro">
+    <p class="eyebrow">Handbalancer’s Studio</p>
+    <h1 id="guest-title">{{ copy('Почнімо з вас.', 'Start with you.') }}</h1>
+    <p>{{ copy('Два короткі кроки про ваші цілі й час на практику. Після входу ви зможете перевірити та зберегти відповіді.', 'Two short steps about your goals and time for practice. After signing in, you can review and save your answers.') }}</p>
+  </div>
+  <form class="profile-form" data-guest-form novalidate aria-describedby="guest-note guest-error">
+    <div class="wizard-head"><p class="wizard-count" data-guest-count aria-live="polite" data-label="{{ copy('Крок {n} з 2', 'Step {n} of 2') }}"></p><div class="wizard-bar" aria-hidden="true"><span data-guest-bar></span></div></div>
+    {% include "shared/onboarding_choices.html" %}
+    <div class="profile-actions">
+      <p class="profile-error" id="guest-error" data-guest-error role="alert" hidden data-required="{{ copy('Оберіть відповіді в позначених полях.', 'Choose answers in the highlighted fields.') }}" data-network="{{ copy('Не вдалося продовжити. Відповіді залишилися у формі - спробуйте ще раз.', 'Could not continue. Your answers are still in the form - please try again.') }}" data-storage="{{ copy('Браузер не дозволяє зберегти відповіді для переходу. Дозвольте сховище для сайту й повторіть спробу або заповніть анкету після входу.', 'Your browser cannot keep these answers for the next page. Allow site storage and retry, or complete the questionnaire after signing in.') }}"></p>
+      <div class="profile-buttons"><button type="button" class="wizard-back" data-guest-back hidden>{{ copy('Назад', 'Back') }}</button><button type="button" class="primary login-submit" data-guest-next disabled>{{ copy('Далі', 'Next') }}</button><button type="submit" class="primary login-submit" data-guest-submit hidden>{{ copy('До тарифів', 'View plans') }}</button></div>
+    </div>
+  </form>
+  <p class="profile-note" id="guest-note">{{ copy('Після переходу до тарифів відповіді зберігаються до 24 годин лише в цій вкладці. Вік, зріст і вага тут не потрібні. Оплата ще не відкрита.', 'After continuing to plans, answers stay in this tab for up to 24 hours. No age, height or weight needed here. Payments are not open yet.') }}</p>
+  <p class="profile-note"><a href="/login?lang={{ language }}">{{ copy('Уже є акаунт? Увійти', 'Already have an account? Log in') }}</a></p>
+  <noscript><p>{{ copy('Увімкніть JavaScript для анкети.', 'Enable JavaScript to use the questionnaire.') }}</p></noscript>
+</section>
+{% endblock %}
+{% block scripts %}<script type="module" src="/static/js/features/onboarding/form.js"></script>{% endblock %}

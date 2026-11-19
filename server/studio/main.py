@@ -10,6 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
+from studio.accounts.onboarding_routes import router as onboarding_router
 from studio.accounts.routes import router as accounts_router
 from studio.auth.oauth_routes import router as oauth_router
 from studio.auth.recovery_routes import router as recovery_router
@@ -67,6 +68,7 @@ def create_app(settings: Settings | Mapping[str, object] | None = None) -> FastA
     app.include_router(recovery_router)
     app.include_router(oauth_router)
     app.include_router(accounts_router)
+    app.include_router(onboarding_router)
     app.include_router(public_router)
     app.mount(
         "/static",

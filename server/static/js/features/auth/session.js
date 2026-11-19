@@ -1,5 +1,6 @@
 import {clearAccountState} from '../../state/session.js';
 import {beginLoading, beginNavigation} from '../../components/loading.js';
+import {claimGuestDraft} from '../onboarding/draft.js';
 
 // Credentials, CSRF and current account identity live only in memory.
 const logout = document.querySelector('[data-logout]');
@@ -72,7 +73,7 @@ async function saveServerTheme(preference) {
 }
 
 // Missing name/questionnaire: open the profile form once per tab, not on every page.
-const setupExempt = new Set(['/profile', '/login', '/register', '/verify-email', '/recovery']);
+const setupExempt = new Set(['/profile', '/onboarding', '/login', '/register', '/verify-email', '/recovery']);
 function offerSetup(id) {
   const key = `studio:account:${id}:setup-offered`;
   try {
@@ -99,7 +100,11 @@ async function refresh() {
     const previous = accountId;
     accountId = authenticated ? snapshot.user?.id || null : null;
     if (accountId && accountId !== previous) loadServerTheme(accountId);
-    if (authenticated && snapshot.setup_required === true) offerSetup(accountId);
+    const draft = authenticated && window.location.pathname !== '/onboarding' ? claimGuestDraft(accountId) : null;
+    if (draft && window.location.pathname === '/plans') {
+      beginNavigation();
+      window.location.assign(`/profile?lang=${document.documentElement.lang || 'uk'}`);
+    } else if (authenticated && snapshot.setup_required === true) offerSetup(accountId);
     logout.hidden = !authenticated; login.hidden = authenticated;
     if (profileLink) profileLink.hidden = !authenticated;
     if (loginCta) loginCta.hidden = authenticated;

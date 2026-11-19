@@ -1,6 +1,7 @@
 // Own profile + questionnaire. Identity/CSRF come only from /api/session; nothing private is stored.
 // Phone: first fill is a step-by-step form; editing later uses collapsible sections.
 import {playSaveFeedback} from '../../components/save-feedback.js';
+import {claimGuestDraft, clearAccountDraft} from '../onboarding/draft.js';
 
 const form = document.querySelector('[data-profile-form]');
 const status = document.querySelector('[data-profile-status]');
@@ -24,6 +25,34 @@ let setupMode = false;
 let mode = 'full';
 let stepIndex = 0;
 let saving = false;
+let draft = null;
+let draftUsed = false;
+let accountId = null;
+const draftNotice = document.querySelector('[data-draft-notice]');
+
+function applyDraft() {
+  if (!draft) return;
+  for (const [name, value] of Object.entries(draft.data)) {
+    setChoices(name, Array.isArray(value) ? value : value == null ? [] : [value]);
+  }
+  draftUsed = true;
+  draftNotice.hidden = true;
+  syncLimits();
+  updateSummaries();
+}
+
+document.querySelector('[data-draft-apply]')?.addEventListener('click', () => {
+  applyDraft();
+  const section = form.querySelector('[data-step="goals"]');
+  if (mode === 'wizard') showStep(1);
+  else { if (mode === 'accordion') setOpen(section, true); section.querySelector('input')?.focus(); }
+});
+document.querySelector('[data-draft-discard]')?.addEventListener('click', () => {
+  clearAccountDraft(accountId);
+  draft = null;
+  draftNotice.hidden = true;
+  form.querySelector('input')?.focus();
+});
 
 async function json(url, options = {}) {
   const response = await fetch(url, {credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(8000), ...options});
@@ -199,6 +228,7 @@ async function load() {
     return;
   }
   csrf = session.body.csrf_token;
+  accountId = session.body.user?.id;
   const [profile, onboarding, preferences] = await Promise.all(
     ['/api/me/profile', '/api/me/onboarding', '/api/me/preferences'].map(url => json(url)),
   );
@@ -211,6 +241,9 @@ async function load() {
   heading.hidden = setupMode;
   wrapSections();
   fill(profile.body, onboarding.body, preferences.body);
+  draft = claimGuestDraft(accountId);
+  if (draft && !onboarding.body) applyDraft();
+  else if (draft) draftNotice.hidden = false;
   applyMode();
   status.textContent = '';
   form.hidden = false;
@@ -278,6 +311,7 @@ form?.addEventListener('submit', async event => {
   form.removeAttribute('aria-busy');
   saving = false;
   if (result.kind === 'ok') {
+    if (draftUsed) { clearAccountDraft(accountId); draft = null; draftUsed = false; }
     onboardingRevision = result.onboarding.body.revision;
     status.textContent = '';
     if (setupMode) {

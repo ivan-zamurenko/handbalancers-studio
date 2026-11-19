@@ -1,0 +1,13 @@
+.guest-section { max-width: 720px; }
+.guest-section .wizard-head { display: grid; gap: 8px; }
+.guest-section .wizard-count { color: var(--muted); font-size: 13px; }
+.guest-section .wizard-bar { height: 4px; overflow: hidden; background: var(--line); border-radius: 2px; }
+.guest-section .wizard-bar span { display: block; height: 100%; background: var(--accent); }
+.guest-section fieldset[hidden] { display: none; }
+.guest-section legend:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.guest-section .profile-note { margin-top: 16px; }
+@media (max-width: 760px) {
+  .guest-section { padding-bottom: 24px; }
+  .guest-section .profile-card { border: 0; background: transparent; padding-inline: 0; }
+  .guest-section .profile-actions { margin-inline: 0; }
+}

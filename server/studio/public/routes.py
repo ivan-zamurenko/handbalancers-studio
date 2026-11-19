@@ -110,6 +110,11 @@ async def plans_page(request: Request) -> HTMLResponse:
     return render(request, "public/plans.html")
 
 
+@router.get("/onboarding", response_class=HTMLResponse, include_in_schema=False)
+async def onboarding_page(request: Request) -> HTMLResponse:
+    return render(request, "public/onboarding.html")
+
+
 @router.get("/login", response_class=HTMLResponse, include_in_schema=False)
 async def login_page(request: Request) -> HTMLResponse:
     return render(request, "auth/login.html")

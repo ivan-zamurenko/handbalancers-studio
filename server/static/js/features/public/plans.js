@@ -1,4 +1,5 @@
 // Presentation preference only. Never grants a subscription or performs a payment.
+import {readGuestDraft} from '../onboarding/draft.js';
 const names = { essential: 'Essential', plus: 'Plus', pro: 'Pro', 'pro-plus': 'Pro+' };
 const storageKey = 'studio:public:plan';
 const english = document.documentElement.lang === 'en';
@@ -32,3 +33,15 @@ for (const radio of radios) radio.addEventListener('change', () => {
   render();
 });
 render();
+
+// An onboarding visitor can create an account now, but this does not start a trial/payment.
+if (button && readGuestDraft()) {
+  button.removeAttribute('data-dialog-open');
+  button.addEventListener('click', () => {
+    const current = radios.find(r => r.checked)?.value;
+    if (Object.hasOwn(names, current)) {
+      try { localStorage.setItem(storageKey, current); } catch { /* Preference only. */ }
+    }
+    window.location.assign(`/register?lang=${english ? 'en' : 'uk'}`);
+  });
+}

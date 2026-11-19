@@ -4,7 +4,8 @@
     {% set heading = 'h1' if page_path == '/plans' else 'h2' %}
     <{{ heading }} id="plans-title">{{ copy('Ваші цілі. Моя увага.', 'Your goals. My attention.') }}</{{ heading }}>
   </div>
-  <p class="availability-note" data-availability>{{ copy('Студія готується до відкриття. Реєстрація й оплата ще недоступні. AI-аналіз ще недоступний; опис пакетів показує запланований формат супроводу.', 'The studio is getting ready to open. Registration and payments are not available yet. AI analysis is not available; the plans describe the intended support.') }}</p>
+  <p class="availability-note" data-availability>{{ copy('Студія готується до відкриття. Оплата ще недоступна. AI-аналіз ще недоступний; опис пакетів показує запланований формат супроводу. Вибір пакета не активує підписку.', 'The studio is getting ready to open. Payments and AI analysis are not available; the plans describe the intended support. Choosing a plan does not activate a subscription.') }}</p>
+  <p class="small"><a href="/onboarding?lang={{ language }}">{{ copy('Почати з моїх цілей', 'Start with my goals') }}</a></p>
   <fieldset class="plans-grid">
     <legend class="sr-only">{{ copy('Оберіть пакет', 'Choose a plan') }}</legend>
     {% for id, name, amount, uk_description, en_description, uk_features, en_features in plans %}
