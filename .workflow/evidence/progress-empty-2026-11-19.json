@@ -1,0 +1,51 @@
+{
+  "task_id": "S05-02",
+  "date": "2026-11-19",
+  "status": "done",
+  "branch": "task/execution-v4",
+  "base_sha": "6d0eb12",
+  "scope": "Owner requested designed empty progress and animation; local UI complete, hosted verification blocked separately. No API/database/guards changes.",
+  "red": {
+    "command": "PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers .local-tools/node-v24.21.0-darwin-arm64/bin/node node_modules/@playwright/test/cli.js test tests/e2e/member-cabinet.spec.js --grep \"empty progress 1440 dark\"",
+    "result": "1 failed: data-progress-empty absent"
+  },
+  "green": [
+    {
+      "command": "PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers .local-tools/node-v24.21.0-darwin-arm64/bin/node node_modules/@playwright/test/cli.js test tests/e2e/member-cabinet.spec.js",
+      "result": "11 passed: overview regression, empty progress320/390/1440 light/dark, locale without reload, CTA, finite animation and reduced motion"
+    },
+    {
+      "command": "PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers .local-tools/node-v24.21.0-darwin-arm64/bin/node node_modules/@playwright/test/cli.js test tests/e2e/profile-form.spec.js",
+      "result": "9 passed: profile geometry, wizard/accordion, success/failure save feedback"
+    },
+    {
+      "command": "PLAYWRIGHT_BROWSERS_PATH=.local-tools/playwright-browsers .local-tools/node-v24.21.0-darwin-arm64/bin/node node_modules/@playwright/test/cli.js test tests/e2e/profile-form.spec.js --grep \"section geometry\"",
+      "result": "4 passed, overlaps prior9; screenshots disable transitions so theme is captured at its final colours"
+    }
+  ],
+  "test_contract_change": "Prior empty progress tab tests replaced by dedicated empty-page tests per owner request, not weakened to accommodate a defect. No implemented training facts were removed.",
+  "visual_review": {
+    "progress": "320/390/1440 light/dark EN, desktop UK; no clipped text or horizontal overflow",
+    "consumers": "Dashboard/profile390/1440 both themes personally inspected after common CSS deletion; profile light recaptured because first screenshot caught a CSS transition",
+    "motion": "Rendered-template frames0/1400/3450ms inspected; 3 CSS animations, each iterations1, latest completion3450ms; no spinner/loop, reduced motion none",
+    "assets": "Ignored private-evidence/member-cabinet-2026-11-19 only, never staged"
+  },
+  "review": {
+    "reviewer": "cabinet_reference_review",
+    "result": "approved"
+  },
+  "hosted": {
+    "status": "env_blocked",
+    "http_status": 503,
+    "attempts": 2,
+    "detail": "Existing browser session GET /progress failed before render; cause not diagnosed, no readiness claim. Motion frames used real local template with synthetic session fixture, not hosted auth success."
+  },
+  "unverified": [
+    "Physical mobile/Safari",
+    "Authenticated hosted rendering currently503",
+    "Real workout analytics do not exist yet; this is the empty state only"
+  ],
+  "privacy": "No account forms submitted, no profile values or credentials logged; private evidence excluded.",
+  "push_status": "pending_at_commit",
+  "next_step": "Diagnose hosted entry503, then roadmap S05-03"
+}

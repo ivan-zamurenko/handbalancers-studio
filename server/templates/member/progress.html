@@ -1,16 +1,39 @@
 {% extends 'member/base.html' %}
 {% block title %}{{ copy('Прогрес','Progress') }} · Handbalancer’s Studio{% endblock %}
+{% block head %}{{ super() }}<link rel="stylesheet" href="/static/css/progress-empty.css">{% endblock %}
 {% block member_content %}
-<div class="cabinet-page-head"><p class="eyebrow">{{ copy('Власний темп','Your own pace') }}</p><h1>{{ copy('Ваш прогрес.', 'Your progress.') }}</h1><p>{{ copy('Від регулярної практики до нових можливостей.', 'From consistent practice to new possibilities.') }}</p></div>
-{% include 'member/metrics.html' %}
-<p class="cabinet-footnote">{{ copy('Дані з’являться після завершених занять. Відсутність даних не означає нульовий результат.', 'Data will appear after completed sessions. No data does not mean a zero result.') }}</p>
-<div class="progress-tabs" role="tablist" aria-label="{{ copy('Розділи прогресу','Progress sections') }}">
-{% for key,uk,en in [('year','Регулярність','Consistency'),('hold','Стійка','Handstand'),('exercises','Вправи','Exercises'),('tests','Тести','Assessments'),('feeling','Самопочуття','Wellbeing')] %}<button type="button" role="tab" id="tab-{{ key }}" aria-controls="progress-{{ key }}" aria-selected="{{ 'true' if loop.first else 'false' }}" tabindex="{{ '0' if loop.first else '-1' }}">{{ copy(uk,en) }}</button>{% endfor %}
+<div class="cabinet-page-head">
+  <p class="eyebrow">{{ copy('Власний темп','Your own pace') }}</p>
+  <h1>{{ copy('Ваш прогрес.', 'Your progress.') }}</h1>
 </div>
-<section class="cabinet-card progress-panel" id="progress-year" role="tabpanel" tabindex="0" aria-labelledby="tab-year"><div class="cabinet-card-head"><h2>{{ copy('Регулярність за рік','A year of practice') }}</h2><span class="muted">{{ copy('Ще немає результатів','No results yet') }}</span></div>{% include 'member/heatmap.html' %}</section>
-<section class="cabinet-card progress-panel" id="progress-hold" role="tabpanel" tabindex="0" aria-labelledby="tab-hold" hidden><div class="cabinet-card-head"><h2>{{ copy('Утримання стійки','Handstand hold') }}</h2><span class="muted">{{ copy('Ще немає результатів','No results yet') }}</span></div><div class="empty-chart" aria-hidden="true"><span>—</span><svg viewBox="0 0 600 150" preserveAspectRatio="none"><path d="M0 25H600M0 75H600M0 125H600"/></svg></div><p class="cabinet-footnote">{{ copy('Ваші вимірювання сформують графік. Поки тут немає жодної точки.', 'Your measurements will build this chart. There are no data points yet.') }}</p></section>
-{% for key,uk,en,note_uk,note_en in [('exercises','Ключові вправи','Key exercises','Повтори, час і навантаження з’являться після запису результатів.','Reps, time and load will appear when you log results.'),('tests','Тестові програми','Assessments','Тут збиратимуться результати пройдених тестів.','Results from completed assessments will appear here.'),('feeling','Самопочуття після занять','Post-session wellbeing','Тут можна буде побачити, як змінюються ваші оцінки самопочуття.','This is where you will see changes in your wellbeing check-ins.')] %}
-<section class="cabinet-card progress-panel" id="progress-{{ key }}" role="tabpanel" tabindex="0" aria-labelledby="tab-{{ key }}" hidden><div class="cabinet-card-head"><h2>{{ copy(uk,en) }}</h2></div><div class="progress-empty"><span class="empty-symbol" aria-hidden="true">—</span><h3>{{ copy('Ще немає результатів','No results yet') }}</h3><p>{{ copy(note_uk,note_en) }}</p></div></section>{% endfor %}
-<noscript><p>{{ copy('Увімкніть JavaScript для перемикання розділів. Даних тренувань поки немає.', 'Enable JavaScript to switch sections. There is no training data yet.') }}</p></noscript>
+<section class="first-practice" data-progress-empty aria-labelledby="first-practice-title">
+  <div class="first-practice-main">
+    <div class="first-step-art" data-empty-art aria-hidden="true">
+      <svg viewBox="0 0 320 280" fill="none" focusable="false">
+        <circle class="first-step-orbit" cx="160" cy="140" r="104"/>
+        <circle class="first-step-orbit first-step-orbit-inner" cx="160" cy="140" r="74"/>
+        <path class="first-step-ground" d="M38 224H282"/>
+        <path class="first-step-trail" pathLength="1" d="M64 216H104Q112 216 112 208V184Q112 176 120 176H144Q152 176 152 168V144Q152 136 160 136H184Q192 136 192 128V104Q192 96 200 96H240"/>
+        <circle class="first-step-halo" cx="240" cy="96" r="18"/>
+        <circle class="first-step-dot" cx="240" cy="96" r="6"/>
+      </svg>
+      <span class="first-step-caption">{{ copy('Крок за кроком','One step at a time') }}</span>
+    </div>
+    <div class="first-practice-copy">
+      <p class="first-practice-status"><span aria-hidden="true"></span>{{ copy('Ще немає результатів','No results yet') }}</p>
+      <h2 id="first-practice-title">{{ copy('Перше заняття — точка відліку.', 'Your first session is a starting point.') }}</h2>
+      <p class="first-practice-description">{{ copy('Тут поки немає записаних занять. Згодом ви побачите свій ритм, час практики й те, що вже вдається краще.', 'There are no recorded sessions here yet. Over time, you’ll see your rhythm, time spent practising and what’s getting easier.') }}</p>
+      <a class="btn primary first-practice-action" data-empty-action href="/dashboard?lang={{ language }}">{{ copy('До огляду','Back to overview') }}<span aria-hidden="true">↗</span></a>
+      <p class="first-practice-note">{{ copy('Почніть із того, де ви є зараз.', 'Start where you are.') }}</p>
+    </div>
+  </div>
+  <div class="first-practice-preview">
+    <p class="eyebrow">{{ copy('Що тут збиратиметься','What this space will hold') }}</p>
+    <ul>
+      <li><span class="first-practice-icon" aria-hidden="true">{% for i in range(9) %}<i></i>{% endfor %}</span><div><h3>{{ copy('Ваш ритм','Your rhythm') }}</h3><p>{{ copy('Дні, коли ви практикували.','The days you showed up.') }}</p></div></li>
+      <li><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg><div><h3>{{ copy('Час для себе','Time for yourself') }}</h3><p>{{ copy('Хвилини, присвячені руху.','Minutes spent moving.') }}</p></div></li>
+      <li><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 19h5v-5h5V9h6M17 6l3 3-3 3"/></svg><div><h3>{{ copy('Маленькі зміни','Small changes') }}</h3><p>{{ copy('Результати, до яких можна повернутися.','Results you can look back on.') }}</p></div></li>
+    </ul>
+  </div>
+</section>
 {% endblock %}
-{% block scripts %}<script type="module" src="/static/js/features/account/progress.js"></script>{% endblock %}

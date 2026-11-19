@@ -124,3 +124,12 @@ Commit: `feat(cabinet): [S05-02] separate member workspace from public pages`.
 існуючі save-feedback сценарії. Докази:
 `.workflow/evidence/cabinet-alignment-2026-11-19.json`.
 Commit: `fix(cabinet): [S05-02] align brand and contain profile controls`.
+
+Новий follow-up власника: порожній прогрес з одноразовою SVG-анімацією
+«Крок за кроком», робочим переходом до огляду й поясненням без фальшивих
+метрик. Заміна попередніх empty-tabs погоджена поточним дорученням.
+Приймання: 320/390/1440 light/dark, UA/EN без reload, reduced motion,
+декоративна анімація завершується до 5 с, CTA працює; регресія профілю й огляду.
+API/БД/guards не змінюються. Evidence:
+`.workflow/evidence/progress-empty-2026-11-19.json`.
+Commit: `feat(cabinet): [S05-02] add calm animated empty progress`.

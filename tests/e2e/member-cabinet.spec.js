@@ -45,22 +45,39 @@ for(const width of [390,1440])for(const theme of ['light','dark'])test(`cabinet 
  await page.screenshot({path:`private-evidence/member-cabinet-2026-11-19/dashboard-${width}-${theme}.png`,fullPage:true});
 });
 
-for(const width of [320,1440])test(`progress tabs and language work without synthetic results ${width}`,async({page})=>{
+// Owner replaced the empty metrics/tabs with one dedicated first-session state.
+for(const width of [320,390,1440])for(const theme of ['light','dark'])test(`empty progress ${width} ${theme}`,async({page})=>{
  await page.setViewportSize({width,height:1000});
  await member(page,'/progress');
- await expect(page.locator('[data-member-nav] a[aria-current=page]')).toHaveAttribute('href','/progress?lang=uk');
- await expect(page.getByRole('tabpanel')).toHaveCount(1);
- await page.getByRole('tab',{name:'Стійка',exact:true}).click();
- await expect(page.locator('#progress-hold')).toBeVisible();
- await page.keyboard.press('ArrowRight');
- await expect(page.locator('#progress-exercises')).toBeVisible();
+ await page.evaluate(theme=>document.dispatchEvent(new CustomEvent('studio:theme-select',{detail:theme})),theme);
+ await expect(page.locator('html')).toHaveAttribute('data-theme',theme);
+ await expect(page.locator('[data-progress-empty]')).toBeVisible();
+ await expect(page.locator('[data-empty-metric], [data-heatmap-empty], [role=tab]')).toHaveCount(0);
+ const art=page.locator('[data-empty-art]');
+ await expect(art).toHaveAttribute('aria-hidden','true');
+ const motion=await art.evaluate(el=>el.getAnimations({subtree:true}).map(a=>a.effect.getTiming()));
+ expect(motion.length).toBeGreaterThan(0);
+ for(const timing of motion){expect(timing.iterations).toBe(1);expect(timing.duration+timing.delay).toBeLessThanOrEqual(5000);}
+ await page.evaluate(()=>{window.emptyDocument=document.documentElement;});
  if(width<780)await page.locator('[data-menu-toggle]').click();
  await page.locator('.locale-nav a[lang=en]').click();
- await expect(page.getByRole('tab',{name:'Exercises',exact:true})).toHaveAttribute('aria-selected','true');
- await expect(page.locator('#progress-exercises')).toContainText('No results yet');
- const tabBox=await page.getByRole('tab',{name:'Exercises',exact:true}).boundingBox();
- const listBox=await page.getByRole('tablist').boundingBox();
- expect(tabBox.x+tabBox.width).toBeLessThanOrEqual(listBox.x+listBox.width+1);
+ await expect(page.locator('[data-progress-empty]')).toContainText('Your first session is a starting point.');
+ expect(await page.evaluate(()=>window.emptyDocument===document.documentElement)).toBe(true);
+ await expect(page.locator('[data-empty-action]')).toHaveAttribute('href','/dashboard?lang=en');
+ await art.evaluate(el=>Promise.all(el.getAnimations({subtree:true}).map(a=>a.finished)));
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
- await page.screenshot({path:`private-evidence/member-cabinet-2026-11-19/progress-${width}.png`,fullPage:true});
+ await page.screenshot({path:`private-evidence/member-cabinet-2026-11-19/empty-progress-${width}-${theme}.png`,fullPage:true});
+ await page.route('**/dashboard?lang=en',r=>r.fulfill({contentType:'text/html',body:'<h1>Overview</h1>'}));
+ await page.locator('[data-empty-action]').click();
+ await expect(page).toHaveURL(/\/dashboard\?lang=en$/);
+});
+
+test('empty progress respects reduced motion',async({page})=>{
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await member(page,'/progress');
+ const art=page.locator('[data-empty-art]');
+ await expect(art).toBeVisible();
+ expect(await art.evaluate(el=>el.getAnimations({subtree:true}).length)).toBe(0);
+ await expect(art.locator('.first-step-dot')).toHaveCSS('opacity','1');
+ await expect(page.locator('[data-empty-action]')).toBeVisible();
 });

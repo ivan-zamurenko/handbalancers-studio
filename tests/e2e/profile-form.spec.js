@@ -184,6 +184,6 @@ for (const width of [390,1440]) for (const theme of ['light','dark']) {
     const overflow=await page.evaluate(()=>[...document.querySelectorAll('main,main *')].filter(el=>el.getBoundingClientRect().right>innerWidth+1).map(el=>({tag:el.tagName,cls:el.className,width:el.getBoundingClientRect().width,right:el.getBoundingClientRect().right})).slice(0,8));
     expect(overflow).toEqual([]);
 
-    await page.screenshot({path:`private-evidence/member-cabinet-2026-11-19/profile-${width}-${theme}.png`,fullPage:true});
+    await page.screenshot({path:`private-evidence/member-cabinet-2026-11-19/profile-${width}-${theme}.png`,fullPage:true,animations:'disabled'});
   });
 }

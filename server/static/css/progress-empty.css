@@ -1,0 +1,48 @@
+/* An empty history, not a loading state. Motion resolves once and stays still. */
+.first-practice { border: 1px solid var(--line); border-radius: var(--radius-panel); background: var(--surface); overflow: hidden; }
+.first-practice-main { display: grid; grid-template-columns: minmax(220px, .9fr) minmax(0, 1.1fr); align-items: center; gap: 32px; padding: 56px 48px; min-height: 420px; }
+.first-step-art { width: 100%; max-width: 320px; margin-inline: auto; text-align: center; }
+.first-step-art svg { display: block; width: 100%; height: auto; overflow: visible; }
+.first-step-orbit { stroke: var(--line); stroke-width: 1; }
+.first-step-orbit-inner { stroke-dasharray: 2 8; }
+.first-step-ground { stroke: var(--line); stroke-width: 1; }
+.first-step-trail { stroke: var(--text); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 0; animation: first-step-draw 2.8s cubic-bezier(.4,0,.2,1) .2s both; }
+.first-step-dot { fill: var(--accent); transform-box: fill-box; transform-origin: center; animation: first-step-arrive .55s ease-out 2.7s both; }
+.first-step-halo { fill: var(--soft); stroke: var(--accent); stroke-width: 1; transform-box: fill-box; transform-origin: center; animation: first-step-arrive .8s ease-out 2.65s both; }
+.first-step-caption { display: block; margin-top: 8px; color: var(--muted); font-size: 11px; letter-spacing: .04em; }
+.first-practice-copy { max-width: 410px; }
+.first-practice-status { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 11px; }
+.first-practice-status > span { width: 5px; height: 5px; border-radius: 50%; background: var(--muted); flex: none; }
+.first-practice-copy h2 { margin: 18px 0 !important; font-size: clamp(28px, 2.6vw, 38px); line-height: 1.15; font-weight: 500; letter-spacing: -.04em; text-wrap: balance; }
+.first-practice-description { font-size: 14px; color: var(--muted); line-height: 1.8; }
+.first-practice-action { margin-top: 28px; gap: 24px; min-height: 48px; font-size: 13px; }
+.first-practice-copy .first-practice-note { margin-top: 14px; color: var(--muted); font-size: 11px; }
+.first-practice-preview { padding: 28px 36px 32px; border-top: 1px solid var(--line); }
+.first-practice-preview ul { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; padding: 0; margin: 24px 0 0; }
+.first-practice-preview li { display: flex; align-items: flex-start; gap: 14px; min-width: 0; }
+.first-practice-preview h3 { font-size: 13px; font-weight: 500; line-height: 1.5; letter-spacing: -.01em; }
+.first-practice-preview li p { margin-top: 6px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.first-practice-preview svg { width: 24px; height: 24px; flex: none; fill: none; stroke: var(--accent); stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+.first-practice-icon { display: grid; grid-template-columns: repeat(3, 4px); grid-template-rows: repeat(3, 4px); gap: 3px; width: 24px; padding: 3px; flex: none; }
+.first-practice-icon i { border: 1px solid var(--accent); border-radius: 1px; }
+@keyframes first-step-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes first-step-arrive { from { opacity: 0; transform: scale(.5); } to { opacity: 1; transform: scale(1); } }
+@media (max-width: 1100px) {
+  .first-practice-main { padding: 36px 28px; gap: 24px; }
+  .first-practice-preview { padding-inline: 28px; }
+}
+@media (max-width: 780px) {
+  .first-practice-main { grid-template-columns: minmax(0, 1fr); padding: 24px; gap: 24px; }
+  .first-step-art { max-width: 210px; }
+  .first-step-caption { margin-top: 0; font-size: 10px; }
+  .first-practice-copy { max-width: 420px; margin-inline: auto; text-align: center; }
+  .first-practice-status { justify-content: center; }
+  .first-practice-copy h2 { font-size: 28px; }
+  .first-practice-description { font-size: 13px; line-height: 1.7; }
+  .first-practice-action { display: flex; justify-content: space-between; width: 100%; margin-top: 24px; }
+  .first-practice-preview { padding: 24px; }
+  .first-practice-preview ul { grid-template-columns: minmax(0, 1fr); gap: 20px; margin-top: 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .first-step-trail, .first-step-dot, .first-step-halo { animation: none; }
+}
