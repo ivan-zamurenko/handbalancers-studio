@@ -1,0 +1,29 @@
+{
+  "task_id": "S13-01",
+  "status": "done",
+  "scope": "Gateway/catalog boundary, pinned SDK dependency, runbook and unit tests; roadmap dependency S13-01 now S05-04 per owner priority. Settings integration belongs to S13-02.",
+  "base_sha": "043bc31",
+  "branch": "task/execution-v4",
+  "red": {
+    "command": ".venv/bin/python -m pytest server/tests/unit/billing/test_stripe_gateway.py -q --tb=short",
+    "result": "16 errors: missing stripe_gateway module before implementation. Later review regression test: 1 failed because SDK logged synthetic private response despite sanitized exception."
+  },
+  "green": {
+    "command": ".venv/bin/python -m pytest server/tests/unit/billing/test_stripe_gateway.py -q",
+    "result": "17 passed after SDK logging fix. Earlier full unit suite: 103 passed; final17 affected tests overlap."
+  },
+  "checks": [
+    "Ruff and mypy gateway passed",
+    "roadmap validate passed"
+  ],
+  "archive": "Read-only archive/pre-execution-v4 tag: billing.py reference. Existing Stripe CLI configured; never restored legacy runtime.",
+  "external": {
+    "result": "env_blocked",
+    "detail": "Actual test-mode prices.list with existing CLI test credential returned Stripe AuthenticationError HTTP401. No payments/objects created. User asked to refresh stripe login, authorization for test payments already exists."
+  },
+  "review": {
+    "result": "approved after logging fix; reviewer independently ran17 passing tests",
+    "finding": "SDK raw payload logging found; regression RED then fixed permanently, no per-call configuration races."
+  },
+  "push_status": "pending_at_commit"
+}

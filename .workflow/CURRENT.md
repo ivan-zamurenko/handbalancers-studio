@@ -1,3 +1,21 @@
+# Stripe: S13-01 завершено — 2026-11-22
+
+За дорученням власника Stripe реалізуємо перед наступними roadmap-етапами.
+S13-01: pinned SDK17.1.0/API2026-11-18.endive; серверна перевірка цін,
+test-only keys/objects, card-only Checkout, 7-day trial eligibility,
+10s timeout/без SDK retries; SDK payload logging вимкнено.
+RED16 відсутній модуль; review RED1 витік синтетичного маркера. GREEN17,
+раніший full unit103 (перетинається), Ruff/mypy/roadmap green. Review approved.
+Evidence: `.workflow/evidence/S13-01.json`. Базовий commit043bc31.
+Наступний крок у поточному дорученні — S13-02: durable Checkout.
+
+Архів archive/pre-execution-v4 прочитано; старий runtime не відновлювався.
+Наявний CLI test key повернув401; власнику показана команда stripe login.
+Тестові платежі дозволені, але зовнішній платіж ще не перевірено.
+Live платежів/хмарних міграцій/deploy немає.
+
+## Попередній checkpoint
+
 # S05-04: серверна модель тарифного доступу — 2026-11-22
 
 Уточнення власника 2026-11-22: Stripe підключений; тестові платежі дозволені.
