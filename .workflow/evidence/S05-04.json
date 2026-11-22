@@ -1,0 +1,67 @@
+{
+  "task_id": "S05-04",
+  "status": "done",
+  "branch": "task/execution-v4",
+  "scope": "Billing models/catalog/pure entitlement policy and isolated PostgreSQL integration tests. Migration 0009 in original card is occupied by preferences; use 0011_subscriptions after existing 0010 without rewriting history. Neighbor additions: billing/__init__.py and Alembic model registry; baseline test head expectation moves to 0011. Cloud runner stays pinned to owner-approved 0010. No UI/API/Stripe/cloud writes. All runtime roles denied subscription writes; synthetic rows only in isolated fixtures until verified billing boundary exists. CI registration: tools/check_migrations.py adds new onboarding suite and new tables to isolation checks; tools/tests/test_s01_07_migration_ci.py verifies the new suite is included.",
+  "documentation": [
+    "https://supabase.com/changelog.md",
+    "https://supabase.com/docs/guides/database/postgres/row-level-security"
+  ],
+  "not_verified": [
+    "Hosted 0011 migration (not authorized)",
+    "Stripe billing/webhooks (future task)"
+  ],
+  "base_sha": "03880b607b96262dac9e1ae2463c7616555b4534",
+  "acceptance": [
+    "Active Essential/Plus/Pro/Pro+ and eligible trialing Essential/Plus share published catalog capability when ready.",
+    "Inactive/expired/missing/foreign projections grant no paid capabilities; own profile/history reads remain subject to authentication and ownership.",
+    "Client dict/plan/role cannot become a trusted projection. PostgreSQL runtime roles cannot insert/update/delete subscriptions or customers.",
+    "Plus has AI eligibility but no mandatory weekly human review; human review only Pro/Pro+; calls/chat only Pro+.",
+    "All capabilities default closed and require trusted server readiness. Exact expiration closes access; fresh column reads observe committed revocation."
+  ],
+  "red": {
+    "command": ".venv/bin/python -m pytest server/tests/integration/onboarding/test_entitlement_projection.py -q --tb=short",
+    "observed_failure": "53 setup assertion errors: Server entitlement policy is absent (find_spec studio.billing is None). Test module collected; runtime billing module not yet created. This is missing implementation RED, not a database/environment failure.",
+    "not_an_environment_failure": true
+  },
+  "green": {
+    "command": "PATH=\"$PWD/.local-tools/supabase-cli/node_modules/@supabase/cli-darwin-arm64/bin:$PATH\" DOCKER_HOST=\"unix://$HOME/.colima/studio-s01/docker.sock\" .venv/bin/python tools/local_stack.py test .venv/bin/python -m pytest server/tests/integration/onboarding/test_entitlement_projection.py server/tests/integration/database server/tests/security/accounts/test_onboarding_model.py server/tests/security/accounts/test_profile_preferences.py --import-mode=importlib -q --tb=short",
+    "exit_code": 0,
+    "summary": "137 passed in 24.99s: 56 entitlement tests plus 81 affected regressions. Real isolated PostgreSQL, no skips. Includes clean upgrade/repeat, model metadata agreement, rollback, RLS, denied runtime grants, duplicate race, fresh revocation and forward-repair-only downgrade. One existing Starlette/httpx deprecation warning."
+  },
+  "ci_registration": {
+    "red": ".venv/bin/python -m pytest tools/tests/test_s01_07_migration_ci.py -q --tb=short: 1 failed, 7 passed because onboarding DB suite absent from CI.",
+    "green": "Same suite: 8 passed after registration. New tables included in isolation metadata checks."
+  },
+  "checks": [
+    "Ruff new billing/migration/test files and Alembic registry: passed.",
+    "mypy server/studio/billing: passed.",
+    "Ruff tools/check_migrations.py and its test: passed.",
+    "MYPYPATH=server mypy --explicit-package-bases tools/check_migrations.py: passed.",
+    "python -m tools.check_migrations --heads-only: single head 0011.",
+    "After CI table isolation registration: test_migration_baseline.py 31 passed in 10.88s (overlaps 137; not additional unique cases)."
+  ],
+  "environment_notes": [
+    "uv absent from initial PATH; used existing locked .venv Python/pytest.",
+    "Initial local_stack refused because default Docker endpoint unavailable; selected existing dedicated project Colima socket from prior evidence. Docker Desktop not installed; no app started. Final tests succeeded on guarded local Colima test database.",
+    "First standalone tooling mypy omitted CI MYPYPATH and failed to locate typed local modules; repeated with documented CI MYPYPATH=server successfully."
+  ],
+  "scope_deviations": [
+    "Use 0011 because original card 0009 already occupied; no old migration edits.",
+    "Alembic model registry and one head expectation updated from 0010 to 0011. Existing cloud-approved revision assertions stay 0010.",
+    "Register new integration directory and tables with existing CI migration gate."
+  ],
+  "review": {
+    "reviewer": "studio_reviewer /root/review_s05_04",
+    "result": "approved, including CI registration; no findings",
+    "findings": []
+  },
+  "visual": "Not applicable: no templates, styles, routes or current UI behavior changed.",
+  "limits": [
+    "Server foundation only: future paid command services must load/evaluate within each command; no new paid routes or grants exposed.",
+    "No runtime writer until verified billing boundary. Future Stripe ingestion must verify trial card/eligibility/one-per-account, provider authenticity and event ordering.",
+    "No hosted migration, payment, webhook, OAuth, AI or private-video processing performed."
+  ],
+  "push_status": "pending_at_commit",
+  "next_task": "S05-05"
+}

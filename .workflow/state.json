@@ -207,9 +207,9 @@
       "push_status": "pending"
     },
     "S05-04": {
-      "status": "todo",
-      "evidence": null,
-      "push_status": "not_started"
+      "status": "done",
+      "evidence": ".workflow/evidence/S05-04.json",
+      "push_status": "pending_at_commit"
     },
     "S05-05": {
       "status": "todo",

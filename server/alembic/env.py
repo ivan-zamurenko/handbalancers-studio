@@ -7,6 +7,7 @@ from sqlalchemy.engine import make_url
 from sqlalchemy.pool import NullPool
 from studio.accounts.models import User  # noqa: F401
 from studio.auth.models import AuthAttempt, WebSession  # noqa: F401
+from studio.billing.models import BillingCustomer, Subscription  # noqa: F401
 from studio.db import Base, include_migration_name
 from studio.migration_connection import migration_owner_username_matches
 

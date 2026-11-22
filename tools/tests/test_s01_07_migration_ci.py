@@ -64,6 +64,7 @@ class MigrationCITests(unittest.TestCase):
         checker = self.checker()
         self.assertIn("server/tests/security/database", checker.DB_SUITES)
         self.assertIn("server/tests/integration/database", checker.DB_SUITES)
+        self.assertIn("server/tests/integration/onboarding", checker.DB_SUITES)
         with (
             patch.object(checker, "require_test_database") as guard,
             patch.object(checker, "verify_fresh_database") as fresh,
