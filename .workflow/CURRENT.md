@@ -1,3 +1,22 @@
+# Stripe: тестова покупка перевірена — 2026-11-22
+
+S13-09 external_verified_test_only: actual Pro decline→paid+active; Plus card trial7d
+→Test Clock→paid4999+active; loaded Portal; realCLI signature/duplicates/owner/CSRF
+/tamper checks. Final gate statuspassed, no failures, exit0. Both synthetic
+subscriptions canceled; localtestservices stopped. Read-only review approved.
+Evidence09 і docs/verification/S13-09-external-check.md; screenshots private only.
+Попередній09a commit02dfcf8.69DB+22SDK earlier green; browser40+affected regressions08.
+G_STRIPE_TEST approved по дозволу власника й actual evidence; це не live/sale.
+
+Наступний конкретний крок: погодити0011–0015 для основної hostedБД і вузький worker
+login, потім ввімкнути TEST billing у поточному локальному застосунку. План у
+external-check. .env.local зараз безStripe/worker; cloudrunnerallowance0010 незмінний.
+Actualcloudhead не перечитували. Жодних livecharges/hostedmigration/deploy немає.
+Без нового дозволу не застосовувати міграції до основної БД. S13-07 future readiness
+не виконана; не переходити самовільно до інших roadmapетапів поза дорученнямStripe.
+
+## Попередній checkpoint
+
 # Stripe: S13-09a сумісність API — 2026-11-22
 
 Actual TEST Checkout відмовив400: payment_method_types видалений у pinned

@@ -552,9 +552,9 @@
       "push_status": "pending_at_commit"
     },
     "S13-09": {
-      "status": "todo",
-      "evidence": null,
-      "push_status": "not_started"
+      "status": "done",
+      "evidence": ".workflow/evidence/S13-09.json",
+      "push_status": "pending_at_commit"
     },
     "S14-01": {
       "status": "todo",
@@ -774,8 +774,9 @@
       "evidence": null
     },
     "G_STRIPE_TEST": {
-      "status": "pending",
-      "evidence": null
+      "status": "approved",
+      "evidence": "docs/verification/S13-09-external-check.md",
+      "scope": "Owner-authorized test calls; final actual local/Stripe sandbox roundtrip verified. No live/hosted/deploy approval."
     },
     "G_VIDEO": {
       "status": "pending",

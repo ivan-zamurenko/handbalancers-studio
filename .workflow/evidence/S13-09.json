@@ -1,0 +1,43 @@
+{
+  "task_id": "S13-09",
+  "status": "done",
+  "base_sha": "02dfcf8",
+  "scope": "Guarded local test harness Python + browser helper; real local Supabase/Auth roles, real Stripe test catalog/customers/Checkout/CLI/clock. No runtime changes here. Private artifacts ignored0600.",
+  "expected": [
+    "Actual Pro Checkout declines then succeeds; no entitlement before signed confirmation",
+    "Actual Plus card trial, clock past7days, paid active renewal",
+    "CLI real signature, duplicate event once; tampering/CSRF/foreign owner rejected",
+    "Owner Portal opens actual Stripe; test key and livemode false required; no live charges"
+  ],
+  "authorization": "User explicitly authorized test payments and verification/security. No hosted migrations/live/deploy.",
+  "result": "external_verified_test_only",
+  "date": "2026-11-22",
+  "scenarios": {
+    "real_test_checkout": "Pro declined then paid17999EUR cents; Plus trial0EUR; real browser+provider API+server projection",
+    "real_signature": "14 accepted signed HTTP deliveries in final run: actual CLI events plus local replays. Pro duplicate audit:2HTTP200,one inboxrow,initialversion1; invalid signature400",
+    "trial_end_lifecycle": "Test Clock beyond7days+finalization ->paid4999EUR cents+active; then both canceled",
+    "no_live_environment": "2live keys with validcatalog+1liveobject rejected;5browserguard cases including run-ID drift"
+  },
+  "green": [
+    "Final real gate statuspassed, failures{}, browser_verifiedtrue, cleanuptrue, exit0",
+    "69 real DB billing regressions from08a;22SDK tests from09a (not rerun unchanged)",
+    "Ruff/Python compile/Node syntax and roadmap validator",
+    "Unsafe-target startup validator: fresh failure evidence+exit1 before provider/DB calls"
+  ],
+  "review": "Independent read-only approved after harness privacy/run-ID/evidence corrections.",
+  "adjustments": [
+    "Initial module invocation needed -m; SDK17 objects use to_dict; diagnostic setup failures not passed",
+    "Iframe selectors and readonly email corrected for actual Stripe page; Portal waits for content, not URL alone",
+    "First actual run passed purchases/trial but audit harness double-entered httpx.Client; recordedfailed and canceled testsubscriptions; fresh final run passed corrected contextmanager",
+    "Removed ineffective post-replay before/after assertion; external proof is durable dedupe+explicit initialversion1, later-processed replay is separate DB regression",
+    "Final minor run-ID guard/live-key-fixture/evidence assertions validated separately during final run; they do not claim a second external roundtrip"
+  ],
+  "private_evidence": "ignored private-evidence/stripe-testmode; JSON/screenshots0600, directory0700; cookies fixture removed on shutdown",
+  "limits": [
+    "Existing app .env.local not enabled; hosted runner remainsapproved0010, actualheadnotrechecked",
+    "No live charges/deploy/hosted migrations; no full pentest guarantee",
+    "No sale/readiness approval for future training/AI/coach modules"
+  ],
+  "next_step": "Owner approval for existing-hosted0011–0015 + narrow worker login + local test billing enablement, per external-check concrete plan",
+  "push_status": "pending_at_commit"
+}

@@ -141,3 +141,12 @@ S13-07 transitions для тренувальних планів/AI/coach лиш�
 карткою, бо відповідні модулі ще не реалізовані. Readiness за замовчуванням
 не відкриває неготові функції. Це уточнення порядку для дорученої test purchase,
 не скасування S13-07 і не дозвіл live/deploy/нових hosted migrations.
+
+## Stripe test roundtrip підтверджено — 2026-11-22
+
+Pro/Plus Checkout, реальні підписані CLI webhooks, trial→paid через Test Clock,
+owner Portal і негативні HTTP checks пройдені в ізольованому локальному стенді.
+Деталі й межі: docs/verification/S13-09-external-check.md. G_STRIPE_TEST дозволений
+власником і перевірений; це не G_COMMERCE/G_PRODUCTION. Для основного застосунку
+окремо потрібні hosted0011–0015 і narrowworkerconfiguration; план підготовлений,
+виконання не погоджене. Дані картки залишаються у hosted Stripe.
