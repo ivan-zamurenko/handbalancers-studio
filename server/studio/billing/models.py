@@ -30,6 +30,8 @@ class BillingCustomer(Base):
 
     user_id: Mapped[UUID] = mapped_column(ForeignKey(User.id), primary_key=True)
     provider_customer_id: Mapped[str] = mapped_column(Text, nullable=False)
+    reconcile_token: Mapped[UUID | None]
+    reconcile_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class Subscription(Base):

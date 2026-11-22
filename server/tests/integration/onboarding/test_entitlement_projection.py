@@ -199,7 +199,7 @@ def test_client_tier_ignored(api, seeded):
 
 
 @pytest.mark.parametrize(
-    "role", ["studio_web", "studio_worker", "studio_auth_runtime", "anon", "authenticated"]
+    "role", ["studio_web", "studio_auth_runtime", "anon", "authenticated"]
 )
 @pytest.mark.parametrize("verb", ["INSERT", "UPDATE", "DELETE"])
 def test_runtime_cannot_grant_or_change_subscription(api, seeded, role, verb):
@@ -317,4 +317,4 @@ def test_downgrade_preserves_subscription(api, seeded):
         with pytest.raises(RuntimeError, match="forward repair"), conn.begin_nested():
             command.downgrade(configuration(conn), "0010")
         assert conn.scalar(text("SELECT count(*) FROM studio.subscriptions")) == 1
-        assert conn.scalar(text("SELECT version_num FROM studio.alembic_version")) == "0013"
+        assert conn.scalar(text("SELECT version_num FROM studio.alembic_version")) == "0014"

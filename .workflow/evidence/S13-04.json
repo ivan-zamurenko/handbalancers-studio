@@ -1,0 +1,25 @@
+{
+  "task_id": "S13-04",
+  "status": "done",
+  "scope": "Current Stripe state reconciliation, durable event/customer leases, bounded retries, atomic projection/event completion and CLI worker. Add0014 customer lease columns (card lacked concurrency persistence), grant studio_worker subscription SELECT/INSERT/UPDATE; web/auth/direct client still read-own or denied. Test updates explicitly recognize verified billing writer, not public bypass. Gateway retrieval helpers validate testmode. Network outside DB transactions; stale workers fenced by lease token+expiry.",
+  "branch": "task/execution-v4",
+  "base_sha": "40c6d67",
+  "red": [
+    "Initial9 missing reconciliation module errors in guardedDB runner.",
+    "Recovery cases2 failures: method absent/open Checkout retried incorrectly.",
+    "Review regressions2 failures: nullable invoice AttributeError and second recovery sweep returned0 rather than2."
+  ],
+  "green": "149 billing/database/entitlement tests passed before recovery additions. Final13 reconciliation tests passed after both review fixes (overlap).25 gateway/tooling tests, Ruff and mypy12modules passed.",
+  "test_adjustments": [
+    "Initial fake Stripe checkout/subscription lacked mandatory object field; corrected fixture to real SDK event shape, retaining signature requirements.",
+    "S05 worker denial cases now apply to untrusted web/auth/direct API roles; verified billing worker gets subscription INSERT/UPDATE in0014 and is exercised through realDB reconciliation. No DELETE/TRUNCATE grants.",
+    "Head assertions move0013→0014 with new linear migration."
+  ],
+  "review": "Approved after nullable invoice and sweep starvation fixes; both reproduced RED then GREEN.",
+  "limits": [
+    "Existing test key401 pending owner stripe login.",
+    "Recovery of known session IDs implemented; unknown provider outcome with no ID stays closed until verified discovery (S13-05).",
+    "No hosted migrations/live payments."
+  ],
+  "push_status": "pending_at_commit"
+}

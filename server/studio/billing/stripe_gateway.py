@@ -149,3 +149,20 @@ class StripeGateway:
         if not isinstance(url, str) or not url.startswith("https://checkout.stripe.com/"):
             raise BillingUnavailable()
         return {"id": str(checkout["id"]), "url": url, "status": str(checkout["status"])}
+
+    def retrieve_checkout(self, identifier: str) -> dict[str, Any]:
+        return self.test_object(
+            self._call(lambda: self.client.v1.checkout.sessions.retrieve(identifier))
+        )
+
+    def retrieve_subscription(self, identifier: str) -> dict[str, Any]:
+        return self.test_object(
+            self._call(
+                lambda: self.client.v1.subscriptions.retrieve(
+                    identifier, {"expand": ["latest_invoice", "default_payment_method"]}
+                )
+            )
+        )
+
+    def retrieve_invoice(self, identifier: str) -> dict[str, Any]:
+        return self.test_object(self._call(lambda: self.client.v1.invoices.retrieve(identifier)))

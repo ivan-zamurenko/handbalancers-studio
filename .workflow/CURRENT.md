@@ -1,3 +1,18 @@
+# Stripe: S13-04 завершено — 2026-11-22
+
+Worker повторно читає актуальний Stripe стан після customer lease, без довгої
+DB transaction. Atomic projection/attempt/event, lease fencing,5 retries,
+власник через локальний customer+durable Checkout; event time не впорядковує права.
+Відомі завислі Checkout перевіряються чергою recovery без starvation/budget reset.
+Міграція0014 надає subscription writes тільки trusted studio_worker.
+GREEN149 до recovery доповнень; фінальні13 reconciliation і25 gateway/tooling,
+Ruff/mypy пройшли. Review знайшов nullable invoice й starvation; RED/GREEN
+зафіксовано, follow-up approved. Evidence S13-04; попередній commit40c6d67.
+Далі S13-05: один trial на акаунт та verified recovery/release.
+Зовнішня перевірка чекає stripe login; hosted/live не змінювалися.
+
+## Попередній checkpoint
+
 # Stripe: S13-03 завершено — 2026-11-22
 
 Durable webhook inbox: raw signature/±300s, testmode only, AES-GCM payload,

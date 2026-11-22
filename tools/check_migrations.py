@@ -119,7 +119,7 @@ def verify_isolation(connection: Connection, *, owner: str = "migration_owner") 
         for role in ("anon", "authenticated", "studio_worker"):
             billing_grants = {
                 "studio.billing_customers": {"SELECT", "INSERT"},
-                "studio.subscriptions": {"SELECT"},
+                "studio.subscriptions": {"SELECT", "INSERT", "UPDATE"},
                 "studio.checkout_attempts": {"SELECT", "INSERT", "UPDATE"},
                 "studio_private.webhook_events": {"SELECT", "INSERT", "UPDATE"},
             }

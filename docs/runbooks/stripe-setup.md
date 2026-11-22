@@ -60,3 +60,25 @@ Only studio_worker can read/write the inbox; public/web/auth roles cannot read i
 Unsupported event types are recorded as ignored; supported references wait for the
 reconciliation worker. Neither webhook body metadata nor event time directly grants
 access. Payloads and SDK responses must never enter logs.
+
+## Reconciliation worker (S13-04)
+
+Run `python -m studio.jobs.billing_worker --watch` under the same private test
+environment. Without --watch it handles at most10 events and exits. A tick also
+schedules at most10 known pending sessions, once per five-minute bucket; failed
+events are not silently requeued. Inspect failed event state with a trusted operator.
+No live environment is supported.
+
+Events lease for90s; customer reconciliation leases for60s. Stripe is re-read after
+the durable customer lease, outside any DB transaction. Both lease tokens and
+expiry fence the atomic projection/attempt/event commit. Event timestamps do not
+order subscription rights. Same-state delivery does not bump row_version.
+Failures retry after30s, at most5 attempts; crashes leave recoverable lease state.
+A fresh subscription must match an owned durable Checkout and local customer
+binding; metadata alone is insufficient. Current invoice must be paid for active
+access; trial/card constraints are checked independently. Unknown or mismatched
+provider data grants nothing. Non-subscription invoices are ignored safely.
+
+Migration0014 adds customer lease columns and grants only the trusted worker
+INSERT/UPDATE subscription rights. Public/web/auth clients cannot issue rights.
+The hosted migration runner remains pinned to0010 pending separate authorization.
