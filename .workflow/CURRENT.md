@@ -1,3 +1,13 @@
+# Stripe: S13-08a завершено — 2026-11-22
+
+Nonterminal subscription блокує новий Checkout і заміну projection незалежно
+від застарілого period_end. Terminal canceled/incomplete_expired дозволені.
+69 real DB billing tests, Ruff/mypy/roadmap green, review approved.
+UI08 commit430d308. Наступне09: actual test Checkout/webhook/trial/Portal.
+Live/hosted/deploy не виконувалися. Evidence08a містить fixture correction і RED.
+
+## Попередній checkpoint
+
 # Stripe: S13-08 локальний UI завершено — 2026-11-22
 
 Owner-only subscription/status UI, original-key recovery, Portal button, guarded pages.

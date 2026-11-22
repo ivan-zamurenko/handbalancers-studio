@@ -1,0 +1,21 @@
+{
+  "task_id": "S13-08a",
+  "status": "done",
+  "scope": [
+    "server/studio/billing/checkout.py",
+    "server/studio/billing/reconciliation.py"
+  ],
+  "base_sha": "430d308",
+  "scenario": "Renewal webhook delayed after local period end; must not create second subscription or replace the first.",
+  "red": [
+    "11 behavior failures +1 invalid Pro trial fixture +4 positive passes",
+    "Corrected Plus trial fixture against original guard: DID NOT RAISE CheckoutConflict (1 RED)"
+  ],
+  "green": "69 billing integration cases passed on isolated PostgreSQL; Ruff/mypy13/roadmap143 green",
+  "test_adjustment": "Pro cannot trial: existing subscription fixture now Plus, preserving all guard expectations. Rechecked original behavior RED for corrected fixture.",
+  "review": "Independent read-only approved: audit P2 closed.",
+  "limits": [
+    "Real Stripe gate follows; no schema/UI/hosted changes"
+  ],
+  "push_status": "pending_at_commit"
+}

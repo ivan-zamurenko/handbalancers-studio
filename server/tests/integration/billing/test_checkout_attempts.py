@@ -207,3 +207,47 @@ def test_parallel_distinct_keys_one_success_one_conflict(api, flow):
     assert len(set(provider.keys)) == 1
     with db.connect() as c:
         assert c.scalar(text("SELECT count(*) FROM studio.checkout_attempts")) == 1
+
+
+@pytest.mark.parametrize(
+    "status",
+    [
+        "active",
+        "trialing",
+        "past_due",
+        "unpaid",
+        "paused",
+        "incomplete",
+        "canceled",
+        "incomplete_expired",
+    ],
+)
+def test_stale_subscription_new_purchase_guard(api, flow, status):
+    service, provider, db = flow
+    first = begin(service, plan="pro")
+    with db.begin() as c:
+        c.execute(
+            text("UPDATE studio.checkout_attempts SET state='completed' WHERE id=:i"),
+            {"i": first["id"]},
+        )
+        c.execute(
+            text(
+                "INSERT INTO studio.subscriptions(user_id,provider_subscription_id,plan_code,status,current_period_start,current_period_end) VALUES (:u,'sub_existing','plus',:s,now()-interval '32 days',now()-interval '1 day')"
+            ),
+            {"u": USER, "s": status},
+        )
+    try:
+        # A repeated owned command remains a replay, never a new Stripe call.
+        assert begin(service, plan="pro")["id"] == first["id"]
+        assert len(provider.keys) == 1
+        if status in {"canceled", "incomplete_expired"}:
+            assert begin(service, key="new-purchase", plan="pro")["id"] != first["id"]
+        else:
+            with pytest.raises(api.CheckoutConflict):
+                begin(service, key="new-purchase", plan="pro")
+            assert len(provider.keys) == 1
+            with db.connect() as c:
+                assert c.scalar(text("SELECT count(*) FROM studio.checkout_attempts")) == 1
+    finally:
+        with db.begin() as c:
+            c.execute(text("DELETE FROM studio.subscriptions WHERE user_id=:u"), {"u": USER})

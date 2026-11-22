@@ -5377,6 +5377,50 @@
       ]
     },
     {
+      "id": "S13-08a",
+      "stage": "13",
+      "slug": "prevent_duplicate_subscription",
+      "title": "Блокувати дубль підписки при запізнілому webhook",
+      "goal": "Nonterminal subscription blocks new Checkout and replacement regardless of stale period end.",
+      "module": "billing",
+      "kind": "integration",
+      "depends_on": [
+        "S13-08"
+      ],
+      "gates": [],
+      "files": [
+        "server/studio/billing/checkout.py",
+        "server/studio/billing/reconciliation.py"
+      ],
+      "test_file": "server/tests/integration/billing/test_checkout_attempts.py",
+      "test_cases": [
+        {
+          "name": "stale_nonterminal_blocks_checkout",
+          "expected": "Six nonterminal states reject fresh purchase without provider call; old key replay is allowed."
+        },
+        {
+          "name": "stale_nonterminal_blocks_replacement",
+          "expected": "New completed Checkout cannot replace current nonterminal projection."
+        },
+        {
+          "name": "terminal_allows_new_purchase",
+          "expected": "Canceled/incomplete_expired permit purchase and verified replacement."
+        }
+      ],
+      "api": "No API/schema changes.",
+      "db": "Нет изменения схемы.",
+      "notes": "Focused audit follow-up before external Stripe gate.",
+      "command": "tools/local_stack.py test .venv/bin/python -m pytest server/tests/integration/billing --import-mode=importlib -q",
+      "commit": "fix(billing): [S13-08a] prevent duplicate subscriptions",
+      "status": "todo",
+      "order": 108.5,
+      "card": "roadmap/tasks/S13-08a_prevent_duplicate_subscription.md",
+      "read": [
+        "docs/contracts.md",
+        "docs/owner-gates.md"
+      ]
+    },
+    {
       "id": "S13-09",
       "stage": "13",
       "slug": "billing_testmode",
@@ -5385,7 +5429,7 @@
       "module": "billing",
       "kind": "gate",
       "depends_on": [
-        "S13-08"
+        "S13-08a"
       ],
       "gates": [
         "G_STRIPE_TEST"

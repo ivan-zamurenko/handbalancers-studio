@@ -389,10 +389,8 @@ ON CONFLICT(event_id) DO NOTHING RETURNING event_id"""),
                 and attempt["plan_code"] == snapshot["plan_code"]
             )
             if current is not None:
-                require(
-                    current["status"] not in {"active", "trialing"}
-                    or current["current_period_end"] <= datetime.now(UTC)
-                )
+                # A stale period end is not proof Stripe stopped billing this subscription.
+                require(current["status"] in {"canceled", "incomplete_expired"})
         with self.transaction() as s:
             require(
                 s.scalar(

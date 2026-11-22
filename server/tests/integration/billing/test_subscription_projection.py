@@ -318,3 +318,37 @@ def test_recovery_sweep_does_not_starve_eleventh_checkout(sync):
     with db.begin() as c:
         c.execute(text("UPDATE studio_private.webhook_events SET state='processed'"))
     assert worker.schedule_pending(cipher) == 2
+
+
+@pytest.mark.parametrize(
+    "status",
+    [
+        "active",
+        "trialing",
+        "past_due",
+        "unpaid",
+        "paused",
+        "incomplete",
+        "canceled",
+        "incomplete_expired",
+    ],
+)
+def test_stale_subscription_replacement_guard(sync, status):
+    worker, _provider, db, enqueue = sync
+    with db.begin() as c:
+        c.execute(
+            text(
+                "INSERT INTO studio.subscriptions(user_id,provider_subscription_id,plan_code,status,current_period_start,current_period_end) VALUES (:u,'sub_previous','plus',:s,now()-interval '32 days',now()-interval '1 day')"
+            ),
+            {"u": USER, "s": status},
+        )
+    enqueue()
+    assert worker.run_once()
+    terminal = status in {"canceled", "incomplete_expired"}
+    with db.connect() as c:
+        assert c.execute(
+            text("SELECT provider_subscription_id,row_version FROM studio.subscriptions")
+        ).one() == (("sub_synthetic", 2) if terminal else ("sub_previous", 1))
+        assert c.scalar(text("SELECT state FROM studio.checkout_attempts")) == (
+            "completed" if terminal else "open"
+        )

@@ -106,9 +106,9 @@ class CheckoutService:
             else:
                 if session.scalar(
                     text(
-                        "SELECT 1 FROM studio.subscriptions WHERE user_id=:u AND status IN ('active','trialing') AND current_period_end>:n"
+                        "SELECT 1 FROM studio.subscriptions WHERE user_id=:u AND status NOT IN ('canceled','incomplete_expired')"
                     ),
-                    {"u": actor.user_id, "n": now},
+                    {"u": actor.user_id},
                 ):
                     raise CheckoutConflict()
                 row = (
