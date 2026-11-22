@@ -101,6 +101,7 @@ def verify_isolation(connection: Connection, *, owner: str = "migration_owner") 
         "studio.billing_customers",
         "studio.subscriptions",
         "studio.checkout_attempts",
+        "studio_private.webhook_events",
     ):
         if connection.scalar(text("SELECT to_regclass(:t)"), {"t": later}) is not None:
             tables.append(later)
@@ -120,6 +121,7 @@ def verify_isolation(connection: Connection, *, owner: str = "migration_owner") 
                 "studio.billing_customers": {"SELECT", "INSERT"},
                 "studio.subscriptions": {"SELECT"},
                 "studio.checkout_attempts": {"SELECT", "INSERT", "UPDATE"},
+                "studio_private.webhook_events": {"SELECT", "INSERT", "UPDATE"},
             }
             if (
                 role == "studio_worker"

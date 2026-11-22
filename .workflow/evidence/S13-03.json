@@ -1,0 +1,15 @@
+{
+  "task_id": "S13-03",
+  "status": "done",
+  "scope": "Raw signed webhook, AES-GCM encrypted payload with event-id AAD, minimal indexed event/type/object IDs for current provider reads, worker-only table.0013 replaces stale0040. Models/main/Settings/CI table registration and updated head assertions. No browser CSRF exemption elsewhere.",
+  "branch": "task/execution-v4",
+  "base_sha": "0dddd44",
+  "red": "Guarded Colima pytest test_webhook_inbox.py:9 errors for absent webhooks module.",
+  "green": "71 passed: billing, auth storage and migration baseline; includes9 webhook cases. Ruff/mypy passed.",
+  "review": "Independent read-only reviewer approved, no findings.",
+  "not_verified": [
+    "Actual Stripe delivery waits for refreshed CLI auth",
+    "No cloud migration/live events"
+  ],
+  "push_status": "pending_at_commit"
+}

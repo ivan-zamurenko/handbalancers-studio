@@ -1,5 +1,6 @@
 """Application factory: assemble a fresh application without external I/O."""
 
+import base64
 from collections.abc import Mapping
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -16,9 +17,12 @@ from studio.auth.oauth_routes import router as oauth_router
 from studio.auth.recovery_routes import router as recovery_router
 from studio.auth.routes import router as auth_router
 from studio.auth.runtime import build_oauth
+from studio.auth.token_store import TokenCipher
 from studio.auth.verification_routes import router as verification_router
 from studio.billing.routes import router as billing_router
 from studio.billing.runtime import build_checkout
+from studio.billing.webhooks import WebhookInbox
+from studio.billing.webhooks import router as webhook_router
 from studio.db import web_transaction_factory
 from studio.health import liveness
 from studio.public.routes import router as public_router
@@ -48,6 +52,19 @@ def create_app(settings: Settings | Mapping[str, object] | None = None) -> FastA
         app.state.auth_gateway = app.state.oauth_service.gateway
     app.state.web_transaction = web_transaction_factory(validated)
     app.state.checkout_service = build_checkout(validated, app.state.web_transaction)
+    if app.state.checkout_service is not None:
+        assert validated.stripe_webhook_secret and validated.token_encryption_key
+        cipher = TokenCipher(
+            "billing-v1",
+            {
+                "billing-v1": base64.b64decode(
+                    validated.token_encryption_key.get_secret_value(), validate=True
+                )
+            },
+        )
+        app.state.webhook_inbox = WebhookInbox(
+            app.state.checkout_service.transaction, validated.stripe_webhook_secret, cipher
+        )
     configure_access_logging()
     if deployed:
         assert validated.public_origin
@@ -70,6 +87,7 @@ def create_app(settings: Settings | Mapping[str, object] | None = None) -> FastA
     app.include_router(verification_router)
     app.include_router(recovery_router)
     app.include_router(oauth_router)
+    app.include_router(webhook_router)
     app.include_router(billing_router)
     app.include_router(accounts_router)
     app.include_router(onboarding_router)

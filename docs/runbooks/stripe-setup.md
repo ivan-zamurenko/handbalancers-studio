@@ -44,3 +44,19 @@ a stable per-user Stripe idempotency key; PostgreSQL verifies unique binding.
 Worker role may create customer bindings and manage checkout attempts, but web,
 auth and direct Supabase client roles cannot issue them. Subscription writes are
 still closed until the signed-event reconciliation implementation.
+
+## Webhook ingress (S13-03)
+
+POST `/api/webhooks/stripe` requires one Stripe-Signature header over the original
+raw body, with a timestamp within ±300 seconds. Only test events from this account
+are accepted; Connect/account events and live-mode objects are rejected. The usual
+64 KiB request bound remains. This endpoint alone uses the provider signature
+instead of browser Origin/CSRF; it cannot issue browser commands.
+
+The response is200 only after commit to `studio_private.webhook_events`; DB failure
+returns503 for Stripe retry. Event IDs are unique. Raw payload is encrypted with
+AES-256-GCM and event-ID-associated data using the configured TOKEN_ENCRYPTION_KEY.
+Only studio_worker can read/write the inbox; public/web/auth roles cannot read it.
+Unsupported event types are recorded as ignored; supported references wait for the
+reconciliation worker. Neither webhook body metadata nor event time directly grants
+access. Payloads and SDK responses must never enter logs.

@@ -1,3 +1,14 @@
+# Stripe: S13-03 завершено — 2026-11-22
+
+Durable webhook inbox: raw signature/±300s, testmode only, AES-GCM payload,
+worker-only RLS, duplicate event-id,200 тільки після commit. Міграція0013.
+RED9 absent module; GREEN71 billing/storage/migration tests. Ruff/mypy green;
+read-only review approved. Evidence S13-03. S13-02 commit0dddd44 запушено.
+Далі S13-04: current-provider-state reconciliation із durable leases.
+Зовнішня перевірка очікує stripe login, попередній test key повернув401.
+
+## Попередній checkpoint
+
 # Stripe: S13-02 завершено — 2026-11-22
 
 S13-02: Checkout intent у БД перед мережею; session/Origin/CSRF/completion,

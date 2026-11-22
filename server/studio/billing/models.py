@@ -107,3 +107,34 @@ class CheckoutAttempt(Base):
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     provider_session_id: Mapped[str | None] = mapped_column(Text)
     checkout_url: Mapped[str | None] = mapped_column(Text)
+
+
+class WebhookEvent(Base):
+    __tablename__ = "webhook_events"
+    __table_args__ = (
+        CheckConstraint("length(event_id) BETWEEN 4 AND 255", name="ck_webhook_event_id"),
+        CheckConstraint("length(object_id) BETWEEN 1 AND 255", name="ck_webhook_object_id"),
+        CheckConstraint("length(event_type) BETWEEN 1 AND 100", name="ck_webhook_type"),
+        CheckConstraint(
+            "state IN ('pending','processing','processed','failed','ignored')",
+            name="ck_webhook_state",
+        ),
+        CheckConstraint("attempts BETWEEN 0 AND 10", name="ck_webhook_attempts"),
+        Index("ix_webhook_retry", "state", "next_retry"),
+        {"schema": "studio_private"},
+    )
+    event_id: Mapped[str] = mapped_column(Text, primary_key=True)
+    event_type: Mapped[str] = mapped_column(Text, nullable=False)
+    object_id: Mapped[str] = mapped_column(Text, nullable=False)
+    encrypted_payload: Mapped[str] = mapped_column(Text, nullable=False)
+    state: Mapped[str] = mapped_column(Text, nullable=False, server_default=text("'pending'"))
+    attempts: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text("0"))
+    received_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=text("now()")
+    )
+    next_retry: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=text("now()")
+    )
+    lease_token: Mapped[UUID | None]
+    lease_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    last_error: Mapped[str | None] = mapped_column(Text)

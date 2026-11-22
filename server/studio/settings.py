@@ -115,6 +115,7 @@ class Settings(BaseModel):
                         settings.public_origin,
                         settings.worker_database_url,
                         settings.database_url,
+                        settings.token_encryption_key,
                         settings.stripe_secret_key,
                         settings.stripe_webhook_secret,
                         settings.stripe_price_essential,
@@ -128,6 +129,15 @@ class Settings(BaseModel):
                     ("sk_test_", "rk_test_")
                 ):
                     raise ValueError("Test billing requires test credentials")
+                if (
+                    len(
+                        base64.b64decode(
+                            settings.token_encryption_key.get_secret_value(), validate=True
+                        )
+                    )
+                    != 32
+                ):
+                    raise ValueError("Billing requires an encryption key")
             return settings
         except (ValidationError, ValueError):
             # hide_input_in_errors alone does not protect errors()/json(). Rebuild
