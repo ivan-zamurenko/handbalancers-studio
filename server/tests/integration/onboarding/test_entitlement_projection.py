@@ -317,4 +317,4 @@ def test_downgrade_preserves_subscription(api, seeded):
         with pytest.raises(RuntimeError, match="forward repair"), conn.begin_nested():
             command.downgrade(configuration(conn), "0010")
         assert conn.scalar(text("SELECT count(*) FROM studio.subscriptions")) == 1
-        assert conn.scalar(text("SELECT version_num FROM studio.alembic_version")) == "0014"
+        assert conn.scalar(text("SELECT version_num FROM studio.alembic_version")) == "0015"

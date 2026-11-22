@@ -166,3 +166,11 @@ class StripeGateway:
 
     def retrieve_invoice(self, identifier: str) -> dict[str, Any]:
         return self.test_object(self._call(lambda: self.client.v1.invoices.retrieve(identifier)))
+
+    def list_checkouts(self, customer_id: str) -> list[dict[str, Any]]:
+        result = self._call(
+            lambda: self.client.v1.checkout.sessions.list({"customer": customer_id, "limit": 100})
+        ).to_dict()
+        if result.get("has_more") is not False:
+            raise BillingUnavailable()
+        return [self.test_object(item) for item in result["data"]]

@@ -64,7 +64,7 @@ class CheckoutService:
         now = datetime.now(UTC)
         with self.transaction() as session:
             lock_customer(session, actor.user_id)
-            row = (
+            row: Any = (
                 session.execute(
                     text(
                         "SELECT * FROM studio.checkout_attempts WHERE user_id=:u AND idempotency_key=:k"
@@ -117,6 +117,14 @@ class CheckoutService:
                     .mappings()
                     .one()
                 )
+                from studio.billing.trials import reserve
+
+                trial_enabled = reserve(session, actor.user_id, row["id"], plan_code)
+                session.execute(
+                    text("UPDATE studio.checkout_attempts SET trial_enabled=:t WHERE id=:i"),
+                    {"t": trial_enabled, "i": row["id"]},
+                )
+                row = {**row, "trial_enabled": trial_enabled}
             attempt = dict(row)
             customer = session.scalar(
                 text("SELECT provider_customer_id FROM studio.billing_customers WHERE user_id=:u"),
@@ -146,7 +154,7 @@ class CheckoutService:
             attempt_id=attempt["id"],
             customer_id=customer,
             plan_code=plan_code,
-            trial=False,
+            trial=attempt["trial_enabled"],
             origin=self.origin,
             expires_at=int(attempt["expires_at"].timestamp()),
         )

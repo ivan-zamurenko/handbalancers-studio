@@ -32,6 +32,7 @@ def main() -> int:
             },
         )
         while True:
+            worker.discover_pending()
             worker.schedule_pending(cipher)
             count = 0
             for _ in range(10):

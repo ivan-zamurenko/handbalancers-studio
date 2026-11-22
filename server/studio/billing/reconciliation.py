@@ -11,6 +11,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from studio.auth.token_store import TokenCipher
 from studio.billing.checkout import BillingTransaction
 from studio.billing.stripe_gateway import AMOUNTS, BillingUnavailable
+from studio.billing.trials import confirm, release
 
 
 class BindingMismatch(ValueError):
@@ -62,6 +63,8 @@ def subscription_snapshot(sub: dict[str, Any], prices: dict[str, str]) -> dict[s
         require(0 < sub.get("trial_end", 0) - sub.get("trial_start", 0) <= 7 * 86400)
     start, end = item.get("current_period_start"), item.get("current_period_end")
     require(type(start) is int and type(end) is int and 0 < start < end < 253402300800)
+    if status == "trialing":
+        require(end <= sub["trial_end"])
     return {
         "subscription_id": sub["id"],
         "plan_code": plan,
@@ -75,6 +78,130 @@ class Reconciler:
     def __init__(self, transaction: BillingTransaction, gateway: Any):
         self.transaction = transaction
         self.gateway = gateway
+
+    def discover_pending(self) -> bool:
+        """Recover one lost create response; complete listing required, five attempts max.
+
+        A missing session releases the reservation only after the original fixed
+        Checkout expiry, when Stripe cannot accept that original create anymore.
+        Missing/ambiguous/truncated provider results keep the reservation closed.
+        """
+        with self.transaction() as s:
+            row = (
+                s.execute(
+                    text("""SELECT a.*,c.provider_customer_id
+FROM studio.checkout_attempts a LEFT JOIN studio.billing_customers c ON c.user_id=a.user_id
+WHERE a.state='creating' AND a.provider_session_id IS NULL AND a.discovery_attempts<5
+AND a.created_at<now()-interval '1 minute' AND a.next_discovery<=now()
+ORDER BY a.created_at,a.id FOR UPDATE OF a SKIP LOCKED LIMIT 1""")
+                )
+                .mappings()
+                .one_or_none()
+            )
+            if row is None:
+                return False
+            attempt = dict(row)
+            s.execute(
+                text(
+                    "UPDATE studio.checkout_attempts SET discovery_attempts=discovery_attempts+1,next_discovery=now()+interval '30 minutes' WHERE id=:i"
+                ),
+                {"i": attempt["id"]},
+            )
+        try:
+            customer = attempt["provider_customer_id"]
+            if customer is None and attempt["expires_at"] > datetime.now(UTC):
+                # Same durable customer key; Checkout cannot be sent before its
+                # local customer binding commits. No card/payment is created here.
+                customer = self.gateway.create_customer(attempt["user_id"])
+                with self.transaction() as s:
+                    s.execute(
+                        text(
+                            "INSERT INTO studio.billing_customers(user_id,provider_customer_id) VALUES(:u,:c) ON CONFLICT(user_id) DO NOTHING"
+                        ),
+                        {"u": attempt["user_id"], "c": customer},
+                    )
+                    require(
+                        s.scalar(
+                            text(
+                                "SELECT provider_customer_id FROM studio.billing_customers WHERE user_id=:u"
+                            ),
+                            {"u": attempt["user_id"]},
+                        )
+                        == customer
+                    )
+            # An empty listing is conclusive only if it STARTED after expiry.
+            # A listing before expiry may race with an original create request.
+            discovery_started = datetime.now(UTC)
+            sessions = self.gateway.list_checkouts(customer) if customer is not None else []
+            matches = [
+                item for item in sessions if item.get("client_reference_id") == str(attempt["id"])
+            ]
+            require(len(matches) <= 1)
+            if matches:
+                checkout = matches[0]
+                require(
+                    checkout.get("livemode") is False
+                    and checkout.get("mode") == "subscription"
+                    and checkout.get("customer") == customer
+                    and isinstance(checkout.get("id"), str)
+                )
+                if checkout.get("status") == "open":
+                    require(
+                        isinstance(checkout.get("url"), str)
+                        and checkout["url"].startswith("https://checkout.stripe.com/")
+                    )
+            with self.transaction() as s:
+                row = (
+                    s.execute(
+                        text(
+                            "SELECT * FROM studio.checkout_attempts WHERE id=:i AND state='creating' AND provider_session_id IS NULL FOR UPDATE"
+                        ),
+                        {"i": attempt["id"]},
+                    )
+                    .mappings()
+                    .one_or_none()
+                )
+                if row is None:
+                    return True
+                if row["discovery_attempts"] != attempt["discovery_attempts"] + 1:
+                    return True  # A newer discovery owns the decision now.
+                if matches:
+                    s.execute(
+                        text(
+                            "UPDATE studio.checkout_attempts SET provider_session_id=:p,state=:s,checkout_url=:url WHERE id=:i"
+                        ),
+                        {
+                            "p": matches[0]["id"],
+                            "i": attempt["id"],
+                            "s": "open" if matches[0].get("status") == "open" else "pending",
+                            "url": matches[0].get("url")
+                            if matches[0].get("status") == "open"
+                            else None,
+                        },
+                    )
+                elif attempt["expires_at"] <= discovery_started:
+                    # Re-read AFTER the deadline: an initial missing binding can
+                    # become stale while the worker is paused. A Checkout is sent
+                    # only after its customer binding commits. No later create can
+                    # succeed with the original, now-expired expires_at.
+                    current_customer = s.scalar(
+                        text(
+                            "SELECT provider_customer_id FROM studio.billing_customers WHERE user_id=:u"
+                        ),
+                        {"u": attempt["user_id"]},
+                    )
+                    if current_customer != customer:
+                        return True
+                    s.execute(
+                        text(
+                            "UPDATE studio.checkout_attempts SET state='expired',checkout_url=NULL WHERE id=:i"
+                        ),
+                        {"i": attempt["id"]},
+                    )
+                    release(s, attempt["id"])
+        except (BillingUnavailable, BindingMismatch, SQLAlchemyError):
+            pass  # Keep the durable reservation; next discovery is bounded above.
+        return True
 
     def schedule_pending(self, cipher: TokenCipher) -> int:
         """At most ten known Checkout sessions per tick, once per five-minute bucket.
@@ -212,7 +339,8 @@ ON CONFLICT(event_id) DO NOTHING RETURNING event_id"""),
                 ),
                 {"t": token, "c": customer},
             ).scalar_one_or_none()
-            require(owner is not None)
+            if owner is None:
+                raise BindingMismatch()
             current = (
                 s.execute(text("SELECT * FROM studio.subscriptions WHERE user_id=:u"), {"u": owner})
                 .mappings()
@@ -292,6 +420,7 @@ WHERE (studio.subscriptions.provider_subscription_id,studio.subscriptions.plan_c
                 {"u": owner, **snapshot},
             )
             if attempt_id is not None:
+                confirm(s, owner, attempt, sub)
                 assert checkout is not None
                 s.execute(
                     text(
@@ -322,7 +451,7 @@ WHERE (studio.subscriptions.provider_subscription_id,studio.subscriptions.plan_c
         with self.transaction() as s:
             row = s.execute(
                 text(
-                    "SELECT a.id,a.provider_session_id FROM studio.checkout_attempts a JOIN studio.billing_customers c ON c.user_id=a.user_id WHERE a.id=:i AND c.provider_customer_id=:c FOR UPDATE OF a"
+                    "SELECT a.id,a.provider_session_id FROM studio.checkout_attempts a LEFT JOIN studio.billing_customers c ON c.user_id=a.user_id WHERE a.id=:i AND c.provider_customer_id=:c FOR UPDATE OF a"
                 ),
                 {"i": reference, "c": checkout.get("customer")},
             ).one_or_none()
@@ -333,4 +462,5 @@ WHERE (studio.subscriptions.provider_subscription_id,studio.subscriptions.plan_c
                 ),
                 {"i": reference},
             )
+            release(s, reference)
             self._finish(s, event)

@@ -1,0 +1,31 @@
+{
+  "task_id": "S13-05",
+  "status": "done",
+  "scope": "One-account trial reservations/confirmation/release;0015 instead of0041, Checkout flag persisted before network, composite FK owner guard, claimed-state immutability. Verified recovery uses bounded complete Stripe session listing for owned customers; no release on redirect/network error. Models/checkout/reconciliation/gateway/worker andCI metadata/head updates.",
+  "branch": "task/execution-v4",
+  "base_sha": "cbe313b",
+  "red": [
+    "Initial7 failed trial behavior checks: absent reservation table/flag and Checkout trial=False.",
+    "Discovery3 failed because recover method absent.",
+    "Trial period regression1 failed: projection accepted30days past7-day trial.",
+    "Review2 failed: missing-customer timeout not recovered; open Checkout URL lost.",
+    "Final review2 failed: stale missing-customer snapshot and predeadline empty listing released reservation after a paused worker resumed."
+  ],
+  "green": {
+    "command": "PATH=\"$PWD/.local-tools/supabase-cli/node_modules/@supabase/cli-darwin-arm64/bin:$PATH\" DOCKER_HOST=\"unix://$HOME/.colima/studio-s01/docker.sock\" .venv/bin/python tools/local_stack.py test .venv/bin/python -m pytest server/tests/integration/billing server/tests/integration/database server/tests/integration/onboarding --import-mode=importlib -q --tb=short",
+    "result": "169 passed; includes16 trial cases, real isolated PostgreSQL, migrations/metadata/grants/rollback/concurrency. Existing Starlette httpx deprecation warning.",
+    "additional": "26 unit gateway/tooling passed; Ruff and mypy12 source files green; diff check clean."
+  },
+  "review": "Approved after observed RED/GREEN for all findings. Negative release requires discovery started after deadline, current customer binding match and latest discovery counter. No network within DB transaction.",
+  "test_adjustments": [
+    "Fake Checkout session IDs now unique per attempt to represent provider behavior across multiple purchases.",
+    "Test cleanup includes trial claims before their parent attempts; expected migration head advances0014 to0015.",
+    "Initial unit/tooling command had incorrect nonexistent test filename; no tests ran; corrected to test_s01_07_migration_ci.py (26 passed)."
+  ],
+  "limits": [
+    "Real Stripe test key returned401; awaiting owner stripe login. Provider tests here use SDK transport fixtures, not real payments.",
+    "No hosted migrations, production changes or live charges.",
+    "Discovery is bounded to5 attempts/30min and complete<=100-session listings; unavailable/truncated/ambiguous provider outcomes retain reservation for operator recovery."
+  ],
+  "push_status": "pending_at_commit"
+}

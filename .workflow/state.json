@@ -532,8 +532,8 @@
       "push_status": "pending_at_commit"
     },
     "S13-05": {
-      "status": "todo",
-      "evidence": null,
+      "status": "done",
+      "evidence": ".workflow/evidence/S13-05.json",
       "push_status": "not_started"
     },
     "S13-06": {

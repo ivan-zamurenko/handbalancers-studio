@@ -180,3 +180,12 @@ def test_sdk_payload_and_error_are_not_logged(api, caplog, capsys, monkeypatch):
         gw.validate_catalog()
     captured = capsys.readouterr()
     assert marker not in caplog.text + captured.out + captured.err
+
+
+def test_discovery_refuses_truncated_results(api):
+    gw, http = gateway(api)
+    http.responses = [
+        {"object": "list", "data": [], "has_more": True, "url": "/v1/checkout/sessions"}
+    ]
+    with pytest.raises(api.BillingUnavailable):
+        gw.list_checkouts("cus_synthetic")

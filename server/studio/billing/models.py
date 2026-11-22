@@ -4,9 +4,11 @@ from datetime import datetime
 from uuid import UUID
 
 from sqlalchemy import (
+    Boolean,
     CheckConstraint,
     DateTime,
     ForeignKey,
+    ForeignKeyConstraint,
     Index,
     Integer,
     Text,
@@ -75,6 +77,8 @@ class Subscription(Base):
 class CheckoutAttempt(Base):
     __tablename__ = "checkout_attempts"
     __table_args__ = (
+        CheckConstraint("discovery_attempts BETWEEN 0 AND 5", name="ck_checkout_discovery"),
+        UniqueConstraint("id", "user_id", name="uq_checkout_owner"),
         UniqueConstraint("user_id", "idempotency_key", name="uq_checkout_key"),
         UniqueConstraint("provider_session_id", name="uq_checkout_session"),
         CheckConstraint("length(idempotency_key) BETWEEN 1 AND 128", name="ck_checkout_key"),
@@ -99,6 +103,15 @@ class CheckoutAttempt(Base):
     )
     id: Mapped[UUID] = mapped_column(primary_key=True, server_default=text("gen_random_uuid()"))
     user_id: Mapped[UUID] = mapped_column(ForeignKey(User.id), nullable=False)
+    trial_enabled: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, server_default=text("false")
+    )
+    discovery_attempts: Mapped[int] = mapped_column(
+        Integer, nullable=False, server_default=text("0")
+    )
+    next_discovery: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=text("now()")
+    )
     idempotency_key: Mapped[str] = mapped_column(Text, nullable=False)
     plan_code: Mapped[str] = mapped_column(Text, nullable=False)
     terms_version: Mapped[str] = mapped_column(Text, nullable=False)
@@ -140,3 +153,22 @@ class WebhookEvent(Base):
     lease_token: Mapped[UUID | None]
     lease_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     last_error: Mapped[str | None] = mapped_column(Text)
+
+
+class TrialClaim(Base):
+    __tablename__ = "trial_claims"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["attempt_id", "user_id"],
+            ["studio.checkout_attempts.id", "studio.checkout_attempts.user_id"],
+            name="fk_trial_attempt_owner",
+        ),
+        UniqueConstraint("attempt_id", name="uq_trial_attempt"),
+        CheckConstraint("state IN ('reserved','claimed','released')", name="ck_trial_state"),
+    )
+    user_id: Mapped[UUID] = mapped_column(ForeignKey(User.id), primary_key=True)
+    attempt_id: Mapped[UUID] = mapped_column(nullable=False)
+    state: Mapped[str] = mapped_column(Text, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=text("now()")
+    )

@@ -114,6 +114,7 @@ def sync(storage_db):  # noqa: F811
         with storage_db.begin() as c:
             c.execute(text("DELETE FROM studio_private.webhook_events"))
             c.execute(text("DELETE FROM studio.subscriptions"))
+            c.execute(text("DELETE FROM studio.trial_claims"))
             c.execute(text("DELETE FROM studio.checkout_attempts"))
             c.execute(text("DELETE FROM studio.billing_customers"))
 

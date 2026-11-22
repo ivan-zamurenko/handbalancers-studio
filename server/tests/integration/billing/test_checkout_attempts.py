@@ -33,7 +33,7 @@ class Provider:
 
             raise BillingUnavailable()
         return {
-            "id": "cs_test_synthetic",
+            "id": f"cs_test_{params['attempt_id'].hex}",
             "url": "https://checkout.stripe.com/c/pay/cs_test_synthetic",
             "status": "open",
         }
@@ -68,6 +68,7 @@ def flow(api, storage_db):  # noqa: F811
         yield service, provider, storage_db
     finally:
         with storage_db.begin() as c:
+            c.execute(text("DELETE FROM studio.trial_claims"))
             c.execute(text("DELETE FROM studio.checkout_attempts"))
             c.execute(text("DELETE FROM studio.billing_customers"))
             c.execute(text("DELETE FROM studio.onboarding_profiles"))

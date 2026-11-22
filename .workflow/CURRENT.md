@@ -1,3 +1,19 @@
+# Stripe: S13-05 завершено — 2026-11-22
+
+Один trial на акаунт: reservation до мережі, confirmation тільки після
+перевірки Stripe, immutable claimed history. Essential/Plus7 днів з карткою;
+Pro/Pro+ без trial. Міграція0015 лише локально. Recovery знаходить загублені
+Checkout, повертає URL відкритої сесії; ambiguous outcome не звільняє trial.
+Negative release захищений від застарілого customer/listing/discovery.
+GREEN169 billing/database/onboarding +26 unit/tooling; Ruff/mypy green.
+Read-only review approved після RED/GREEN знайдених гонок.
+Evidence S13-05; попередній commit cbe313b. UI не змінено цією карткою.
+Наступний крок у Stripe scope: S13-06 owner-only Billing Portal.
+Реальний test payment очікує stripe login (наявний test key401). Власнику
+показано /opt/homebrew/bin/stripe login. Hosted/live не змінювалися.
+
+## Попередній checkpoint
+
 # Stripe: S13-04 завершено — 2026-11-22
 
 Worker повторно читає актуальний Stripe стан після customer lease, без довгої
