@@ -1,5 +1,9 @@
 # Stripe: тестова покупка перевірена — 2026-11-22
 
+Основний commit79a123b успішно запушено в origin/task/execution-v4 разом із06/08/08a/09a.
+Documentation follow-up уточнює: окремий DB regression перевіряє повтор projection
+від наступної іншої події, не same-event replay після processing. Runtime незмінний.
+
 S13-09 external_verified_test_only: actual Pro decline→paid+active; Plus card trial7d
 →Test Clock→paid4999+active; loaded Portal; realCLI signature/duplicates/owner/CSRF
 /tamper checks. Final gate statuspassed, no failures, exit0. Both synthetic

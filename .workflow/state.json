@@ -539,7 +539,7 @@
     "S13-06": {
       "status": "done",
       "evidence": ".workflow/evidence/S13-06.json",
-      "push_status": "not_started"
+      "push_status": "pushed"
     },
     "S13-07": {
       "status": "todo",
@@ -549,12 +549,12 @@
     "S13-08": {
       "status": "done",
       "evidence": ".workflow/evidence/S13-08.json",
-      "push_status": "pending_at_commit"
+      "push_status": "pushed"
     },
     "S13-09": {
       "status": "done",
       "evidence": ".workflow/evidence/S13-09.json",
-      "push_status": "pending_at_commit"
+      "push_status": "pushed"
     },
     "S14-01": {
       "status": "todo",
@@ -724,12 +724,12 @@
     "S13-08a": {
       "status": "done",
       "evidence": ".workflow/evidence/S13-08a.json",
-      "push_status": "pending_at_commit"
+      "push_status": "pushed"
     },
     "S13-09a": {
       "status": "done",
       "evidence": ".workflow/evidence/S13-09a.json",
-      "push_status": "pending_at_commit"
+      "push_status": "pushed"
     }
   },
   "gates": {

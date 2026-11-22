@@ -29,9 +29,10 @@ Pro and Plus, declined-card page and fully loaded Portals. UI layout coverage
 320/390/1440, both themes and UA/EN is recorded separately in S13-08.
 
 The durable duplicate test does not claim replay occurred after processing.
-That timing is covered by `test_repeated_projection_idempotent` on real local
-PostgreSQL. Global inbox counts also include earlier diagnostic runs, so they
-are not reported as unique events belonging to the final run.
+`test_repeated_projection_idempotent` on real local PostgreSQL separately checks
+repeating a projection from a subsequent event with a different event ID. Neither
+case is reported as same-event replay after processing. Global inbox counts also
+include earlier diagnostic runs, not only events from the final run.
 
 Issues found and fixed:
 

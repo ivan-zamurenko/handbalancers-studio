@@ -49,8 +49,8 @@ Never commit cookies, Checkout/Portal URLs, signing secrets or raw payloads.
 
 Duplicates replay immediately over HTTP with the original CLI body/signature.
 For Pro, external proof is two200 responses, one inbox row and initial projection version1.
-Replay after completed processing is a separate real PostgreSQL regression;
-this external gate does not claim that timing guarantee.
+A separate real PostgreSQL regression checks a later, distinct event repeating
+the same projection. Same-event replay after processing is not claimed here.
 
 Official references: [test cards](https://docs.stripe.com/testing),
 [billing lifecycle](https://docs.stripe.com/billing/testing),
