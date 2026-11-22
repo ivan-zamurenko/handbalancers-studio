@@ -128,7 +128,7 @@ class StripeGateway:
             "customer": customer_id,
             "client_reference_id": str(attempt_id),
             "line_items": [{"price": price_id, "quantity": 1}],
-            "payment_method_types": ["card"],
+            "allowed_payment_method_types": ["card"],
             "payment_method_collection": "always",
             "success_url": f"{origin}/billing/checkout/{attempt_id}",
             "cancel_url": f"{origin}/billing/checkout/{attempt_id}?cancelled=1",

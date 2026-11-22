@@ -116,6 +116,11 @@ def test_client_price_id_ignored_and_no_cards_in_app(api):
         expires_at=1800000000,
     )
     body = http.calls[-1][3]
+    from urllib.parse import parse_qs
+
+    fields = parse_qs(body)
+    assert fields.get("allowed_payment_method_types[0]") == ["card"]
+    assert not any(key.startswith("payment_method_types") for key in fields)
     assert "price_plus" in body and "payment_method_collection=always" in body
     assert "trial_period_days%5D=7" in body or "trial_period_days]=7" in body
     assert http.calls[-1][2]["Idempotency-Key"] == f"studio:checkout:{attempt}"

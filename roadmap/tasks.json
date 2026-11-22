@@ -5421,6 +5421,41 @@
       ]
     },
     {
+      "id": "S13-09a",
+      "stage": "13",
+      "slug": "stripe_endive_card_filter",
+      "title": "Stripe Endive card-only Checkout",
+      "goal": "Use allowed_payment_method_types for pinned2026-11-18.endive; keep card-only requirement.",
+      "module": "billing",
+      "kind": "integration",
+      "depends_on": [
+        "S13-08a"
+      ],
+      "gates": [],
+      "files": [
+        "server/studio/billing/stripe_gateway.py"
+      ],
+      "test_file": "server/tests/unit/billing/test_stripe_gateway.py",
+      "test_cases": [
+        {
+          "name": "endive_card_only_wire_contract",
+          "expected": "allowed_payment_method_types card only; removed payment_method_types absent"
+        }
+      ],
+      "api": "No API/schema changes.",
+      "db": "Нет изменения схемы.",
+      "notes": "Focused audit follow-up before external Stripe gate.",
+      "command": ".venv/bin/python -m pytest server/tests/unit/billing -q",
+      "commit": "fix(billing): [S13-09a] use supported card payment filter",
+      "status": "todo",
+      "order": 108.6,
+      "card": "roadmap/tasks/S13-09a_stripe_endive_card_filter.md",
+      "read": [
+        "docs/contracts.md",
+        "docs/owner-gates.md"
+      ]
+    },
+    {
       "id": "S13-09",
       "stage": "13",
       "slug": "billing_testmode",
@@ -5429,7 +5464,7 @@
       "module": "billing",
       "kind": "gate",
       "depends_on": [
-        "S13-08a"
+        "S13-09a"
       ],
       "gates": [
         "G_STRIPE_TEST"

@@ -1,0 +1,12 @@
+{
+  "task_id": "S13-09a",
+  "status": "done",
+  "base_sha": "a02b672",
+  "trigger": "Real TEST Checkout400: payment_method_types unsupported by pinned Endive API. No payment created.",
+  "source": "https://docs.stripe.com/api/checkout/sessions/create",
+  "red": "SDK transport test1 failed: allowed_payment_method_types missing",
+  "green": "22 billing unit tests; Ruff/mypy green",
+  "review": "Independent approved and reran22 tests",
+  "limits": "Actual Checkout retry follows; no UI/schema/hosted/live change",
+  "push_status": "pending_at_commit"
+}

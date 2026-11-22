@@ -1,3 +1,14 @@
+# Stripe: S13-09a сумісність API — 2026-11-22
+
+Actual TEST Checkout відмовив400: payment_method_types видалений у pinned
+2026-11-18.endive. Офіційний allowed_payment_method_types=[card] зберігає card-only.
+RED1, GREEN22SDK, Ruff/mypy, independent review approved.
+Попередній08a commit a02b672; далі повтор09 real test. Test catalog4 +CLI/Auth готові,
+але жодного успішного платежу ще немає. Harness artifacts приватні й не committed.
+Live/hosted не змінювалися.
+
+## Попередній checkpoint
+
 # Stripe: S13-08a завершено — 2026-11-22
 
 Nonterminal subscription блокує новий Checkout і заміну projection незалежно
