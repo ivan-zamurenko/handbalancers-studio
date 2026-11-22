@@ -189,3 +189,29 @@ def test_discovery_refuses_truncated_results(api):
     ]
     with pytest.raises(api.BillingUnavailable):
         gw.list_checkouts("cus_synthetic")
+
+
+@pytest.mark.parametrize("malformed", [None, "live", "foreign_customer", "foreign_url"])
+def test_portal_validates_provider_response(api, malformed):
+    gw, http = gateway(api)
+    payload = {
+        "object": "billing_portal.session",
+        "id": "bps_test",
+        "livemode": False,
+        "customer": "cus_owner",
+        "return_url": "https://studio.test/subscription",
+        "url": "https://billing.stripe.com/p/session/test_synthetic",
+    }
+    if malformed == "live":
+        payload["livemode"] = True
+    if malformed == "foreign_customer":
+        payload["customer"] = "cus_foreign"
+    if malformed == "foreign_url":
+        payload["url"] = "https://evil.test/session"
+    http.responses = [payload]
+    if malformed:
+        with pytest.raises(api.BillingUnavailable):
+            gw.create_portal("cus_owner", "https://studio.test/subscription")
+    else:
+        assert gw.create_portal("cus_owner", "https://studio.test/subscription") == payload["url"]
+        assert "customer=cus_owner" in http.calls[0][3]

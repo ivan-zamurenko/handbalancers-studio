@@ -1,0 +1,21 @@
+{
+  "task_id": "S13-06",
+  "status": "done",
+  "scope": "Portal service+thin authenticated route+gateway. Contract tests placed integration/billing because real session/RLS DB is mandatory; SDK tests unit. Template/button integrated once in S13-08 to avoid an incomplete UI.",
+  "base_sha": "043a00f",
+  "branch": "task/execution-v4",
+  "red": [
+    "4 SDK failures: missing create_portal",
+    "1 real DB/HTTP failure: missing route404"
+  ],
+  "green": "22 gateway unit tests;51 billing regressions; final Portal integration1 passed after envelope fix; Ruff/mypy12 modules green.",
+  "test_adjustments": [
+    "Use canonical error.code envelope instead of FastAPI detail: global safe HTTPException handler strips detail intentionally. Explicit checkout_required response preserves missing-customer acceptance."
+  ],
+  "review": "Read-only approved; reviewer independently ran22 gateway tests.",
+  "limits": [
+    "Real provider Portal not yet exercised; part of external gate.",
+    "No UI/hosted migration/live charges."
+  ],
+  "push_status": "pending_at_commit"
+}

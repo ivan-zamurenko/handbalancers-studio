@@ -174,3 +174,21 @@ class StripeGateway:
         if result.get("has_more") is not False:
             raise BillingUnavailable()
         return [self.test_object(item) for item in result["data"]]
+
+    def create_portal(self, customer_id: str, return_url: str) -> str:
+        portal = self.test_object(
+            self._call(
+                lambda: self.client.v1.billing_portal.sessions.create(
+                    {"customer": customer_id, "return_url": return_url}
+                )
+            )
+        )
+        url = portal.get("url")
+        if (
+            portal.get("customer") != customer_id
+            or portal.get("return_url") != return_url
+            or not isinstance(url, str)
+            or not url.startswith("https://billing.stripe.com/")
+        ):
+            raise BillingUnavailable()
+        return url

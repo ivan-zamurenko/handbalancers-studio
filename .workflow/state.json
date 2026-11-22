@@ -537,8 +537,8 @@
       "push_status": "not_started"
     },
     "S13-06": {
-      "status": "todo",
-      "evidence": null,
+      "status": "done",
+      "evidence": ".workflow/evidence/S13-06.json",
       "push_status": "not_started"
     },
     "S13-07": {

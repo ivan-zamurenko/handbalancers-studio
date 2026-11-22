@@ -1,3 +1,16 @@
+# Stripe: S13-06 завершено — 2026-11-22
+
+Owner-only Billing Portal API: server customer, fixed return URL, CSRF/Origin,
+no-store, test-only provider validation. UI button planned with S13-08.
+RED4 SDK +1HTTP; GREEN22 gateway +51 regressions +final1 Portal. Review approved.
+Попередній commit043a00f запушено. Наступне: S13-08 purchase/status UI.
+Локальний MCP OAuth підтверджено:1 sandbox,0 live; вебплагін не встановлено.
+Test API key також уже працює: read-only prices.list success;401 більше не blocker.
+Actual test payment, trial lifecycle й real Portal ще не пройдені.
+Hosted migrations/live/deploy не дозволені й не виконувалися.
+
+## Попередній checkpoint
+
 # Stripe: S13-05 завершено — 2026-11-22
 
 Один trial на акаунт: reservation до мережі, confirmation тільки після

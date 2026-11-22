@@ -70,3 +70,32 @@ async def checkout_status(request: Request, attempt_id: UUID) -> JSONResponse:
     except (SQLAlchemyError, UnsafeWebRole):
         raise HTTPException(503) from None
     return JSONResponse(jsonable_encoder(result), headers=HEADERS)
+
+
+class PortalInput(BaseModel):
+    model_config = ConfigDict(extra="forbid", hide_input_in_errors=True)
+
+
+@router.post("/api/billing-portal")
+async def billing_portal(request: Request, data: PortalInput) -> JSONResponse:
+    from studio.billing.portal import create_portal
+
+    actor, _ = await _actor(request, mutating=True)
+    try:
+        result = await run_db(create_portal, service_for(request), actor)
+    except CheckoutNotFound:
+        return JSONResponse(
+            {
+                "error": {
+                    "code": "checkout_required",
+                    "message_key": "billing.checkout_required",
+                    "field_errors": [],
+                    "request_id": request.state.request_id,
+                }
+            },
+            status_code=409,
+            headers=HEADERS,
+        )
+    except (BillingUnavailable, SQLAlchemyError, UnsafeWebRole):
+        raise HTTPException(503) from None
+    return JSONResponse(result, headers=HEADERS)
