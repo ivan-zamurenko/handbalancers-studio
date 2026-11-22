@@ -1,0 +1,17 @@
+{% extends "member/base.html" %}
+{% block title %}{{ copy('Статус оплати','Payment status') }} · Handbalancer’s Studio{% endblock %}
+{% block head %}{{ super() }}<link rel="stylesheet" href="/static/css/billing.css">{% endblock %}
+{% block member_content %}
+<div class="cabinet-page-head"><p class="eyebrow">{{ copy('Підписка','Subscription') }}</p><h1>{{ copy('Ваш платіж.','Your payment.') }}</h1><p>{{ copy('Статус оновлюється після підтвердження Stripe.','The status updates after Stripe confirms your payment.') }}</p></div>
+<section class="cabinet-card billing-payment" data-payment-state data-state="loading">
+  <span class="billing-payment-mark" aria-hidden="true">↗</span><p class="eyebrow">{{ copy('Обраний пакет','Selected plan') }}</p><h2 data-payment-plan>—</h2><p data-payment-message role="status">{{ copy('Завантажуємо…','Loading…') }}</p>
+  <a class="btn primary" data-resume-checkout hidden rel="noreferrer">{{ copy('Продовжити оплату','Continue payment') }} ↗</a>
+  <button type="button" class="primary" data-retry-checkout hidden>{{ copy('Повторити спробу оплати','Retry this payment attempt') }}</button>
+  <button type="button" data-refresh-billing>{{ copy('Оновити статус','Refresh status') }}</button>
+  <p class="billing-error" data-billing-error role="alert" hidden></p>
+  <a class="cabinet-text-link" href="/subscription?lang={{ language }}">{{ copy('До підписки','Back to subscription') }} →</a>
+  <a class="cabinet-text-link" href="/dashboard?lang={{ language }}" data-payment-dashboard hidden>{{ copy('До кабінету','Go to your studio') }} →</a>
+</section>
+<p class="cabinet-footnote">{{ copy('Це тестова покупка — реальні кошти не списуються.','This is a test purchase — no real money is charged.') }}</p>
+{% endblock %}
+{% block scripts %}<script type="module" src="/static/js/features/billing/checkout.js"></script>{% endblock %}

@@ -97,6 +97,7 @@ def render(request: Request, template: str) -> HTMLResponse:
             "copy": copy,
             "translations": translations,
             "plans": PLANS,
+            "billing_available": getattr(request.app.state, "checkout_service", None) is not None,
             "page_path": request.url.path,
             "oauth_providers": providers,
             "email_auth_enabled": request.app.state.settings.auth_email_enabled,

@@ -1,0 +1,31 @@
+{% extends "member/base.html" %}
+{% block title %}{{ copy('Підписка','Subscription') }} · Handbalancer’s Studio{% endblock %}
+{% block head %}{{ super() }}<link rel="stylesheet" href="/static/css/billing.css">{% endblock %}
+{% block member_content %}
+<div class="cabinet-page-head"><p class="eyebrow">{{ copy('Ваш пакет','Your plan') }}</p><h1>{{ copy('Практика у вашому ритмі.','Practice at your pace.') }}</h1><p>{{ copy('Оберіть пакет і керуйте підпискою в одному місці.','Choose a plan and manage your subscription in one place.') }}</p></div>
+<section class="billing-layout" data-billing-page data-enabled="{{ 'true' if billing_available else 'false' }}">
+  <div class="billing-notice">{{ copy('Тестова оплата. Реальні кошти не списуються. Програми й запис тренувань ще готуються.','Test payments. No real money is charged. Programmes and workout logging are still being prepared.') }}</div>
+  <section class="cabinet-card billing-current" aria-labelledby="subscription-heading">
+    <div><p class="eyebrow">{{ copy('Поточна підписка','Current subscription') }}</p><h2 id="subscription-heading" data-subscription-plan>—</h2><p data-subscription-date></p></div>
+    <span class="billing-badge" data-subscription-state data-state="loading">{{ copy('Завантажуємо…','Loading…') }}</span>
+    <button type="button" data-billing-portal hidden>{{ copy('Керувати у Stripe','Manage in Stripe') }} <span aria-hidden="true">↗</span></button>
+  </section>
+  <div class="billing-notice" data-active-attempt hidden><p>{{ copy('Є незавершена спроба оплати. Продовжіть її, щоб уникнути повторної покупки.','A payment attempt is already in progress. Continue it to avoid a duplicate purchase.') }}</p><a class="cabinet-text-link" data-active-link>{{ copy('Перевірити оплату','Check payment') }} →</a></div>
+  <form class="billing-form" data-billing-form hidden>
+    <fieldset class="billing-plans"><legend>{{ copy('Оберіть пакет','Choose your plan') }}</legend>
+      {% for code, name, cents, uk_tag, en_tag, uk_items, en_items in plans %}
+      <label class="billing-plan"><input type="radio" name="plan_code" value="{{ code }}" required><span class="billing-plan-name">{{ name }}</span><span class="billing-price">€{{ '%.2f' | format(cents / 100) }}<small>{{ copy('/ місяць','/ month') }}</small></span><span class="billing-plan-note">{{ copy(uk_tag,en_tag) }}</span></label>
+      {% endfor %}
+    </fieldset>
+    <div class="cabinet-card billing-confirm">
+      <p data-trial-terms></p>
+      <label class="billing-consent"><input type="checkbox" data-billing-consent required><span>{{ copy('Погоджуюсь із щомісячним автоматичним продовженням за вказаною ціною. Скасувати можна у Stripe. У тестовому режимі кошти не списуються.','I agree to automatic monthly renewal at the stated price. I can cancel in Stripe. No money is charged in test mode.') }}</span></label>
+      <div class="billing-actions"><button class="primary" type="submit" data-buy-package disabled>{{ copy('Продовжити у Stripe','Continue to Stripe') }}<span aria-hidden="true">↗</span></button><p>{{ copy('Дані картки вводяться лише на захищеній сторінці Stripe.','Card details are entered only on Stripe’s secure page.') }}</p></div>
+    </div>
+  </form>
+  <p class="billing-error" data-billing-error role="alert" hidden></p>
+  <button type="button" data-refresh-billing>{{ copy('Оновити статус','Refresh status') }}</button>
+  <noscript><p>{{ copy('Увімкніть JavaScript, щоб оформити підписку.','Enable JavaScript to subscribe.') }}</p></noscript>
+</section>
+{% endblock %}
+{% block scripts %}<script type="module" src="/static/js/features/billing/checkout.js"></script>{% endblock %}

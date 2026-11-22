@@ -37,7 +37,18 @@ def lock_customer(session: Session, user_id: UUID) -> None:
 
 
 def view(row: Any) -> dict[str, Any]:
-    return {name: row[name] for name in ("id", "plan_code", "state", "checkout_url", "expires_at")}
+    return {
+        name: row[name]
+        for name in (
+            "id",
+            "plan_code",
+            "state",
+            "checkout_url",
+            "expires_at",
+            "trial_enabled",
+            "idempotency_key",
+        )
+    }
 
 
 class CheckoutService:

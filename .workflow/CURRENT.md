@@ -1,3 +1,15 @@
+# Stripe: S13-08 локальний UI завершено — 2026-11-22
+
+Owner-only subscription/status UI, original-key recovery, Portal button, guarded pages.
+53 real DB tests;40 browser cases plus final5 affected regressions; prior62 cabinet/profile
+checks overlap. Visual desktop/mobile320/390/1440 both themes; evidence S13-08.
+Попередній commit b4b0d74 (06); push відкладений до security follow-up.
+Наступне: S13-08a блокує нову підписку при nonterminal старій незалежно від period_end.
+Потім09: actual test Checkout/signature/trial/Portal. Тестовий API доступний; точних
+чотирьох цін немає, потрібен ізольований test catalog. Live/hosted/deploy не виконані.
+
+## Попередній checkpoint
+
 # Stripe: S13-06 завершено — 2026-11-22
 
 Owner-only Billing Portal API: server customer, fixed return URL, CSRF/Origin,

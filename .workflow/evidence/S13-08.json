@@ -1,0 +1,48 @@
+{
+  "task_id": "S13-08",
+  "status": "done",
+  "scope": "Purchase/status templates+scoped CSS/JS; member navigation; owner-only GET subscription summary API and HTML guards. Read-only summary API needed for real status/trial eligibility; public render feature flag only. No schema changes. Fixtures and HTTP/browser tests. Dependency06 rather than unimplemented future planning transitions07 documented per owner Stripe priority.",
+  "base_sha": "b4b0d74",
+  "branch": "task/execution-v4",
+  "red": [
+    "Initial owner summary API404 and missing billing templates",
+    "Recovery radio lock and missing creating retry button (2 failures)",
+    "Webhook commit between reads: pending instead of active (1 failure)",
+    "UA→EN after503 left error Ukrainian (1 failure)"
+  ],
+  "green": [
+    "53 real DB billing integration tests",
+    "62 browser billing/profile/member cases before final race/locale fixes",
+    "40 billing browser cases after race fix; final39 plus targeted5 passed after locale fix (overlap)",
+    "Ruff and mypy13 modules green"
+  ],
+  "commands": {
+    "db": "tools/local_stack.py test .venv/bin/python -m pytest server/tests/integration/billing --import-mode=importlib -q",
+    "browser": "playwright test tests/e2e/s13-08-billing-ui-flow.spec.js",
+    "final": "playwright test tests/e2e/s13-08-billing-ui-flow.spec.js -g \"Checkout timeout|payment success\""
+  },
+  "adjustments": [
+    "Use configured default Chromium, no named project",
+    "Initial bind sandbox failure was environment, not RED",
+    "QA theme reapplied after navigation; menu captured before language click. Superseded *-menu.png files are closed, not open."
+  ],
+  "visual": {
+    "directory": "ignored private-evidence/stripe-ui",
+    "personally_viewed": [
+      "subscription1440 light/dark,390 light/dark,320light",
+      "checkout1440 light/dark,390light/dark,320light",
+      "dashboard/progress/loaded profile320/390/1440 both themes EN via contact sheets",
+      "loaded profile1440lightUA/390darkUA",
+      "open menu390dark profile/320light dashboard",
+      "active390dark/1440light; success390dark; error390light/1440dark"
+    ],
+    "checks": "UA/EN, mobile menu/keyboard, overflow, empty/current subscription, confirmed/pending, consent and selection retained after503. No visible defect in viewed states."
+  },
+  "limits": [
+    "Browser provider responses are fixtures; actual Stripe purchase/trial/Portal remain gate09",
+    "No hosted migration or live payment",
+    "Independent audit P2: stale nonterminal subscription may allow duplicate purchase; separate08a before external gate/push"
+  ],
+  "push_status": "pending_at_commit",
+  "review": "Read-only review approved after race+locale fixes; reviewer checked corrected theme/menu screenshots."
+}

@@ -6,9 +6,14 @@ from starlette.requests import Request
 from studio.main import create_app
 from studio.public.routes import render
 
-path, language = sys.argv[1:]
-assert path in {"/dashboard", "/progress", "/profile"} and language in {"uk", "en"}
+path, language = sys.argv[1:3]
+assert (
+    path in {"/dashboard", "/progress", "/profile", "/subscription"}
+    or path.startswith("/billing/checkout/")
+) and language in {"uk", "en"}
 app = create_app({"app_env": "test", "public_origin": "http://127.0.0.1:8765"})
+if len(sys.argv) > 3 and sys.argv[3] == "billing":
+    app.state.checkout_service = object()  # Template fixture only, never a runtime service.
 request = Request(
     {
         "type": "http",
@@ -21,4 +26,9 @@ request = Request(
         "app": app,
     }
 )
-print(render(request, f"member/{path[1:]}.html").body.decode())
+template = (
+    "public/checkout_status.html"
+    if path.startswith("/billing/checkout/")
+    else f"member/{path[1:]}.html"
+)
+print(render(request, template).body.decode())

@@ -99,3 +99,44 @@ async def billing_portal(request: Request, data: PortalInput) -> JSONResponse:
     except (BillingUnavailable, SQLAlchemyError, UnsafeWebRole):
         raise HTTPException(503) from None
     return JSONResponse(result, headers=HEADERS)
+
+
+@router.get("/api/me/subscription")
+async def subscription_status(request: Request) -> JSONResponse:
+    from studio.billing.summary import subscription_summary
+
+    actor, _ = await _actor(request, mutating=False)
+    try:
+        result = await run_db(subscription_summary, service_for(request), actor)
+    except (SQLAlchemyError, UnsafeWebRole):
+        raise HTTPException(503) from None
+    return JSONResponse(jsonable_encoder(result), headers=HEADERS)
+
+
+@router.get("/subscription", include_in_schema=False)
+async def subscription_page(request: Request):
+    from studio.accounts.entry import entry_destination
+    from studio.public.routes import member_redirect, render
+
+    destination = await entry_destination(request)
+    if destination != "/dashboard":
+        return member_redirect(request, destination)
+    return render(request, "member/subscription.html")
+
+
+@router.get("/billing/checkout/{attempt_id}", include_in_schema=False)
+async def payment_page(request: Request, attempt_id: UUID):
+    from studio.accounts.entry import entry_destination
+    from studio.public.routes import member_redirect, render
+
+    destination = await entry_destination(request)
+    if destination != "/dashboard":
+        return member_redirect(request, destination)
+    actor, _ = await _actor(request, mutating=False)
+    try:
+        await run_db(service_for(request).get, actor, attempt_id)
+    except CheckoutNotFound:
+        raise HTTPException(404) from None
+    except (SQLAlchemyError, UnsafeWebRole):
+        raise HTTPException(503) from None
+    return render(request, "public/checkout_status.html")
