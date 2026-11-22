@@ -1,3 +1,17 @@
+# Stripe: S13-02 завершено — 2026-11-22
+
+S13-02: Checkout intent у БД перед мережею; session/Origin/CSRF/completion,
+строгі plan/terms DTO, owner-only status, повтор оригінального key, один active
+attempt. Інший key при активній спробі →409. Redirect не надає entitlement.
+Міграція0012, вузький studio_worker writer; billing вимкнений за замовчуванням.
+132 DB/regression green; після review-fix фінальні13 Checkout green (перетин).
+112 unit/tooling green. Read-only review approved. Evidence S13-02.
+S13-01 commit0aa8207. Далі S13-03 підписаний durable webhook inbox.
+Stripe test credential401; очікуємо stripe login від власника, незалежний код триває.
+Хмарних міграцій/live платежів немає.
+
+## Попередній checkpoint
+
 # Stripe: S13-01 завершено — 2026-11-22
 
 За дорученням власника Stripe реалізуємо перед наступними roadmap-етапами.

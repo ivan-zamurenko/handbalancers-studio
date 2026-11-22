@@ -25,6 +25,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DB_SUITES = (
     "server/tests/integration/database",
     "server/tests/integration/onboarding",
+    "server/tests/integration/billing",
     "server/tests/security/database",
     "server/tests/security/accounts",
     "server/tests/integration/auth",
@@ -99,6 +100,7 @@ def verify_isolation(connection: Connection, *, owner: str = "migration_owner") 
         "studio.onboarding_profiles",
         "studio.billing_customers",
         "studio.subscriptions",
+        "studio.checkout_attempts",
     ):
         if connection.scalar(text("SELECT to_regclass(:t)"), {"t": later}) is not None:
             tables.append(later)
@@ -114,6 +116,28 @@ def verify_isolation(connection: Connection, *, owner: str = "migration_owner") 
             "Product ownership/RLS mismatch",
         )
         for role in ("anon", "authenticated", "studio_worker"):
+            billing_grants = {
+                "studio.billing_customers": {"SELECT", "INSERT"},
+                "studio.subscriptions": {"SELECT"},
+                "studio.checkout_attempts": {"SELECT", "INSERT", "UPDATE"},
+            }
+            if (
+                role == "studio_worker"
+                and table in billing_grants
+                and connection.scalar(text("SELECT to_regclass('studio.checkout_attempts')"))
+            ):
+                for privilege in ("SELECT", "INSERT", "UPDATE", "DELETE", "TRUNCATE"):
+                    require(
+                        bool(
+                            connection.scalar(
+                                text("SELECT has_table_privilege(:r,:t,:p)"),
+                                {"r": role, "t": table, "p": privilege},
+                            )
+                        )
+                        == (privilege in billing_grants[table]),
+                        "Unexpected billing worker grant",
+                    )
+                continue
             require(
                 not connection.scalar(
                     text(

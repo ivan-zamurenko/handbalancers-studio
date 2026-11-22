@@ -26,6 +26,11 @@ class Settings(BaseModel):
     auth_client_attempts_per_minute: int = Field(default=10, ge=1, le=10)
     auth_account_attempts_per_minute: int = Field(default=10, ge=1, le=10)
     oauth_google_enabled: bool = False
+    billing_enabled: bool = False
+    stripe_price_essential: str = ""
+    stripe_price_plus: str = ""
+    stripe_price_pro: str = ""
+    stripe_price_pro_plus: str = ""
     stripe_secret_key: SecretStr | None = None
     stripe_webhook_secret: SecretStr | None = None
 
@@ -104,6 +109,25 @@ class Settings(BaseModel):
                 )
                 if len(key) != 32:
                     raise ValueError("Invalid encryption key")
+            if settings.billing_enabled:
+                if settings.app_env in {"production", "staging"} or not all(
+                    (
+                        settings.public_origin,
+                        settings.worker_database_url,
+                        settings.database_url,
+                        settings.stripe_secret_key,
+                        settings.stripe_webhook_secret,
+                        settings.stripe_price_essential,
+                        settings.stripe_price_plus,
+                        settings.stripe_price_pro,
+                        settings.stripe_price_pro_plus,
+                    )
+                ):
+                    raise ValueError("Test billing configuration incomplete")
+                if not settings.stripe_secret_key.get_secret_value().startswith(
+                    ("sk_test_", "rk_test_")
+                ):
+                    raise ValueError("Test billing requires test credentials")
             return settings
         except (ValidationError, ValueError):
             # hide_input_in_errors alone does not protect errors()/json(). Rebuild

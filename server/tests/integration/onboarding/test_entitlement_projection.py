@@ -221,14 +221,23 @@ def test_runtime_cannot_grant_or_change_subscription(api, seeded, role, verb):
                 text("SELECT relrowsecurity FROM pg_class WHERE oid=to_regclass(:t)"),
                 {"t": f"studio.{table}"},
             )
-            assert not conn.scalar(
-                text("SELECT has_table_privilege(:r, :t, :v)"),
-                {"r": role, "t": f"studio.{table}", "v": verb},
+            expected = role == "studio_worker" and table == "billing_customers" and verb == "INSERT"
+            assert (
+                bool(
+                    conn.scalar(
+                        text("SELECT has_table_privilege(:r, :t, :v)"),
+                        {"r": role, "t": f"studio.{table}", "v": verb},
+                    )
+                )
+                == expected
             )
-        assert not conn.scalar(
-            text("SELECT has_table_privilege(:r, 'studio.billing_customers', 'SELECT')"),
-            {"r": role},
-        )
+        # S13-02 adds the verified billing worker; public/auth/web still cannot read customers.
+        assert bool(
+            conn.scalar(
+                text("SELECT has_table_privilege(:r, 'studio.billing_customers', 'SELECT')"),
+                {"r": role},
+            )
+        ) == (role == "studio_worker")
 
 
 @pytest.mark.parametrize(
@@ -308,4 +317,4 @@ def test_downgrade_preserves_subscription(api, seeded):
         with pytest.raises(RuntimeError, match="forward repair"), conn.begin_nested():
             command.downgrade(configuration(conn), "0010")
         assert conn.scalar(text("SELECT count(*) FROM studio.subscriptions")) == 1
-        assert conn.scalar(text("SELECT version_num FROM studio.alembic_version")) == "0011"
+        assert conn.scalar(text("SELECT version_num FROM studio.alembic_version")) == "0012"

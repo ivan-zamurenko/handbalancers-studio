@@ -1,0 +1,18 @@
+{
+  "task_id": "S13-02",
+  "status": "done",
+  "scope": "Durable checkout, 0012 migration instead of stale card0039; models/registry/settings/routes/runtime/CI registration. Existing studio_worker becomes narrow billing writer for customers/attempts, subscriptions still unwritable until verified reconciliation S13-04. Reuses real profile completion and session/CSRF boundary. S05-04 test permission expectations will reflect trusted billing writer now present, no changes to web/anon/authenticated grants.",
+  "red": "Initial direct pytest hit env guard (not RED); guarded Colima local_stack pytest:10 missing checkout-module errors.",
+  "not_verified": [
+    "Real Stripe test key initially401; user refresh pending",
+    "No hosted schema changes"
+  ],
+  "base_sha": "0aa8207",
+  "branch": "task/execution-v4",
+  "green": "132 DB+HTTP+entitlement regression tests passed before key fix; final13 affected Checkout tests passed after fix.112 unit+CI tooling tests passed. Ruff/mypy passed.",
+  "review": "Read-only reviewer found unpersisted second-key alias; observed RED then different active keys return409. Follow-up approved.",
+  "test_adjustments": "Original two-key parallel test incorrectly required two successes though card only requires one active attempt. Split into same-key parallel replay (both same id), and distinct-key race (one success,one409), retaining DB one-row/provider-key assertion. S05 role checks now explicitly allow only customer SELECT/INSERT for verified studio_worker, and subscription SELECT. Public/web/auth mutation denial preserved. Migration-head assertions0012 because new linear head.",
+  "http_red": "Real auth/DB test returned404 instead of expected403 before route implementation.",
+  "limits": "Feature disabled by default. Test-mode only; trial reservation and webhook fulfillment follow in separate cards. Current key401 remains external blocker, not passed.",
+  "push_status": "pending_at_commit"
+}

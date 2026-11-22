@@ -3,7 +3,16 @@
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Integer, Text, UniqueConstraint, text
+from sqlalchemy import (
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    Text,
+    UniqueConstraint,
+    text,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from studio.accounts.models import User
@@ -59,3 +68,42 @@ class Subscription(Base):
     current_period_start: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     current_period_end: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     row_version: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text("1"))
+
+
+class CheckoutAttempt(Base):
+    __tablename__ = "checkout_attempts"
+    __table_args__ = (
+        UniqueConstraint("user_id", "idempotency_key", name="uq_checkout_key"),
+        UniqueConstraint("provider_session_id", name="uq_checkout_session"),
+        CheckConstraint("length(idempotency_key) BETWEEN 1 AND 128", name="ck_checkout_key"),
+        CheckConstraint(
+            "plan_code IN ('essential','plus','pro','pro-plus')", name="ck_checkout_plan"
+        ),
+        CheckConstraint(
+            "state IN ('creating','open','pending','completed','expired','failed','needs_reconcile')",
+            name="ck_checkout_state",
+        ),
+        CheckConstraint(
+            "isfinite(created_at) AND isfinite(expires_at) AND expires_at > created_at",
+            name="ck_checkout_time",
+        ),
+        CheckConstraint("length(terms_version) BETWEEN 1 AND 100", name="ck_checkout_terms"),
+        Index(
+            "uq_checkout_active",
+            "user_id",
+            unique=True,
+            postgresql_where=text("state IN ('creating','open','pending','needs_reconcile')"),
+        ),
+    )
+    id: Mapped[UUID] = mapped_column(primary_key=True, server_default=text("gen_random_uuid()"))
+    user_id: Mapped[UUID] = mapped_column(ForeignKey(User.id), nullable=False)
+    idempotency_key: Mapped[str] = mapped_column(Text, nullable=False)
+    plan_code: Mapped[str] = mapped_column(Text, nullable=False)
+    terms_version: Mapped[str] = mapped_column(Text, nullable=False)
+    state: Mapped[str] = mapped_column(Text, nullable=False, server_default=text("'creating'"))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=text("now()")
+    )
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    provider_session_id: Mapped[str | None] = mapped_column(Text)
+    checkout_url: Mapped[str | None] = mapped_column(Text)

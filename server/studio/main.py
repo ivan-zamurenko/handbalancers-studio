@@ -17,6 +17,8 @@ from studio.auth.recovery_routes import router as recovery_router
 from studio.auth.routes import router as auth_router
 from studio.auth.runtime import build_oauth
 from studio.auth.verification_routes import router as verification_router
+from studio.billing.routes import router as billing_router
+from studio.billing.runtime import build_checkout
 from studio.db import web_transaction_factory
 from studio.health import liveness
 from studio.public.routes import router as public_router
@@ -45,6 +47,7 @@ def create_app(settings: Settings | Mapping[str, object] | None = None) -> FastA
     if validated.auth_email_enabled and app.state.oauth_service is not None:
         app.state.auth_gateway = app.state.oauth_service.gateway
     app.state.web_transaction = web_transaction_factory(validated)
+    app.state.checkout_service = build_checkout(validated, app.state.web_transaction)
     configure_access_logging()
     if deployed:
         assert validated.public_origin
@@ -67,6 +70,7 @@ def create_app(settings: Settings | Mapping[str, object] | None = None) -> FastA
     app.include_router(verification_router)
     app.include_router(recovery_router)
     app.include_router(oauth_router)
+    app.include_router(billing_router)
     app.include_router(accounts_router)
     app.include_router(onboarding_router)
     app.include_router(public_router)
