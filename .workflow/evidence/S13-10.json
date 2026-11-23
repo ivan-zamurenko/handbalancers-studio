@@ -1,0 +1,61 @@
+{
+  "task_id": "S13-10",
+  "status": "done",
+  "date": "2026-11-23",
+  "base_sha": "576926a",
+  "branch": "task/execution-v4",
+  "scope": "Local migration0016: separate payments and payment_refunds, immutable original facts, current refund status only mutable by worker. Verified Stripe invoice/PI/Charge/Checkout owner binding, original invoice-line plan, paid_at UTC, idempotency, atomic projection/history/inbox, fenced historical path. Owner-only bounded no-store GET /api/me/payments. No UI change.",
+  "red": [
+    {
+      "command": "PATH=\"$PWD/.local-tools/supabase-cli/node_modules/@supabase/cli-darwin-arm64/bin:$PATH\" DOCKER_HOST=\"unix://$HOME/.colima/studio-s01/docker.sock\" .venv/bin/python tools/local_stack.py test .venv/bin/python -m pytest server/tests/integration/billing/test_payment_history.py -k confirmed --import-mode=importlib -q --tb=short",
+      "result": "1 failed: Separate payments absent (to_regclass NULL)."
+    },
+    {
+      "command": "PATH=\"$PWD/.local-tools/supabase-cli/node_modules/@supabase/cli-darwin-arm64/bin:$PATH\" DOCKER_HOST=\"unix://$HOME/.colima/studio-s01/docker.sock\" .venv/bin/python tools/local_stack.py test .venv/bin/python -m pytest server/tests/integration/billing/test_payment_history.py server/tests/integration/billing/test_payment_history_api.py --import-mode=importlib -q --tb=short",
+      "result": "16 passed,2 failed: missing refund status column and GET payments404 before implementation."
+    },
+    {
+      "command": "PATH=\"$PWD/.local-tools/supabase-cli/node_modules/@supabase/cli-darwin-arm64/bin:$PATH\" DOCKER_HOST=\"unix://$HOME/.colima/studio-s01/docker.sock\" .venv/bin/python tools/local_stack.py test .venv/bin/python -m pytest server/tests/integration/billing/test_payment_history.py -k nested --import-mode=importlib -q --tb=short",
+      "result": "1 failed:105 nested refund records returned instead of100."
+    },
+    {
+      "command": "PATH=\"$PWD/.local-tools/supabase-cli/node_modules/@supabase/cli-darwin-arm64/bin:$PATH\" DOCKER_HOST=\"unix://$HOME/.colima/studio-s01/docker.sock\" .venv/bin/python tools/local_stack.py test .venv/bin/python -m pytest server/tests/integration/billing/test_payment_history.py -k 'noncard or historical_payment_requires' --import-mode=importlib -q --tb=short",
+      "result": "2 failed: noncard Charge accepted; historical invoice persisted after customer lease expired."
+    }
+  ],
+  "green": {
+    "command": "PATH=\"$PWD/.local-tools/supabase-cli/node_modules/@supabase/cli-darwin-arm64/bin:$PATH\" DOCKER_HOST=\"unix://$HOME/.colima/studio-s01/docker.sock\" .venv/bin/python tools/local_stack.py test .venv/bin/python -m pytest server/tests/integration/billing server/tests/integration/database server/tests/integration/onboarding server/tests/security/database server/tests/unit/billing tools/tests/test_s01_07_migration_ci.py --import-mode=importlib -q --tb=short",
+    "result": "272 passed,1 existing Starlette httpx deprecation warning. Real PostgreSQL/RLS/migration metadata, SDK transport, HTTP auth/API, concurrency and rollback.",
+    "additional": "Ruff check+format, mypy64 source files, roadmap validate145 tasks, git diff --check passed. Final local verify_isolation covers table and refund status-only column grants."
+  },
+  "review": "Independent read-only /root/review_stripe. Findings fixed: refund lacks livemode; late refund failure needs current status; card Charge proof; historical customer fencing; bounded nested refunds; nullable line fields; provider-call budget. Atomic rollback and two-thread stale-refund race tested. Final code review: no unresolved findings; reviewer did not independently run tests.",
+  "external": {
+    "status": "passed_test_only",
+    "invoice_delivery": "Actual existing S13-09 Stripe test invoice objects replayed through local HTTP with current test listener HMAC. These are not newly charged purchases or fresh Stripe invoice.paid deliveries.",
+    "verified": [
+      "Actual Pro17999eur and Plus4999eur stored once with owner/original plan and exact Stripe InvoicePayment.paid_at",
+      "Exact invoice event replay after processed returns200 and keeps one row",
+      "New EUR1 test refund for verified synthetic canceled Pro subscription, stable idempotency key",
+      "Actual Stripe CLI-signed refund HTTP delivery and replay; one refund row, original17999 payment unchanged"
+    ],
+    "private_result": "private-evidence/stripe-testmode/payment-history-result.json",
+    "private_recipe": "private-evidence/stripe-testmode/payment-history-check.py",
+    "command": "PYTHONPATH=\"$PWD\" PATH=\"$PWD/.local-tools/supabase-cli/node_modules/@supabase/cli-darwin-arm64/bin:$PATH\" DOCKER_HOST=\"unix://$HOME/.colima/studio-s01/docker.sock\" .venv/bin/python tools/local_stack.py test .venv/bin/python private-evidence/stripe-testmode/payment-history-check.py",
+    "cleanup": "Local webhook server and Stripe CLI listener stopped. Existing synthetic subscriptions remain canceled; no new subscription or live charge."
+  },
+  "test_adjustments": [
+    "Advanced existing expected migration head0015→0016; downgrade still refuses history loss. No assertions weakened.",
+    "Role helper supports only product roles; anon/authenticated grants tested via actual has_table_privilege instead of unsupported role helper.",
+    "Initial implementation accidentally inserted two ORM types for trial_enabled; corrected declaration. These setup errors are not counted as behavioral RED.",
+    "External harness first needed explicit app_env and Decimal-to-string JSON serialization for Stripe SDK values; fixed test harness only, final roundtrip passed."
+  ],
+  "limits": [
+    "Migration0016 applied only to isolated local test DB. Hosted0011–0016 and narrow worker configuration still require separate approval; cloud allowance0010 unchanged.",
+    "No UI payment-history screen, live charges, deployment, fiscal/accounting or dispute implementation.",
+    "Supported single-card subscription invoice, one invoice per PI and one paid allocation per invoice; full bounded provider lists required. Other/multi-price/out-of-band payment shapes fail closed with bounded retries/operator attention.",
+    "Payments immutable; refund original facts immutable but status refreshed from current Stripe. Raw signed encrypted inbox retains status event history. No card PAN/CVC stored.",
+    "Prior purchases in another environment require deliberate replay/backfill; this migration does not silently fetch all historical records."
+  ],
+  "next_step": "Review/authorize hosted0011–0016 and narrow test worker setup when ready; no unrelated roadmap work.",
+  "push_status": "pending_at_commit"
+}

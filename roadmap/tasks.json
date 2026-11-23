@@ -7091,6 +7091,58 @@
         "docs/contracts.md",
         "docs/decisions.md"
       ]
+    },
+    {
+      "id": "S13-10",
+      "stage": "13",
+      "slug": "payment_history",
+      "title": "Окрема незмінна історія платежів і повернень",
+      "goal": "Підтверджені Stripe платежі з власником, пакетом, сумою та UTC часом незалежно від поточної підписки.",
+      "module": "billing",
+      "kind": "integration",
+      "depends_on": [
+        "S13-09"
+      ],
+      "gates": [],
+      "files": [
+        "server/studio/billing/payments.py",
+        "server/alembic/versions/0016_payment_history.py"
+      ],
+      "test_file": "server/tests/integration/billing/test_payment_history.py",
+      "test_cases": [
+        {
+          "name": "confirmed_history",
+          "expected": "Verified invoice payment recorded once; UTC paid time and original plan preserved."
+        },
+        {
+          "name": "ownership_and_immutability",
+          "expected": "Owner-only RLS; immutable financial facts; worker may UPDATE refund status only; foreign bindings fail closed."
+        },
+        {
+          "name": "atomic_replay",
+          "expected": "Duplicate/concurrent deliveries do not duplicate; lease failure rolls back history and current projection."
+        },
+        {
+          "name": "refund_history",
+          "expected": "Verified refund facts separate with current status; succeeded-to-failed restores balance; out-of-order recovery; no excess refund."
+        },
+        {
+          "name": "safe_read",
+          "expected": "Authenticated bounded owner-only API, no-store, no sensitive provider payload."
+        }
+      ],
+      "api": "GET /api/me/payments, bounded pagination. No UI.",
+      "db": "0016 payments/payment_refunds, append-only runtime grants and owner RLS. Local only.",
+      "notes": "User authorized 2026-11-23. Test-mode card subscription scope; no live or hosted rollout.",
+      "command": ".venv/bin/python -m pytest server/tests/integration/billing/test_payment_history.py --import-mode=importlib -q",
+      "commit": "feat(billing): [S13-10] preserve payment and refund history",
+      "status": "todo",
+      "order": 108.8,
+      "card": "roadmap/tasks/S13-10_payment_history.md",
+      "read": [
+        "docs/decisions.md",
+        "docs/billing-payment-history.md"
+      ]
     }
   ]
 }

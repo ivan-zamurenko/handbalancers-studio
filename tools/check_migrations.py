@@ -102,6 +102,8 @@ def verify_isolation(connection: Connection, *, owner: str = "migration_owner") 
         "studio.subscriptions",
         "studio.checkout_attempts",
         "studio.trial_claims",
+        "studio.payments",
+        "studio.payment_refunds",
         "studio_private.webhook_events",
     ):
         if connection.scalar(text("SELECT to_regclass(:t)"), {"t": later}) is not None:
@@ -122,6 +124,8 @@ def verify_isolation(connection: Connection, *, owner: str = "migration_owner") 
                 "studio.billing_customers": {"SELECT", "INSERT"},
                 "studio.subscriptions": {"SELECT", "INSERT", "UPDATE"},
                 "studio.checkout_attempts": {"SELECT", "INSERT", "UPDATE"},
+                "studio.payments": {"SELECT", "INSERT"},
+                "studio.payment_refunds": {"SELECT", "INSERT"},
                 "studio.trial_claims": {"SELECT", "INSERT", "UPDATE"},
                 "studio_private.webhook_events": {"SELECT", "INSERT", "UPDATE"},
             }
@@ -150,6 +154,24 @@ def verify_isolation(connection: Connection, *, owner: str = "migration_owner") 
                     {"role": role, "table": table},
                 ),
                 "Unexpected runtime table grant",
+            )
+    if connection.scalar(text("SELECT to_regclass('studio.payment_refunds')")):
+        for column in connection.execute(
+            text(
+                "SELECT column_name FROM information_schema.columns WHERE table_schema='studio' AND table_name='payment_refunds'"
+            )
+        ).scalars():
+            require(
+                bool(
+                    connection.scalar(
+                        text(
+                            "SELECT has_column_privilege('studio_worker','studio.payment_refunds',:c,'UPDATE')"
+                        ),
+                        {"c": column},
+                    )
+                )
+                == (column == "status"),
+                "Unexpected refund update privilege",
             )
     for column in ("id", "auth_user_id", "role", "is_active", "created_at", "row_version"):
         require(

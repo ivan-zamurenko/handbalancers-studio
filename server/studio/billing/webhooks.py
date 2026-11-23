@@ -22,6 +22,9 @@ TYPES = {
     "customer.subscription.updated": "subscription",
     "customer.subscription.deleted": "subscription",
     "invoice.paid": "invoice",
+    "refund.created": "refund",
+    "refund.updated": "refund",
+    "refund.failed": "refund",
     "invoice.payment_failed": "invoice",
 }
 
@@ -59,7 +62,8 @@ class WebhookInbox:
             ):
                 raise InvalidWebhook()
             if event_type in TYPES and (
-                obj.get("object") != TYPES[event_type] or obj.get("livemode") is not False
+                obj.get("object") != TYPES[event_type]
+                or (TYPES[event_type] != "refund" and obj.get("livemode") is not False)
             ):
                 raise InvalidWebhook()
             encrypted = self.cipher.encrypt(raw.decode("utf-8"), ("stripe-event", event_id))

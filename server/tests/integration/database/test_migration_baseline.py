@@ -118,7 +118,7 @@ def test_operator_fk_upgrade_repeat_preserves_privileges(operator_engine):
         command.upgrade(configuration(connection), "head")
         assert connection.scalar(text("SELECT current_user")) == "postgres"
         assert operator_membership(connection) == before
-        assert connection.scalar(text("SELECT version_num FROM studio.alembic_version")) == "0015"
+        assert connection.scalar(text("SELECT version_num FROM studio.alembic_version")) == "0016"
         assert connection.execute(text(
             "SELECT DISTINCT pg_get_userbyid(relowner) FROM pg_class "
             "WHERE relnamespace IN ('studio'::regnamespace,'studio_private'::regnamespace)"

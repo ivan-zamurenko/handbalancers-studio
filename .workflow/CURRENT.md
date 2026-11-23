@@ -1,3 +1,24 @@
+# Stripe: S13-10 історія платежів — 2026-11-23
+
+Окремі studio.payments та studio.payment_refunds, міграція0016 лише local test.
+Платіж: власник, початковий пакет, сума/валюта, Stripe paid_at UTC, test marker;
+фінансові факти незмінні. Refund має актуальний статус, сума/зв’язки незмінні.
+GET /api/me/payments: owner-only RLS, no-store, bounded cursor; UI не змінено.
+
+272 affected DB/API/SDK/tooling tests passed; Ruff/mypy/roadmap green.
+Review без невирішених зауважень після RED/GREEN. Справжні попередні Stripe
+test Pro17999/Plus4999 підтверджено у новій таблиці через HTTP replay; новий
+test refund100 пройшов actual signed CLI webhook. Повтори без дублікатів.
+Деталі й межі: .workflow/evidence/S13-10.json, docs/billing-payment-history.md.
+Попередній commit576926a; основний S13-10 commit/push pending на цьому checkpoint.
+
+Наступний крок: окремо погодити hosted0011–0016 і narrow worker configuration,
+щоб увімкнути TEST billing в основному застосунку. Cloud allowance0010 незмінний.
+Live charges/hosted migrations/deploy не виконані. Тестові listener/server зупинені.
+Не переходити до непогоджених roadmap-карток.
+
+## Попередній checkpoint
+
 # Stripe: тестова покупка перевірена — 2026-11-22
 
 Основний commit79a123b успішно запушено в origin/task/execution-v4 разом із06/08/08a/09a.

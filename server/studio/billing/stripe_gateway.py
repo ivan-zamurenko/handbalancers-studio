@@ -192,3 +192,30 @@ class StripeGateway:
         ):
             raise BillingUnavailable()
         return url
+
+    def list_invoice_payments(
+        self, *, invoice: str | None = None, payment_intent: str | None = None
+    ) -> list[dict[str, Any]]:
+        params: Any = {"limit": 100, "status": "paid"}
+        if (invoice is None) == (payment_intent is None):
+            raise BillingUnavailable()
+        if invoice is not None:
+            params["invoice"] = invoice
+        else:
+            params["payment"] = {"type": "payment_intent", "payment_intent": payment_intent}
+        result = self._call(lambda: self.client.v1.invoice_payments.list(params)).to_dict()
+        if result.get("has_more") is not False:
+            raise BillingUnavailable()
+        return [self.test_object(item) for item in result["data"]]
+
+    def retrieve_payment_intent(self, identifier: str) -> dict[str, Any]:
+        return self.test_object(
+            self._call(lambda: self.client.v1.payment_intents.retrieve(identifier))
+        )
+
+    def retrieve_charge(self, identifier: str) -> dict[str, Any]:
+        return self.test_object(self._call(lambda: self.client.v1.charges.retrieve(identifier)))
+
+    def retrieve_refund(self, identifier: str) -> dict[str, Any]:
+        # Refund has no livemode. Caller MUST verify its PI/Charge against test mode.
+        return self._call(lambda: self.client.v1.refunds.retrieve(identifier)).to_dict()

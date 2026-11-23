@@ -264,7 +264,7 @@ ON CONFLICT(event_id) DO NOTHING RETURNING event_id"""),
             token = uuid4()
             s.execute(
                 text(
-                    "UPDATE studio_private.webhook_events SET state='processing',attempts=attempts+1,lease_token=:t,lease_until=now()+interval '90 seconds' WHERE event_id=:e"
+                    "UPDATE studio_private.webhook_events SET state='processing',attempts=attempts+1,lease_token=:t,lease_until=now()+interval '180 seconds' WHERE event_id=:e"
                 ),
                 {"t": token, "e": row["event_id"]},
             )
@@ -301,8 +301,15 @@ ON CONFLICT(event_id) DO NOTHING RETURNING event_id"""),
         return True
 
     def _reconcile(self, event: dict[str, Any]) -> None:
+        from studio.billing.payments import PaymentHistory
+
+        history = PaymentHistory(self.transaction, self.gateway)
+        payment = None
         checkout = None
         kind = event["event_type"]
+        if kind.startswith("refund."):
+            history.refund(self, event)
+            return
         if kind.startswith("checkout.session."):
             checkout = self.gateway.retrieve_checkout(event["object_id"])
             require(checkout.get("id") == event["object_id"] and checkout.get("livemode") is False)
@@ -317,7 +324,7 @@ ON CONFLICT(event_id) DO NOTHING RETURNING event_id"""),
                 return
         elif kind.startswith("invoice."):
             invoice = self.gateway.retrieve_invoice(event["object_id"])
-            require(invoice.get("livemode") is False)
+            require(invoice.get("livemode") is False and invoice.get("id") == event["object_id"])
             customer = invoice.get("customer")
             details = (invoice.get("parent") or {}).get("subscription_details")
             if not details:
@@ -325,6 +332,8 @@ ON CONFLICT(event_id) DO NOTHING RETURNING event_id"""),
                     self._finish(s, event)
                 return
             subscription_id = details.get("subscription")
+            if kind == "invoice.paid":
+                payment = history.prepare(invoice)
         else:
             initial = self.gateway.retrieve_subscription(event["object_id"])
             require(initial.get("livemode") is False and initial.get("id") == event["object_id"])
@@ -372,6 +381,27 @@ ON CONFLICT(event_id) DO NOTHING RETURNING event_id"""),
                 )
             if attempt is None:
                 raise BindingMismatch()
+            if payment is not None and current is not None and attempt["state"] == "completed":
+                # Historical financial facts never replace a newer entitlement.
+                with self.transaction() as s:
+                    require(
+                        s.scalar(
+                            text("""SELECT 1 FROM studio.billing_customers
+WHERE user_id=:u AND reconcile_token=:t AND reconcile_until>now() FOR UPDATE"""),
+                            {"u": owner, "t": token},
+                        )
+                        == 1
+                    )
+                    history.fence(s, event)
+                    history.persist(s, payment)
+                    self._finish(s, event)
+                    s.execute(
+                        text(
+                            "UPDATE studio.billing_customers SET reconcile_token=NULL,reconcile_until=NULL WHERE user_id=:u AND reconcile_token=:t"
+                        ),
+                        {"u": owner, "t": token},
+                    )
+                return
             # Terminal old attempts cannot displace a subsequent subscription.
             require(attempt["state"] in {"creating", "open", "pending", "needs_reconcile"})
             if checkout is None:
@@ -426,6 +456,8 @@ WHERE (studio.subscriptions.provider_subscription_id,studio.subscriptions.plan_c
                     ),
                     {"p": checkout["id"], "i": attempt_id, "u": owner},
                 )
+            if payment is not None:
+                history.persist(s, payment)
             self._finish(s, event)
             s.execute(
                 text(

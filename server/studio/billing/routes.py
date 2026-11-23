@@ -1,9 +1,9 @@
 """Thin authenticated Checkout endpoints; no browser route grants entitlement."""
 
-from typing import Literal
+from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy.exc import SQLAlchemyError
@@ -140,3 +140,20 @@ async def payment_page(request: Request, attempt_id: UUID):
     except (SQLAlchemyError, UnsafeWebRole):
         raise HTTPException(503) from None
     return render(request, "public/checkout_status.html")
+
+
+@router.get("/api/me/payments")
+async def payment_records(
+    request: Request, limit: Annotated[int, Query(ge=1, le=100)] = 25, before: UUID | None = None
+) -> JSONResponse:
+    from studio.billing.payments import payment_history
+
+    actor, _ = await _actor(request, mutating=False)
+    transaction = getattr(request.app.state, "web_transaction", None)
+    if transaction is None:
+        raise HTTPException(503)
+    try:
+        result = await run_db(payment_history, transaction, actor, limit=limit, before=before)
+    except (SQLAlchemyError, UnsafeWebRole):
+        raise HTTPException(503) from None
+    return JSONResponse(jsonable_encoder(result), headers=HEADERS)

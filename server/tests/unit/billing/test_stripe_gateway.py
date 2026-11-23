@@ -220,3 +220,44 @@ def test_portal_validates_provider_response(api, malformed):
     else:
         assert gw.create_portal("cus_owner", "https://studio.test/subscription") == payload["url"]
         assert "customer=cus_owner" in http.calls[0][3]
+
+
+def test_payment_history_sdk_contract(api):
+    from urllib.parse import parse_qs, urlparse
+
+    service, transport = gateway(api)
+    transport.responses = [
+        {"object": "list", "has_more": False, "data": [{"id": "inpay_test", "livemode": False}]},
+        {"object": "list", "has_more": False, "data": [{"id": "inpay_test", "livemode": False}]},
+        {"id": "pi_test", "livemode": False},
+        {"id": "ch_test", "livemode": False},
+        {"id": "re_test", "object": "refund", "status": "succeeded"},  # no livemode in Stripe
+    ]
+    assert service.list_invoice_payments(invoice="in_test")[0]["id"] == "inpay_test"
+    assert service.list_invoice_payments(payment_intent="pi_test")[0]["id"] == "inpay_test"
+    assert service.retrieve_payment_intent("pi_test")["id"] == "pi_test"
+    assert service.retrieve_charge("ch_test")["id"] == "ch_test"
+    assert service.retrieve_refund("re_test")["status"] == "succeeded"
+    first = parse_qs(urlparse(transport.calls[0][1]).query)
+    second = parse_qs(urlparse(transport.calls[1][1]).query)
+    assert first == {"invoice": ["in_test"], "limit": ["100"], "status": ["paid"]}
+    assert second == {
+        "payment[type]": ["payment_intent"],
+        "payment[payment_intent]": ["pi_test"],
+        "limit": ["100"],
+        "status": ["paid"],
+    }
+
+
+@pytest.mark.parametrize(
+    "result",
+    [
+        {"object": "list", "has_more": True, "data": []},
+        {"object": "list", "has_more": False, "data": [{"livemode": True}]},
+    ],
+)
+def test_payment_list_requires_complete_test_mode_result(api, result):
+    service, transport = gateway(api)
+    transport.responses = [result]
+    with pytest.raises(api.BillingUnavailable):
+        service.list_invoice_payments(invoice="in_test")

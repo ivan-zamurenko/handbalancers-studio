@@ -4,6 +4,7 @@ from datetime import datetime
 from uuid import UUID
 
 from sqlalchemy import (
+    BigInteger,
     Boolean,
     CheckConstraint,
     DateTime,
@@ -170,5 +171,69 @@ class TrialClaim(Base):
     attempt_id: Mapped[UUID] = mapped_column(nullable=False)
     state: Mapped[str] = mapped_column(Text, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=text("now()")
+    )
+
+
+class Payment(Base):
+    __tablename__ = "payments"
+    __table_args__ = (
+        UniqueConstraint("provider_payment_id", name="uq_payment_provider"),
+        UniqueConstraint("provider_payment_intent_id", name="uq_payment_intent"),
+        UniqueConstraint("id", "user_id", name="uq_payment_owner"),
+        CheckConstraint(
+            "plan_code IN ('essential','plus','pro','pro-plus')", name="ck_payment_plan"
+        ),
+        CheckConstraint("amount_minor > 0", name="ck_payment_amount"),
+        CheckConstraint("currency ~ '^[a-z]{3}$'", name="ck_payment_currency"),
+        CheckConstraint("isfinite(paid_at) AND isfinite(recorded_at)", name="ck_payment_time"),
+        Index("ix_payment_owner_time", "user_id", "paid_at", "id"),
+    )
+    id: Mapped[UUID] = mapped_column(primary_key=True, server_default=text("gen_random_uuid()"))
+    user_id: Mapped[UUID] = mapped_column(ForeignKey(BillingCustomer.user_id), nullable=False)
+    provider_payment_id: Mapped[str] = mapped_column(Text, nullable=False)
+    provider_invoice_id: Mapped[str] = mapped_column(Text, nullable=False)
+    provider_payment_intent_id: Mapped[str] = mapped_column(Text, nullable=False)
+    provider_customer_id: Mapped[str] = mapped_column(Text, nullable=False)
+    provider_subscription_id: Mapped[str] = mapped_column(Text, nullable=False)
+    provider_charge_id: Mapped[str] = mapped_column(Text, nullable=False)
+    plan_code: Mapped[str] = mapped_column(Text, nullable=False)
+    amount_minor: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    currency: Mapped[str] = mapped_column(Text, nullable=False)
+    paid_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    recorded_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=text("now()")
+    )
+    livemode: Mapped[bool] = mapped_column(Boolean, nullable=False)
+
+
+class PaymentRefund(Base):
+    __tablename__ = "payment_refunds"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["payment_id", "user_id"],
+            ["studio.payments.id", "studio.payments.user_id"],
+            name="fk_refund_payment_owner",
+        ),
+        UniqueConstraint("provider_refund_id", name="uq_refund_provider"),
+        CheckConstraint(
+            "status IN ('pending','requires_action','succeeded','failed','canceled')",
+            name="ck_refund_status",
+        ),
+        CheckConstraint("amount_minor > 0", name="ck_refund_amount"),
+        CheckConstraint("currency ~ '^[a-z]{3}$'", name="ck_refund_currency"),
+        CheckConstraint("isfinite(created_at) AND isfinite(recorded_at)", name="ck_refund_time"),
+        Index("ix_refund_payment", "payment_id", "user_id"),
+        Index("ix_refund_owner", "user_id"),
+    )
+    id: Mapped[UUID] = mapped_column(primary_key=True, server_default=text("gen_random_uuid()"))
+    payment_id: Mapped[UUID] = mapped_column(nullable=False)
+    user_id: Mapped[UUID] = mapped_column(nullable=False)
+    provider_refund_id: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(Text, nullable=False)
+    amount_minor: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    currency: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    recorded_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=text("now()")
     )
