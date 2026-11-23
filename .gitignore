@@ -50,3 +50,8 @@ dumps/
 *.[aA][vV][iI]
 *.[mM][kK][vV]
 .DS_Store
+
+# Locally installed upstream agent skills and fetched web content.
+/.agents/skills/superpowers/
+/.agents/skills/firecrawl/
+/.firecrawl/

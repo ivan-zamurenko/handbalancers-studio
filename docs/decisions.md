@@ -159,3 +159,15 @@ owner Portal і негативні HTTP checks пройдені в ізольо�
 Повернення — окрема payment_refunds з незмінними сумою/зв’язками та актуальним статусом; карткових реквізитів не зберігаємо.
 S13-10 має пріоритет за новим дорученням; локальні міграції та test-only перевірки.
 Hosted migration, live charges й deploy не дозволені цим дорученням.
+
+## Superpowers і Firecrawl — 2026-11-23
+
+Власник прямо доручив встановити й використовувати обидва GitHub-проєкти.
+Офіційні upstream: obra/superpowers і firecrawl/cli; версії зафіксовано в
+`tools/agent-integrations.json`. Skills і CLI встановлені локально для цього repo;
+Firecrawl MCP налаштований у `.codex/config.toml`. Глобальні налаштування Codex
+й вебплагіни не змінюємо. Поточні правила AGENTS і погоджений обсяг пріоритетні.
+Firecrawl keyless відхилив мережу як VPN/proxy; власник підтвердив browser login.
+MCP повторно використовує локальний CLI credential через header helper.
+Ключ не записується у repo, URL або командні аргументи; результати у gitignored
+`.firecrawl/`. Інструменти використовуємо для публічних джерел, не приватних даних.

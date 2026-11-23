@@ -1,3 +1,24 @@
+# Superpowers + Firecrawl підключені — 2026-11-23
+
+S00-08: 15 Superpowers +13 Firecrawl skills встановлені у project .agents/skills;
+Codex skills/list підтвердив all enabled/no errors. CLI1.30.0 у .local-tools,
+project MCP у .codex/config.toml; exact upstream refs у tools/agent-integrations.json.
+Firecrawl browser login підтверджено власником; CLI і authenticated MCP scrape
+публічних Stripe docs реально пройдені. Ключ лише в OS credential store0600,
+helper не копіює його в Git/config/URL; вивід helper призначений тільки Codex.
+6 auth/helper tests, Ruff/mypy, shell syntax, roadmap validate green.
+Review знайшов cwd issue — RED/GREEN виправлено; інших зауважень немає.
+Вебплагіни та глобальні Codex settings не змінено. UI/БД/runtime не змінено.
+Документація: docs/agent-integrations.md; evidence .workflow/evidence/S00-08.json.
+Попередній payment-history commit f57c582 запушений. S00-08 commit/push pending
+на цьому checkpoint; фактичний SHA повідомляється після commit.
+
+Подальша робота використовує доречні skills і Firecrawl в межах задачі.
+Попередній наступний крок Stripe лишається: окреме погодження hosted0011–0016
+і narrow worker setup. Без нового доручення не змінювати основну БД/deploy.
+
+## Попередній checkpoint
+
 # Stripe: S13-10 історія платежів — 2026-11-23
 
 Окремі studio.payments та studio.payment_refunds, міграція0016 лише local test.

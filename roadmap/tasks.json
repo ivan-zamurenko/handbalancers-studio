@@ -7143,6 +7143,57 @@
         "docs/decisions.md",
         "docs/billing-payment-history.md"
       ]
+    },
+    {
+      "id": "S00-08",
+      "stage": "00",
+      "slug": "agent_integrations",
+      "title": "Підключити Superpowers і Firecrawl для цього проєкту",
+      "goal": "Встановити офіційні навички й локальний CLI, підключити MCP і перевірити реальне використання без секретів у Git.",
+      "module": "tooling",
+      "kind": "tooling",
+      "depends_on": [
+        "S00-07"
+      ],
+      "gates": [],
+      "files": [
+        ".codex/config.toml",
+        "AGENTS.md",
+        "tools/firecrawl.sh",
+        "tools/firecrawl_mcp_headers.py",
+        "tools/agent-integrations.json"
+      ],
+      "test_file": "tools/tests/test_firecrawl_headers.py",
+      "test_cases": [
+        {
+          "name": "skills_discovered",
+          "expected": "Codex skills/list discovers15 Superpowers and13 Firecrawl enabled skills."
+        },
+        {
+          "name": "live_provider_use",
+          "expected": "Authenticated CLI scrape and MCP call return actual public documentation."
+        },
+        {
+          "name": "safe_credentials",
+          "expected": "Reuse local CLI credential; no credential copy to repo; reject unrelated API origin/header injection."
+        },
+        {
+          "name": "project_scope",
+          "expected": "Project config only; no ChatGPT web plugin or global settings edits; fetched results ignored."
+        }
+      ],
+      "api": "No product API changes.",
+      "db": "No database changes.",
+      "notes": "Explicit owner request2026-11-23. Verification commands replace artificial application tests for setup.",
+      "command": ".venv/bin/python -m pytest tools/tests/test_firecrawl_headers.py -q",
+      "commit": "chore(tooling): [S00-08] connect Superpowers and Firecrawl",
+      "status": "todo",
+      "order": 7.1,
+      "card": "roadmap/tasks/S00-08_agent_integrations.md",
+      "read": [
+        "docs/agent-integrations.md",
+        "docs/decisions.md"
+      ]
     }
   ]
 }

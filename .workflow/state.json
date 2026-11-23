@@ -735,6 +735,11 @@
       "status": "done",
       "evidence": ".workflow/evidence/S13-10.json",
       "push_status": "pending_at_commit"
+    },
+    "S00-08": {
+      "status": "done",
+      "evidence": ".workflow/evidence/S00-08.json",
+      "push_status": "pending_at_commit"
     }
   },
   "gates": {

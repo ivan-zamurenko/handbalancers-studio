@@ -1,0 +1,51 @@
+{
+  "superpowers": {
+    "repository": "https://github.com/obra/superpowers",
+    "ref": "22f0b463e7a5e579904dd6211a520321035526f7",
+    "skills_dir": ".agents/skills/superpowers",
+    "skill_count": 15,
+    "skill_paths": [
+      "skills/brainstorming",
+      "skills/diagnosing-superpowers",
+      "skills/dispatching-parallel-agents",
+      "skills/executing-plans",
+      "skills/finishing-a-development-branch",
+      "skills/receiving-code-review",
+      "skills/requesting-code-review",
+      "skills/subagent-driven-development",
+      "skills/systematic-debugging",
+      "skills/test-driven-development",
+      "skills/using-git-worktrees",
+      "skills/using-superpowers",
+      "skills/verification-before-completion",
+      "skills/writing-plans",
+      "skills/writing-skills"
+    ]
+  },
+  "firecrawl": {
+    "repository": "https://github.com/firecrawl/cli",
+    "ref": "a9ce64e4d114fd203d8402ca000339d66e902cde",
+    "skills_dir": ".agents/skills/firecrawl",
+    "skill_count": 13,
+    "cli_package": "firecrawl-cli",
+    "cli_version": "1.30.0",
+    "cli_prefix": ".local-tools/firecrawl-cli",
+    "mcp_url": "https://mcp.firecrawl.dev/v2/mcp",
+    "auth": "local_cli_credential_via_http_headers_helper",
+    "skill_paths": [
+      "skills/firecrawl",
+      "skills/firecrawl-agent",
+      "skills/firecrawl-alexandria",
+      "skills/firecrawl-crawl",
+      "skills/firecrawl-developer-index",
+      "skills/firecrawl-download",
+      "skills/firecrawl-interact",
+      "skills/firecrawl-map",
+      "skills/firecrawl-monitor",
+      "skills/firecrawl-parse",
+      "skills/firecrawl-research-index",
+      "skills/firecrawl-scrape",
+      "skills/firecrawl-search"
+    ]
+  }
+}

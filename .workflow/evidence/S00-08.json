@@ -1,0 +1,82 @@
+{
+  "task_id": "S00-08",
+  "date": "2026-11-23",
+  "status": "done",
+  "base_sha": "f57c582",
+  "branch": "task/execution-v4",
+  "scope": "Project-local Superpowers/Firecrawl skills, pinned Firecrawl CLI, project HTTP MCP and secure reuse of CLI login. Product runtime, DB, global Codex config and web plugin installations unchanged.",
+  "versions": {
+    "superpowers": {
+      "repository": "https://github.com/obra/superpowers",
+      "ref": "22f0b463e7a5e579904dd6211a520321035526f7",
+      "skills_dir": ".agents/skills/superpowers",
+      "skill_count": 15
+    },
+    "firecrawl": {
+      "repository": "https://github.com/firecrawl/cli",
+      "ref": "a9ce64e4d114fd203d8402ca000339d66e902cde",
+      "skills_dir": ".agents/skills/firecrawl",
+      "skill_count": 13,
+      "cli_package": "firecrawl-cli",
+      "cli_version": "1.30.0",
+      "cli_prefix": ".local-tools/firecrawl-cli",
+      "mcp_url": "https://mcp.firecrawl.dev/v2/mcp",
+      "auth": "local_cli_credential_via_http_headers_helper"
+    }
+  },
+  "red": [
+    {
+      "command": ".venv/bin/python -m pytest tools/tests/test_firecrawl_headers.py -q --tb=short",
+      "result": "5 failures: missing header helper module."
+    },
+    {
+      "command": ".venv/bin/python -m pytest tools/tests/test_firecrawl_headers.py -k subdirectory -q --tb=short",
+      "result": "1 behavioral failure: configured relative helper path exits2 when session cwd=server/. Fixed with quoted git repository root resolution."
+    }
+  ],
+  "green": {
+    "command": ".venv/bin/python -m pytest tools/tests/test_firecrawl_headers.py -q",
+    "result": "6 passed: local credential read-only reuse, no-auth empty map, reject unrelated API origin/header injection, environment precedence, configured helper from project subdirectory.",
+    "other": [
+      "Ruff and mypy for helper/tests passed; sh -n tools/firecrawl.sh passed",
+      "Codex app-server initialize→skills/list(forceReload):15+13 enabled,0 errors",
+      "codex mcp get firecrawl --json: enabled, accepted header helper (redacted),3 allowed tools",
+      "CLI version1.30.0; credentials permissions0600 outside repository",
+      "Roadmap validator and git diff --check passed"
+    ]
+  },
+  "actual_provider": {
+    "cli_command": "./tools/firecrawl.sh scrape 'https://docs.stripe.com/api/invoice-payment/object' -o .firecrawl/stripe-invoice-payment.md",
+    "cli_result": "Exit0;14150 bytes inspected selectively, actual InvoicePayment fields present.",
+    "mcp_result": {
+      "authenticated": true,
+      "configured_helper_used": true,
+      "mcp_tool": "firecrawl_scrape",
+      "source": "https://docs.stripe.com/webhooks/signature",
+      "content_characters": 41632,
+      "status": "passed"
+    },
+    "source_behavior": "Initial keyless scrape failed due VPN/proxy detection. User explicitly confirmed browser login; authenticated CLI and MCP calls subsequently succeeded.",
+    "mcp_validation": "Actual initialize, tools/list and tools/call using configured endpoint and header command; helper stdout kept in memory, never logged. Native tool catalog in an already-open client may need connection restart.",
+    "private_artifacts": [
+      ".firecrawl/skills-discovery.json",
+      ".firecrawl/mcp-connection.json",
+      ".firecrawl/mcp-auth-proof.json",
+      ".firecrawl/stripe-invoice-payment.md",
+      ".firecrawl/stripe-webhook-signature-mcp.json"
+    ]
+  },
+  "review": "Independent read-only reviewer verified upstream refs and copied skill bytes, CLI version, credential handling and scope. Relative-helper cwd issue reproduced RED and fixed GREEN. Final verdict recorded in conversation.",
+  "adjustments": [
+    "Skill installer Python download failed CA verification; switched to its supported --method git, retaining TLS verification.",
+    "First subdirectory test execution lacked a Path import; corrected test setup before observing actual path-related RED.",
+    "Skill/CLI installed copies ignored; pinned manifest and restoration instructions committed, not upstream vendored source."
+  ],
+  "limits": [
+    "Only this repository config and skills changed; local Firecrawl CLI login is stored in its OS-wide credential store, not in ChatGPT web.",
+    "MCP exposes scrape/search/parse; CLI provides other requested operations. Account quota/rate limits still apply.",
+    "No runtime application/provider integration, hosted DB change, deployment or scheduled crawl."
+  ],
+  "next_step": "Use these skills and Firecrawl for relevant future Studio tasks. Previous hosted Stripe migration approval remains outstanding.",
+  "push_status": "pending_at_commit"
+}
