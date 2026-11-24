@@ -54,3 +54,22 @@ Assessment использует program.kind=assessment и обычные traini
 Entitlement projection отделена от identity и UI. Trial card required на 7дней Essential/Plus один раз; source webhook/reconcile, не success URL. Отказ/expiry/downgrade прекращает новые запрещённые writes/jobs, но не скрывает собственную историю. Утрата entitlement в середине workout не уничтожает локальный ввод; запись на сервер отклоняется как402, дальнейший доступ требует восстановления, специальный grace не вводится молча.
 
 Analysis states queued→access_check→quality_check→analyzing→succeeded|needs_input|failed|cancelled. Lease/retry durable. Exact video version+fact/rules/protocol/context fingerprint. Observations != decision != program write. Proposal validates allowed type/range/source IDs. Trusted apply всегда заново checks fresh plan/context; old results never applied over owner changes. Private notes доступны AI только по явно разрешённой цели, не все автоматически. Разрешение personalization отдельно от model training. No real processing/Plus-sale until gates.
+
+## AI-розширення — погоджений майбутній контракт 2026-11-24
+
+Деталі й interfaces: [ai-coaching.md](ai-coaching.md). Чинний url attachment
+зберігається; S10-10/11 додають private upload intent/finalize, S10-12 —
+validated upload_id та optional captured_set_log_id. Один current video
+на session_exercise, immutable replacement versions, server owner/revision
+checks. Raw video не передається LLM; measurement/interpretation/hypothesis
+мають різні поля й обмеження. Report-only не є дозволом processing.
+
+Private storage і PostgreSQL не мають спільної транзакції: lifecycle має
+durable intents, generation/lease fencing та bounded cleanup. Нові результати
+не публікуються після revoke/delete. Retention звітів і backups визначається
+G_PRIVACY. Порівняння перевіряє сумісність method/model/metric/transform/units;
+неякісні або несумісні записи не утворюють тренд.
+
+У невиконаних картках номери SQL-файлів не резервують Alembic revision.
+Перед DB-карткою інтегратор перевіряє фактичний head та створює наступну
+адитивну міграцію; чинні застосовані файли не перейменовуються/не переписуються.

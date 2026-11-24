@@ -1,3 +1,37 @@
+# AI-roadmap і навчання власника — 2026-11-24
+
+S00-09: погоджений план внесено у чинний roadmap. Додано 20 майбутніх
+карток + документаційну S00-09 (167 загалом), 8 уточнень dependencies
+лише до todo. Попередні 146 task states, completed definitions і gates
+збережено. Функції AI ще не реалізовані; runtime/БД/UI/lockfiles незмінні.
+
+Контракт: docs/ai-coaching.md. Мінімальний стек, SQL retrieval без vectors,
+один CV/LLM кандидат; поетапні uploads → metrics → knowledge/report →
+adaptation. Private files окремо від typed DB facts, без raw video/SQL для
+LLM. Відомі номери майбутніх міграцій не резервуються: фактичний head
+перевіряється перед DB-карткою; застосовані файли не переписувати.
+
+Власник навчається Python з основ: docs/learning/README.md і перше завдання
+docs/learning/01-duration.md. Самостійний файл learning/duration.py ще не
+створений. Агент дає підказки/review, не пише відповідь замість власника;
+навчальний код не використовується у runtime до перевірки.
+
+Перевірки: roadmap validate 167, 16 selector/validator tests, JSON/card
+consistency, preservation/reachability/link audit, lesson harness і diff check.
+Read-only review знайшов missing rules/lifecycle prerequisites; додані
+S14-18→S11-01 та S14-19→S10-14, audit RED→GREEN. Невирішених зауважень немає.
+Evidence: .workflow/evidence/S00-09.json. База ad45059; SHA цього commit
+повідомляється після створення, push pending_at_commit.
+
+Наступний крок: S14-00 — дозволений evaluation manifest та відтворювані
+перевірки CV/LLM. Actual dataset/модель/якість/вартість ще не перевірені.
+За відсутності потрібних входів — env_blocked, потім незалежна ready
+картка S05-05; не вигадувати benchmarks чи анатомічні нормативи.
+Hosted0011–0016, реальні дані клієнтів, live charges/deploy не дозволені
+цим документаційним checkpoint; чинні owner gates залишаються.
+
+## Попередній checkpoint
+
 # Superpowers + Firecrawl підключені — 2026-11-23
 
 S00-08: 15 Superpowers +13 Firecrawl skills встановлені у project .agents/skills;

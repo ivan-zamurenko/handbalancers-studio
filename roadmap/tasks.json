@@ -1,7 +1,7 @@
 {
   "version": 4,
   "created": "2026-10-06",
-  "status": "implementation_not_started",
+  "status": "implementation_in_progress",
   "stages": {
     "00": [
       "Основа пустого репозитория",
@@ -20,7 +20,7 @@
       "Email/password через Supabase, подтверждение, вход, refresh, logout и recovery."
     ],
     "04": [
-      "Google, Apple и профиль владельца",
+      "Google і профіль власника (Apple виключено)",
       "OAuth через Supabase, связность identities и безопасная выдача роли coach."
     ],
     "05": [
@@ -61,7 +61,7 @@
     ],
     "14": [
       "Контролируемая AI-подсистема",
-      "Долговечные задания, evidence, проверяемые предложения; автоматика выключена до допуска."
+      "Поступове AI-ведення: приватне відео вправи, явні метрики, затверджені знання, звіт і захищена адаптація. Default off."
     ],
     "15": [
       "Опциональный Pro+",
@@ -2587,7 +2587,8 @@
       "module": "programs",
       "kind": "integration",
       "depends_on": [
-        "S07-03"
+        "S07-03",
+        "S06-07"
       ],
       "gates": [],
       "files": [
@@ -5666,7 +5667,9 @@
       "module": "analysis",
       "kind": "unit",
       "depends_on": [
-        "S14-03"
+        "S14-03",
+        "S10-12",
+        "S14-10"
       ],
       "gates": [],
       "files": [
@@ -5717,7 +5720,8 @@
       "module": "analysis",
       "kind": "integration",
       "depends_on": [
-        "S14-04"
+        "S14-04",
+        "S14-14"
       ],
       "gates": [],
       "files": [
@@ -5771,7 +5775,9 @@
       "module": "analysis",
       "kind": "integration",
       "depends_on": [
-        "S14-05"
+        "S14-05",
+        "S11-05",
+        "S14-18"
       ],
       "gates": [],
       "files": [
@@ -5820,7 +5826,9 @@
       "module": "analysis",
       "kind": "tooling",
       "depends_on": [
-        "S14-06"
+        "S14-06",
+        "S14-20",
+        "S14-21"
       ],
       "gates": [],
       "files": [
@@ -5870,7 +5878,8 @@
       "module": "analysis",
       "kind": "integration",
       "depends_on": [
-        "S14-07"
+        "S14-07",
+        "S14-22"
       ],
       "gates": [],
       "files": [
@@ -6562,7 +6571,8 @@
       "module": "release",
       "kind": "gate",
       "depends_on": [
-        "S16-08"
+        "S16-08",
+        "S10-14"
       ],
       "gates": [
         "G_VIDEO",
@@ -6614,7 +6624,8 @@
       "depends_on": [
         "S14-08",
         "S17-02",
-        "S14-07"
+        "S14-07",
+        "S14-22"
       ],
       "gates": [
         "G_METHOD",
@@ -7193,6 +7204,1179 @@
       "read": [
         "docs/agent-integrations.md",
         "docs/decisions.md"
+      ]
+    },
+    {
+      "id": "S00-09",
+      "stage": "00",
+      "slug": "ai_coaching_roadmap",
+      "title": "Закріпити простий AI-roadmap і навчання власника",
+      "goal": "Додати 20 майбутніх карток, мінімальний стек, правила даних і навчання без зміни runtime.",
+      "module": "tooling",
+      "kind": "tooling",
+      "owner": "Integrator",
+      "complexity": "M",
+      "depends_on": [
+        "S00-08"
+      ],
+      "gates": [],
+      "files": [
+        "roadmap/tasks.json",
+        "roadmap/ROADMAP.md",
+        "roadmap/MILESTONES.md",
+        "docs/ai-coaching.md",
+        "docs/learning/01-duration.md"
+      ],
+      "inputs": "Погоджений власником план 2026-11-24 та чинний roadmap.",
+      "outputs": "Узгоджений машинний/людський roadmap і перше завдання для початківця.",
+      "test_file": "tools/tests/test_roadmap.py",
+      "test_cases": [
+        {
+          "name": "valid_dependency_graph",
+          "expected": "Всі картки/read paths існують, DAG без циклів; 20 майбутніх функцій лишаються todo."
+        },
+        {
+          "name": "preserve_existing_work",
+          "expected": "Попередні completed definitions/state і gates незмінні; runtime/DDL не редагуються."
+        },
+        {
+          "name": "machine_human_consistency",
+          "expected": "Dependencies, API, DB, test cases і commands у нових картках відповідають JSON."
+        },
+        {
+          "name": "simple_safe_learning",
+          "expected": "SQL retrieval first, protected data/lifecycle, beginner exercise з перевірками без готового рішення."
+        }
+      ],
+      "api": "Продуктові API не змінюються; майбутні interfaces позначені як заплановані.",
+      "db": "DDL не виконується; номери майбутніх міграцій визначаються від фактичного head.",
+      "notes": "Це документаційна картка погодженого плану, не реалізація майбутніх 20 функцій.",
+      "command": "python tools/roadmap.py validate && python -m unittest discover -s tools/tests -p test_roadmap.py -v",
+      "commit": "docs(roadmap): [S00-09] plan incremental AI coaching and learning",
+      "status": "todo",
+      "order": 7.2,
+      "card": "roadmap/tasks/S00-09_ai_coaching_roadmap.md",
+      "read": [
+        "docs/ai-coaching.md",
+        "docs/learning/01-duration.md",
+        "docs/decisions.md"
+      ]
+    },
+    {
+      "id": "S14-00",
+      "stage": "14",
+      "slug": "handstand_feasibility",
+      "title": "Перевірити мінімальний CV/AI стек на дозволених прикладах",
+      "goal": "Відтворюваний звіт із вибором одного CV/LLM кандидата, версіями, ліцензіями, обмеженнями та виміряними результатами.",
+      "module": "analysis",
+      "kind": "tooling",
+      "owner": "Principal Architect",
+      "complexity": "L",
+      "depends_on": [
+        "S00-02",
+        "S00-09"
+      ],
+      "gates": [],
+      "files": [
+        "tools/evaluate_handstand.py",
+        "docs/verification/handstand-feasibility.md"
+      ],
+      "inputs": "Дозволений dataset manifest, task-specific критерії прийнятності, цільове середовище; бюджет LLM перед фактичними викликами.",
+      "outputs": "Відтворюваний звіт із вибором одного CV/LLM кандидата, версіями, ліцензіями, обмеженнями та виміряними результатами.",
+      "test_file": "tools/evaluate_handstand.py",
+      "test_cases": [
+        {
+          "name": "separate_evaluations",
+          "expected": "Окремі CV і LLM результати; smoke не видається за точність чи готовність."
+        },
+        {
+          "name": "rights_and_holdout",
+          "expected": "Права на кліпи/моделі/ваги зафіксовані; held-out люди/кліпи не використані для підбору правил."
+        },
+        {
+          "name": "quality_and_resources",
+          "expected": "На стійці збоку виміряні помилки, відмови, latency, RAM і витрати; прийнятність погоджена, не вигадана."
+        },
+        {
+          "name": "minimal_selection",
+          "expected": "MediaPipe перший кандидат; RTMPose лише за недостатньої якості. Один LLM; SQL retrieval baseline."
+        },
+        {
+          "name": "environment_explicit",
+          "expected": "Перевірені Python 3.13/target OS та pinned artifacts; відсутній dataset/budget означає env_blocked, не passed."
+        }
+      ],
+      "api": "Немає продуктового API. CLI читає дозволений manifest і пише приватні результати перевірки.",
+      "db": "Немає DDL або доступу до клієнтських даних.",
+      "notes": "Дослідження офіційних docs вже є у docs/ai-coaching.md; ця картка перевіряє виконання, не повторює вебогляд. Команду запускати лише після створення harness і надання дозволеного manifest.",
+      "command": "uv run python tools/evaluate_handstand.py --manifest <approved-manifest> --output private-evidence/handstand-evaluation",
+      "commit": "feat(analysis): [S14-00] handstand feasibility",
+      "status": "todo",
+      "order": 7.3,
+      "card": "roadmap/tasks/S14-00_handstand_feasibility.md",
+      "read": [
+        "docs/ai-coaching.md",
+        "docs/contracts.md",
+        "docs/owner-gates.md"
+      ]
+    },
+    {
+      "id": "S06-07",
+      "stage": "06",
+      "slug": "exercise_demonstration",
+      "title": "Прив’язати приклад виконання до версії вправи",
+      "goal": "Версійний приклад для C3 без зміни старих призначень.",
+      "module": "catalog",
+      "kind": "integration",
+      "owner": "Backend",
+      "complexity": "M",
+      "depends_on": [
+        "S06-03",
+        "S06-05"
+      ],
+      "gates": [],
+      "files": [
+        "server/studio/catalog/demonstrations.py"
+      ],
+      "inputs": "Published exercise version і дозволене демонстраційне медіа.",
+      "outputs": "Версійний приклад для C3 без зміни старих призначень.",
+      "test_file": "server/tests/integration/catalog/test_exercise_demonstration.py",
+      "test_cases": [
+        {
+          "name": "published_example",
+          "expected": "Published exercise version фіксує дозволений приклад та інструкцію."
+        },
+        {
+          "name": "old_example_immutable",
+          "expected": "Заміна прикладу не переписує опубліковану версію або старий snapshot."
+        },
+        {
+          "name": "unavailable_example",
+          "expected": "Недоступний приклад явно позначено; приватні ролики клієнтів не стають прикладами."
+        }
+      ],
+      "api": "Розширити чинний exercise read DTO даними прикладу; окремого каталогу не створювати.",
+      "db": "Адитивне посилання на приклад у версії вправи; фактична наступна Alembic revision.",
+      "notes": "",
+      "command": "uv run pytest server/tests/integration/catalog/test_exercise_demonstration.py -q",
+      "commit": "feat(catalog): [S06-07] exercise demonstration",
+      "status": "todo",
+      "order": 48.5,
+      "card": "roadmap/tasks/S06-07_exercise_demonstration.md",
+      "read": [
+        "docs/ai-coaching.md",
+        "docs/contracts.md",
+        "docs/owner-gates.md"
+      ]
+    },
+    {
+      "id": "S10-10",
+      "stage": "10",
+      "slug": "private_upload_intent",
+      "title": "Видати обмежений дозвіл приватного завантаження",
+      "goal": "UploadIntent: id, дозволений спосіб завантаження, строк дії та обмеження.",
+      "module": "media",
+      "kind": "integration",
+      "owner": "Backend",
+      "complexity": "M",
+      "depends_on": [
+        "S09-02",
+        "S14-01",
+        "S14-02"
+      ],
+      "gates": [],
+      "files": [
+        "server/studio/media/uploads.py",
+        "server/studio/media/storage.py",
+        "server/studio/media/routes.py"
+      ],
+      "inputs": "Перевірений actor, exercise snapshot, processing permissions, Storage adapter.",
+      "outputs": "UploadIntent: id, дозволений спосіб завантаження, строк дії та обмеження.",
+      "test_file": "server/tests/integration/media/test_private_upload_intent.py",
+      "test_cases": [
+        {
+          "name": "owner_permission",
+          "expected": "Сервер перевіряє session_exercise owner, актуальну capability й окремий дозвіл processing; роль не береться з body."
+        },
+        {
+          "name": "bounded_intent",
+          "expected": "Сервер створює незмінний object key; строк, розмір, квота й кількість одночасних intent обмежені."
+        },
+        {
+          "name": "idempotent_intent",
+          "expected": "Повтор того самого ключа не створює новий intent; інший payload дає 409."
+        },
+        {
+          "name": "private_token",
+          "expected": "Bucket приватний, signed upload не дозволяє list/read/overwrite інших об’єктів; секрети не потрапляють у відповідь чи logs."
+        }
+      ],
+      "api": "POST /api/session-exercises/{id}/video/uploads: owner-bound upload intent і обмежена upload capability; CSRF/Origin/idempotency.",
+      "db": "Upload intents з owner/session_exercise/object key/state/expires_at; RLS, унікальність command key; наступна revision.",
+      "notes": "Supabase Storage + signed TUS — початковий шлях; actual provider/дані тільки після G_VIDEO/G_PRIVACY. Storage credentials серверні, без розширення DB-ролі web.",
+      "command": "uv run pytest server/tests/integration/media/test_private_upload_intent.py -q",
+      "commit": "feat(media): [S10-10] private upload intent",
+      "status": "todo",
+      "order": 145,
+      "card": "roadmap/tasks/S10-10_private_upload_intent.md",
+      "read": [
+        "docs/ai-coaching.md",
+        "docs/contracts.md",
+        "docs/owner-gates.md"
+      ]
+    },
+    {
+      "id": "S10-11",
+      "stage": "10",
+      "slug": "upload_finalize",
+      "title": "Перевірити файл і надійно завершити upload",
+      "goal": "ValidatedMediaAsset з незмінним hash, container, dimensions, duration і storage reference.",
+      "module": "media",
+      "kind": "integration",
+      "owner": "Backend",
+      "complexity": "M",
+      "depends_on": [
+        "S10-10"
+      ],
+      "gates": [],
+      "files": [
+        "server/studio/media/validation.py",
+        "server/studio/media/uploads.py"
+      ],
+      "inputs": "UploadIntent і завершений приватний object.",
+      "outputs": "ValidatedMediaAsset з незмінним hash, container, dimensions, duration і storage reference.",
+      "test_file": "server/tests/integration/media/test_upload_finalize.py",
+      "test_cases": [
+        {
+          "name": "actual_bytes_checked",
+          "expected": "Перевіряються фактичні MIME/container/size/duration/hash, не довірені browser metadata."
+        },
+        {
+          "name": "incomplete_or_foreign",
+          "expected": "Неповний, чужий або невідповідний object не стає evidence."
+        },
+        {
+          "name": "decode_bounds",
+          "expected": "Malformed media, надмірні dimensions/frame count, timeout/RAM limit завершуються контрольовано; мережеві протоколи decoder заборонені."
+        },
+        {
+          "name": "finalize_idempotent",
+          "expected": "Повтор finalize та збій між Storage і DB відновлюються без дублів; повторно перевірені owner/permissions/expiry."
+        }
+      ],
+      "api": "POST /api/media/uploads/{id}/complete: перевірений стан/metadata; no-store; не приймати довільний URL для fetch.",
+      "db": "Стани отримання/перевірки/готовності й checksum в upload intent; файли поза БД; наступна revision за потреби.",
+      "notes": "",
+      "command": "uv run pytest server/tests/integration/media/test_upload_finalize.py -q",
+      "commit": "feat(media): [S10-11] upload finalize",
+      "status": "todo",
+      "order": 146,
+      "card": "roadmap/tasks/S10-11_upload_finalize.md",
+      "read": [
+        "docs/ai-coaching.md",
+        "docs/contracts.md",
+        "docs/owner-gates.md"
+      ]
+    },
+    {
+      "id": "S10-12",
+      "stage": "10",
+      "slug": "capture_set_binding",
+      "title": "Зв’язати відеоверсію з обраним підходом",
+      "goal": "Точна версія evidence для одного обраного підходу без вимоги відео кожного підходу.",
+      "module": "media",
+      "kind": "integration",
+      "owner": "Backend",
+      "complexity": "M",
+      "depends_on": [
+        "S10-02",
+        "S10-11"
+      ],
+      "gates": [],
+      "files": [
+        "server/studio/media/models.py",
+        "server/studio/media/service.py",
+        "server/studio/media/schemas.py"
+      ],
+      "inputs": "ValidatedMediaAsset, submission, exercise snapshot і optional recorded set.",
+      "outputs": "Точна версія evidence для одного обраного підходу без вимоги відео кожного підходу.",
+      "test_file": "server/tests/integration/media/test_capture_set_binding.py",
+      "test_cases": [
+        {
+          "name": "one_current_video",
+          "expected": "Один submission на session_exercise збережено; новий файл створює immutable version."
+        },
+        {
+          "name": "captured_set_owner",
+          "expected": "captured_set_log_id, якщо заданий, належить цій вправі й власнику; skipped/чужий підхід відхилено."
+        },
+        {
+          "name": "concurrent_replace",
+          "expected": "Очікувана revision і locking дають один current pointer; старі evidence/reviews не переписуються."
+        },
+        {
+          "name": "link_compatibility",
+          "expected": "Чинний URL input підтримується; новий upload_id приймається лише після серверної перевірки ownership."
+        }
+      ],
+      "api": "Чинний POST /api/session-exercises/{id}/video: рівно один із url/upload_id, expected_revision, optional captured_set_log_id. Старий url payload валідний.",
+      "db": "Додати asset reference і nullable captured_set_log_id до immutable media version; composite owner constraints, зберегти unique(session_exercise_id).",
+      "notes": "",
+      "command": "uv run pytest server/tests/integration/media/test_capture_set_binding.py -q",
+      "commit": "feat(media): [S10-12] capture set binding",
+      "status": "todo",
+      "order": 147,
+      "card": "roadmap/tasks/S10-12_capture_set_binding.md",
+      "read": [
+        "docs/ai-coaching.md",
+        "docs/contracts.md",
+        "docs/owner-gates.md"
+      ]
+    },
+    {
+      "id": "S10-13",
+      "stage": "10",
+      "slug": "exercise_video_upload_ui",
+      "title": "Додати відео одного підходу в C3",
+      "goal": "Зрозумілий UI запису/завантаження одного контрольного підходу в наявній оболонці.",
+      "module": "media",
+      "kind": "e2e",
+      "owner": "Frontend",
+      "complexity": "M",
+      "depends_on": [
+        "S10-12",
+        "S09-07",
+        "S06-07"
+      ],
+      "gates": [],
+      "files": [
+        "server/templates/training/",
+        "server/static/js/training/"
+      ],
+      "inputs": "C3, exercise demonstration, media API.",
+      "outputs": "Зрозумілий UI запису/завантаження одного контрольного підходу в наявній оболонці.",
+      "test_file": "tests/e2e/exercise_video_upload_ui.spec.js",
+      "test_cases": [
+        {
+          "name": "example_and_upload",
+          "expected": "Приклад та завантаження/запис доступні всередині конкретної вправи; native file/camera capture із fallback file picker."
+        },
+        {
+          "name": "retry_preserves_input",
+          "expected": "Втрата мережі, відмова camera, expired intent і validation error не очищають set logs; retry зрозумілий."
+        },
+        {
+          "name": "no_video_completion",
+          "expected": "Можна завершити заняття без відео; technique лишається unreviewed."
+        },
+        {
+          "name": "visual_states",
+          "expected": "Особисто перевірено 1440/390/320, light/dark, UA/EN, keyboard, upload/empty/error/loaded states."
+        }
+      ],
+      "api": "Використовує upload intent/finalize та чинне video attachment API; browser не визначає доступ.",
+      "db": "Немає DDL.",
+      "notes": "",
+      "command": "npx playwright test tests/e2e/exercise_video_upload_ui.spec.js",
+      "commit": "feat(media): [S10-13] exercise video upload ui",
+      "status": "todo",
+      "order": 148,
+      "card": "roadmap/tasks/S10-13_exercise_video_upload_ui.md",
+      "read": [
+        "docs/ai-coaching.md",
+        "docs/contracts.md",
+        "docs/owner-gates.md"
+      ]
+    },
+    {
+      "id": "S10-14",
+      "stage": "10",
+      "slug": "media_lifecycle",
+      "title": "Видаляти приватне медіа та його похідні",
+      "goal": "Відновлюване видалення без спільної транзакції PostgreSQL/Storage.",
+      "module": "media",
+      "kind": "integration",
+      "owner": "Security",
+      "complexity": "L",
+      "depends_on": [
+        "S10-12",
+        "S14-03"
+      ],
+      "gates": [],
+      "files": [
+        "server/studio/media/lifecycle.py",
+        "server/studio/jobs/media_cleanup.py"
+      ],
+      "inputs": "Media version, permissions, перелік derivative artifacts, durable jobs.",
+      "outputs": "Відновлюване видалення без спільної транзакції PostgreSQL/Storage.",
+      "test_file": "server/tests/integration/media/test_media_lifecycle.py",
+      "test_cases": [
+        {
+          "name": "revoke_during_job",
+          "expected": "Revocation/delete між claim/read/send забороняє наступний крок; пізній результат не публікується."
+        },
+        {
+          "name": "stale_worker_fenced",
+          "expected": "Прострочений lease або generation не дозволяє відновити artifact після видалення."
+        },
+        {
+          "name": "partial_failure_recovery",
+          "expected": "DB tombstone та Storage delete відновлюються після часткового збою; retry обмежений і спостережуваний."
+        },
+        {
+          "name": "all_derivatives",
+          "expected": "Original, normalized, pose, thumbnail, temp та orphan upload охоплені lifecycle; чужі objects не зачіпаються."
+        },
+        {
+          "name": "signed_url_window",
+          "expected": "Задокументовано строк дії й залишкове вікно signed URL; не обіцяти миттєве відкликання вже виданого доступу."
+        }
+      ],
+      "api": "Чинна контрольована remove action: негайний tombstone і статус асинхронного очищення; повтор безпечний.",
+      "db": "Lifecycle/deletion generation і bounded cleanup intents; provenance tombstones; політика зберігання звітів окрема, не безстрокова.",
+      "notes": "",
+      "command": "uv run pytest server/tests/integration/media/test_media_lifecycle.py -q",
+      "commit": "feat(media): [S10-14] media lifecycle",
+      "status": "todo",
+      "order": 149,
+      "card": "roadmap/tasks/S10-14_media_lifecycle.md",
+      "read": [
+        "docs/ai-coaching.md",
+        "docs/contracts.md",
+        "docs/owner-gates.md"
+      ]
+    },
+    {
+      "id": "S14-10",
+      "stage": "14",
+      "slug": "handstand_method",
+      "title": "Описати версійну методику стійки збоку",
+      "goal": "HandstandSideView MethodVersion із видимими критеріями та межами висновків.",
+      "module": "analysis",
+      "kind": "integration",
+      "owner": "Biomechanics",
+      "complexity": "M",
+      "depends_on": [
+        "S06-07"
+      ],
+      "gates": [],
+      "files": [
+        "server/studio/analysis/handstand.py",
+        "server/studio/analysis/methods.py"
+      ],
+      "inputs": "Вправа, методика власника, перевірені джерела й requirements до відео.",
+      "outputs": "HandstandSideView MethodVersion із видимими критеріями та межами висновків.",
+      "test_file": "server/tests/integration/analysis/test_handstand_method.py",
+      "test_cases": [
+        {
+          "name": "published_method",
+          "expected": "Методика має exercise/version/camera requirements/criteria і автора погодження; published version immutable."
+        },
+        {
+          "name": "no_invented_thresholds",
+          "expected": "Без погоджених task-specific порогів automatic criterion не активний; загальна норма для всіх людей не вигадується."
+        },
+        {
+          "name": "observability_limits",
+          "expected": "Звичайні landmarks не видаються за вимір попереку/лопаток чи м’язової сили; wrist/ribcage лише де видно й валідовано."
+        },
+        {
+          "name": "wrong_exercise_view",
+          "expected": "Інша вправа, ракурс або непідтриманий критерій дає needs_input/unsupported."
+        }
+      ],
+      "api": "Внутрішній MethodVersion; API publication використовує чинні owner guards.",
+      "db": "Версії методик і критеріїв; зв’язок з exercise version. Assessment criterion reference лише за потреби; не дублювати S12.",
+      "notes": "",
+      "command": "uv run pytest server/tests/integration/analysis/test_handstand_method.py -q",
+      "commit": "feat(analysis): [S14-10] handstand method",
+      "status": "todo",
+      "order": 150,
+      "card": "roadmap/tasks/S14-10_handstand_method.md",
+      "read": [
+        "docs/ai-coaching.md",
+        "docs/contracts.md",
+        "docs/owner-gates.md"
+      ]
+    },
+    {
+      "id": "S14-11",
+      "stage": "14",
+      "slug": "pose_contract",
+      "title": "Визначити змінний pose adapter",
+      "goal": "PoseSequence: timestamps, canonical/native joints, visibility, координати, модель/config/transform versions.",
+      "module": "analysis",
+      "kind": "unit",
+      "owner": "Computer Vision",
+      "complexity": "M",
+      "depends_on": [
+        "S14-04",
+        "S14-00"
+      ],
+      "gates": [],
+      "files": [
+        "server/studio/analysis/pose.py"
+      ],
+      "inputs": "EvidenceManifest, ValidatedMediaAsset, versioned config.",
+      "outputs": "PoseSequence: timestamps, canonical/native joints, visibility, координати, модель/config/transform versions.",
+      "test_file": "server/tests/unit/analysis/test_pose_contract.py",
+      "test_cases": [
+        {
+          "name": "canonical_landmarks",
+          "expected": "Native joint IDs мапляться явно; відсутній орієнтир = missing, не нуль чи вигадана точка."
+        },
+        {
+          "name": "time_coordinate_metadata",
+          "expected": "Timestamp, original/processed dimensions, rotation/transform, coordinate convention і units відомі."
+        },
+        {
+          "name": "provider_independent",
+          "expected": "Два contract fixtures різних schemas дають однаковий canonical DTO; downstream не імпортує SDK."
+        },
+        {
+          "name": "confidence_not_accuracy",
+          "expected": "Detector visibility/presence збережені окремо; не видаються за калібровану достовірність метрики."
+        }
+      ],
+      "api": "PoseAdapter.extract(validated_asset, config) -> PoseSequence; без тренерських рішень.",
+      "db": "Немає DDL. PoseSequence — DTO/серіалізований private artifact; manifest persistence належить S14-04/S14-12, результати — S14-19.",
+      "notes": "",
+      "command": "uv run pytest server/tests/unit/analysis/test_pose_contract.py -q",
+      "commit": "feat(analysis): [S14-11] pose contract",
+      "status": "todo",
+      "order": 151,
+      "card": "roadmap/tasks/S14-11_pose_contract.md",
+      "read": [
+        "docs/ai-coaching.md",
+        "docs/contracts.md",
+        "docs/owner-gates.md"
+      ]
+    },
+    {
+      "id": "S14-12",
+      "stage": "14",
+      "slug": "pose_adapter",
+      "title": "Підключити перший перевірений pose adapter",
+      "goal": "Перший реальний адаптер в окремому worker-процесі того самого застосунку.",
+      "module": "analysis",
+      "kind": "integration",
+      "owner": "Computer Vision",
+      "complexity": "L",
+      "depends_on": [
+        "S14-11"
+      ],
+      "gates": [],
+      "files": [
+        "server/studio/analysis/pose_mediapipe.py",
+        "server/studio/analysis/video_preprocessing.py",
+        "server/studio/jobs/analysis_worker.py"
+      ],
+      "inputs": "PoseAdapter contract і рішення S14-00 про конкретну модель.",
+      "outputs": "Перший реальний адаптер в окремому worker-процесі того самого застосунку.",
+      "test_file": "server/tests/integration/analysis/test_pose_adapter.py",
+      "test_cases": [
+        {
+          "name": "actual_allowed_video",
+          "expected": "Реальні дозволені кліпи проходять pinned модель; unit fake не є quality evidence."
+        },
+        {
+          "name": "inverted_rotation_timeline",
+          "expected": "Перевірено upside-down, phone rotation, variable frame rate; landmarks прив’язані до часу вихідного кліпу."
+        },
+        {
+          "name": "resource_and_integrity",
+          "expected": "Обмежені decode/inference час, RAM, frames; неповний/невірний hash не приймається."
+        },
+        {
+          "name": "durable_execution",
+          "expected": "Crash/retry/lease з S14-03 не множить результати; permissions повторно перевіряються перед читанням/публікацією."
+        }
+      ],
+      "api": "Реалізація PoseAdapter; job stage/progress через чинний analysis status.",
+      "db": "Версія pose artifact і processing metadata; нова revision лише для потрібних полів.",
+      "notes": "MediaPipe default candidate. Якщо S14-00 обґрунтовано вибирає RTMPose, спочатку оновити шлях адаптера/lock/ADR; не підключати обидва наперед.",
+      "command": "uv run pytest server/tests/integration/analysis/test_pose_adapter.py -q",
+      "commit": "feat(analysis): [S14-12] pose adapter",
+      "status": "todo",
+      "order": 152,
+      "card": "roadmap/tasks/S14-12_pose_adapter.md",
+      "read": [
+        "docs/ai-coaching.md",
+        "docs/contracts.md",
+        "docs/owner-gates.md"
+      ]
+    },
+    {
+      "id": "S14-13",
+      "stage": "14",
+      "slug": "pose_quality",
+      "title": "Відхиляти непридатний запис і недостатні орієнтири",
+      "goal": "Перевірені інтервали й перелік дозволених до обчислення критеріїв.",
+      "module": "analysis",
+      "kind": "unit",
+      "owner": "Computer Vision",
+      "complexity": "M",
+      "depends_on": [
+        "S14-12",
+        "S14-10"
+      ],
+      "gates": [],
+      "files": [
+        "server/studio/analysis/quality.py"
+      ],
+      "inputs": "PoseSequence і MethodVersion.",
+      "outputs": "Перевірені інтервали й перелік дозволених до обчислення критеріїв.",
+      "test_file": "server/tests/unit/analysis/test_pose_quality.py",
+      "test_cases": [
+        {
+          "name": "bad_view_visibility",
+          "expected": "Невірний ракурс, crop, occlusion, кілька людей або відсутність потрібних суглобів дають конкретну причину needs_input."
+        },
+        {
+          "name": "per_metric_observability",
+          "expected": "Частково придатний кліп не має одного оманливого confidence для всіх метрик."
+        },
+        {
+          "name": "hold_interval",
+          "expected": "Вхід/вихід зі стійки не змішуються з аналізом утримання; gaps і непевні intervals позначаються."
+        },
+        {
+          "name": "no_fabricated_gaps",
+          "expected": "Пропуски не заповнюються вигаданими впевненими вимірюваннями."
+        }
+      ],
+      "api": "QualityAssessment: usable intervals, per-criterion observability, reasons і suggested recording correction.",
+      "db": "Немає DDL. QualityAssessment — чистий DTO; його версійне збереження разом із метриками належить S14-19.",
+      "notes": "",
+      "command": "uv run pytest server/tests/unit/analysis/test_pose_quality.py -q",
+      "commit": "feat(analysis): [S14-13] pose quality",
+      "status": "todo",
+      "order": 153,
+      "card": "roadmap/tasks/S14-13_pose_quality.md",
+      "read": [
+        "docs/ai-coaching.md",
+        "docs/contracts.md",
+        "docs/owner-gates.md"
+      ]
+    },
+    {
+      "id": "S14-14",
+      "stage": "14",
+      "slug": "biomechanics_metrics",
+      "title": "Обчислювати явні метрики біомеханіки",
+      "goal": "Відтворювані метрики доступних суглобів, лінії та руху в часі.",
+      "module": "analysis",
+      "kind": "unit",
+      "owner": "Biomechanics",
+      "complexity": "M",
+      "depends_on": [
+        "S14-13"
+      ],
+      "gates": [],
+      "files": [
+        "server/studio/analysis/biomechanics.py"
+      ],
+      "inputs": "Перевірені pose intervals і методика.",
+      "outputs": "Відтворювані метрики доступних суглобів, лінії та руху в часі.",
+      "test_file": "server/tests/unit/analysis/test_biomechanics_metrics.py",
+      "test_cases": [
+        {
+          "name": "analytic_geometry",
+          "expected": "Відомі геометричні fixtures перевіряють кути, сегменти, units і нульову довжину вектора."
+        },
+        {
+          "name": "aspect_ratio",
+          "expected": "Різні width/height, rotation/crop transform не спотворюють кути нормованих координат."
+        },
+        {
+          "name": "temporal_metrics",
+          "expected": "Стабільність/тривалість враховують реальні timestamps і gaps, не frame_count/fps assumption."
+        },
+        {
+          "name": "measurement_limits",
+          "expected": "2D projected angle не видається за точний анатомічний 3D кут; missing/noisy дані не стають результатом."
+        },
+        {
+          "name": "model_cannot_override",
+          "expected": "MetricResult зберігає значення/одиниці/інтервал/версію/якість незалежно від LLM."
+        }
+      ],
+      "api": "calculate_metrics(PoseSequence, QualityAssessment, MethodVersion) -> MetricResult[]; чисті Python-функції.",
+      "db": "Немає DDL. MetricResult — чистий typed DTO; owner-bound metric rows, FK/indexes/provenance реалізуються й DB-тестуються в S14-19.",
+      "notes": "",
+      "command": "uv run pytest server/tests/unit/analysis/test_biomechanics_metrics.py -q",
+      "commit": "feat(analysis): [S14-14] biomechanics metrics",
+      "status": "todo",
+      "order": 154,
+      "card": "roadmap/tasks/S14-14_biomechanics_metrics.md",
+      "read": [
+        "docs/ai-coaching.md",
+        "docs/contracts.md",
+        "docs/owner-gates.md"
+      ]
+    },
+    {
+      "id": "S14-15",
+      "stage": "14",
+      "slug": "approved_knowledge",
+      "title": "Опублікувати вузьку базу перевірених знань",
+      "goal": "Невеликий затверджений корпус стійки з простежуваними джерелами.",
+      "module": "knowledge",
+      "kind": "integration",
+      "owner": "Knowledge Engineer",
+      "complexity": "M",
+      "depends_on": [
+        "S06-03"
+      ],
+      "gates": [],
+      "files": [
+        "server/studio/knowledge/models.py",
+        "server/studio/knowledge/service.py"
+      ],
+      "inputs": "Дозволені джерела і published exercise versions.",
+      "outputs": "Невеликий затверджений корпус стійки з простежуваними джерелами.",
+      "test_file": "server/tests/integration/knowledge/test_approved_knowledge.py",
+      "test_cases": [
+        {
+          "name": "source_provenance",
+          "expected": "Кожен фрагмент має source/author/date-if-known/license/evidence classification і version; недозволені копії не імпортуються."
+        },
+        {
+          "name": "published_only",
+          "expected": "Draft/revoked джерела не доступні новому retrieval; publication потребує owner authority."
+        },
+        {
+          "name": "private_separation",
+          "expected": "Відео, private notes і персональні факти не потрапляють у спільний корпус."
+        },
+        {
+          "name": "exercise_metadata",
+          "expected": "Затверджені вправи містять purpose/prerequisites/equipment/progression/regression/cues/constraints/source refs; claims не вигадуються."
+        }
+      ],
+      "api": "Owner-only draft/publish/revoke knowledge commands; спільний каталог вправ лишається джерелом exercise IDs.",
+      "db": "Sources, document/chunk versions, tags і exercise/criterion links у PostgreSQL. Без pgvector/embeddings на цьому етапі.",
+      "notes": "",
+      "command": "uv run pytest server/tests/integration/knowledge/test_approved_knowledge.py -q",
+      "commit": "feat(knowledge): [S14-15] approved knowledge",
+      "status": "todo",
+      "order": 155,
+      "card": "roadmap/tasks/S14-15_approved_knowledge.md",
+      "read": [
+        "docs/ai-coaching.md",
+        "docs/contracts.md",
+        "docs/owner-gates.md"
+      ]
+    },
+    {
+      "id": "S14-16",
+      "stage": "14",
+      "slug": "knowledge_retrieval",
+      "title": "Вибирати затверджені знання простим SQL-пошуком",
+      "goal": "Малий релевантний контекст без приватних фактів і без RAG-фреймворку.",
+      "module": "knowledge",
+      "kind": "integration",
+      "owner": "AI Engineer",
+      "complexity": "M",
+      "depends_on": [
+        "S14-15",
+        "S14-14"
+      ],
+      "gates": [],
+      "files": [
+        "server/studio/knowledge/retrieval.py"
+      ],
+      "inputs": "Metric criterion IDs і approved knowledge.",
+      "outputs": "Малий релевантний контекст без приватних фактів і без RAG-фреймворку.",
+      "test_file": "server/tests/integration/knowledge/test_knowledge_retrieval.py",
+      "test_cases": [
+        {
+          "name": "relevant_versioned_sources",
+          "expected": "SQL filters exercise/criterion/publication і bounded text search дають релевантні реальні chunk IDs."
+        },
+        {
+          "name": "revocation_cache",
+          "expected": "Відкликана версія виключається навіть за stale cache; порожній результат явний."
+        },
+        {
+          "name": "bounded_context",
+          "expected": "Обмежені кількість/розмір фрагментів; джерело розглядається як дані, не інструкція моделі."
+        },
+        {
+          "name": "ua_en_evaluation",
+          "expected": "Перевірені питання UA/EN й expected source set; помилки retrieval виміряні до рішення про vectors."
+        }
+      ],
+      "api": "retrieve_knowledge(exercise_version, criterion_ids, locale) -> KnowledgeContext з versioned source refs.",
+      "db": "Metadata indexes і text search за потреби. pgvector лише за окремим рішенням після виміряної недостатності baseline.",
+      "notes": "",
+      "command": "uv run pytest server/tests/integration/knowledge/test_knowledge_retrieval.py -q",
+      "commit": "feat(knowledge): [S14-16] knowledge retrieval",
+      "status": "todo",
+      "order": 156,
+      "card": "roadmap/tasks/S14-16_knowledge_retrieval.md",
+      "read": [
+        "docs/ai-coaching.md",
+        "docs/contracts.md",
+        "docs/owner-gates.md"
+      ]
+    },
+    {
+      "id": "S14-17",
+      "stage": "14",
+      "slug": "grounded_explanations",
+      "title": "Пояснювати факти й відокремлювати гіпотези",
+      "goal": "Перевірене пояснення без права змінювати вимірювання або програму.",
+      "module": "analysis",
+      "kind": "integration",
+      "owner": "AI Engineer",
+      "complexity": "L",
+      "depends_on": [
+        "S14-16",
+        "S14-05",
+        "S14-00"
+      ],
+      "gates": [],
+      "files": [
+        "server/studio/analysis/coach.py",
+        "server/studio/analysis/llm_gateway.py"
+      ],
+      "inputs": "MetricResult[], KnowledgeContext, мінімальний серверний user context, дозволи/бюджет.",
+      "outputs": "Перевірене пояснення без права змінювати вимірювання або програму.",
+      "test_file": "server/tests/integration/analysis/test_grounded_explanations.py",
+      "test_cases": [
+        {
+          "name": "grounded_claims",
+          "expected": "Пояснення містить реальні metric/evidence/source IDs; вигадані значення/цитати відхилено."
+        },
+        {
+          "name": "hypothesis_not_diagnosis",
+          "expected": "Observed angle не підтверджує слабкість, обмеження рухливості чи травму; непідтверджена причина лишається гіпотезою."
+        },
+        {
+          "name": "needs_assessment",
+          "expected": "Коли потрібне уточнення, повертається затверджений assessment reference або needs_input, без вигаданого тесту."
+        },
+        {
+          "name": "bounded_provider_failure",
+          "expected": "Один provider, timeout/retry/token budget, refusal/invalid JSON/no sources обробляються без partial publish."
+        },
+        {
+          "name": "minimal_private_context",
+          "expected": "LLM отримує лише дозволені структуровані факти користувача й джерела; без відео, SQL, credentials або чужих даних."
+        }
+      ],
+      "api": "CoachExplanation: observations, hypotheses, source refs, assessment needs; Pydantic плюс domain validation.",
+      "db": "Structured explanation/versioned model+prompt+source manifest; raw sensitive prompt logging заборонений.",
+      "notes": "",
+      "command": "uv run pytest server/tests/integration/analysis/test_grounded_explanations.py -q",
+      "commit": "feat(analysis): [S14-17] grounded explanations",
+      "status": "todo",
+      "order": 157,
+      "card": "roadmap/tasks/S14-17_grounded_explanations.md",
+      "read": [
+        "docs/ai-coaching.md",
+        "docs/contracts.md",
+        "docs/owner-gates.md"
+      ]
+    },
+    {
+      "id": "S14-18",
+      "stage": "14",
+      "slug": "catalog_recommendations",
+      "title": "Добирати рекомендації лише з каталогу",
+      "goal": "Перевірений набір вправ/уточнень для майбутньої пропозиції.",
+      "module": "analysis",
+      "kind": "integration",
+      "owner": "AI Engineer",
+      "complexity": "M",
+      "depends_on": [
+        "S14-17",
+        "S06-06",
+        "S11-01"
+      ],
+      "gates": [],
+      "files": [
+        "server/studio/analysis/recommendations.py"
+      ],
+      "inputs": "CoachExplanation, approved catalog і structured profile constraints. Published planning_rule_set from S11-01; do not create a second rules store.",
+      "outputs": "Перевірений набір вправ/уточнень для майбутньої пропозиції.",
+      "test_file": "server/tests/integration/analysis/test_catalog_recommendations.py",
+      "test_cases": [
+        {
+          "name": "allowlisted_versions",
+          "expected": "Лише published доступні exercise versions; невідомі/чужі/private/revoked IDs відхилено."
+        },
+        {
+          "name": "constraints_and_load",
+          "expected": "Враховано рівень, ціль, equipment, prerequisites і затверджені правила навантаження; невідомі норми не генеруються."
+        },
+        {
+          "name": "explain_selection",
+          "expected": "Кожна вправа пов’язана зі спостереженням/метою/джерелом; гіпотеза явно непідтверджена."
+        },
+        {
+          "name": "no_plan_write",
+          "expected": "Генерація рекомендацій не записує програму й не створює нову вправу в каталозі."
+        }
+      ],
+      "api": "Recommendation[]: exercise_version_id, purpose, evidence/source refs, constraints, assessment need.",
+      "db": "Версійні recommendations із FK до published catalog і analysis run; наступна revision.",
+      "notes": "",
+      "command": "uv run pytest server/tests/integration/analysis/test_catalog_recommendations.py -q",
+      "commit": "feat(analysis): [S14-18] catalog recommendations",
+      "status": "todo",
+      "order": 158,
+      "card": "roadmap/tasks/S14-18_catalog_recommendations.md",
+      "read": [
+        "docs/ai-coaching.md",
+        "docs/contracts.md",
+        "docs/owner-gates.md"
+      ]
+    },
+    {
+      "id": "S14-19",
+      "stage": "14",
+      "slug": "analysis_report",
+      "title": "Показати версійний звіт і скелет у Studio",
+      "goal": "Вбудований звіт із Canvas/SVG overlay; новий frontend runtime не потрібен.",
+      "module": "analysis",
+      "kind": "e2e",
+      "owner": "Frontend",
+      "complexity": "L",
+      "depends_on": [
+        "S14-18",
+        "S09-04",
+        "S10-13",
+        "S10-14"
+      ],
+      "gates": [],
+      "files": [
+        "server/studio/analysis/reports.py",
+        "server/studio/analysis/routes.py",
+        "server/studio/analysis/service.py",
+        "server/studio/analysis/models.py",
+        "server/studio/jobs/analysis_worker.py",
+        "server/tests/integration/analysis/test_report_persistence.py",
+        "server/templates/member/analysis.html",
+        "server/templates/coach/analysis_detail.html",
+        "server/static/js/features/analysis/status.js"
+      ],
+      "inputs": "Analysis run, recommendation set, authorized media і current Studio shell.",
+      "outputs": "Вбудований звіт із Canvas/SVG overlay; новий frontend runtime не потрібен.",
+      "test_file": "tests/e2e/analysis_report.spec.js",
+      "test_cases": [
+        {
+          "name": "owner_report",
+          "expected": "Власний report no-store; чужий приховано; report-only проходить permissions/quality gates і не викликає apply."
+        },
+        {
+          "name": "overlay_sync",
+          "expected": "Скелет відповідає часу, rotation/crop/resize; pause/seek працює; missing intervals не домальовуються."
+        },
+        {
+          "name": "immutable_report",
+          "expected": "Заміна відео/методики не підміняє старий звіт; є обмеження, джерела й точні evidence timestamps."
+        },
+        {
+          "name": "visual_states",
+          "expected": "Переглянуті 1440/390/320, light/dark, UA/EN, keyboard, queued/needs_input/failed/succeeded та видалене evidence."
+        },
+        {
+          "name": "persist_owner_bound_results",
+          "expected": "Реальна test DB перевіряє typed metrics/quality/report owner/run FK, RLS для двох користувачів, immutable versions, atomic rollback і duplicate publication."
+        },
+        {
+          "name": "pipeline_and_revocation",
+          "expected": "Оркестрація pose→quality→metrics→retrieval→coach→recommendations завершує один versioned report; низька якість зупиняє downstream; revoke/delete/stale lease забороняє publish."
+        }
+      ],
+      "api": "Owner-only POST /api/session-exercises/{id}/analyses; GET /api/analyses/{id} status/result; scoped artifact access. Existing status DTO перевикористати.",
+      "db": "Адитивні typed metric/quality rows і immutable report versions з owner/run/criterion/source refs та індексами; наступна фактична revision, реальні DB/RLS/rollback/concurrency тести. Без нових training facts.",
+      "notes": "Один primary owner Frontend інтегрує звіт; DB/migrations перевіряє інтегратор, reviewer read-only. S14-09 пізніше доповнює цей самий UI авторством/before-after адаптації, не створює другий звіт.",
+      "command": "uv run pytest server/tests/integration/analysis/test_report_persistence.py -q && npx playwright test tests/e2e/analysis_report.spec.js",
+      "commit": "feat(analysis): [S14-19] analysis report",
+      "status": "todo",
+      "order": 159,
+      "card": "roadmap/tasks/S14-19_analysis_report.md",
+      "read": [
+        "docs/ai-coaching.md",
+        "docs/contracts.md",
+        "docs/owner-gates.md"
+      ]
+    },
+    {
+      "id": "S14-20",
+      "stage": "14",
+      "slug": "analysis_comparison",
+      "title": "Порівнювати лише сумісні аналізи",
+      "goal": "Прогрес техніки зі зрозумілими обмеженнями сумісності.",
+      "module": "progress",
+      "kind": "integration",
+      "owner": "Backend",
+      "complexity": "M",
+      "depends_on": [
+        "S14-19",
+        "S09-09"
+      ],
+      "gates": [],
+      "files": [
+        "server/studio/progress/analysis.py",
+        "server/templates/member/progress.html",
+        "tests/e2e/analysis_comparison.spec.js"
+      ],
+      "inputs": "Версійні звіти й чинна історія виконань.",
+      "outputs": "Прогрес техніки зі зрозумілими обмеженнями сумісності.",
+      "test_file": "server/tests/integration/progress/test_analysis_comparison.py",
+      "test_cases": [
+        {
+          "name": "comparable_versions",
+          "expected": "Порівняння перевіряє method/metric/pose/preprocessing versions, view/side/units/normalization; несумісність явна."
+        },
+        {
+          "name": "no_false_trend",
+          "expected": "Низька якість/відсутність даних не означає покращення чи погіршення; job retry не додає прогрес."
+        },
+        {
+          "name": "own_bounded_history",
+          "expected": "Лише власна історія, bounded pagination; особисті метрики не агрегуються в загальний knowledge corpus."
+        },
+        {
+          "name": "reprocessing_explicit",
+          "expected": "Повторна обробка лише за актуальним дозволом створює новий результат; старий звіт збережений."
+        },
+        {
+          "name": "visual_comparison_states",
+          "expected": "Особистий browser review UA/EN, 1440/390, light/dark, loaded/empty/incompatible/needs_input; keyboard та 320 для змін ширини."
+        }
+      ],
+      "api": "Owner-scoped comparison read projection у чинному progress API; лише сумісні metric IDs.",
+      "db": "Похідна read projection із results, не друге джерело тренувальних фактів; індекси за owner/exercise/time.",
+      "notes": "",
+      "command": "uv run pytest server/tests/integration/progress/test_analysis_comparison.py -q && npx playwright test tests/e2e/analysis_comparison.spec.js",
+      "commit": "feat(progress): [S14-20] analysis comparison",
+      "status": "todo",
+      "order": 160,
+      "card": "roadmap/tasks/S14-20_analysis_comparison.md",
+      "read": [
+        "docs/ai-coaching.md",
+        "docs/contracts.md",
+        "docs/owner-gates.md"
+      ]
+    },
+    {
+      "id": "S14-21",
+      "stage": "14",
+      "slug": "coaching_adaptation",
+      "title": "Передати рекомендації в чинний планувальник",
+      "goal": "Перевірена пропозиція наступних занять через спільний command layer.",
+      "module": "analysis",
+      "kind": "integration",
+      "owner": "Backend",
+      "complexity": "L",
+      "depends_on": [
+        "S14-19",
+        "S11-05",
+        "S14-06"
+      ],
+      "gates": [],
+      "files": [
+        "server/studio/analysis/adaptation.py",
+        "server/studio/planning/apply.py"
+      ],
+      "inputs": "Recommendations, fresh plan/context revisions, затверджені правила S11.",
+      "outputs": "Перевірена пропозиція наступних занять через спільний command layer.",
+      "test_file": "server/tests/integration/analysis/test_coaching_adaptation.py",
+      "test_cases": [
+        {
+          "name": "future_only_preview",
+          "expected": "Preview з approved recommendations змінює лише майбутнє; не completed/started sessions чи catalog."
+        },
+        {
+          "name": "stale_context",
+          "expected": "Новий факт, coach edit, video/method version чи відкликаний source робить стару пропозицію stale."
+        },
+        {
+          "name": "shared_apply",
+          "expected": "Пропозиція використовує чинні S14-06/S11-05; idempotency/rollback/concurrency перевірені реальною БД, окремий apply не створено."
+        },
+        {
+          "name": "ownership_and_mode",
+          "expected": "Effective entitlement/permission перевірено перед write; Pro/Pro+ лишається за coach, kill switch діє."
+        }
+      ],
+      "api": "Adapter Recommendations -> чинний AdaptationProposal/preview; рішення про autoapply належить S14-08/S14-22.",
+      "db": "Перевикористати proposal/plan revision і command receipts; нова таблиця лише за доведеної потреби.",
+      "notes": "",
+      "command": "uv run pytest server/tests/integration/analysis/test_coaching_adaptation.py -q",
+      "commit": "feat(analysis): [S14-21] coaching adaptation",
+      "status": "todo",
+      "order": 161,
+      "card": "roadmap/tasks/S14-21_coaching_adaptation.md",
+      "read": [
+        "docs/ai-coaching.md",
+        "docs/contracts.md",
+        "docs/owner-gates.md"
+      ]
+    },
+    {
+      "id": "S14-22",
+      "stage": "14",
+      "slug": "coaching_rollout",
+      "title": "Керувати поступовим увімкненням AI",
+      "goal": "Відтворюваний поступовий rollout із безпечним вимкненням.",
+      "module": "analysis",
+      "kind": "integration",
+      "owner": "QA",
+      "complexity": "M",
+      "depends_on": [
+        "S14-07",
+        "S14-21",
+        "S10-14"
+      ],
+      "gates": [],
+      "files": [
+        "server/studio/analysis/rollout.py",
+        "server/studio/settings.py",
+        "docs/verification/ai-rollout.md"
+      ],
+      "inputs": "Evaluation results, adaptation integration, media lifecycle і owner-approved gates.",
+      "outputs": "Відтворюваний поступовий rollout із безпечним вимкненням.",
+      "test_file": "server/tests/integration/analysis/test_coaching_rollout.py",
+      "test_cases": [
+        {
+          "name": "default_off",
+          "expected": "Default off зберігає чинний training path; DB expansion не змушує вмикати AI."
+        },
+        {
+          "name": "mode_boundaries",
+          "expected": "off/shadow/report/proposal/auto мають server policy; shadow/report не застосовують план і не обходять processing/quality gates."
+        },
+        {
+          "name": "fresh_guards",
+          "expected": "Allowlist, budget, gates, capability і permissions перевірено перед кожною дією; kill switch зупиняє нові операції."
+        },
+        {
+          "name": "safe_rollback",
+          "expected": "Вимкнення не стирає history і не дає stale worker опублікувати результат; failed зовнішня перевірка лишається env_blocked."
+        },
+        {
+          "name": "no_sale_claim",
+          "expected": "Report milestone не означає готовність обіцяного Plus або дозвіл продажу; G_COMMERCE/G_PRODUCTION окремі."
+        }
+      ],
+      "api": "Внутрішня server rollout policy, без клієнтського role/tier/mode selector.",
+      "db": "Немає міграції за замовчуванням; використовувати перевірені config/gates.",
+      "notes": "",
+      "command": "uv run pytest server/tests/integration/analysis/test_coaching_rollout.py -q",
+      "commit": "feat(analysis): [S14-22] coaching rollout",
+      "status": "todo",
+      "order": 162,
+      "card": "roadmap/tasks/S14-22_coaching_rollout.md",
+      "read": [
+        "docs/ai-coaching.md",
+        "docs/contracts.md",
+        "docs/owner-gates.md"
       ]
     }
   ]

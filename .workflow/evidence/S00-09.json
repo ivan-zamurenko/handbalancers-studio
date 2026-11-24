@@ -1,0 +1,75 @@
+{
+  "task_id": "S00-09",
+  "date": "2026-11-24",
+  "status": "done",
+  "base_sha": "ad45059",
+  "branch": "task/execution-v4",
+  "scope": "Documentation-only implementation of the approved incremental AI coaching roadmap and beginner learning workflow. Adds 20 future product cards plus this completed documentation card; runtime, dependencies, database, UI and external configuration unchanged.",
+  "scenario": "Keep Studio as one product; program -> exercise example -> one selected set video -> measurements -> grounded explanations -> recommendations -> future adaptation -> comparison. Minimal initial stack; private ownership/provenance/lifecycle; one beginner Python exercise at a time.",
+  "red": [
+    {
+      "command": ".venv/bin/python tools/roadmap.py validate",
+      "result": "Exit 1 after registering the approved tasks but before writing their documents: 167 tasks, missing_document entries for the 21 new cards and required AI/learning documents. No graph errors. Documentation validator RED, not a runtime behavioral test."
+    },
+    {
+      "command": ".venv/bin/python /tmp/verify_studio_ai_roadmap.py",
+      "result": "Review follow-up ancestor checks failed: S14-18 did not depend on the S11-01 planning rules source; S14-19 did not depend on S10-14 media lifecycle. Added both dependencies and reused the existing planning_rule_set source."
+    }
+  ],
+  "green": [
+    {
+      "command": ".venv/bin/python tools/roadmap.py validate",
+      "result": "Exit 0; valid=true, tasks=167, errors=[]."
+    },
+    {
+      "command": ".venv/bin/python -m unittest discover -s tools/tests -p test_roadmap.py -v",
+      "result": "16 tests passed. Existing validator/selector regression suite, no artificial product tests."
+    },
+    {
+      "command": ".venv/bin/python /tmp/verify_studio_ai_roadmap.py",
+      "result": "One-off structural audit passed: all 146 prior task states, completed/skipped definitions and gates preserved; 20 future tasks todo; 21 new JSON/card contracts/cases/commands/owners consistent; eight existing dependency tables consistent; source-of-truth prerequisites present; all new tasks reachable in an in-memory selector simulation; local Markdown links resolve; only docs/roadmap/workflow changed. The audit script is temporary, not a new maintained product/test subsystem."
+    },
+    {
+      "command": "Lesson Python snippets compiled; documented unittest discovery executed in a temporary directory against the provided unfinished stub.",
+      "result": "All six examples are discovered and reject the stub with NotImplementedError as expected. No learner solution or production function created; this is validation of the teaching harness, not completion of L01."
+    },
+    {
+      "command": "git diff --check",
+      "result": "Passed."
+    }
+  ],
+  "preserved": {
+    "existing_task_count": 146,
+    "new_future_task_count": 20,
+    "new_documentation_task_count": 1,
+    "existing_states_unchanged": true,
+    "existing_completed_definitions_unchanged": true,
+    "owner_gates_unchanged": true,
+    "runtime_database_ui_unchanged": true,
+    "existing_todo_dependency_updates": ["S07-04", "S14-04", "S14-05", "S14-06", "S14-07", "S14-08", "S17-02", "S17-03"]
+  },
+  "decisions": [
+    "Continue in the existing project root and task/execution-v4, as explicitly required; no new working project/worktree.",
+    "This checkpoint records the approved plan and learning workflow. Future application capabilities remain todo and are not claimed implemented.",
+    "SQL metadata/text retrieval first; pgvector/embeddings, RTMPose, extra LLM providers, RAG frameworks and external queues deferred until measured need.",
+    "Pure pose/quality/metric DTO tasks have no DDL; report persistence owns typed results and real DB/RLS/rollback/concurrency acceptance cases.",
+    "Future migration numbers in historical cards are nonbinding; allocate actual next Alembic revision at implementation, never overwrite applied migrations.",
+    "One primary owner per new card, one writer plus independent read-only review; user-owned learning code is not overwritten."
+  ],
+  "review": {
+    "agent": "review_ai_roadmap",
+    "result": "No unresolved findings after two missing prerequisite edges were fixed; independently verified graph, 16 tests, preservation and new-card consistency.",
+    "scope": "Uncommitted documentation/task diff; no claims about future runtime behavior or provider quality."
+  },
+  "adjustments": [
+    "An initial inline Python script failed UTF-8 source decoding before any edits. Replaced it with an explicit UTF-8 temporary script executed by project Python 3.13. This setup failure is not RED evidence."
+  ],
+  "unverified": [
+    "S14-00 model/framework install, actual CV/LLM benchmarks, dataset rights, numerical quality thresholds and costs remain future work.",
+    "No application implementation, DB migration, RLS runtime test, browser visual verification, private video processing, hosted service change, live charge or deployment occurred.",
+    "Retention/deletion periods, real processing permissions, provider/budget and production gates remain as previously recorded.",
+    "The learner has not implemented L01."
+  ],
+  "next_step": "S14-00: prepare the allowed evaluation manifest and reproducible checks; record unavailable dataset/budget/methodology as env_blocked without inventing passed evidence. Independent next core work remains S05-05. Learner starts docs/learning/01-duration.md.",
+  "push_status": "pending_at_commit"
+}

@@ -740,6 +740,111 @@
       "status": "done",
       "evidence": ".workflow/evidence/S00-08.json",
       "push_status": "pending_at_commit"
+    },
+    "S00-09": {
+      "status": "done",
+      "evidence": ".workflow/evidence/S00-09.json",
+      "push_status": "pending_at_commit"
+    },
+    "S14-00": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S06-07": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S10-10": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S10-11": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S10-12": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S10-13": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S10-14": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S14-10": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S14-11": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S14-12": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S14-13": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S14-14": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S14-15": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S14-16": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S14-17": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S14-18": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S14-19": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S14-20": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S14-21": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
+    },
+    "S14-22": {
+      "status": "todo",
+      "evidence": null,
+      "push_status": "not_started"
     }
   },
   "gates": {

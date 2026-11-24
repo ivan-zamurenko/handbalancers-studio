@@ -1,13 +1,18 @@
-# Roadmap v4 — 134 небольшие задачи
+# Roadmap v4 — поетапний розвиток Studio
 
-Статус на выдачу: разработка приложения НЕ начата. Это последовательность выполнения, не отчёт о готовности. Примерный размер задачи — одна наблюдаемая ответственность. Если после чтения кода задача явно больше одного обозримого коммита, сначала разделить её на дочерние карточки с теми же acceptance criteria; не расширять продукт и не ослаблять критерии.
+Реєстр містить **167 карток**. Фактичні статуси й evidence — у `.workflow/state.json`; цей індекс не означає готовність функцій.
 
-Сначала запустить `python tools/roadmap.py next`. Это read-only selector, не автозапуск команд из файлов. Внешние gates не мешают доступным независимым задачам. `S15` условный: канал Pro+ ещё не выбран. `S17` — реальные проверки, а не имитация «green».
+Початок: `python tools/roadmap.py next`. Залежності визначають порядок; номер Sxx не є жорсткою чергою. Пріоритет власника 2026-11-24: просте поступове AI-ведення в поточному продукті та навчання Python з основ.
+
+Контракти: [AI-супровід і дані](../docs/ai-coaching.md), [навчання](../docs/learning/README.md), [перше завдання](../docs/learning/01-duration.md), [віхи](MILESTONES.md).
+
+Старі номери майбутніх міграцій у невиконаних картках — історичні орієнтири. Не створювати їх наперед і не перезаписувати застосовані файли: наступну revision визначає інтегратор за фактичним Alembic head.
 
 ## S00 — Основа пустого репозитория
+
 Запускаемый минимальный FastAPI и воспроизводимые инструменты, без продуктовой логики.
 
-| Задача | Что меняется | Тест |
+| Задача | Результат | Перевірка |
 |---|---|---|
 | [S00-01](tasks/S00-01_workspace.md) | Создать изолированный рабочий репозиторий | tooling |
 | [S00-02](tasks/S00-02_toolchain.md) | Зафиксировать воспроизводимый toolchain | tooling |
@@ -16,11 +21,14 @@
 | [S00-05](tasks/S00-05_js_harness.md) | Настроить JS и браузерные проверки | tooling |
 | [S00-06](tasks/S00-06_error_contract.md) | Ввести единый контракт ошибок и correlation ID | contracts |
 | [S00-07](tasks/S00-07_ci_baseline.md) | Проверять каждый небольшой коммит в CI | tooling |
+| [S00-08](tasks/S00-08_agent_integrations.md) | Підключити Superpowers і Firecrawl для цього проєкту | tooling |
+| [S00-09](tasks/S00-09_ai_coaching_roadmap.md) | Закріпити простий AI-roadmap і навчання власника | tooling |
 
 ## S01 — Локальная БД и границы доступа
+
 Изолированный Supabase, Alembic и проверенные права до первых продуктовых записей.
 
-| Задача | Что меняется | Тест |
+| Задача | Результат | Перевірка |
 |---|---|---|
 | [S01-01](tasks/S01-01_local_supabase.md) | Поднять одноразовый стенд Supabase для интеграций | tooling |
 | [S01-02](tasks/S01-02_migration_baseline.md) | Создать схемы и роли минимальной baseline | integration |
@@ -31,9 +39,10 @@
 | [S01-07](tasks/S01-07_migration_ci.md) | Проверить последовательность миграций в CI | tooling |
 
 ## S02 — Общая оболочка интерфейса
+
 C1/A1/C3 foundations, UA/EN, доступные формы и обе темы.
 
-| Задача | Что меняется | Тест |
+| Задача | Результат | Перевірка |
 |---|---|---|
 | [S02-01](tasks/S02-01_design_tokens.md) | Перенести утверждённые токены без demo-логики | js |
 | [S02-02](tasks/S02-02_form_primitives.md) | Создать доступные примитивы формы и диалога | e2e |
@@ -42,9 +51,10 @@ C1/A1/C3 foundations, UA/EN, доступные формы и обе темы.
 | [S02-05](tasks/S02-05_http_client.md) | Создать единый браузерный клиент API | js |
 
 ## S03 — Регистрация и сессии
+
 Email/password через Supabase, подтверждение, вход, refresh, logout и recovery.
 
-| Задача | Что меняется | Тест |
+| Задача | Результат | Перевірка |
 |---|---|---|
 | [S03-01](tasks/S03-01_auth_gateway.md) | Определить Supabase Auth boundary | unit |
 | [S03-02](tasks/S03-02_jwt_validation.md) | Проверять Supabase JWT, а не просто декодировать | security |
@@ -57,23 +67,31 @@ Email/password через Supabase, подтверждение, вход, refres
 | [S03-09](tasks/S03-09_csrf_rate_limits.md) | Защитить изменяющие запросы и формы входа | security |
 | [S03-10](tasks/S03-10_registration_ui.md) | Собрать формы регистрации, кода и входа | e2e |
 | [S03-11](tasks/S03-11_auth_local_e2e.md) | Проверить полный путь на настоящем local Supabase | integration |
+| [S03-10a](tasks/S03-10a_login_preview.md) | Форма входу для локального перегляду | e2e |
+| [S03-10b](tasks/S03-10b_login_layout.md) | Вирівняти допоміжні дії форми входу | e2e |
+| [S03-10c](tasks/S03-10c_password_eye.md) | Анімоване око в полі пароля | e2e |
 
-## S04 — Google, Apple и профиль владельца
+## S04 — Google і профіль власника (Apple виключено)
+
 OAuth через Supabase, связность identities и безопасная выдача роли coach.
 
-| Задача | Что меняется | Тест |
+| Задача | Результат | Перевірка |
 |---|---|---|
 | [S04-01](tasks/S04-01_oauth_attempt.md) | Подготовить Google OAuth через Supabase PKCE | security |
 | [S04-02](tasks/S04-02_oauth_callback.md) | Обменять OAuth code и восстановить пользовательский путь | contracts |
-| [S04-03](tasks/S04-03_apple_adapter.md) | Добавить Apple без предположения о полном имени | contracts |
+| [S04-03](tasks/S04-03_apple_adapter.md) | Добавить Apple без предположения о полном имени (skipped: Apple видалено) | contracts |
 | [S04-04](tasks/S04-04_identity_linking.md) | Проверить linking и конфликты identities | security |
 | [S04-05](tasks/S04-05_coach_bootstrap.md) | Выдать владельцу coach вне публичной регистрации | security |
 | [S04-06](tasks/S04-06_profile_preferences.md) | Сохранить профиль и выбор темы на сервере | contracts |
+| [S04-01a](tasks/S04-01a_oauth_runtime.md) | Серверний OAuth PKCE для Google та Apple | integration |
+| [S04-03a](tasks/S04-03a_oauth_ui.md) | Кнопки Google/Apple і стани OAuth | e2e |
+| [S04-02a](tasks/S04-02a_oauth_profile_data.md) | Автоматичний імпорт даних OAuth профілю | integration |
 
 ## S05 — Онбординг и права тарифов
+
 Правильный публичный путь и серверная модель доступа без настоящих списаний.
 
-| Задача | Что меняется | Тест |
+| Задача | Результат | Перевірка |
 |---|---|---|
 | [S05-01](tasks/S05-01_onboarding_model.md) | Сохранить анкету без медицинского scoring | integration |
 | [S05-02](tasks/S05-02_guest_onboarding.md) | Перенести гостевую анкету через вход | e2e |
@@ -82,23 +100,28 @@ OAuth через Supabase, связность identities и безопасная
 | [S05-05](tasks/S05-05_server_guards.md) | Применить единые auth/role/paid guards | security |
 | [S05-06](tasks/S05-06_coach_access.md) | Ограничить тренерский доступ к клиенту | integration |
 | [S05-07](tasks/S05-07_command_receipts.md) | Ввести идемпотентные команды для продуктовых эффектов | integration |
+| [S05-03a](tasks/S05-03a_public_preview.md) | Запустити незалежний публічний лендінг для перегляду | e2e |
+| [S05-03b](tasks/S05-03b_landing_refinement.md) | Уточнити схему поступу та іконки спорядження | e2e |
 
 ## S06 — Упражнения
+
 Создание, публикация и неизменяемые ревизии с тренерским интерфейсом.
 
-| Задача | Что меняется | Тест |
+| Задача | Результат | Перевірка |
 |---|---|---|
 | [S06-01](tasks/S06-01_exercise_drafts.md) | Создать упражнение и переводы как черновик | integration |
 | [S06-02](tasks/S06-02_measurement_types.md) | Зафиксировать типы фактического результата | unit |
 | [S06-03](tasks/S06-03_exercise_publish.md) | Публиковать неизменяемую ревизию упражнения | integration |
 | [S06-04](tasks/S06-04_exercise_browse.md) | Дать поиск и просмотр доступного каталога | contracts |
 | [S06-05](tasks/S06-05_exercise_editor_ui.md) | Собрать тренерский редактор упражнения | e2e |
+| [S06-07](tasks/S06-07_exercise_demonstration.md) | Прив’язати приклад виконання до версії вправи | integration |
 | [S06-06](tasks/S06-06_planning_metadata.md) | Описать нагрузку без выдуманных нормативов | unit |
 
 ## S07 — Программы
+
 Общий конструктор coach/member, дерево программы и публикация.
 
-| Задача | Что меняется | Тест |
+| Задача | Результат | Перевірка |
 |---|---|---|
 | [S07-01](tasks/S07-01_program_identity.md) | Создать private/catalog программу и первый draft | integration |
 | [S07-02](tasks/S07-02_workout_structure.md) | Добавить и упорядочить занятия внутри draft | integration |
@@ -111,9 +134,10 @@ OAuth через Supabase, связность identities и безопасная
 | [S07-09](tasks/S07-09_builder_ui.md) | Собрать общий конструктор для клиента и тренера | e2e |
 
 ## S08 — Основная программа и единый календарь
+
 Один личный план, основное назначение и реальные занятия.
 
-| Задача | Что меняется | Тест |
+| Задача | Результат | Перевірка |
 |---|---|---|
 | [S08-01](tasks/S08-01_single_plan.md) | Создать один текущий личный план | integration |
 | [S08-02](tasks/S08-02_primary_assignment.md) | Назначить одну основную published программу | integration |
@@ -123,9 +147,10 @@ OAuth через Supabase, связность identities и безопасная
 | [S08-06](tasks/S08-06_client_today.md) | Собрать C1 по реальным данным | e2e |
 
 ## S09 — Фактическая тренировка
+
 C3, подходы, паузы, сохранение, завершение и история.
 
-| Задача | Что меняется | Тест |
+| Задача | Результат | Перевірка |
 |---|---|---|
 | [S09-01](tasks/S09-01_session_start.md) | Начать занятие один раз и сделать snapshot | integration |
 | [S09-02](tasks/S09-02_record_sets.md) | Сохранить факт подхода с optimistic concurrency | integration |
@@ -139,9 +164,10 @@ C3, подходы, паузы, сохранение, завершение и и
 | [S09-10](tasks/S09-10_training_roundtrip.md) | Пройти первый тренировочный вертикальный срез | e2e |
 
 ## S10 — Видео и проверка тренера
+
 Версии evidence, A1, черновик и публикация feedback.
 
-| Задача | Что меняется | Тест |
+| Задача | Результат | Перевірка |
 |---|---|---|
 | [S10-01](tasks/S10-01_media_links.md) | Распознать видеоссылки без скачивания | unit |
 | [S10-02](tasks/S10-02_media_versions.md) | Хранить один текущий ролик с историей замен | integration |
@@ -152,11 +178,17 @@ C3, подходы, паузы, сохранение, завершение и и
 | [S10-07](tasks/S10-07_late_evidence.md) | Пометить проверку при позднем видео | integration |
 | [S10-08](tasks/S10-08_coach_a1.md) | Собрать A1: клиент, факты, проверка | e2e |
 | [S10-09](tasks/S10-09_member_feedback.md) | Показать проверку и фактический отчёт клиенту | e2e |
+| [S10-10](tasks/S10-10_private_upload_intent.md) | Видати обмежений дозвіл приватного завантаження | integration |
+| [S10-11](tasks/S10-11_upload_finalize.md) | Перевірити файл і надійно завершити upload | integration |
+| [S10-12](tasks/S10-12_capture_set_binding.md) | Зв’язати відеоверсію з обраним підходом | integration |
+| [S10-13](tasks/S10-13_exercise_video_upload_ui.md) | Додати відео одного підходу в C3 | e2e |
+| [S10-14](tasks/S10-14_media_lifecycle.md) | Видаляти приватне медіа та його похідні | integration |
 
 ## S11 — Планировщик и самостоятельный выбор
+
 Правила, preview/apply, Essential и разрешения Pro/Pro+.
 
-| Задача | Что меняется | Тест |
+| Задача | Результат | Перевірка |
 |---|---|---|
 | [S11-01](tasks/S11-01_rules_versioning.md) | Создать версии правил владельца | integration |
 | [S11-02](tasks/S11-02_compatibility_engine.md) | Проверить совместимость единого плана | unit |
@@ -172,9 +204,10 @@ C3, подходы, паузы, сохранение, завершение и и
 | [S11-12](tasks/S11-12_planner_properties.md) | Проверить конкуренцию и инварианты планировщика | integration |
 
 ## S12 — Тестовая программа и оценка
+
 Методика владельца и оценка через тот же тренировочный движок.
 
-| Задача | Что меняется | Тест |
+| Задача | Результат | Перевірка |
 |---|---|---|
 | [S12-01](tasks/S12-01_assessment_protocol.md) | Создать версионируемую методику тестовой программы | integration |
 | [S12-02](tasks/S12-02_assessment_assignment.md) | Назначить тест в тот же личный план | integration |
@@ -183,9 +216,10 @@ C3, подходы, паузы, сохранение, завершение и и
 | [S12-05](tasks/S12-05_assessment_ui.md) | Собрать тестовую программу и переоценку в обоих кабинетах | e2e |
 
 ## S13 — Stripe и жизненный цикл доступа
+
 Настоящий test-mode Checkout, события, trial, portal и смена тарифа.
 
-| Задача | Что меняется | Тест |
+| Задача | Результат | Перевірка |
 |---|---|---|
 | [S13-01](tasks/S13-01_stripe_gateway.md) | Создать Stripe boundary с серверным каталогом цен | unit |
 | [S13-02](tasks/S13-02_checkout_attempts.md) | Создать долговечную попытку Checkout | integration |
@@ -195,13 +229,18 @@ C3, подходы, паузы, сохранение, завершение и и
 | [S13-06](tasks/S13-06_billing_portal.md) | Дать управление оплатой через Stripe Portal | contracts |
 | [S13-07](tasks/S13-07_tier_transitions.md) | Согласовать смену тарифа с управлением планом | integration |
 | [S13-08](tasks/S13-08_billing_ui_flow.md) | Связать public путь, Checkout ожидание и кабинет | e2e |
+| [S13-08a](tasks/S13-08a_prevent_duplicate_subscription.md) | Блокувати дубль підписки при запізнілому webhook | integration |
+| [S13-09a](tasks/S13-09a_stripe_endive_card_filter.md) | Stripe Endive card-only Checkout | integration |
+| [S13-10](tasks/S13-10_payment_history.md) | Окрема незмінна історія платежів і повернень | integration |
 | [S13-09](tasks/S13-09_billing_testmode.md) | Проверить реальную test-mode интеграцию отдельно от mocks | gate |
 
 ## S14 — Контролируемая AI-подсистема
-Долговечные задания, evidence, проверяемые предложения; автоматика выключена до допуска.
 
-| Задача | Что меняется | Тест |
+Поступове AI-ведення: приватне відео вправи, явні метрики, затверджені знання, звіт і захищена адаптація. Default off.
+
+| Задача | Результат | Перевірка |
 |---|---|---|
+| [S14-00](tasks/S14-00_handstand_feasibility.md) | Перевірити мінімальний CV/AI стек на дозволених прикладах | tooling |
 | [S14-01](tasks/S14-01_processing_permissions.md) | Разделить разрешения персонализации и обучения модели | integration |
 | [S14-02](tasks/S14-02_media_access_boundary.md) | Описать доступ к evidence без выбора провайдера за владельца | unit |
 | [S14-03](tasks/S14-03_analysis_jobs.md) | Создать долговечные analysis jobs в БД | integration |
@@ -211,20 +250,35 @@ C3, подходы, паузы, сохранение, завершение и и
 | [S14-07](tasks/S14-07_ai_evaluation.md) | Создать процедуру проверки качества и shadow mode | tooling |
 | [S14-08](tasks/S14-08_guarded_auto_apply.md) | Применить допустимую Plus адаптацию через общий command layer | integration |
 | [S14-09](tasks/S14-09_analysis_status_ui.md) | Показать честный статус анализа и объяснение адаптации | e2e |
+| [S14-10](tasks/S14-10_handstand_method.md) | Описати версійну методику стійки збоку | integration |
+| [S14-11](tasks/S14-11_pose_contract.md) | Визначити змінний pose adapter | unit |
+| [S14-12](tasks/S14-12_pose_adapter.md) | Підключити перший перевірений pose adapter | integration |
+| [S14-13](tasks/S14-13_pose_quality.md) | Відхиляти непридатний запис і недостатні орієнтири | unit |
+| [S14-14](tasks/S14-14_biomechanics_metrics.md) | Обчислювати явні метрики біомеханіки | unit |
+| [S14-15](tasks/S14-15_approved_knowledge.md) | Опублікувати вузьку базу перевірених знань | integration |
+| [S14-16](tasks/S14-16_knowledge_retrieval.md) | Вибирати затверджені знання простим SQL-пошуком | integration |
+| [S14-17](tasks/S14-17_grounded_explanations.md) | Пояснювати факти й відокремлювати гіпотези | integration |
+| [S14-18](tasks/S14-18_catalog_recommendations.md) | Добирати рекомендації лише з каталогу | integration |
+| [S14-19](tasks/S14-19_analysis_report.md) | Показати версійний звіт і скелет у Studio | e2e |
+| [S14-20](tasks/S14-20_analysis_comparison.md) | Порівнювати лише сумісні аналізи | integration |
+| [S14-21](tasks/S14-21_coaching_adaptation.md) | Передати рекомендації в чинний планувальник | integration |
+| [S14-22](tasks/S14-22_coaching_rollout.md) | Керувати поступовим увімкненням AI | integration |
 
 ## S15 — Опциональный Pro+
+
 Реализация согласованного канала общения и учёта двух звонков; не выбирать сервис молча.
 
-| Задача | Что меняется | Тест |
+| Задача | Результат | Перевірка |
 |---|---|---|
 | [S15-01](tasks/S15-01_proplus_service_contract.md) | Зафиксировать реальный канал Pro+ до разработки интеграции | gate |
 | [S15-02](tasks/S15-02_call_allowance.md) | Учесть две 30-минутные сессии в периоде Pro+ | integration |
 | [S15-03](tasks/S15-03_chat_delivery.md) | Реализовать выбранный канал и управление услугой | integration |
 
 ## S16 — Укрепление и эксплуатация
+
 Приватность, доступность, наблюдаемость, контейнеры и восстановление.
 
-| Задача | Что меняется | Тест |
+| Задача | Результат | Перевірка |
 |---|---|---|
 | [S16-01](tasks/S16-01_accessibility_i18n.md) | Проверить доступность и UA/EN на основных путях | e2e |
 | [S16-02](tasks/S16-02_security_regressions.md) | Проверить сквозные security границы | security |
@@ -236,11 +290,12 @@ C3, подходы, паузы, сохранение, завершение и и
 | [S16-08](tasks/S16-08_release_matrix.md) | Собрать матрицу фактической готовности возможностей | tooling |
 
 ## S17 — Проверки внешних сервисов и выпуск
+
 Отдельные допуски по SMTP, OAuth, видео, AI и продаваемым тарифам.
 
-| Задача | Что меняется | Тест |
+| Задача | Результат | Перевірка |
 |---|---|---|
-| [S17-01](tasks/S17-01_smtp_oauth_live.md) | Проверить внешний email и Google/Apple на staging | gate |
+| [S17-01](tasks/S17-01_smtp_oauth_live.md) | Проверить внешний email и Google на staging | gate |
 | [S17-02](tasks/S17-02_video_access_live.md) | Проверить выбранный путь частного видео | gate |
 | [S17-03](tasks/S17-03_ai_release_evaluation.md) | Проверить реальный AI и разрешить ограниченный rollout | gate |
 | [S17-04](tasks/S17-04_commerce_ready.md) | Проверить готовность реальной коммерции | gate |

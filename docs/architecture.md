@@ -47,3 +47,18 @@ Actor context вычислен из проверенной сессии и curre
 Clock и ID generation inject для детерминированных тестов. Private response no-store. Retry ограничен с backoff/jitter по внешнему провайдеру; бизнес-ошибка не ретраится. Job errors и request ID доступны оператору без приватных payloads. Append-only audit хранит redacted changes, а не копию секретов.
 
 Увеличение нагрузки сначала измеряется (S16), затем pool/index/query/worker capacity; микросервисы/Redis не добавляются заранее.
+
+## Погоджене розширення AI — 2026-11-24 (ще не реалізовано)
+
+Контракт і джерела: [ai-coaching.md](ai-coaching.md). Поточна web-архітектура
+зберігається; окремий worker-процес того самого застосунку виконує media/pose
+обробку. MediaAccessAdapter відповідає за дозволений доступ до файлу,
+PoseAdapter — за координати, pure biomechanics — за метрики, knowledge —
+за published sources, analysis — за перевірені пояснення/recommendations.
+Planning залишається єдиним власником program changes.
+
+Приватні великі video/pose artifacts у Storage, owner/typed results/version
+manifest у PostgreSQL. SQL retrieval спочатку без vectors. LLM не має
+SQL-доступу чи raw video; private user context і спільні знання відокремлені.
+Початкові readiness вимкнені, rollout поетапний. Нові API/таблиці в цьому
+документі — майбутні, а не твердження про наявність функції.
